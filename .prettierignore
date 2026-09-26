@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+.expo
+.turbo
+ios
+android
+pnpm-lock.yaml
+supabase/.temp
+supabase/.branches
+data-pipeline/.cache
+data-pipeline/.venv
+playwright-report
+test-results
+*.sql
+supabase/functions

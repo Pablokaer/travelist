@@ -1,0 +1,128 @@
+# Launch cities for Wayfarer.
+#
+# Adding a city is a config-only change: add an entry here, then run
+#   python -m wayfarer_pipeline ingest --city <slug>
+#
+# Field reference
+#   slug            url-safe id, unique, used by the CLI (--city <slug>)
+#   name.en/pt      display names (Wikidata labels)
+#   country_code    ISO-3166-1 alpha-2
+#   wikidata_id     city item on Wikidata
+#   osm_relation_id OSM administrative boundary relation (null if not usable)
+#   center          [lat, lon] (Wikidata P625)
+#   bbox            [south, west, north, east] used for ingestion queries (Nominatim)
+#   is_active       inactive cities are ingested but hidden from the map
+#
+# Sources: Wikidata SPARQL + Nominatim, retrieved 2026-09-26. See docs/DATA_SOURCES.md.
+
+version: 1
+
+cities:
+  - slug: london
+    name: { en: London, pt: Londres }
+    country_code: GB
+    wikidata_id: Q84
+    osm_relation_id: 175342 # Greater London
+    center: [51.507222, -0.1275]
+    bbox: [51.2867601, -0.5103751, 51.6918741, 0.3340155]
+    is_active: true
+
+  - slug: paris
+    name: { en: Paris, pt: Paris }
+    country_code: FR
+    wikidata_id: Q90
+    osm_relation_id: 7444
+    center: [48.856667, 2.352222]
+    bbox: [48.8155755, 2.224122, 48.902156, 2.4697602]
+    is_active: true
+
+  - slug: istanbul
+    name: { en: Istanbul, pt: Istambul }
+    country_code: TR
+    wikidata_id: Q406
+    # The province-level boundary covers large rural areas; use the centre-based bbox instead.
+    osm_relation_id: null
+    center: [41.01, 28.960278]
+    bbox: [40.846381, 28.8158715, 41.166381, 29.1358715]
+    is_active: true
+
+  - slug: rome
+    name: { en: Rome, pt: Roma }
+    country_code: IT
+    wikidata_id: Q220
+    osm_relation_id: 41485
+    center: [41.893056, 12.482778]
+    bbox: [41.6556417, 12.2344416, 42.1410285, 12.8557603]
+    is_active: true
+
+  - slug: prague
+    name: { en: Prague, pt: Praga }
+    country_code: CZ
+    wikidata_id: Q1085
+    osm_relation_id: 435514
+    center: [50.0875, 14.421389]
+    bbox: [49.9419006, 14.2244355, 50.1774302, 14.7067867]
+    is_active: true
+
+  - slug: amsterdam
+    name: { en: Amsterdam, pt: Amesterdão }
+    country_code: NL
+    wikidata_id: Q727
+    osm_relation_id: 271110
+    center: [52.366667, 4.883333]
+    bbox: [52.2781742, 4.7287776, 52.4310638, 5.0791622]
+    is_active: true
+
+  - slug: barcelona
+    name: { en: Barcelona, pt: Barcelona }
+    country_code: ES
+    wikidata_id: Q1492
+    osm_relation_id: 347950
+    center: [41.3825, 2.176944]
+    bbox: [41.3170354, 2.0524977, 41.4679135, 2.2283555]
+    is_active: true
+
+  - slug: milan
+    name: { en: Milan, pt: Milão }
+    country_code: IT
+    wikidata_id: Q490
+    osm_relation_id: 44915
+    center: [45.466944, 9.19]
+    bbox: [45.3867381, 9.0408867, 45.5358482, 9.2781103]
+    is_active: true
+
+  - slug: vienna
+    name: { en: Vienna, pt: Viena }
+    country_code: AT
+    wikidata_id: Q1741
+    osm_relation_id: 109166
+    center: [48.208333, 16.3725]
+    bbox: [48.1179069, 16.181831, 48.3226679, 16.5775132]
+    is_active: true
+
+  - slug: madrid
+    name: { en: Madrid, pt: Madrid }
+    country_code: ES
+    wikidata_id: Q2807
+    osm_relation_id: 5326784
+    center: [40.416944, -3.703333]
+    bbox: [40.3119774, -3.8889539, 40.6437293, -3.5183264]
+    is_active: true
+
+  - slug: lisbon
+    name: { en: Lisbon, pt: Lisboa }
+    country_code: PT
+    wikidata_id: Q597
+    osm_relation_id: 5400890
+    center: [38.708042, -9.139016]
+    bbox: [38.6913994, -9.2298356, 38.7967584, -9.0863328]
+    is_active: true
+
+  - slug: porto
+    name: { en: Porto, pt: Porto }
+    country_code: PT
+    wikidata_id: Q36433
+    osm_relation_id: 3372453
+    center: [41.15, -8.610833]
+    bbox: [41.1383507, -8.691289, 41.1859353, -8.5520792]
+    is_active: true

@@ -1,0 +1,15 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# React Native libraries (MapLibre, Reanimated, etc.) are most reliable with a flat
+# node_modules layout. See docs/DECISIONS.md (D-003).
+nodeLinker: hoisted
+
+onlyBuiltDependencies:
+  - esbuild
+  - supabase
+  - unrs-resolver
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'

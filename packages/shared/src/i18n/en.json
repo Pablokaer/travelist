@@ -1,0 +1,52 @@
+{
+  "common": {
+    "appName": "Wayfarer",
+    "loading": "Loading…",
+    "retry": "Try again",
+    "comingSoon": "Coming soon"
+  },
+  "tabs": {
+    "explore": "Explore",
+    "trips": "My Trips",
+    "profile": "Profile"
+  },
+  "explore": {
+    "title": "Where to next?",
+    "subtitle": "Pick a destination to see what to know before you go, explore attractions and plan a walking route.",
+    "mapPlaceholder": "The attractions map arrives in milestone M2."
+  },
+  "trips": {
+    "title": "My Trips",
+    "empty": "You haven't saved any trips yet. Build a walking route from the map and save it here."
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "languageName": {
+      "en": "English",
+      "pt": "Português"
+    },
+    "about": "About and data sources"
+  },
+  "about": {
+    "title": "About",
+    "body": "Wayfarer helps you prepare for a trip and explore a city on foot.",
+    "dataSources": "Data sources",
+    "sources": {
+      "osm": "Map data © OpenStreetMap contributors (ODbL)",
+      "wikidata": "Attraction data from Wikidata (CC0)",
+      "commons": "Images from Wikimedia Commons (licence shown per image)"
+    },
+    "version": "Version {{version}}"
+  },
+  "validation": {
+    "required": "This field is required",
+    "countryCode": "Choose a valid country",
+    "date": "Enter a valid date"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "This screen doesn't exist.",
+    "goHome": "Go to the home screen"
+  }
+}
