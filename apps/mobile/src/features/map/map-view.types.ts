@@ -1,0 +1,86 @@
+import type { LineString } from '@wayfarer/shared';
+import type { StyleProp, ViewStyle } from 'react-native';
+
+export type MapPoint = {
+  id: string;
+  lat: number;
+  lng: number;
+  color: string;
+  /** Selected points are drawn larger with a ring. */
+  selected?: boolean;
+  /** 1-based position when the point is a route stop. */
+  order?: number;
+};
+
+export type MapViewProps = {
+  styleUrl: string;
+  /** Initial / target viewport: [west, south, east, north]. */
+  bounds: [number, number, number, number];
+  points: MapPoint[];
+  route?: LineString | null;
+  onPointPress?: (id: string) => void;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+  accessibilityLabel?: string;
+};
+
+export function toFeatureCollection(points: MapPoint[]): GeoJSON.FeatureCollection<GeoJSON.Point> {
+  return {
+    type: 'FeatureCollection',
+    features: points.map((p) => ({
+      type: 'Feature',
+      id: p.id,
+      geometry: { type: 'Point', coordinates: [p.lng, p.lat] },
+      properties: {
+        id: p.id,
+        color: p.color,
+        selected: p.selected ? 1 : 0,
+        label: p.order ? String(p.order) : '',
+      },
+    })),
+  };
+}
+
+export function toRouteFeature(route: LineString | null | undefined): GeoJSON.FeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: route ? [{ type: 'Feature', geometry: route, properties: {} }] : [],
+  };
+}
+
+/** Bounds that contain every point, padded; falls back to the given bounds. */
+export function boundsOf(
+  points: { lat: number; lng: number }[],
+  fallback: [number, number, number, number],
+): [number, number, number, number] {
+  if (points.length === 0) return fallback;
+  const lngs = points.map((p) => p.lng);
+  const lats = points.map((p) => p.lat);
+  const pad = 0.004;
+  return [
+    Math.min(...lngs) - pad,
+    Math.min(...lats) - pad,
+    Math.max(...lngs) + pad,
+    Math.max(...lats) + pad,
+  ];
+}
+
+export const circlePaint = {
+  'circle-color': ['get', 'color'],
+  'circle-radius': ['case', ['==', ['get', 'selected'], 1], 11, 7],
+  'circle-stroke-color': '#FFFFFF',
+  'circle-stroke-width': ['case', ['==', ['get', 'selected'], 1], 3, 1.5],
+} as const;
+
+export const labelLayout = {
+  'text-field': ['get', 'label'],
+  'text-size': 12,
+  'text-font': ['Noto Sans Bold'],
+  'text-allow-overlap': true,
+} as const;
+
+export const routePaint = {
+  'line-color': '#0B6E99',
+  'line-width': 4,
+  'line-opacity': 0.85,
+} as const;

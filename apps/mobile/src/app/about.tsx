@@ -6,7 +6,18 @@ import { Screen } from '@/components/screen';
 import { Text } from '@/components/text';
 import { spacing } from '@/theme/colors';
 
-const SOURCES = ['osm', 'wikidata', 'commons'] as const;
+const SOURCES = [
+  'osm',
+  'wikidata',
+  'commons',
+  'pageviews',
+  'openfreemap',
+  'ors',
+  'openMeteo',
+  'passportIndex',
+  'canada',
+  'fx',
+] as const;
 
 export default function AboutScreen() {
   const { t } = useTranslation();

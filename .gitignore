@@ -44,3 +44,4 @@ blob-report/
 .idea/
 *.log
 *.egg-info/
+apps/mobile/public/maplibre/

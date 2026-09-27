@@ -28,3 +28,16 @@ export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;
 export const radius = { sm: 8, md: 12, lg: 20 } as const;
 /** Minimum touch target (iOS HIG 44pt / Material 48dp). */
 export const MIN_TOUCH = 44;
+
+/** Marker colours per attraction category (readable on light and dark map styles). */
+export const categoryColors: Record<string, string> = {
+  museum: '#7C3AED',
+  monument: '#B45309',
+  church: '#0E7490',
+  castle: '#9F1239',
+  viewpoint: '#15803D',
+  landmark: '#1D4ED8',
+  park: '#4D7C0F',
+  palace: '#C2410C',
+  other: '#475569',
+};
