@@ -246,6 +246,15 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Bilingual (EN/PT) templates that include both the link and the 6-digit code.
+[auth.email.template.magic_link]
+subject = "Your Wayfarer sign-in link · O seu link de acesso ao Wayfarer"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.confirmation]
+subject = "Confirm your Wayfarer account · Confirme a sua conta Wayfarer"
+content_path = "./supabase/templates/confirmation.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
@@ -322,9 +331,11 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
+# Sign in with Apple: set enabled = true and provide the Services ID (web/Android) and bundle id
+# (native iOS) as a comma-separated client_id, plus the generated client secret (JWT) in .env.
 [auth.external.apple]
 enabled = false
-client_id = ""
+client_id = "env(SUPABASE_AUTH_EXTERNAL_APPLE_CLIENT_ID)"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
 secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
 # Overrides the default auth callback URL derived from auth.external_url.
@@ -336,6 +347,13 @@ url = ""
 skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
+
+# Google: set enabled = true and put the Web OAuth client id/secret in .env.
+[auth.external.google]
+enabled = false
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+skip_nonce_check = false
 
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
 # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
@@ -421,3 +439,11 @@ enabled = true
 
 [functions.health]
 verify_jwt = false
+
+# User-only functions. The gateway checks the JWT signature; the functions additionally
+# resolve the user with auth.getUser() so the public anon key alone is rejected.
+[functions.checklist]
+verify_jwt = true
+
+[functions.route-optimize]
+verify_jwt = true
