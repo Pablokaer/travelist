@@ -1,0 +1,356 @@
+{
+  "common": {
+    "appName": "Wayfarer",
+    "locale": "pt-PT",
+    "loading": "A carregar…",
+    "retry": "Tentar novamente",
+    "comingSoon": "Em breve",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "done": "Concluído",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "save": "Guardar"
+  },
+  "tabs": {
+    "explore": "Explorar",
+    "trips": "As minhas viagens",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "signInTitle": "Bem-vindo de volta",
+    "signInSubtitle": "Inicie sessão para planear o seu próximo passeio.",
+    "signUpTitle": "Criar conta",
+    "email": "Email",
+    "password": "Palavra-passe",
+    "passwordHint": "Pelo menos 8 caracteres.",
+    "signIn": "Iniciar sessão",
+    "signOut": "Terminar sessão",
+    "createAccount": "Criar conta",
+    "noAccount": "É novo por aqui? Crie uma conta",
+    "haveAccount": "Já tem conta? Inicie sessão",
+    "useMagicLink": "Enviar-me antes um link de acesso por email",
+    "magicLinkTitle": "Entrar com email",
+    "magicLinkSubtitle": "Enviamos-lhe um link e um código de 6 dígitos. Não precisa de palavra-passe.",
+    "magicLinkSent": "Enviámos um link e um código para {{email}}. Abra o link neste dispositivo ou introduza o código abaixo.",
+    "sendLink": "Enviar link",
+    "code": "Código de 6 dígitos",
+    "verifyCode": "Verificar código",
+    "useAnotherEmail": "Usar outro email",
+    "backToSignIn": "Voltar ao início de sessão",
+    "checkInboxTitle": "Verifique o seu email",
+    "confirmEmailBody": "Enviámos um link de confirmação para {{email}}. Abra-o para concluir a criação da conta.",
+    "orContinueWith": "ou continue com",
+    "signingIn": "A iniciar sessão…",
+    "provider": {
+      "google": "Continuar com Google",
+      "apple": "Continuar com Apple"
+    }
+  },
+  "onboarding": {
+    "title": "Bem-vindo",
+    "progress": "Passo {{step}} de {{total}}",
+    "step1Title": "Sobre si",
+    "step2Title": "Os seus passaportes",
+    "step3Title": "Validade do passaporte",
+    "finish": "Começar a explorar"
+  },
+  "countryPicker": {
+    "choose": "Escolher um país",
+    "addAnother": "Adicionar outro",
+    "search": "Pesquisar países",
+    "noResults": "Nenhum país corresponde à pesquisa."
+  },
+  "explore": {
+    "title": "Para onde vamos?",
+    "subtitle": "Escolha um destino para saber o que precisa antes de partir, explorar atrações e planear um percurso a pé.",
+    "chooseCity": "Escolher uma cidade",
+    "changeCity": "Cidade atual {{city}}. Mudar de cidade",
+    "placesCount_one": "{{count}} local",
+    "placesCount_other": "{{count}} locais",
+    "filters": "Filtrar por categoria",
+    "allCategories": "Todas",
+    "viewMode": "Ver como",
+    "mapView": "Mapa",
+    "listView": "Lista",
+    "mapLabel": "Mapa de atrações. Use a vista de lista para uma lista acessível.",
+    "noResults": "Nenhum local corresponde a estes filtros.",
+    "noCities": "Ainda sem destinos",
+    "noCitiesBody": "Os dados de referência não foram carregados. Execute os seeds do pipeline de dados e tente novamente."
+  },
+  "category": {
+    "museum": "Museus",
+    "monument": "Monumentos",
+    "church": "Igrejas",
+    "castle": "Castelos",
+    "viewpoint": "Miradouros",
+    "landmark": "Pontos de interesse",
+    "park": "Parques",
+    "palace": "Palácios",
+    "other": "Outros"
+  },
+  "attraction": {
+    "visitMinutes": "~{{minutes}} min",
+    "visitTime": "Visita típica",
+    "openingHours": "Horário",
+    "notAvailable": "Não disponível",
+    "fee": "Entrada",
+    "feeYes": "Paga",
+    "feeNo": "Gratuita",
+    "website": "Site oficial",
+    "wikipedia": "Ler na Wikipédia",
+    "imageSource": "Origem e licença da imagem",
+    "photoOf": "Fotografia de {{name}}",
+    "photoCredit": "Foto: {{author}} · {{license}} · Wikimedia Commons",
+    "unknownAuthor": "Autor desconhecido",
+    "unesco": "Património Mundial da UNESCO",
+    "dataCredit": "Dados do Wikidata (CC0) e © colaboradores do OpenStreetMap (ODbL). Os horários podem estar desatualizados."
+  },
+  "checklist": {
+    "title": "Antes de partir",
+    "titleFor": "Antes de partir: {{city}}",
+    "open": "Antes de partir",
+    "intro": "Personalizado para os seus passaportes e datas de viagem.",
+    "arrival": "Chegada",
+    "departure": "Partida",
+    "optional": "opcional",
+    "datesHint": "Use AAAA-MM-DD; a partida tem de ser depois da chegada.",
+    "update": "Atualizar lista",
+    "loading": "A preparar a sua lista…",
+    "error": "Não foi possível carregar a lista. Verifique a ligação e tente novamente.",
+    "unavailable": "Esta informação está temporariamente indisponível.",
+    "needNationality": "Adicione a sua nacionalidade para ver uma lista personalizada.",
+    "source": "Fonte",
+    "disclaimer": "As regras de entrada mudam. Confirme sempre no site oficial da embaixada ou do governo antes de viajar.",
+    "tone": {
+      "ok": "Tudo em ordem",
+      "warning": "Requer atenção",
+      "problem": "Ação necessária",
+      "info": "Informação"
+    },
+    "visa": {
+      "title": "Visto",
+      "citizen": "É cidadão: não precisa de visto",
+      "withPassport": "Melhor opção com o seu passaporte de {{country}}",
+      "maxStay": "até {{days}} dias",
+      "disclaimer": "Com base no conjunto de dados aberto passport-index.",
+      "advice": {
+        "citizen": "Entre com o seu passaporte ou cartão de cidadão.",
+        "freedom_of_movement": "Aplica-se a livre circulação: leve um passaporte ou cartão de cidadão válido.",
+        "visa_free": "Não precisa de visto para estadias turísticas curtas.",
+        "visa_on_arrival": "Pode obter o visto à chegada. Leve dinheiro e confirme as taxas com antecedência.",
+        "eta": "Precisa de uma autorização eletrónica de viagem antes de partir.",
+        "e_visa": "Peça um visto eletrónico online antes de partir.",
+        "visa_required": "Precisa de um visto da embaixada ou consulado antes de partir.",
+        "no_admission": "A entrada não é permitida atualmente com este passaporte."
+      }
+    },
+    "passport": {
+      "title": "Passaporte",
+      "validUntil": "Tem de ser válido até",
+      "yourExpiry": "O seu passaporte expira",
+      "rule": {
+        "free_movement": "O seu passaporte ou cartão de cidadão tem de ser válido durante toda a estadia.",
+        "schengen_3m_after_departure": "Regra Schengen: válido pelo menos 3 meses após a saída e emitido nos últimos 10 anos.",
+        "whole_stay": "Tem de ser válido durante toda a estadia.",
+        "tr_150d_after_arrival": "Tem de ser válido pelo menos 150 dias a partir do dia de chegada.",
+        "generic_6m_after_arrival": "Muitos países e companhias aéreas exigem 6 meses de validade a partir da chegada."
+      },
+      "validity": {
+        "ok": "O seu passaporte cumpre esta regra.",
+        "warning": "O seu passaporte cumpre a regra com pouca margem. Considere renová-lo.",
+        "problem": "O seu passaporte não cumpre esta regra. Renove-o antes de viajar.",
+        "unknown": "Adicione a data de validade do passaporte no perfil para verificar."
+      }
+    },
+    "power": {
+      "title": "Eletricidade e tomadas",
+      "plugs": "Tomadas",
+      "type": "Tipo {{type}}",
+      "voltage": "Tensão",
+      "yourPlugs": "As suas fichas",
+      "noAdapter": "As suas fichas servem: não precisa de adaptador.",
+      "adapterNeeded": "Leve um adaptador de tomada.",
+      "adapterUnknown": "Verifique se as suas fichas servem.",
+      "voltageWarning": "A tensão é diferente da de casa. Confirme que os seus aparelhos a suportam (a maioria dos carregadores suporta) ou leve um conversor."
+    },
+    "weather": {
+      "title": "Tempo",
+      "forecast": "Previsão para as suas datas",
+      "climate": "Tempo típico em {{month}} (média dos últimos {{years}} anos)",
+      "avgHigh": "Máxima média",
+      "avgLow": "Mínima média",
+      "rainPerDay": "Chuva por dia",
+      "rainyDays": "Dias de chuva no mês"
+    },
+    "money": {
+      "title": "Dinheiro",
+      "currency": "Moeda local",
+      "rate": "Câmbio",
+      "rateUnavailable": "Câmbio indisponível neste momento.",
+      "sameCurrency": "A mesma moeda que em casa.",
+      "indicative": "Câmbio indicativo {{date}} · {{provider}}"
+    },
+    "safety": {
+      "title": "Segurança",
+      "level": {
+        "0": "Tome as precauções de segurança habituais.",
+        "1": "Tenha um elevado grau de precaução.",
+        "2": "Evite viagens não essenciais.",
+        "3": "Evite todas as viagens."
+      },
+      "regional": "Algumas regiões têm avisos específicos: leia o aviso completo.",
+      "source": "Nível de alerta do {{source}}.",
+      "readCanada": "Ler o aviso",
+      "readUk": "Conselhos de viagem do Reino Unido"
+    },
+    "practical": {
+      "title": "Informações práticas",
+      "emergency": "Emergência",
+      "police": "Polícia",
+      "ambulance": "Ambulância",
+      "fire": "Bombeiros",
+      "driving": "Conduz-se pela",
+      "side": {
+        "left": "esquerda",
+        "right": "direita"
+      },
+      "callingCode": "Indicativo do país",
+      "languages": "Línguas",
+      "timezone": "Fuso horário"
+    }
+  },
+  "visa": {
+    "freedom_of_movement": "Livre circulação",
+    "visa_free": "Isento de visto",
+    "visa_on_arrival": "Visto à chegada",
+    "eta": "Autorização eletrónica de viagem (ETA)",
+    "e_visa": "Visto eletrónico",
+    "visa_required": "Visto obrigatório",
+    "no_admission": "Entrada não permitida"
+  },
+  "weather": {
+    "clear": "Céu limpo",
+    "cloudy": "Nublado",
+    "fog": "Nevoeiro",
+    "drizzle": "Chuvisco",
+    "rain": "Chuva",
+    "snow": "Neve",
+    "thunderstorm": "Trovoada",
+    "unknown": "–"
+  },
+  "route": {
+    "title": "Percurso a pé",
+    "titleFor": "O seu passeio em {{city}}",
+    "defaultName": "Passeio em {{city}}",
+    "stopsHint": "Escolha entre {{min}} e {{max}} locais. O primeiro é o ponto de partida.",
+    "trayCount_one": "{{count}} paragem no percurso",
+    "trayCount_other": "{{count}} paragens no percurso",
+    "build": "Criar percurso",
+    "addStop": "Adicionar ao percurso",
+    "removeStop": "Remover do percurso",
+    "removeNamed": "Remover {{name}}",
+    "moveUp": "Mover para cima",
+    "moveDown": "Mover para baixo",
+    "full": "O seu percurso já tem {{max}} paragens.",
+    "startedNewCity": "Começou um novo percurso nesta cidade.",
+    "optimize": "Otimizar percurso",
+    "reoptimize": "Otimizar novamente",
+    "optimizeError": "Não foi possível otimizar o percurso. Tente novamente.",
+    "needMore": "Adicione pelo menos {{min}} locais.",
+    "distance": "Distância",
+    "walking": "A pé",
+    "visiting": "Visitas",
+    "total": "Total",
+    "fallbackNotice": "Estimativa com base em distâncias em linha reta: o serviço de direções a pé estava indisponível.",
+    "mapLabel": "Mapa do percurso a pé",
+    "saveTitle": "Guardar como viagem",
+    "tripName": "Nome da viagem",
+    "tripDate": "Data",
+    "save": "Guardar viagem",
+    "clear": "Limpar percurso",
+    "emptyTitle": "O seu percurso está vazio",
+    "emptyBody": "Abra um local no mapa e toque em “Adicionar ao percurso”.",
+    "backToMap": "Voltar ao mapa",
+    "navigate": "Navegar",
+    "openGoogleMaps": "Abrir o passeio completo no Google Maps",
+    "googleLimit": "O Google Maps mostra até 9 paragens intermédias; use os links por troço para as restantes.",
+    "legByLeg": "Ou navegue troço a troço:",
+    "leg": "{{from}} até {{to}}"
+  },
+  "trips": {
+    "title": "As minhas viagens",
+    "detailTitle": "Viagem",
+    "emptyTitle": "Ainda sem viagens",
+    "empty": "Ainda não guardou nenhuma viagem. Crie um percurso a pé a partir do mapa e guarde-o aqui.",
+    "explore": "Explorar o mapa",
+    "stops_one": "{{count}} paragem",
+    "stops_other": "{{count}} paragens",
+    "walk": "{{duration}} a pé",
+    "delete": "Apagar viagem",
+    "deleteConfirm": "Apagar esta viagem? Esta ação não pode ser anulada.",
+    "deleteYes": "Sim, apagar viagem"
+  },
+  "profile": {
+    "title": "Perfil",
+    "edit": "Editar perfil",
+    "displayName": "Nome",
+    "language": "Idioma",
+    "languageName": {
+      "en": "English",
+      "pt": "Português"
+    },
+    "units": "Unidades",
+    "unitsName": {
+      "metric": "Métrico (km, °C)",
+      "imperial": "Imperial (mi, °F)"
+    },
+    "nationalities": "Nacionalidades",
+    "nationalitiesHint": "Adicione todos os passaportes que tem: escolhemos a melhor opção de entrada.",
+    "homeCountry": "País onde vive",
+    "homeCountryHint": "Usado para comparar tomadas, tensão e moeda.",
+    "passportExpiry": "Data de validade do passaporte (opcional)",
+    "passportExpiryHint": "Formato AAAA-MM-DD. Deixe vazio para ignorar.",
+    "privacyNote": "Nunca guardamos números nem cópias do passaporte, apenas a data de validade opcional.",
+    "notSet": "Não definido",
+    "about": "Sobre e fontes de dados",
+    "deleteAccount": "Apagar conta",
+    "deleteConfirm": "Isto apaga permanentemente a sua conta, o perfil e as viagens guardadas.",
+    "deleteYes": "Sim, apagar a minha conta"
+  },
+  "about": {
+    "title": "Sobre",
+    "body": "O Wayfarer ajuda-o a preparar uma viagem e a explorar uma cidade a pé.",
+    "dataSources": "Fontes de dados",
+    "sources": {
+      "osm": "Dados do mapa © colaboradores do OpenStreetMap (ODbL)",
+      "wikidata": "Dados das atrações do Wikidata (CC0)",
+      "commons": "Imagens da Wikimedia Commons (licença indicada em cada imagem)",
+      "pageviews": "Popularidade a partir das visualizações da Wikipédia (Wikimedia)",
+      "openfreemap": "Mosaicos do mapa por OpenFreeMap © OpenMapTiles",
+      "ors": "Percursos a pé © openrouteservice.org by HeiGIT",
+      "openMeteo": "Dados meteorológicos por Open-Meteo.com (CC BY 4.0)",
+      "passportIndex": "Dados de vistos do passport-index-dataset (MIT)",
+      "canada": "Avisos de viagem do Governo do Canadá (Open Government Licence – Canada)",
+      "fx": "Câmbios do Frankfurter (Banco Central Europeu) e ExchangeRate-API"
+    },
+    "version": "Versão {{version}}"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "countryCode": "Escolha um país válido",
+    "date": "Introduza uma data válida (AAAA-MM-DD)",
+    "email": "Introduza um email válido",
+    "passwordLength": "Use pelo menos 8 caracteres",
+    "otp": "Introduza o código de 6 dígitos",
+    "nationalityRequired": "Adicione pelo menos uma nacionalidade",
+    "tooManyNationalities": "Adicione até 5 nacionalidades",
+    "duplicate": "Remova os duplicados",
+    "tooLong": "É demasiado longo"
+  },
+  "errors": {
+    "generic": "Algo correu mal. Tente novamente.",
+    "notFound": "Este ecrã não existe.",
+    "goHome": "Ir para o ecrã inicial"
+  }
+}
