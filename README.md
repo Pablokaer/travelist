@@ -19,43 +19,63 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITEC
 | Deno                   | 2.x                    | optional, to run Edge Function tests outside Supabase |
 | Xcode / Android Studio | latest                 | for iOS simulator / Android emulator                  |
 
-## Quick start
+## Quick start (local, everything on your machine)
 
 ```bash
 corepack enable
 pnpm install
 
-# 1. Local backend (Postgres + PostGIS, Auth, Edge Functions)
-pnpm db:start                 # = supabase start; prints API URL + keys
-cp .env.example .env          # paste the API URL and ANON_KEY into EXPO_PUBLIC_SUPABASE_*
+# 1. Backend: Postgres + PostGIS, Auth, Edge Functions (Docker must be running)
+pnpm db:start                 # = supabase start; prints API URL + keys, loads migrations + seeds
+cp .env.example .env          # paste API URL + ANON_KEY into EXPO_PUBLIC_SUPABASE_*,
+                              # SERVICE_ROLE_KEY into SUPABASE_SERVICE_ROLE_KEY
 ln -s ../../.env apps/mobile/.env   # Expo reads .env from the app folder
+pnpm functions:serve          # keep running: checklist + route-optimize Edge Functions
 
-# 2. App
-pnpm dev                      # Expo dev server → press w (web), i (iOS), a (Android)
+# 2. App (another terminal)
+pnpm dev                      # Expo dev server → w (web), i (iOS), a (Android)
 ```
+
+- Seeds in `supabase/seed/` contain all reference data (countries, 12 cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
+- Sign-up emails (confirmation, magic link + 6-digit code) are caught by Mailpit at http://127.0.0.1:54324. Local sign-up doesn't require confirmation.
+- Supabase Studio: http://127.0.0.1:54323.
+- Without `ORS_API_KEY` the route optimiser uses a built-in nearest-neighbour + 2-opt fallback with straight-line estimates (flagged in the UI). With a free key from openrouteservice.org you get real walking directions.
+- The map uses MapLibre. It works on web in any browser; on iOS/Android it needs a **development build** (not Expo Go): `pnpm --filter @wayfarer/mobile exec expo run:ios` (or `run:android`), or build in the cloud with EAS (`npx eas-cli build --profile development`).
 
 The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>` works without a global install.
 
-> Expo Go is fine for M0/M1. From M2 (MapLibre) the app needs a development build: `pnpm --filter @wayfarer/mobile exec expo run:ios` (or `run:android`).
+## Deploying (hosted)
+
+1. **Supabase project** (supabase.com): `pnpm exec supabase login`, `pnpm exec supabase link --project-ref <ref>`, then
+   `pnpm exec supabase db push --include-seed` (schema + reference data) and
+   `pnpm exec supabase functions deploy checklist route-optimize health`.
+2. **Secrets:** `pnpm exec supabase secrets set ORS_API_KEY=...` (optional `EXCHANGE_RATES_BASE_URL`). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
+3. **Auth:** Dashboard → Authentication → URL configuration: Site URL = your web URL; redirect URLs `https://<web>/auth/callback`, `wayfarer://auth/callback`. Providers → Google / Apple with your client ids. Email templates: paste `supabase/templates/*.html`. Configure a custom SMTP server for production email volume.
+4. **Web:** `pnpm build:web` → deploy `apps/mobile/dist` to any static host (EAS Hosting: `npx eas-cli deploy`, Netlify, Vercel, Cloudflare Pages) with `EXPO_PUBLIC_*` set at build time.
+5. **iOS / Android:** set `EXPO_PUBLIC_*` as EAS environment variables, then `npx eas-cli build --profile production -p ios|android` and `npx eas-cli submit`.
 
 ## Scripts (root)
 
-| Command                                      | What it does                                                   |
-| -------------------------------------------- | -------------------------------------------------------------- |
-| `pnpm dev`                                   | Start the Expo dev server                                      |
-| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                        |
-| `pnpm check`                                 | format check + lint + typecheck + tests                        |
-| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                         |
-| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                |
-| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds |
-| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                    |
-| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets               |
+| Command                                      | What it does                                                          |
+| -------------------------------------------- | --------------------------------------------------------------------- |
+| `pnpm dev`                                   | Start the Expo dev server                                             |
+| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                               |
+| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests           |
+| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                |
+| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                       |
+| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                    |
+| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds        |
+| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                           |
+| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB  |
+| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                      |
+| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer` |
 
 Edge Function checks: `cd supabase/functions && deno lint && deno fmt --check && deno test --allow-net=jsr.io`.
+After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy is stale, see D-005).
 
 ## Environment variables
 
-See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, …) are only for Edge Functions: set them with `supabase secrets set` in hosted projects. Sentry / PostHog are no-ops when their keys are empty.
+See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, OAuth secrets) are only for Edge Functions / Supabase Auth: set them with `supabase secrets set` or in the dashboard for hosted projects. Sentry / PostHog are no-ops when their keys are empty. `EXPO_PUBLIC_AUTH_PROVIDERS=google,apple` shows the OAuth buttons once the providers are enabled in Supabase.
 
 ## Data pipeline
 

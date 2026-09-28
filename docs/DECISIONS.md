@@ -33,7 +33,7 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **Context:** The shared package is consumed by Metro (app) and Deno (Edge Functions). Deno requires explicit file extensions on relative imports.
 - **Decision:** `packages/shared` exports its `src/` directly. Relative imports inside it use `.ts` extensions (`allowImportingTsExtensions`), which Metro, Vitest and Deno all resolve. The package must stay free of React/RN/Node APIs. External deps are limited to `zod`.
 - **Alternatives:** a tsup/tsc build step (extra watch process, stale-build bugs); duplicating schemas in `supabase/functions/_shared` (drift).
-- **Follow-up (M3):** confirm the Supabase CLI bundles files outside `supabase/functions` via the function's `deno.json` import map on deploy; if not, sync `packages/shared/src` into `supabase/functions/_shared/shared` with a script.
+- **Follow-up (resolved 2026-09-27):** the edge runtime cannot load files outside `supabase/functions` (verified: "Module not found" for `../../packages/shared`). `scripts/sync-shared.mjs` copies `packages/shared/src` (minus tests) into `supabase/functions/_shared/wayfarer`, which is committed and mapped as `@wayfarer/shared` in `deno.json`. `pnpm check` and CI fail when the copy is stale. The copy is excluded from `deno lint`/`deno fmt`.
 
 ## D-006 — ESLint 9 flat config
 
@@ -64,3 +64,47 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **Context:** Cities need a centre point and an area for ingestion queries.
 - **Decision:** Each city stores its Wikidata QID, OSM relation id, centre and bbox. Values were taken from Wikidata (P625 coordinates) and Nominatim (bbox, OSM relation) on 2026-09-26, not typed from memory. Ingestion queries by bbox first; the OSM relation is available for precise area filters.
 - **Alternatives:** polygon files per city (heavier, not needed for MVP).
+
+## D-011 — Reference data ships as committed SQL seeds
+
+- **Context:** Ingestion hits Wikidata, Overpass and Wikimedia and takes a while; every `supabase db reset` would otherwise empty the database.
+- **Decision:** The pipeline writes normalised snapshots (`data-pipeline/data/`) and deterministic, idempotent SQL seeds (`supabase/seed/10_countries.sql` … `40_attractions.sql`). Local resets and hosted `db push --include-seed` load them directly; `python -m wayfarer_pipeline seed` regenerates SQL offline.
+- **Alternatives:** upsert through PostgREST with the service role (needs network + secrets on every reset).
+
+## D-012 — Country data from Wikidata + curated overrides; advisories from Global Affairs Canada
+
+- **Context:** Plugs, voltage, currency, calling codes and emergency numbers are needed for every possible home country, and safety levels for every destination, without paid APIs.
+- **Decision:** Countries come from Wikidata SPARQL (P2853 plugs, P2884 voltage, P38 currency, P474, P2852, P1622, P37) with `data-pipeline/data/country_overrides.yaml` fixing known errors (each with a source). Safety uses the Government of Canada open-data feed (one JSON for all countries, advisory level 0–3, Open Government Licence) plus a link to GOV.UK travel advice.
+- **Alternatives:** restcountries.com (v3 API was deprecated during development), GOV.UK content API (no machine-readable level).
+
+## D-013 — FX: Frankfurter (ECB) first, ExchangeRate-API open endpoint as fallback
+
+- **Decision:** `api.frankfurter.dev` (no key, ECB reference rates, ~30 currencies) with `open.er-api.com` (no key, attribution required) for currencies the ECB doesn't publish. `EXCHANGE_RATES_BASE_URL` can point at any Frankfurter-compatible host. Cached 24 h.
+
+## D-014 — Route optimisation: ORS when a key exists, deterministic fallback otherwise
+
+- **Decision:** `route-optimize` uses the ORS optimisation (VROOM) + foot-walking directions APIs when `ORS_API_KEY` is set; otherwise, or on any ORS error, it returns a nearest-neighbour + 2-opt order from `@wayfarer/shared` with straight-line legs × 1.3 at 4.5 km/h, flagged `isFallback` in the UI. Only successful ORS results are cached (30 days).
+
+## D-015 — Edge Functions verify the user, not just the JWT
+
+- **Context:** `verify_jwt = true` at the gateway also accepts the public anon key, because it is a validly signed JWT.
+- **Decision:** Keep `verify_jwt = true` and additionally call `auth.getUser(token)` inside `checklist` and `route-optimize`; anonymous calls get 401.
+
+## D-016 — OAuth through Supabase-hosted flows (PKCE); native Sign in with Apple on iOS
+
+- **Decision:** Google (all platforms) and Apple (web/Android) use `signInWithOAuth` with PKCE: a full redirect on web, `WebBrowser.openAuthSessionAsync` on native, and the code exchanged on `/auth/callback`. iOS uses `expo-apple-authentication` + `signInWithIdToken`, as App Store guidelines prefer. Buttons appear only for providers listed in `EXPO_PUBLIC_AUTH_PROVIDERS`. Magic-link emails also carry a 6-digit code, so sign-in works even when the link opens on another device.
+- **Alternatives:** `@react-native-google-signin` (native SDK, extra config per platform).
+
+## D-017 — Sessions in SecureStore, chunked
+
+- **Context:** SecureStore values are limited to ~2 KB; Supabase sessions are larger.
+- **Decision:** `src/lib/secure-storage.ts` splits the session into 1.8 KB chunks in the Keychain / Keystore. Web uses Supabase's default localStorage.
+
+## D-018 — Web: MapLibre worker served from `public/`, trip detail at `/trip/[id]`
+
+- **Context:** maplibre-gl v6 loads its Web Worker from a separate ES module that Metro doesn't bundle, and the static export can't serve both `/trips` (tab) and a `trips/` folder.
+- **Decision:** `apps/mobile/scripts/copy-maplibre-worker.mjs` copies the worker into `public/maplibre/` before `start`/`build:web`, and the map calls `setWorkerUrl('/maplibre/maplibre-gl-worker.mjs')`. Trip detail lives at `/trip/[id]`.
+
+## D-019 — Dates are typed as ISO text in the MVP
+
+- **Decision:** Passport expiry and travel dates use a validated `YYYY-MM-DD` text field on every platform (no native date picker dependency). A native picker is a post-MVP polish item.
