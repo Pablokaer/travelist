@@ -7,14 +7,16 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
-import { ListRow } from '@/components/list-row';
-import { Screen } from '@/components/screen';
+import { Badge, StatTile } from '@/components/card';
+import { categoryIcon } from '@/components/icon';
+import { ListRow, RowGroup } from '@/components/list-row';
+import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { localizedName, useAttraction } from '@/features/destinations/api';
-import { CategoryDot } from '@/features/destinations/components';
 import { useRouteStore } from '@/features/route/store';
 import { radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/theme/use-theme';
 
 export default function AttractionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -60,12 +62,44 @@ export default function AttractionScreen() {
   };
 
   const open = (url: string) => void WebBrowser.openBrowserAsync(url);
+  const fee = a.fee
+    ? a.fee === 'yes'
+      ? t('attraction.feeYes')
+      : a.fee === 'no'
+        ? t('attraction.feeNo')
+        : a.fee
+    : null;
 
   return (
-    <Screen>
+    <Screen
+      edges={['left', 'right']}
+      footer={
+        <>
+          <View style={styles.footerText}>
+            <Text variant="subtitle">
+              {t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
+            </Text>
+            {notice ? (
+              <Text variant="helper" secondary accessibilityLiveRegion="polite">
+                {notice}
+              </Text>
+            ) : (
+              <Text variant="helper" secondary numberOfLines={1}>
+                {t('attraction.visitTime')}
+              </Text>
+            )}
+          </View>
+          <Button
+            label={inRoute ? t('route.removeStop') : t('route.addStop')}
+            variant={inRoute ? 'secondary' : 'primary'}
+            onPress={toggleRoute}
+            testID="toggle-route"
+          />
+        </>
+      }>
       <Stack.Screen options={{ title: name }} />
       {a.imageUrl ? (
-        <View style={{ gap: spacing.xs }}>
+        <View style={styles.hero}>
           <Image
             source={a.imageUrl}
             style={styles.image}
@@ -73,7 +107,7 @@ export default function AttractionScreen() {
             accessibilityLabel={t('attraction.photoOf', { name })}
             transition={200}
           />
-          <Text variant="caption" secondary>
+          <Text variant="helper" secondary>
             {t('attraction.photoCredit', {
               author: a.imageAuthor ?? t('attraction.unknownAuthor'),
               license: a.imageLicense ?? '',
@@ -81,75 +115,90 @@ export default function AttractionScreen() {
           </Text>
         </View>
       ) : null}
-      <Text variant="title">{name}</Text>
-      <View style={styles.meta}>
-        <CategoryDot category={a.category} />
-        <Text secondary>
-          {t(`category.${a.category}`)}
-          {a.isUnesco ? ` · ${t('attraction.unesco')}` : ''}
-        </Text>
-      </View>
-      {description ? <Text>{description}</Text> : null}
 
-      <Button
-        label={inRoute ? t('route.removeStop') : t('route.addStop')}
-        variant={inRoute ? 'secondary' : 'primary'}
-        onPress={toggleRoute}
-        testID="toggle-route"
-      />
-      {notice ? (
-        <Text variant="caption" secondary accessibilityLiveRegion="polite">
-          {notice}
-        </Text>
+      <View style={styles.titleBlock}>
+        <Text variant="display">{name}</Text>
+        <View style={styles.badges}>
+          <Badge icon={categoryIcon(a.category)} label={t(`category.${a.category}`)} />
+          {a.isUnesco ? <Badge icon="globe" label={t('attraction.unesco')} /> : null}
+        </View>
+      </View>
+
+      {description ? <Text style={styles.description}>{description}</Text> : null}
+
+      <Divider />
+
+      <Section title={t('attraction.details')}>
+        <View style={styles.tiles}>
+          <StatTile
+            icon="clock"
+            label={t('attraction.visitTime')}
+            value={t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
+          />
+          {fee ? <StatTile icon="ticket" label={t('attraction.fee')} value={fee} /> : null}
+        </View>
+        {/* Opening hours are free-form OSM strings, often too long for a tile. */}
+        <RowGroup>
+          <ListRow
+            icon="calendar"
+            label={t('attraction.openingHours')}
+            value={a.openingHours ?? t('attraction.notAvailable')}
+          />
+        </RowGroup>
+      </Section>
+
+      {a.website || wikipediaUrl || a.imagePageUrl ? (
+        <Section title={t('attraction.links')}>
+          <RowGroup>
+            {a.website ? (
+              <ListRow
+                icon="globe"
+                role="link"
+                external
+                label={t('attraction.website')}
+                onPress={() => open(a.website!)}
+              />
+            ) : null}
+            {wikipediaUrl ? (
+              <ListRow
+                icon="info"
+                role="link"
+                external
+                label={t('attraction.wikipedia')}
+                onPress={() => open(wikipediaUrl)}
+              />
+            ) : null}
+            {a.imagePageUrl ? (
+              <ListRow
+                icon="photo"
+                role="link"
+                external
+                label={t('attraction.imageSource')}
+                onPress={() => open(a.imagePageUrl!)}
+              />
+            ) : null}
+          </RowGroup>
+        </Section>
       ) : null}
-
-      <View style={{ gap: spacing.sm }}>
-        <ListRow
-          label={t('attraction.visitTime')}
-          value={t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
-        />
-        <ListRow
-          label={t('attraction.openingHours')}
-          value={a.openingHours ?? t('attraction.notAvailable')}
-        />
-        {a.fee ? (
-          <ListRow
-            label={t('attraction.fee')}
-            value={
-              a.fee === 'yes'
-                ? t('attraction.feeYes')
-                : a.fee === 'no'
-                  ? t('attraction.feeNo')
-                  : a.fee
-            }
-          />
-        ) : null}
-        {a.website ? (
-          <ListRow role="link" label={t('attraction.website')} onPress={() => open(a.website!)} />
-        ) : null}
-        {wikipediaUrl ? (
-          <ListRow
-            role="link"
-            label={t('attraction.wikipedia')}
-            onPress={() => open(wikipediaUrl)}
-          />
-        ) : null}
-        {a.imagePageUrl ? (
-          <ListRow
-            role="link"
-            label={t('attraction.imageSource')}
-            onPress={() => open(a.imagePageUrl!)}
-          />
-        ) : null}
-      </View>
-      <Text variant="caption" secondary>
+      <Text variant="helper" secondary>
         {t('attraction.dataCredit')}
       </Text>
     </Screen>
   );
 }
 
+function Divider() {
+  const theme = useTheme();
+  return <View style={[styles.divider, { backgroundColor: theme.border }]} />;
+}
+
 const styles = StyleSheet.create({
-  image: { width: '100%', aspectRatio: 16 / 10, borderRadius: radius.lg },
-  meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  hero: { gap: spacing.sm },
+  image: { width: '100%', aspectRatio: 16 / 10, maxHeight: 460, borderRadius: radius.xl },
+  titleBlock: { gap: spacing.md - 4 },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  description: { fontSize: 17, lineHeight: 27 },
+  divider: { height: StyleSheet.hairlineWidth },
+  tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md - 4 },
+  footerText: { flex: 1, gap: spacing.xxs },
 });

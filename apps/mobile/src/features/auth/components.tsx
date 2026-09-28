@@ -1,6 +1,6 @@
 import { SUPPORTED_LANGUAGES } from '@wayfarer/shared';
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { Link, router, type Href } from 'expo-router';
+import { useState, type PropsWithChildren } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -8,23 +8,89 @@ import { signInWithOAuth, type OAuthProvider } from './api';
 
 import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
+import { Icon } from '@/components/icon';
+import { Screen } from '@/components/screen';
 import { Text } from '@/components/text';
 import { env } from '@/lib/env';
-import { spacing } from '@/theme/colors';
-import { useTheme } from '@/theme/use-theme';
+import { radius, spacing } from '@/theme/colors';
+import { fontFamilyFor } from '@/theme/fonts';
+import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
 
 export function FormError({ message }: { message: string | null }) {
   const theme = useTheme();
   if (!message) return null;
   return (
-    <Text accessibilityRole="alert" style={{ color: theme.danger }}>
-      {message}
-    </Text>
+    <View style={[styles.error, { backgroundColor: theme.primarySoft }]}>
+      <Icon name="error" size={18} color={theme.danger} />
+      <Text accessibilityRole="alert" variant="caption" style={{ color: theme.danger, flex: 1 }}>
+        {message}
+      </Text>
+    </View>
+  );
+}
+
+/** Inline underlined text link (secondary navigation such as "create an account"). */
+export function TextLink({ href, label }: { href: Href; label: string }) {
+  const theme = useTheme();
+  return (
+    <Link
+      href={href}
+      style={[styles.link, { color: theme.text, fontFamily: fontFamilyFor('600') }]}>
+      {label}
+    </Link>
+  );
+}
+
+/**
+ * Centred auth layout: brand mark and title on top, form in a card on tablets and desktop
+ * (full-bleed on phones).
+ */
+export function AuthLayout({
+  title,
+  subtitle,
+  children,
+  footer,
+}: PropsWithChildren<{ title: string; subtitle?: string; footer?: React.ReactNode }>) {
+  const theme = useTheme();
+  const shadows = useShadows();
+  const { isTablet } = useBreakpoint();
+  const { t } = useTranslation();
+  return (
+    <Screen width="form" centered>
+      <View style={styles.brand}>
+        <View style={[styles.logo, { backgroundColor: theme.primary }]}>
+          <Icon name="map" size={22} color={theme.onPrimary} />
+        </View>
+        <Text variant="subtitle" style={{ color: theme.primary }}>
+          {t('common.appName')}
+        </Text>
+      </View>
+      <View
+        style={[
+          styles.panel,
+          isTablet && [
+            styles.card,
+            {
+              backgroundColor: theme.surface,
+              borderColor: theme.border,
+              boxShadow: shadows.raised,
+            },
+          ],
+        ]}>
+        <View style={styles.heading}>
+          <Text variant="title">{title}</Text>
+          {subtitle ? <Text secondary>{subtitle}</Text> : null}
+        </View>
+        {children}
+      </View>
+      {footer}
+    </Screen>
   );
 }
 
 export function OAuthButtons({ onError }: { onError: (message: string) => void }) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [busy, setBusy] = useState<OAuthProvider | null>(null);
   if (env.authProviders.length === 0) return null;
 
@@ -44,9 +110,11 @@ export function OAuthButtons({ onError }: { onError: (message: string) => void }
   return (
     <View style={styles.oauth}>
       <View style={styles.divider}>
-        <Text secondary variant="caption">
+        <View style={[styles.line, { backgroundColor: theme.border }]} />
+        <Text secondary variant="helper">
           {t('auth.orContinueWith')}
         </Text>
+        <View style={[styles.line, { backgroundColor: theme.border }]} />
       </View>
       {env.authProviders.map((p) => (
         <Button
@@ -82,6 +150,7 @@ export function AuthFooter() {
       <Button
         variant="ghost"
         compact
+        icon="info"
         label={t('profile.about')}
         onPress={() => router.push('/about')}
       />
@@ -90,8 +159,37 @@ export function AuthFooter() {
 }
 
 const styles = StyleSheet.create({
+  error: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.md - 4,
+    borderRadius: radius.md,
+  },
+  link: { fontSize: 15, paddingVertical: spacing.sm, textDecorationLine: 'underline' },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, alignSelf: 'center' },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  panel: { gap: spacing.md },
+  card: {
+    padding: spacing.xl,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  heading: { gap: spacing.sm, marginBottom: spacing.sm },
   oauth: { gap: spacing.sm },
-  divider: { alignItems: 'center', paddingVertical: spacing.sm },
-  footer: { alignItems: 'center', gap: spacing.sm, marginTop: spacing.lg },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  line: { flex: 1, height: StyleSheet.hairlineWidth },
+  footer: { alignItems: 'center', gap: spacing.sm },
   langs: { flexDirection: 'row', gap: spacing.sm },
 });

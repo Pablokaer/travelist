@@ -36,9 +36,7 @@ export function NameAndPreferencesFields({ control }: Props) {
         name="language"
         render={({ field }) => (
           <View style={styles.group}>
-            <Text variant="caption" style={styles.label}>
-              {t('profile.language')}
-            </Text>
+            <Text variant="label">{t('profile.language')}</Text>
             <View style={styles.row} accessibilityRole="radiogroup">
               {SUPPORTED_LANGUAGES.map((lng) => (
                 <Chip
@@ -60,9 +58,7 @@ export function NameAndPreferencesFields({ control }: Props) {
         name="units"
         render={({ field }) => (
           <View style={styles.group}>
-            <Text variant="caption" style={styles.label}>
-              {t('profile.units')}
-            </Text>
+            <Text variant="label">{t('profile.units')}</Text>
             <View style={styles.row} accessibilityRole="radiogroup">
               {UNITS.map((u) => (
                 <Chip
@@ -98,7 +94,7 @@ export function NationalityFields({ control }: Props) {
           />
         )}
       />
-      <Text variant="caption" secondary>
+      <Text variant="helper" secondary style={styles.hint}>
         {t('profile.nationalitiesHint')}
       </Text>
       <Controller
@@ -114,7 +110,7 @@ export function NationalityFields({ control }: Props) {
           />
         )}
       />
-      <Text variant="caption" secondary>
+      <Text variant="helper" secondary style={styles.hint}>
         {t('profile.homeCountryHint')}
       </Text>
     </>
@@ -143,7 +139,7 @@ export function PassportFields({ control }: Props) {
           />
         )}
       />
-      <Text variant="caption" secondary>
+      <Text variant="helper" secondary style={styles.hint}>
         {t('profile.privacyNote')}
       </Text>
     </>
@@ -151,7 +147,8 @@ export function PassportFields({ control }: Props) {
 }
 
 const styles = StyleSheet.create({
-  group: { gap: spacing.xs },
-  label: { fontWeight: '600' },
+  group: { gap: spacing.sm },
+  // Pull hints up under the picker they describe.
+  hint: { marginTop: -spacing.sm },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

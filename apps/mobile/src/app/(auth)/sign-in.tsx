@@ -1,24 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInSchema } from '@wayfarer/shared';
-import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
-import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { signInWithPassword } from '@/features/auth/api';
-import { AuthFooter, FormError, OAuthButtons } from '@/features/auth/components';
-import { useTheme } from '@/theme/use-theme';
+import {
+  AuthFooter,
+  AuthLayout,
+  FormError,
+  OAuthButtons,
+  TextLink,
+} from '@/features/auth/components';
 
 type Form = z.infer<typeof signInSchema>;
 
 export default function SignInScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [error, setError] = useState<string | null>(null);
   const { control, handleSubmit, formState } = useForm<Form>({
     resolver: zodResolver(signInSchema),
@@ -35,9 +36,10 @@ export default function SignInScreen() {
   });
 
   return (
-    <Screen>
-      <Text variant="title">{t('auth.signInTitle')}</Text>
-      <Text secondary>{t('auth.signInSubtitle')}</Text>
+    <AuthLayout
+      title={t('auth.signInTitle')}
+      subtitle={t('auth.signInSubtitle')}
+      footer={<AuthFooter />}>
       <Controller
         control={control}
         name="email"
@@ -49,6 +51,7 @@ export default function SignInScreen() {
             onBlur={field.onBlur}
             error={fieldState.error?.message}
             autoCapitalize="none"
+            icon="mail"
             autoComplete="email"
             keyboardType="email-address"
             textContentType="emailAddress"
@@ -76,14 +79,9 @@ export default function SignInScreen() {
       />
       <FormError message={error} />
       <Button label={t('auth.signIn')} loading={formState.isSubmitting} onPress={onSubmit} />
-      <Link href="/magic-link" style={{ color: theme.primary, fontSize: 16, paddingVertical: 10 }}>
-        {t('auth.useMagicLink')}
-      </Link>
+      <TextLink href="/magic-link" label={t('auth.useMagicLink')} />
       <OAuthButtons onError={setError} />
-      <Link href="/sign-up" style={{ color: theme.primary, fontSize: 16, paddingVertical: 10 }}>
-        {t('auth.noAccount')}
-      </Link>
-      <AuthFooter />
-    </Screen>
+      <TextLink href="/sign-up" label={t('auth.noAccount')} />
+    </AuthLayout>
   );
 }

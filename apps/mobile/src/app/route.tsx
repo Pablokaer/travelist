@@ -12,8 +12,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
+import { Button, IconButton } from '@/components/button';
+import { Card } from '@/components/card';
+import { PageHeader, Screen, Section } from '@/components/screen';
 import { EmptyState } from '@/components/states';
 import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
@@ -28,7 +29,8 @@ import { RouteTotals } from '@/features/route/components';
 import { useRouteStore } from '@/features/route/store';
 import { useSaveTrip } from '@/features/trips/api';
 import { env } from '@/lib/env';
-import { spacing } from '@/theme/colors';
+import { radius, spacing } from '@/theme/colors';
+import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
 
 export default function RouteScreen() {
   const { t, i18n } = useTranslation();
@@ -39,6 +41,9 @@ export default function RouteScreen() {
   const optimize = useOptimizeRoute();
   const save = useSaveTrip();
   const [result, setResult] = useState<RouteResponse | null>(null);
+  const theme = useTheme();
+  const shadows = useShadows();
+  const { isDesktop } = useBreakpoint();
 
   const cityName = city ? (i18n.resolvedLanguage === 'pt' ? city.namePt : city.nameEn) : '';
   const { control, handleSubmit } = useForm<SaveTripForm>({
@@ -52,20 +57,21 @@ export default function RouteScreen() {
         id: s.id,
         lat: s.lat,
         lng: s.lng,
-        color: '#0B6E99',
+        color: theme.primary,
         selected: true,
         order: i + 1,
       })),
-    [stops],
+    [stops, theme.primary],
   );
   const visitMinutes = stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0);
 
   if (stops.length === 0) {
     return (
       <EmptyState
+        icon="route"
         title={t('route.emptyTitle')}
         body={t('route.emptyBody')}
-        action={<Button label={t('route.backToMap')} onPress={() => router.back()} />}
+        action={<Button icon="map" label={t('route.backToMap')} onPress={() => router.back()} />}
       />
     );
   }
@@ -98,22 +104,22 @@ export default function RouteScreen() {
     ? [city.bbox[1], city.bbox[0], city.bbox[3], city.bbox[2]]
     : [-180, -85, 180, 85];
 
-  return (
-    <Screen>
-      <Text variant="title">{t('route.titleFor', { city: cityName })}</Text>
-      <Text secondary>{t('route.stopsHint', { min: ROUTE_MIN_STOPS, max: ROUTE_MAX_STOPS })}</Text>
-      <View style={styles.map}>
-        <MapView
-          testID="route-map"
-          accessibilityLabel={t('route.mapLabel')}
-          styleUrl={env.mapStyleUrl}
-          bounds={boundsOf(stops, fallbackBounds)}
-          points={points}
-          route={result?.geometry}
-        />
-      </View>
+  const map = (
+    <View style={[styles.map, isDesktop && styles.mapDesktop, { boxShadow: shadows.card }]}>
+      <MapView
+        testID="route-map"
+        accessibilityLabel={t('route.mapLabel')}
+        styleUrl={env.mapStyleUrl}
+        bounds={boundsOf(stops, fallbackBounds)}
+        points={points}
+        route={result?.geometry}
+      />
+    </View>
+  );
 
-      <View style={{ gap: spacing.sm }}>
+  const details = (
+    <View style={styles.column}>
+      <Section title={t('route.stopsTitle')}>
         {stops.map((s, i) => (
           <AttractionRow
             key={s.id}
@@ -121,10 +127,8 @@ export default function RouteScreen() {
             index={i}
             trailing={
               <View style={styles.rowActions}>
-                <Button
-                  compact
-                  variant="ghost"
-                  label="↑"
+                <IconButton
+                  icon="arrowUp"
                   accessibilityLabel={t('route.moveUp')}
                   disabled={i === 0}
                   onPress={() => {
@@ -132,10 +136,8 @@ export default function RouteScreen() {
                     invalidate();
                   }}
                 />
-                <Button
-                  compact
-                  variant="ghost"
-                  label="↓"
+                <IconButton
+                  icon="arrowDown"
                   accessibilityLabel={t('route.moveDown')}
                   disabled={i === stops.length - 1}
                   onPress={() => {
@@ -143,10 +145,8 @@ export default function RouteScreen() {
                     invalidate();
                   }}
                 />
-                <Button
-                  compact
-                  variant="ghost"
-                  label="✕"
+                <IconButton
+                  icon="close"
                   accessibilityLabel={t('route.removeNamed', { name: s.nameEn })}
                   onPress={() => {
                     remove(s.id);
@@ -157,7 +157,7 @@ export default function RouteScreen() {
             }
           />
         ))}
-      </View>
+      </Section>
 
       <RouteTotals
         distanceM={result?.distanceM ?? null}
@@ -168,21 +168,25 @@ export default function RouteScreen() {
         attribution={result?.attribution}
       />
 
-      <Button
-        label={result ? t('route.reoptimize') : t('route.optimize')}
-        onPress={runOptimize}
-        loading={optimize.isPending}
-        disabled={stops.length < ROUTE_MIN_STOPS}
-        testID="optimize"
-      />
-      {stops.length < ROUTE_MIN_STOPS ? (
-        <Text variant="caption" secondary>
-          {t('route.needMore', { min: ROUTE_MIN_STOPS })}
-        </Text>
-      ) : null}
-      <FormError message={optimize.error ? t('route.optimizeError') : null} />
+      <View style={styles.optimize}>
+        <Button
+          icon="sparkles"
+          variant={result ? 'secondary' : 'primary'}
+          label={result ? t('route.reoptimize') : t('route.optimize')}
+          onPress={runOptimize}
+          loading={optimize.isPending}
+          disabled={stops.length < ROUTE_MIN_STOPS}
+          testID="optimize"
+        />
+        {stops.length < ROUTE_MIN_STOPS ? (
+          <Text variant="helper" secondary>
+            {t('route.needMore', { min: ROUTE_MIN_STOPS })}
+          </Text>
+        ) : null}
+        <FormError message={optimize.error ? t('route.optimizeError') : null} />
+      </View>
 
-      <View style={styles.save}>
+      <Card>
         <Text variant="heading">{t('route.saveTitle')}</Text>
         <Controller
           control={control}
@@ -204,6 +208,7 @@ export default function RouteScreen() {
           name="tripDate"
           render={({ field, fieldState }) => (
             <TextField
+              icon="calendar"
               label={t('route.tripDate')}
               placeholder={`YYYY-MM-DD · ${t('checklist.optional')}`}
               value={field.value ?? ''}
@@ -215,6 +220,7 @@ export default function RouteScreen() {
         />
         <FormError message={save.error ? save.error.message : null} />
         <Button
+          variant={result ? 'primary' : 'secondary'}
           label={t('route.save')}
           onPress={onSave}
           loading={save.isPending}
@@ -223,19 +229,44 @@ export default function RouteScreen() {
         />
         <Button
           variant="ghost"
+          icon="trash"
           label={t('route.clear')}
           onPress={() => {
             clear();
             router.back();
           }}
         />
-      </View>
+      </Card>
+    </View>
+  );
+
+  return (
+    <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
+      <PageHeader
+        size="title"
+        title={t('route.titleFor', { city: cityName })}
+        subtitle={t('route.stopsHint', { min: ROUTE_MIN_STOPS, max: ROUTE_MAX_STOPS })}
+      />
+      {isDesktop ? (
+        <View style={styles.split}>
+          <View style={styles.column}>{map}</View>
+          {details}
+        </View>
+      ) : (
+        <>
+          {map}
+          {details}
+        </>
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  map: { height: 280, borderRadius: 20, overflow: 'hidden' },
+  map: { height: 280, borderRadius: radius.xl, overflow: 'hidden' },
+  mapDesktop: { height: 560 },
+  split: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xl },
+  column: { flex: 1, gap: spacing.lg },
   rowActions: { flexDirection: 'row' },
-  save: { gap: spacing.sm, marginTop: spacing.md },
+  optimize: { gap: spacing.sm },
 });

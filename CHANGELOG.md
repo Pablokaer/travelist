@@ -11,6 +11,16 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Changed
+
+- UI redesign across every screen (D-020): neutral palette with one coral accent for primary actions and selection, Inter typeface with an 8-step type scale, soft shadows and generous radii, light and dark themes.
+- Explore: search-style city pill with a searchable city picker (flags), icon category tabs, responsive image-card grid (1–4 columns), floating Map/List switch and route tray; cards show the stop number when a place is in the route.
+- Attraction: hero photo, category/UNESCO badges, "Good to know" tiles, grouped links and a sticky bottom bar with **Add to route**.
+- Route and trip detail: map beside the stop list on desktop, stat tiles for totals, icon reorder/remove buttons; My Trips as a card grid; Profile with avatar and grouped settings; checklist sections in two columns with status pills.
+- Navigation: bottom tab bar on phones, side rail on desktop (≥ 1024 px). Modals open as page sheets on phones and centred dialogs on tablets/desktop.
+- Auth and onboarding: centred card layout with the brand mark; onboarding shows a progress bar.
+- Micro-interactions: press-in scale, hover states on web, keyboard focus rings, in-place button spinners.
+
 ### Data
 
 - 20 more cities — major secondary destinations in covered countries (80 total in 32 countries, 14,222 attractions): Lyon, Marseille, Bordeaux, Turin, Verona, Pisa, Granada, Bilbao, Córdoba, Manchester, Liverpool, Glasgow, York, Gdańsk, Wrocław, Dresden, Innsbruck, Ghent, Bergen, Gothenburg. Córdoba and Gothenburg use centre-based bboxes.

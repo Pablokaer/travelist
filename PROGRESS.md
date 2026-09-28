@@ -49,12 +49,16 @@ Sofia, Zagreb, Nicosia, Luxembourg, Valletta, Bucharest, Cardiff, Belfast — wi
 
 Lyon, Marseille, Bordeaux, Turin, Verona, Pisa, Granada, Bilbao, Córdoba, Manchester, Liverpool, Glasgow, York, Gdańsk, Wrocław, Dresden, Innsbruck, Ghent, Bergen, Gothenburg — no new countries. Córdoba (1,250 km² mostly rural municipality) and Gothenburg (municipality includes the outer archipelago) use centre-based bboxes; Manchester, Liverpool and York OSM relations came from Nominatim (no P402 on Wikidata). Fix: items with a second Wikidata coordinate in another city are seeded where OSM confirms them (Madrid Arena). French communes are small, so counts are low: Bordeaux 58, Marseille 85. Known gaps: Bergen's Bryggen is typed "architectural ensemble" (too broad to include: its subclasses cover hamlets and schools); Marseille's Vieux-Port is a seaport.
 
+## 2026-09-28 — UI redesign (D-020)
+
+Design system (tokens, Inter, shared components with hover/focus/press/loading states) and every screen reworked: Explore card grid with floating Map/List switch and route tray, attraction hero with sticky CTA, desktop map-beside-list for route and trip detail, card grid for trips, grouped profile, two-column checklist, centred auth. Bottom tabs on phones, side rail on desktop. Verified on web at desktop and phone widths (unit tests + full E2E journey); native rendering not yet checked.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
-- Native date pickers (D-019) and a wide-screen web side panel (D-007) are post-MVP polish.
+- Native date pickers (D-019) and a map-beside-list layout for Explore on wide screens (D-007) are post-MVP polish; route and trip detail already use it (D-020).
 - Owner-only items (accounts, keys, store listings): see [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md).
 
 ## Known issues / open questions

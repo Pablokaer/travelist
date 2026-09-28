@@ -9,6 +9,9 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { Card, StatTile } from '@/components/card';
+import { Icon } from '@/components/icon';
+import { Section } from '@/components/screen';
 import { Text } from '@/components/text';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { localizedName } from '@/features/destinations/api';
@@ -36,29 +39,40 @@ export function RouteTotals({
   const lang = i18n.resolvedLanguage ?? 'en';
   const walk = walkingSeconds ?? 0;
   return (
-    <View
-      style={[styles.totals, { backgroundColor: theme.surface, borderColor: theme.border }]}
-      testID="route-totals">
+    <View style={styles.totals} testID="route-totals">
       <View style={styles.stats}>
-        <Stat
+        <StatTile
           testID="route-distance"
+          icon="route"
           label={t('route.distance')}
           value={distanceM != null ? formatDistance(distanceM, units, lang) : '–'}
         />
-        <Stat
+        <StatTile
+          icon="walk"
           label={t('route.walking')}
           value={walkingSeconds != null ? formatDuration(walk) : '–'}
         />
-        <Stat label={t('route.visiting')} value={formatDuration(visitMinutes * 60)} />
-        <Stat label={t('route.total')} value={formatDuration(walk + visitMinutes * 60)} />
+        <StatTile
+          icon="pin"
+          label={t('route.visiting')}
+          value={formatDuration(visitMinutes * 60)}
+        />
+        <StatTile
+          icon="clock"
+          label={t('route.total')}
+          value={formatDuration(walk + visitMinutes * 60)}
+        />
       </View>
       {isFallback ? (
-        <Text variant="caption" secondary>
-          {t('route.fallbackNotice')}
-        </Text>
+        <View style={styles.notice}>
+          <Icon name="info" size={14} color={theme.warning} />
+          <Text variant="helper" secondary style={styles.flex}>
+            {t('route.fallbackNotice')}
+          </Text>
+        </View>
       ) : null}
       {attribution ? (
-        <Text variant="caption" secondary>
+        <Text variant="helper" secondary>
           {attribution}
         </Text>
       ) : null}
@@ -66,76 +80,82 @@ export function RouteTotals({
   );
 }
 
-function Stat({ label, value, testID }: { label: string; value: string; testID?: string }) {
-  return (
-    <View style={styles.stat} accessible accessibilityLabel={`${label}: ${value}`} testID={testID}>
-      <Text variant="caption" secondary>
-        {label}
-      </Text>
-      <Text style={{ fontWeight: '700' }}>{value}</Text>
-    </View>
-  );
-}
-
 /** Links that open the walking route in Google Maps / Apple Maps. */
 export function NavigationLinks({ stops }: { stops: AttractionSummary[] }) {
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
   const lang = i18n.resolvedLanguage ?? 'en';
   if (stops.length < 2) return null;
   const open = (url: string) => void Linking.openURL(url);
   return (
-    <View style={{ gap: spacing.sm }}>
-      <Text variant="heading">{t('route.navigate')}</Text>
+    <Section title={t('route.navigate')}>
       <Button
         variant="secondary"
+        icon="directions"
         label={t('route.openGoogleMaps')}
         onPress={() => open(googleMapsDirectionsUrl(stops))}
       />
       {stops.length > 11 ? (
-        <Text variant="caption" secondary>
+        <Text variant="helper" secondary>
           {t('route.googleLimit')}
         </Text>
       ) : null}
-      <Text variant="caption" secondary>
+      <Text variant="label" secondary>
         {t('route.legByLeg')}
       </Text>
-      {stops.slice(1).map((to, i) => {
-        const from = stops[i]!;
-        const label = t('route.leg', {
-          from: localizedName(from, lang),
-          to: localizedName(to, lang),
-        });
-        return (
-          <View key={to.id} style={styles.leg}>
-            <Text style={{ flex: 1 }} numberOfLines={2}>
-              {i + 1}→{i + 2} · {label}
-            </Text>
-            <Button
-              compact
-              variant="ghost"
-              label="Google"
-              accessibilityLabel={`${label}, Google Maps`}
-              onPress={() => open(googleMapsLegUrl(from, to))}
-            />
-            {Platform.OS !== 'android' ? (
+      <Card style={styles.legs}>
+        {stops.slice(1).map((to, i) => {
+          const from = stops[i]!;
+          const label = t('route.leg', {
+            from: localizedName(from, lang),
+            to: localizedName(to, lang),
+          });
+          return (
+            <View
+              key={to.id}
+              style={[
+                styles.leg,
+                i > 0 && { borderTopColor: theme.border, borderTopWidth: StyleSheet.hairlineWidth },
+              ]}>
+              <View style={[styles.legNo, { backgroundColor: theme.surfaceMuted }]}>
+                <Text variant="helper" style={styles.legNoText}>
+                  {i + 1}→{i + 2}
+                </Text>
+              </View>
+              <Text variant="caption" style={styles.flex} numberOfLines={2}>
+                {label}
+              </Text>
               <Button
                 compact
                 variant="ghost"
-                label="Apple"
-                accessibilityLabel={`${label}, Apple Maps`}
-                onPress={() => open(appleMapsLegUrl(from, to))}
+                label="Google"
+                accessibilityLabel={`${label}, Google Maps`}
+                onPress={() => open(googleMapsLegUrl(from, to))}
               />
-            ) : null}
-          </View>
-        );
-      })}
-    </View>
+              {Platform.OS !== 'android' ? (
+                <Button
+                  compact
+                  variant="ghost"
+                  label="Apple"
+                  accessibilityLabel={`${label}, Apple Maps`}
+                  onPress={() => open(appleMapsLegUrl(from, to))}
+                />
+              ) : null}
+            </View>
+          );
+        })}
+      </Card>
+    </Section>
   );
 }
 
 const styles = StyleSheet.create({
-  totals: { borderWidth: 1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  stat: { minWidth: 70, gap: 2 },
-  leg: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  flex: { flex: 1 },
+  totals: { gap: spacing.sm },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  notice: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xs },
+  legs: { paddingVertical: 0, gap: 0 },
+  leg: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.sm },
+  legNo: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xxs, borderRadius: radius.sm },
+  legNoText: { fontWeight: '600' },
 });

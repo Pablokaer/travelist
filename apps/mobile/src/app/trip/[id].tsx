@@ -4,7 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
+import { Card } from '@/components/card';
+import { PageHeader, Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { AttractionRow } from '@/features/destinations/components';
@@ -15,7 +16,8 @@ import { NavigationLinks, RouteTotals } from '@/features/route/components';
 import { useDeleteTrip, useTrip } from '@/features/trips/api';
 import { env } from '@/lib/env';
 import { formatDate } from '@/lib/format';
-import { spacing } from '@/theme/colors';
+import { radius, spacing } from '@/theme/colors';
+import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
 
 export default function TripScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,6 +27,9 @@ export default function TripScreen() {
   const del = useDeleteTrip();
   const [confirming, setConfirming] = useState(false);
   const lang = i18n.resolvedLanguage ?? 'en';
+  const theme = useTheme();
+  const shadows = useShadows();
+  const { isDesktop } = useBreakpoint();
 
   const points = useMemo(
     () =>
@@ -32,35 +37,33 @@ export default function TripScreen() {
         id: s.id,
         lat: s.lat,
         lng: s.lng,
-        color: '#0B6E99',
+        color: theme.primary,
         selected: true,
         order: i + 1,
       })),
-    [trip.data],
+    [trip.data, theme.primary],
   );
 
   if (trip.isPending) return <LoadingState />;
   if (trip.isError) return <ErrorState onRetry={() => trip.refetch()} />;
   const data = trip.data;
 
-  return (
-    <Screen>
-      <Stack.Screen options={{ title: data.name }} />
-      <Text variant="title">{data.name}</Text>
-      {data.tripDate ? (
-        <Text secondary>{formatDate(data.tripDate, lang, { dateStyle: 'full' })}</Text>
-      ) : null}
-      <View style={styles.map}>
-        <MapView
-          testID="trip-map"
-          accessibilityLabel={t('route.mapLabel')}
-          styleUrl={env.mapStyleUrl}
-          bounds={boundsOf(data.stops, [-180, -85, 180, 85])}
-          points={points}
-          route={data.geometry}
-          onPointPress={(aid) => router.push({ pathname: '/attraction/[id]', params: { id: aid } })}
-        />
-      </View>
+  const map = (
+    <View style={[styles.map, isDesktop && styles.mapDesktop, { boxShadow: shadows.card }]}>
+      <MapView
+        testID="trip-map"
+        accessibilityLabel={t('route.mapLabel')}
+        styleUrl={env.mapStyleUrl}
+        bounds={boundsOf(data.stops, [-180, -85, 180, 85])}
+        points={points}
+        route={data.geometry}
+        onPointPress={(aid) => router.push({ pathname: '/attraction/[id]', params: { id: aid } })}
+      />
+    </View>
+  );
+
+  const details = (
+    <View style={styles.column}>
       <RouteTotals
         distanceM={data.distanceM}
         walkingSeconds={data.walkingSeconds}
@@ -73,7 +76,7 @@ export default function TripScreen() {
             : null
         }
       />
-      <View style={{ gap: spacing.sm }}>
+      <Section title={t('route.stopsTitle')}>
         {data.stops.map((s, i) => (
           <AttractionRow
             key={s.id}
@@ -82,26 +85,65 @@ export default function TripScreen() {
             onPress={() => router.push({ pathname: '/attraction/[id]', params: { id: s.id } })}
           />
         ))}
-      </View>
+      </Section>
       <NavigationLinks stops={data.stops} />
       {confirming ? (
-        <View style={{ gap: spacing.sm }}>
+        <Card style={{ borderColor: theme.danger }}>
           <Text>{t('trips.deleteConfirm')}</Text>
+          <View style={styles.actions}>
+            <Button
+              variant="danger"
+              label={t('trips.deleteYes')}
+              loading={del.isPending}
+              onPress={() => del.mutate(data.id, { onSuccess: () => router.back() })}
+            />
+            <Button
+              variant="ghost"
+              label={t('common.cancel')}
+              onPress={() => setConfirming(false)}
+            />
+          </View>
+        </Card>
+      ) : (
+        <View style={styles.actions}>
           <Button
-            variant="danger"
-            label={t('trips.deleteYes')}
-            loading={del.isPending}
-            onPress={() => del.mutate(data.id, { onSuccess: () => router.back() })}
+            variant="ghost"
+            icon="trash"
+            label={t('trips.delete')}
+            onPress={() => setConfirming(true)}
           />
-          <Button variant="ghost" label={t('common.cancel')} onPress={() => setConfirming(false)} />
+        </View>
+      )}
+    </View>
+  );
+
+  return (
+    <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
+      <Stack.Screen options={{ title: data.name }} />
+      <PageHeader
+        size="title"
+        title={data.name}
+        subtitle={data.tripDate ? formatDate(data.tripDate, lang, { dateStyle: 'full' }) : null}
+      />
+      {isDesktop ? (
+        <View style={styles.split}>
+          <View style={styles.column}>{map}</View>
+          {details}
         </View>
       ) : (
-        <Button variant="ghost" label={t('trips.delete')} onPress={() => setConfirming(true)} />
+        <>
+          {map}
+          {details}
+        </>
       )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  map: { height: 300, borderRadius: 20, overflow: 'hidden' },
+  map: { height: 300, borderRadius: radius.xl, overflow: 'hidden' },
+  mapDesktop: { height: 560 },
+  split: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xl },
+  column: { flex: 1, gap: spacing.lg },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

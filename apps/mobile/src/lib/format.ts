@@ -62,3 +62,26 @@ export function weatherBucket(code: number | null | undefined) {
   if (code >= 95) return 'thunderstorm';
   return 'unknown';
 }
+
+/**
+ * Flag emoji from an ISO 3166-1 alpha-2 code (regional indicator symbols).
+ * @example flagEmoji('pt') // '🇵🇹'
+ */
+export function flagEmoji(countryCode: string): string {
+  return countryCode
+    .toUpperCase()
+    .replace(/[A-Z]/g, (c) => String.fromCodePoint(0x1f1a5 + c.charCodeAt(0)));
+}
+
+/**
+ * Up to two initials for an avatar, from a name or an email address.
+ * @example initials('Ana Traveller') // 'AT'
+ */
+export function initials(name: string): string {
+  return name
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('');
+}

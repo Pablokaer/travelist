@@ -1,6 +1,8 @@
 import type { LineString } from '@wayfarer/shared';
 import type { StyleProp, ViewStyle } from 'react-native';
 
+import { palette } from '@/theme/colors';
+
 export type MapPoint = {
   id: string;
   lat: number;
@@ -80,7 +82,7 @@ export const labelLayout = {
 } as const;
 
 export const routePaint = {
-  'line-color': '#0B6E99',
+  'line-color': palette.light.primary,
   'line-width': 4,
   'line-opacity': 0.85,
 } as const;

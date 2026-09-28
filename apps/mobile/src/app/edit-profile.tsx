@@ -2,10 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { profileFormSchema, type ProfileForm } from '@wayfarer/shared';
 import { router } from 'expo-router';
 import { useForm } from 'react-hook-form';
+import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
+import { Card } from '@/components/card';
+import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { FormError } from '@/features/auth/components';
 import { useProfile, useSaveProfile, type Profile } from '@/features/profile/api';
@@ -14,6 +16,7 @@ import {
   NationalityFields,
   PassportFields,
 } from '@/features/profile/profile-fields';
+import { spacing } from '@/theme/colors';
 
 function EditProfileForm({ profile }: { profile: Profile }) {
   const { t } = useTranslation();
@@ -31,17 +34,34 @@ function EditProfileForm({ profile }: { profile: Profile }) {
   });
   const onSave = handleSubmit((form) => save.mutate(form, { onSuccess: () => router.back() }));
   return (
-    <Screen>
-      <NameAndPreferencesFields control={control} />
-      <NationalityFields control={control} />
-      <PassportFields control={control} />
+    <Screen
+      width="form"
+      edges={['left', 'right']}
+      footer={
+        <Button
+          label={t('common.save')}
+          loading={save.isPending}
+          onPress={onSave}
+          testID="save-profile"
+          style={styles.save}
+        />
+      }>
+      <Section title={t('onboarding.step1Title')}>
+        <Card style={styles.fields}>
+          <NameAndPreferencesFields control={control} />
+        </Card>
+      </Section>
+      <Section title={t('onboarding.step2Title')}>
+        <Card style={styles.fields}>
+          <NationalityFields control={control} />
+        </Card>
+      </Section>
+      <Section title={t('onboarding.step3Title')}>
+        <Card style={styles.fields}>
+          <PassportFields control={control} />
+        </Card>
+      </Section>
       <FormError message={save.error ? save.error.message : null} />
-      <Button
-        label={t('common.save')}
-        loading={save.isPending}
-        onPress={onSave}
-        testID="save-profile"
-      />
     </Screen>
   );
 }
@@ -52,3 +72,8 @@ export default function EditProfileScreen() {
   if (profile.isError) return <ErrorState onRetry={() => profile.refetch()} />;
   return <EditProfileForm profile={profile.data} />;
 }
+
+const styles = StyleSheet.create({
+  fields: { gap: spacing.lg },
+  save: { flex: 1 },
+});

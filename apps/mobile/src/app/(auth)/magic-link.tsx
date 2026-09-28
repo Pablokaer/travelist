@@ -1,22 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { magicLinkSchema, otpSchema } from '@wayfarer/shared';
-import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
-import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { sendMagicLink, verifyEmailCode } from '@/features/auth/api';
-import { FormError } from '@/features/auth/components';
-import { useTheme } from '@/theme/use-theme';
+import { AuthLayout, FormError, TextLink } from '@/features/auth/components';
 
 export default function MagicLinkScreen() {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +44,11 @@ export default function MagicLinkScreen() {
   });
 
   return (
-    <Screen>
-      <Text variant="title">{t('auth.magicLinkTitle')}</Text>
+    <AuthLayout
+      title={t('auth.magicLinkTitle')}
+      subtitle={sentTo ? t('auth.magicLinkSent', { email: sentTo }) : t('auth.magicLinkSubtitle')}>
       {!sentTo ? (
         <>
-          <Text secondary>{t('auth.magicLinkSubtitle')}</Text>
           <Controller
             control={emailForm.control}
             name="email"
@@ -65,6 +60,7 @@ export default function MagicLinkScreen() {
                 onBlur={field.onBlur}
                 error={fieldState.error?.message}
                 autoCapitalize="none"
+                icon="mail"
                 autoComplete="email"
                 keyboardType="email-address"
                 onSubmitEditing={send}
@@ -81,7 +77,6 @@ export default function MagicLinkScreen() {
         </>
       ) : (
         <>
-          <Text>{t('auth.magicLinkSent', { email: sentTo })}</Text>
           <Controller
             control={codeForm.control}
             name="code"
@@ -114,9 +109,7 @@ export default function MagicLinkScreen() {
           />
         </>
       )}
-      <Link href="/sign-in" style={{ color: theme.primary, fontSize: 16, paddingVertical: 10 }}>
-        {t('auth.backToSignIn')}
-      </Link>
-    </Screen>
+      <TextLink href="/sign-in" label={t('auth.backToSignIn')} />
+    </AuthLayout>
   );
 }

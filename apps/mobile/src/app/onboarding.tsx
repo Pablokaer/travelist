@@ -11,6 +11,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
 import { Text } from '@/components/text';
 import { FormError } from '@/features/auth/components';
@@ -20,7 +21,8 @@ import {
   NationalityFields,
   PassportFields,
 } from '@/features/profile/profile-fields';
-import { spacing } from '@/theme/colors';
+import { radius, spacing } from '@/theme/colors';
+import { useTheme } from '@/theme/use-theme';
 
 const STEP_FIELDS = [
   ['displayName', 'language', 'units'],
@@ -30,6 +32,7 @@ const STEP_FIELDS = [
 
 export default function OnboardingScreen() {
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
   const profile = useProfile();
   const save = useSaveProfile();
   const [step, setStep] = useState(0);
@@ -58,14 +61,26 @@ export default function OnboardingScreen() {
   ];
 
   return (
-    <Screen>
-      <Text variant="caption" secondary accessibilityLiveRegion="polite">
-        {t('onboarding.progress', { step: step + 1, total: 3 })}
-      </Text>
+    <Screen width="form" edges={['left', 'right']}>
+      <View style={styles.progress}>
+        <View style={styles.bars}>
+          {titles.map((_, i) => (
+            <View
+              key={i}
+              style={[styles.bar, { backgroundColor: i <= step ? theme.primary : theme.border }]}
+            />
+          ))}
+        </View>
+        <Text variant="label" secondary accessibilityLiveRegion="polite">
+          {t('onboarding.progress', { step: step + 1, total: 3 })}
+        </Text>
+      </View>
       <Text variant="title">{titles[step]}</Text>
-      {step === 0 ? <NameAndPreferencesFields control={control} /> : null}
-      {step === 1 ? <NationalityFields control={control} /> : null}
-      {step === 2 ? <PassportFields control={control} /> : null}
+      <Card style={styles.fields}>
+        {step === 0 ? <NameAndPreferencesFields control={control} /> : null}
+        {step === 1 ? <NationalityFields control={control} /> : null}
+        {step === 2 ? <PassportFields control={control} /> : null}
+      </Card>
       <FormError message={save.error ? save.error.message : null} />
       <View style={styles.actions}>
         {step > 0 ? (
@@ -92,6 +107,10 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  actions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  progress: { gap: spacing.sm },
+  bars: { flexDirection: 'row', gap: spacing.xs },
+  bar: { flex: 1, height: 4, borderRadius: radius.pill },
+  fields: { gap: spacing.lg },
+  actions: { flexDirection: 'row', gap: spacing.sm },
   flex: { flex: 1 },
 });

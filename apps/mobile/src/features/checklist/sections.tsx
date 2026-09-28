@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { Icon, type IconName } from '@/components/icon';
 import { Text } from '@/components/text';
 import { PlugIcon } from '@/features/checklist/plug-icon';
 import { useCountries, countryName } from '@/features/profile/api';
@@ -16,11 +17,16 @@ import {
   weatherBucket,
 } from '@/lib/format';
 import { radius, spacing } from '@/theme/colors';
-import { useTheme } from '@/theme/use-theme';
+import { useShadows, useTheme } from '@/theme/use-theme';
 
 export type Tone = 'ok' | 'warning' | 'problem' | 'info';
 
-const ICON: Record<Tone, string> = { ok: '✅', warning: '⚠️', problem: '⛔', info: 'ℹ️' };
+const TONE_ICON: Record<Tone, IconName> = {
+  ok: 'check',
+  warning: 'error',
+  problem: 'close',
+  info: 'info',
+};
 
 export function SectionCard({
   title,
@@ -29,17 +35,32 @@ export function SectionCard({
   children,
 }: PropsWithChildren<{ title: string; tone: Tone; testID?: string }>) {
   const theme = useTheme();
+  const shadows = useShadows();
   const { t } = useTranslation();
+  const color = {
+    ok: theme.success,
+    warning: theme.warning,
+    problem: theme.danger,
+    info: theme.info,
+  }[tone];
   return (
     <View
       testID={testID}
-      style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}
+      style={[
+        styles.card,
+        { backgroundColor: theme.surface, borderColor: theme.border, boxShadow: shadows.card },
+      ]}
       accessible={false}>
       <View style={styles.cardHeader}>
-        <Text accessibilityLabel={t(`checklist.tone.${tone}`)}>{ICON[tone]}</Text>
         <Text variant="heading" style={{ flex: 1 }}>
           {title}
         </Text>
+        <View style={[styles.tone, { borderColor: color }]}>
+          <Icon name={TONE_ICON[tone]} size={14} color={color} />
+          <Text variant="helper" style={{ color, fontWeight: '600' }}>
+            {t(`checklist.tone.${tone}`)}
+          </Text>
+        </View>
       </View>
       {children}
     </View>
@@ -429,8 +450,22 @@ export function PracticalSection({ data }: { data: ChecklistResponse['practical'
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  card: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.lg,
+    padding: spacing.lg - 4,
+    gap: spacing.md - 4,
+  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
+  tone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xxs + 1,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+  },
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 28 },
   value: { fontWeight: '600', textAlign: 'right', flexShrink: 1 },
   buttons: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },

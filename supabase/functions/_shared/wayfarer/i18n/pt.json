@@ -76,7 +76,9 @@
     "mapLabel": "Mapa de atrações. Use a vista de lista para uma lista acessível.",
     "noResults": "Nenhum local corresponde a estes filtros.",
     "noCities": "Ainda sem destinos",
-    "noCitiesBody": "Os dados de referência não foram carregados. Execute os seeds do pipeline de dados e tente novamente."
+    "noCitiesBody": "Os dados de referência não foram carregados. Execute os seeds do pipeline de dados e tente novamente.",
+    "searchCities": "Pesquisar cidades",
+    "noCityMatch": "Nenhuma cidade corresponde à pesquisa."
   },
   "category": {
     "museum": "Museus",
@@ -104,7 +106,9 @@
     "photoCredit": "Foto: {{author}} · {{license}} · Wikimedia Commons",
     "unknownAuthor": "Autor desconhecido",
     "unesco": "Património Mundial da UNESCO",
-    "dataCredit": "Dados do Wikidata (CC0) e © colaboradores do OpenStreetMap (ODbL). Os horários podem estar desatualizados."
+    "dataCredit": "Dados do Wikidata (CC0) e © colaboradores do OpenStreetMap (ODbL). Os horários podem estar desatualizados.",
+    "details": "Informações úteis",
+    "links": "Saber mais"
   },
   "checklist": {
     "title": "Antes de partir",
@@ -276,7 +280,8 @@
     "openGoogleMaps": "Abrir o passeio completo no Google Maps",
     "googleLimit": "O Google Maps mostra até 9 paragens intermédias; use os links por troço para as restantes.",
     "legByLeg": "Ou navegue troço a troço:",
-    "leg": "{{from}} até {{to}}"
+    "leg": "{{from}} até {{to}}",
+    "stopsTitle": "Paragens"
   },
   "trips": {
     "title": "As minhas viagens",
@@ -289,7 +294,8 @@
     "walk": "{{duration}} a pé",
     "delete": "Apagar viagem",
     "deleteConfirm": "Apagar esta viagem? Esta ação não pode ser anulada.",
-    "deleteYes": "Sim, apagar viagem"
+    "deleteYes": "Sim, apagar viagem",
+    "subtitle": "Os seus percursos a pé guardados, prontos para o dia."
   },
   "profile": {
     "title": "Perfil",
@@ -316,7 +322,10 @@
     "about": "Sobre e fontes de dados",
     "deleteAccount": "Apagar conta",
     "deleteConfirm": "Isto apaga permanentemente a sua conta, o perfil e as viagens guardadas.",
-    "deleteYes": "Sim, apagar a minha conta"
+    "deleteYes": "Sim, apagar a minha conta",
+    "travelDocuments": "Documentos de viagem",
+    "preferences": "Preferências",
+    "account": "Conta"
   },
   "about": {
     "title": "Sobre",

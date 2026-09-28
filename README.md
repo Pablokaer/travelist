@@ -75,14 +75,14 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 
 The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 
-- **City switcher** — modal list of all active cities ([docs/CITIES.md](./docs/CITIES.md)). Defaults to the city of the current route tray, else the first city.
-- **Category filters** — multi-select chips: museum, monument, church, castle, viewpoint, landmark, park, palace, other; "clear" resets. No selection = all categories.
-- **Map / List toggle**
+- **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count. Defaults to the city of the current route tray, else the first city.
+- **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories.
+- **Map / List switch** — floating pill at the bottom of the screen.
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
-  - **List** — accessible list of the same attractions (name, category, image), sorted by popularity.
+  - **List** — responsive grid of image cards (1 column on phones, up to 4 on desktop), sorted by popularity: photo, UNESCO badge, stop number when the place is in the route, name, category and visit time.
 - **Places count** — "N places" for the current filters (announced to screen readers).
-- **Route tray** — when at least one stop is selected, a bar shows "N stops" and a **Build route** button.
-- **Checklist** button — opens the pre-trip checklist for the current city.
+- **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route" and a **Build route** button.
+- **Checklist** button (**Before you go**; icon-only on phones) — opens the pre-trip checklist for the current city.
 
 Data comes from the `attractions_in_view` RPC (bbox + categories, most popular first, up to 500 per city), cached by TanStack Query for 1 hour. Map style is `EXPO_PUBLIC_MAP_STYLE_URL` (OpenFreeMap "liberty" by default, D-008).
 
@@ -90,13 +90,14 @@ Data comes from the `attractions_in_view` RPC (bbox + categories, most popular f
 
 `attraction/[id].tsx`, opened as a modal from the map, the list, a route or a trip.
 
-- Photo from Wikimedia Commons with **author + licence credit** and a link to the image source page.
+- Hero photo from Wikimedia Commons with **author + licence credit** and a link to the image source page.
+- A sticky bottom bar shows the typical visit time and the **Add to route** button.
 - Localised name and description (PT falls back to EN and vice versa), category and a **UNESCO** badge when applicable.
 - **Add to route / Remove from route**:
   - max 12 stops — shows "route is full" beyond that;
   - a route belongs to one city — adding a place from another city **starts a new route** (with a notice).
-- Average visit time (minutes, per category default or per place), opening hours (OSM, when available), entry fee (yes / no / free text).
-- Links (in-app browser): official website, Wikipedia (PT article when the app is in PT and it exists, otherwise EN), image source.
+- **Good to know:** average visit time (minutes, per category default or per place) and entry fee (yes / no / free text) as tiles; opening hours (OSM, when available) on their own row.
+- **Learn more** links (in-app browser): official website, Wikipedia (PT article when the app is in PT and it exists, otherwise EN), image source.
 - Data credit (Wikidata / OpenStreetMap).
 
 ### 5. Pre-trip checklist
@@ -105,6 +106,7 @@ Data comes from the `attractions_in_view` RPC (bbox + categories, most popular f
 
 - **Dates:** arrival (defaults to today) and optional departure, typed as `YYYY-MM-DD`; **Update** re-runs the checklist. Departure must not be before arrival.
 - Every section is computed independently: if one provider fails, only that section shows "unavailable" and the others still load.
+- Each section is a card with a status pill (**All good**, **Needs attention**, **Action required**, **Information**); two columns on tablets and desktop.
 
 | Section               | What it shows                                                                                                                                                                                                                                                                                                                                                                                                                        | Source / logic                                                                  |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
@@ -122,12 +124,12 @@ A disclaimer at the bottom reminds the user to confirm requirements with officia
 
 `route.tsx`, opened from the route tray on Explore.
 
-- Map of the selected stops (numbered) and, after optimising, the walking line.
+- Map of the selected stops (numbered) and, after optimising, the walking line. On desktop the map sits beside the stop list.
 - Stop list with **move up / move down / remove** controls. Any manual change clears the previous optimisation result.
 - **Optimise** (needs 2–12 stops) calls the `route-optimize` Edge Function, keeping the first stop as the start, and reorders the list.
   - With `ORS_API_KEY`: OpenRouteService optimisation (VROOM) + foot-walking directions — real street distances and geometry.
   - Without a key or on any ORS error: nearest-neighbour + 2-opt order with straight-line legs × 1.3 at 4.5 km/h. The UI flags this as an **estimate** (D-014).
-- **Totals:** walking distance (km or mi), walking time, total visit time, and attribution.
+- **Totals:** tiles for walking distance (km or mi), walking time, visit time and total time, plus attribution.
 - **Save as trip:** name (default "Walk in {city}", max 80 characters) and optional date. Saving works with or without an optimisation result; the trip opens right after saving and the tray is cleared.
 - **Clear route** empties the tray.
 
@@ -135,8 +137,8 @@ The tray itself (`features/route/store.ts`, Zustand) is in-memory client state: 
 
 ### 7. My Trips
 
-- **List** (`(tabs)/trips.tsx`) — saved trips, newest first: name, city, date, number of stops, distance and walking time. Pull to refresh. Empty state links back to Explore.
-- **Detail** (`trip/[id].tsx`) — map with numbered stops and the saved route line, totals, stop list (tap to open the attraction).
+- **List** (`(tabs)/trips.tsx`) — grid of trip cards, newest first: city (with flag) and date, name, number of stops, distance and walking time. Pull to refresh. Empty state links back to Explore.
+- **Detail** (`trip/[id].tsx`) — map with numbered stops and the saved route line (beside the details on desktop), totals, stop list (tap to open the attraction).
 - **Navigate:**
   - **Open in Google Maps** — one walking route through all stops (Google allows up to 9 waypoints; longer routes are truncated, with a note).
   - **Leg by leg** — per-leg walking links for Google Maps and Apple Maps.
@@ -148,8 +150,9 @@ Trips are saved with the `save_trip` RPC (trip + ordered stops in one transactio
 
 - **Languages:** English and Portuguese. Order: profile language → device language → English. All strings live in `packages/shared/src/i18n/{en,pt}.json` (a test enforces key parity). Attraction and city names are shown in PT when available, otherwise EN.
 - **Units:** metric (km, °C, mm) or imperial (mi, °F, in) for distances, temperatures and precipitation.
-- **Theme:** light and dark follow the system setting.
-- **Accessibility:** roles and labels on interactive elements, ≥ 44 pt touch targets, live regions for counts and notices, a list alternative to the map, text scales with the system font size.
+- **Theme:** light and dark follow the system setting. Design tokens (colours, spacing, radii, shadows, breakpoints) live in `apps/mobile/src/theme`; shared components in `apps/mobile/src/components` (D-020).
+- **Layout:** phones (< 600 px) get a bottom tab bar and single-column content; tablets (≥ 600 px) get card grids, centred dialogs and two-column sections; desktop (≥ 1024 px) gets a side navigation rail and map-beside-list layouts. Content is capped at 440 px (forms), 760 px (reading) or 1200 px (grids).
+- **Accessibility:** roles and labels on interactive elements, ≥ 44 pt touch targets, live regions for counts and notices, a list alternative to the map, text scales with the system font size, visible focus rings for keyboard users on web, decorative icons hidden from screen readers.
 - **States:** every data screen has loading, empty and error (with retry) states.
 
 ### 9. About / data sources
@@ -171,7 +174,7 @@ Expo Router, files in `apps/mobile/src/app`.
 | `/onboarding`       | `onboarding.tsx`        | signed in, not onboarded | 3-step profile setup                        |
 | `/` (Explore tab)   | `(tabs)/index.tsx`      | onboarded                | Map/list, filters, city switcher, tray      |
 | `/trips`            | `(tabs)/trips.tsx`      | onboarded                | Saved trips                                 |
-| `/profile`          | `(tabs)/profile.tsx`    | onboarded                | Profile, language, units, account           |
+| `/profile`          | `(tabs)/profile.tsx`    | onboarded                | Profile, documents, preferences, account    |
 | `/attraction/[id]`  | `attraction/[id].tsx`   | onboarded (modal)        | Attraction detail, add to route             |
 | `/checklist/[city]` | `checklist/[city].tsx`  | onboarded (modal)        | Pre-trip checklist                          |
 | `/route`            | `route.tsx`             | onboarded                | Route builder and save                      |
@@ -243,7 +246,8 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Portuguese attraction names exist for only ~15–55% of places outside Portugal/Rome (English shown as fallback); opening hours cover ~15–30% of places.
 - Expo Go cannot load MapLibre: iOS/Android need a development build.
 - Sentry / PostHog are not wired yet (no-op facade).
-- No native date pickers; no wide-screen web side panel yet.
+- No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
+- The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
 
 ## Maintaining this README
 

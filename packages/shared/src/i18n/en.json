@@ -76,7 +76,9 @@
     "mapLabel": "Map of attractions. Use the list view for an accessible list.",
     "noResults": "No places match these filters.",
     "noCities": "No destinations yet",
-    "noCitiesBody": "Reference data has not been loaded. Run the data pipeline seeds and try again."
+    "noCitiesBody": "Reference data has not been loaded. Run the data pipeline seeds and try again.",
+    "searchCities": "Search cities",
+    "noCityMatch": "No cities match your search."
   },
   "category": {
     "museum": "Museums",
@@ -104,7 +106,9 @@
     "photoCredit": "Photo: {{author}} · {{license}} · Wikimedia Commons",
     "unknownAuthor": "Unknown author",
     "unesco": "UNESCO World Heritage",
-    "dataCredit": "Data from Wikidata (CC0) and © OpenStreetMap contributors (ODbL). Opening hours may be out of date."
+    "dataCredit": "Data from Wikidata (CC0) and © OpenStreetMap contributors (ODbL). Opening hours may be out of date.",
+    "details": "Good to know",
+    "links": "Learn more"
   },
   "checklist": {
     "title": "Before you go",
@@ -276,7 +280,8 @@
     "openGoogleMaps": "Open the whole walk in Google Maps",
     "googleLimit": "Google Maps shows up to 9 intermediate stops; use the per-leg links for the rest.",
     "legByLeg": "Or navigate one leg at a time:",
-    "leg": "{{from}} to {{to}}"
+    "leg": "{{from}} to {{to}}",
+    "stopsTitle": "Stops"
   },
   "trips": {
     "title": "My Trips",
@@ -289,7 +294,8 @@
     "walk": "{{duration}} walking",
     "delete": "Delete trip",
     "deleteConfirm": "Delete this trip? This can't be undone.",
-    "deleteYes": "Yes, delete trip"
+    "deleteYes": "Yes, delete trip",
+    "subtitle": "Your saved walking routes, ready for the day."
   },
   "profile": {
     "title": "Profile",
@@ -316,7 +322,10 @@
     "about": "About and data sources",
     "deleteAccount": "Delete account",
     "deleteConfirm": "This permanently deletes your account, profile and saved trips.",
-    "deleteYes": "Yes, delete my account"
+    "deleteYes": "Yes, delete my account",
+    "travelDocuments": "Travel documents",
+    "preferences": "Preferences",
+    "account": "Account"
   },
   "about": {
     "title": "About",

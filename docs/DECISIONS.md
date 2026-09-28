@@ -108,3 +108,15 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 ## D-019 — Dates are typed as ISO text in the MVP
 
 - **Decision:** Passport expiry and travel dates use a validated `YYYY-MM-DD` text field on every platform (no native date picker dependency). A native picker is a post-MVP polish item.
+
+## D-020 — Design system: neutral base, one accent, Inter, soft elevation
+
+- **Context:** the MVP UI was functional but visually plain: bordered grey boxes stacked vertically, system fonts, the same weight for primary and secondary actions.
+- **Decision:** a small in-house design system, inspired by the calm, image-led feel of marketplace travel apps (without copying any product's components or brand):
+  - **Colour:** white surfaces, near-black text (`#222`), soft greys for secondary text, dividers and muted backgrounds, and one coral accent (`#D7383B`, 4.6:1 on white) used only for primary actions, selection, active states and route markers. Status colours (success, warning, danger, info) appear only in checklist status pills and errors. Dark mode has its own tokens and relies on surfaces rather than shadows.
+  - **Type:** Inter (`@expo-google-fonts/inter`, SIL OFL) in four weights, loaded before the splash screen hides; an 8-step scale (display, title, heading, subtitle, body, label, caption, helper). `Text` maps `fontWeight` to the matching Inter family because custom fonts ship one family per weight.
+  - **Shape and depth:** radii 8–24 px, hairline borders, `boxShadow` elevation in three levels (card, raised, floating).
+  - **Interaction:** a shared `Tappable` (press-in scale via RN `Animated`, hover on web, keyboard-only focus ring), spinner-in-place loading buttons.
+  - **Layout:** breakpoints at 600 / 1024 px; bottom tabs on phones, side rail on desktop; modals as page sheets on phones and centred dialogs on larger screens; content widths 440 / 760 / 1200 px.
+  - **Icons:** `expo-symbols` (SF Symbols on iOS, Material Symbols on Android/web) behind an `Icon` wrapper with a fixed name map.
+- **Trade-offs:** one more dependency (the font package, ~1 MB of font files). No animation library beyond RN `Animated`, to keep Jest setup unchanged. Some SF Symbols are approximations for attraction categories.

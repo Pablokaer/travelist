@@ -1,24 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema } from '@wayfarer/shared';
-import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { z } from 'zod';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
-import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { signUp } from '@/features/auth/api';
-import { AuthFooter, FormError, OAuthButtons } from '@/features/auth/components';
-import { useTheme } from '@/theme/use-theme';
+import {
+  AuthFooter,
+  AuthLayout,
+  FormError,
+  OAuthButtons,
+  TextLink,
+} from '@/features/auth/components';
 
 type Form = z.infer<typeof signUpSchema>;
 
 export default function SignUpScreen() {
   const { t, i18n } = useTranslation();
-  const theme = useTheme();
   const [error, setError] = useState<string | null>(null);
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
   const { control, handleSubmit, formState } = useForm<Form>({
@@ -42,19 +43,16 @@ export default function SignUpScreen() {
 
   if (confirmEmail) {
     return (
-      <Screen>
-        <Text variant="title">{t('auth.checkInboxTitle')}</Text>
-        <Text>{t('auth.confirmEmailBody', { email: confirmEmail })}</Text>
-        <Link href="/sign-in" style={{ color: theme.primary, fontSize: 16, paddingVertical: 10 }}>
-          {t('auth.backToSignIn')}
-        </Link>
-      </Screen>
+      <AuthLayout
+        title={t('auth.checkInboxTitle')}
+        subtitle={t('auth.confirmEmailBody', { email: confirmEmail })}>
+        <TextLink href="/sign-in" label={t('auth.backToSignIn')} />
+      </AuthLayout>
     );
   }
 
   return (
-    <Screen>
-      <Text variant="title">{t('auth.signUpTitle')}</Text>
+    <AuthLayout title={t('auth.signUpTitle')} footer={<AuthFooter />}>
       <Controller
         control={control}
         name="displayName"
@@ -82,6 +80,7 @@ export default function SignUpScreen() {
             onBlur={field.onBlur}
             error={fieldState.error?.message}
             autoCapitalize="none"
+            icon="mail"
             autoComplete="email"
             keyboardType="email-address"
             textContentType="emailAddress"
@@ -111,10 +110,7 @@ export default function SignUpScreen() {
       <FormError message={error} />
       <Button label={t('auth.createAccount')} loading={formState.isSubmitting} onPress={onSubmit} />
       <OAuthButtons onError={setError} />
-      <Link href="/sign-in" style={{ color: theme.primary, fontSize: 16, paddingVertical: 10 }}>
-        {t('auth.haveAccount')}
-      </Link>
-      <AuthFooter />
-    </Screen>
+      <TextLink href="/sign-in" label={t('auth.haveAccount')} />
+    </AuthLayout>
   );
 }

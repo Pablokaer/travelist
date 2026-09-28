@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { countryName, useCountries, type Country } from './api';
 
 import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
+import { Icon } from '@/components/icon';
+import { Sheet } from '@/components/sheet';
 import { ErrorState, LoadingState } from '@/components/states';
+import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
+import { flagEmoji } from '@/lib/format';
 import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
+import { fontFamilyFor } from '@/theme/fonts';
 import { useTheme } from '@/theme/use-theme';
 
 const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -65,10 +69,8 @@ export function CountryPicker({ label, value, onChange, multiple, max = 5, error
   const message = error ? t(error as never, { defaultValue: error }) : undefined;
 
   return (
-    <View style={{ gap: spacing.xs }} testID={testID}>
-      <Text variant="caption" style={{ fontWeight: '600' }}>
-        {label}
-      </Text>
+    <View style={{ gap: spacing.sm }} testID={testID}>
+      <Text variant="label">{label}</Text>
       <View style={styles.chips}>
         {value.map((code) => (
           <Chip
@@ -84,6 +86,7 @@ export function CountryPicker({ label, value, onChange, multiple, max = 5, error
           <Button
             compact
             variant="secondary"
+            icon="add"
             label={value.length ? t('countryPicker.addAnother') : t('countryPicker.choose')}
             onPress={() => setOpen(true)}
             disabled={multiple && value.length >= max}
@@ -91,22 +94,24 @@ export function CountryPicker({ label, value, onChange, multiple, max = 5, error
         ) : null}
       </View>
       {message ? (
-        <Text variant="caption" style={{ color: theme.danger }}>
+        <Text variant="helper" style={{ color: theme.danger }}>
           {message}
         </Text>
       ) : null}
 
-      <Modal visible={open} animationType="slide" onRequestClose={() => setOpen(false)}>
-        <SafeAreaView style={[styles.modal, { backgroundColor: theme.background }]}>
-          <View style={styles.header}>
-            <Text variant="heading">{label}</Text>
-            <Button
-              compact
-              variant="ghost"
-              label={t('common.done')}
-              onPress={() => setOpen(false)}
-            />
-          </View>
+      <Sheet
+        visible={open}
+        onClose={() => setOpen(false)}
+        title={label}
+        action={
+          <Button compact variant="ghost" label={t('common.done')} onPress={() => setOpen(false)} />
+        }>
+        <View
+          style={[
+            styles.search,
+            { backgroundColor: theme.surfaceMuted, borderColor: theme.border },
+          ]}>
+          <Icon name="search" size={18} color={theme.textSecondary} />
           <TextInput
             autoFocus
             value={query}
@@ -114,67 +119,82 @@ export function CountryPicker({ label, value, onChange, multiple, max = 5, error
             placeholder={t('countryPicker.search')}
             accessibilityLabel={t('countryPicker.search')}
             placeholderTextColor={theme.textSecondary}
-            style={[
-              styles.search,
-              { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border },
-            ]}
+            style={[styles.searchInput, { color: theme.text }]}
           />
-          {countries.isPending ? (
-            <LoadingState />
-          ) : countries.isError ? (
-            <ErrorState onRetry={() => countries.refetch()} />
-          ) : (
-            <FlatList
-              data={filtered}
-              keyExtractor={(c) => c.code}
-              keyboardShouldPersistTaps="handled"
-              initialNumToRender={30}
-              renderItem={({ item }) => {
-                const selected = value.includes(item.code);
-                return (
-                  <Pressable
-                    onPress={() => toggle(item)}
-                    accessibilityRole={multiple ? 'checkbox' : 'radio'}
-                    accessibilityState={{ checked: selected }}
-                    accessibilityLabel={countryName(item, lang)}
-                    style={({ pressed }) => [
-                      styles.row,
-                      { borderColor: theme.border, opacity: pressed ? 0.7 : 1 },
-                    ]}>
-                    <Text style={{ flex: 1 }}>{countryName(item, lang)}</Text>
-                    <Text secondary>{selected ? '✓' : item.code}</Text>
-                  </Pressable>
-                );
-              }}
-              ListEmptyComponent={
-                <Text secondary style={{ padding: spacing.md }}>
-                  {t('countryPicker.noResults')}
-                </Text>
-              }
-            />
-          )}
-        </SafeAreaView>
-      </Modal>
+        </View>
+        {countries.isPending ? (
+          <LoadingState />
+        ) : countries.isError ? (
+          <ErrorState onRetry={() => countries.refetch()} />
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={(c) => c.code}
+            keyboardShouldPersistTaps="handled"
+            initialNumToRender={30}
+            renderItem={({ item }) => {
+              const selected = value.includes(item.code);
+              return (
+                <Tappable
+                  onPress={() => toggle(item)}
+                  accessibilityRole={multiple ? 'checkbox' : 'radio'}
+                  accessibilityState={{ checked: selected }}
+                  accessibilityLabel={countryName(item, lang)}
+                  pressScale={0.98}
+                  style={({ hovered, pressed }) => [
+                    styles.row,
+                    {
+                      backgroundColor: selected
+                        ? theme.primarySoft
+                        : hovered || pressed
+                          ? theme.surfaceMuted
+                          : 'transparent',
+                    },
+                  ]}>
+                  <Text style={styles.flag}>{flagEmoji(item.code)}</Text>
+                  <Text style={styles.flex}>{countryName(item, lang)}</Text>
+                  {selected ? (
+                    <Icon name="check" size={18} color={theme.primary} />
+                  ) : (
+                    <Text variant="helper" secondary>
+                      {item.code}
+                    </Text>
+                  )}
+                </Tappable>
+              );
+            }}
+            ListEmptyComponent={
+              <Text secondary style={{ padding: spacing.md, textAlign: 'center' }}>
+                {t('countryPicker.noResults')}
+              </Text>
+            }
+          />
+        )}
+      </Sheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, alignItems: 'center' },
-  modal: { flex: 1, padding: spacing.md, gap: spacing.md },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   search: {
-    minHeight: MIN_TOUCH + 4,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-  },
-  row: {
-    minHeight: MIN_TOUCH + 4,
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: spacing.sm,
+    gap: spacing.sm,
+    minHeight: MIN_TOUCH + 4,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
   },
+  searchInput: { flex: 1, alignSelf: 'stretch', fontSize: 16, fontFamily: fontFamilyFor('400') },
+  row: {
+    minHeight: MIN_TOUCH + 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md - 4,
+    paddingHorizontal: spacing.sm + 2,
+    borderRadius: radius.md,
+  },
+  flag: { fontSize: 20, lineHeight: 26 },
 });

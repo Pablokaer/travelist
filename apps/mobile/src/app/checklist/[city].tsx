@@ -5,7 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
-import { Screen } from '@/components/screen';
+import { Card } from '@/components/card';
+import { PageHeader, Screen } from '@/components/screen';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
@@ -23,12 +24,14 @@ import { useCities } from '@/features/destinations/api';
 import { useProfile } from '@/features/profile/api';
 import { todayIso } from '@/lib/format';
 import { spacing } from '@/theme/colors';
+import { useBreakpoint } from '@/theme/use-theme';
 
 const valid = (v: string) => isoDateSchema.safeParse(v).success;
 
 export default function ChecklistScreen() {
   const { city: citySlug } = useLocalSearchParams<{ city: string }>();
   const { t, i18n } = useTranslation();
+  const { isTablet, isDesktop } = useBreakpoint();
   const profile = useProfile();
   const cities = useCities();
   const city = cities.data?.find((c) => c.slug === citySlug);
@@ -68,19 +71,33 @@ export default function ChecklistScreen() {
   if (p && p.nationalities.length === 0) {
     return (
       <EmptyState
+        icon="passport"
         title={t('checklist.needNationality')}
         action={<Button label={t('profile.edit')} onPress={() => router.push('/edit-profile')} />}
       />
     );
   }
 
+  const sections = checklist.data
+    ? [
+        <VisaSection key="visa" data={checklist.data.visa} />,
+        <PassportSection key="passport" data={checklist.data.passport} />,
+        <WeatherSection key="weather" data={checklist.data.weather} units={p?.units ?? 'metric'} />,
+        <PowerSection key="power" data={checklist.data.power} />,
+        <MoneySection key="money" data={checklist.data.money} />,
+        <SafetySection key="safety" data={checklist.data.safety} />,
+        <PracticalSection key="practical" data={checklist.data.practical} />,
+      ]
+    : [];
+
   return (
-    <Screen>
+    <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
       <Stack.Screen options={{ title: t('checklist.titleFor', { city: cityName }) }} />
-      <Text secondary>{t('checklist.intro')}</Text>
-      <View style={styles.dates}>
+      <PageHeader size="title" title={cityName} subtitle={t('checklist.intro')} />
+      <Card muted style={[styles.dates, isTablet && styles.datesWide]}>
         <View style={styles.flex}>
           <TextField
+            icon="calendar"
             label={t('checklist.arrival')}
             value={arrivalInput}
             onChangeText={setArrivalInput}
@@ -91,6 +108,7 @@ export default function ChecklistScreen() {
         </View>
         <View style={styles.flex}>
           <TextField
+            icon="calendar"
             label={t('checklist.departure')}
             value={departureInput}
             onChangeText={setDepartureInput}
@@ -99,43 +117,50 @@ export default function ChecklistScreen() {
             testID="departure"
           />
         </View>
-      </View>
+        <Button
+          compact={isTablet}
+          label={t('checklist.update')}
+          disabled={!!datesError}
+          onPress={() => setDates({ arrival: arrivalInput, departure: departureInput || null })}
+        />
+      </Card>
       {datesError ? (
-        <Text variant="caption" secondary>
+        <Text variant="helper" secondary>
           {t('checklist.datesHint')}
         </Text>
       ) : null}
-      <Button
-        compact
-        variant="secondary"
-        label={t('checklist.update')}
-        disabled={!!datesError}
-        onPress={() => setDates({ arrival: arrivalInput, departure: departureInput || null })}
-      />
 
       {checklist.isPending ? (
         <LoadingState label={t('checklist.loading')} />
       ) : checklist.isError ? (
         <ErrorState message={t('checklist.error')} onRetry={() => checklist.refetch()} />
       ) : (
-        <View style={{ gap: spacing.md }}>
-          <VisaSection data={checklist.data.visa} />
-          <PassportSection data={checklist.data.passport} />
-          <WeatherSection data={checklist.data.weather} units={p?.units ?? 'metric'} />
-          <PowerSection data={checklist.data.power} />
-          <MoneySection data={checklist.data.money} />
-          <SafetySection data={checklist.data.safety} />
-          <PracticalSection data={checklist.data.practical} />
-          <Text variant="caption" secondary>
+        <>
+          {isTablet ? (
+            // Two balanced columns on wider screens.
+            <View style={styles.columns}>
+              {[0, 1].map((col) => (
+                <View key={col} style={styles.column}>
+                  {sections.filter((_, i) => i % 2 === col)}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.column}>{sections}</View>
+          )}
+          <Text variant="helper" secondary>
             {t('checklist.disclaimer')}
           </Text>
-        </View>
+        </>
       )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  dates: { flexDirection: 'row', gap: spacing.sm },
   flex: { flex: 1 },
+  dates: { gap: spacing.md },
+  datesWide: { flexDirection: 'row', alignItems: 'flex-end' },
+  columns: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  column: { flex: 1, gap: spacing.md },
 });
