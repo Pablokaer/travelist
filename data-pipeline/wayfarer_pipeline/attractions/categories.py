@@ -77,6 +77,7 @@ ROOTS: dict[str, str] = {
     "Q44539": "landmark",  # temple
     "Q39614": "landmark",  # cemetery
     "Q7138926": "landmark",  # parliament building (e.g. Hungarian Parliament)
+    "Q25550691": "landmark",  # city hall (e.g. Stockholm, Oslo, Vienna, Belfast)
     "Q88372": "landmark",  # promenade (e.g. Promenade des Anglais)
     # other
     "Q43501": "other",  # zoo

@@ -11,6 +11,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Data
+
+- 8 more cities — the remaining EU capitals and the UK nation capitals (60 total in 32 countries, 11,760 attractions): Sofia, Zagreb, Nicosia, Luxembourg, Valletta, Bucharest, Cardiff, Belfast. Every EU capital is now covered (test). City halls became a category root (Stockholm, Oslo, Vienna, Belfast); all 60 cities re-ingested under the same rules (+35 attractions in existing cities). CY override: 1400 is not an ambulance number.
+
 ### Added
 
 - Checklist → Power: each destination plug type is shown with an illustration of the plug face.

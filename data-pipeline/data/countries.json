@@ -1175,7 +1175,7 @@
     "calling_code": "+357",
     "emergency_number": "112",
     "police_number": null,
-    "ambulance_number": "1400",
+    "ambulance_number": null,
     "fire_number": "199",
     "languages": ["el", "tr"],
     "timezones": ["Asia/Nicosia", "Asia/Famagusta"],

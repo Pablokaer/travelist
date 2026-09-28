@@ -543,3 +543,85 @@ cities:
     bbox: [44.4210532, 11.2296206, 44.556094, 11.4334471]
     timezone: Europe/Rome
     is_active: true
+
+  # --- Added 2026-09-28 (batch 4): remaining EU capitals + UK nation capitals.
+
+  - slug: sofia
+    name: { en: Sofia, pt: Sófia }
+    country_code: BG
+    wikidata_id: Q472
+    osm_relation_id: 4283101
+    center: [42.697886, 23.321726]
+    bbox: [42.5579851, 23.167997, 42.864302, 23.6215817]
+    timezone: Europe/Sofia
+    is_active: true
+
+  - slug: zagreb
+    name: { en: Zagreb, pt: Zagreb }
+    country_code: HR
+    wikidata_id: Q1435
+    osm_relation_id: 226224
+    center: [45.813056, 15.977222]
+    bbox: [45.6139895, 15.7732052, 45.9691466, 16.2395548]
+    timezone: Europe/Zagreb
+    is_active: true
+
+  - slug: nicosia
+    name: { en: Nicosia, pt: Nicósia }
+    country_code: CY
+    wikidata_id: Q3856
+    osm_relation_id: 2628521
+    center: [35.1725, 33.365]
+    bbox: [35.1521717, 33.3358797, 35.2017784, 33.4182382]
+    timezone: Asia/Nicosia
+    is_active: true
+
+  - slug: luxembourg
+    name: { en: Luxembourg, pt: Luxemburgo }
+    country_code: LU
+    wikidata_id: Q1842
+    osm_relation_id: 407489
+    center: [49.611389, 6.13]
+    bbox: [49.5609875, 6.06917, 49.6548682, 6.2036491]
+    timezone: Europe/Luxembourg
+    is_active: true
+
+  - slug: valletta
+    name: { en: Valletta, pt: Valeta }
+    country_code: MT
+    wikidata_id: Q23800
+    osm_relation_id: null # municipality is 1 km²: ±0.04° covers the Grand Harbour, Floriana and the Three Cities
+    center: [35.897778, 14.5125]
+    bbox: [35.8577778, 14.4725, 35.9377778, 14.5525]
+    timezone: Europe/Malta
+    is_active: true
+
+  - slug: bucharest
+    name: { en: Bucharest, pt: Bucareste }
+    country_code: RO
+    wikidata_id: Q19660
+    osm_relation_id: 377733
+    center: [44.413361, 26.097778]
+    bbox: [44.3342466, 25.9666745, 44.5413964, 26.2255768]
+    timezone: Europe/Bucharest
+    is_active: true
+
+  - slug: cardiff
+    name: { en: Cardiff, pt: Cardiff }
+    country_code: GB
+    wikidata_id: Q10690
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [51.481667, -3.179167]
+    bbox: [51.3216546, -3.3391934, 51.6416546, -3.0191934]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: belfast
+    name: { en: Belfast, pt: Belfast }
+    country_code: GB
+    wikidata_id: Q10686
+    osm_relation_id: 19414244
+    center: [54.596667, -5.93]
+    bbox: [54.5305618, -6.0601801, 54.6649674, -5.8073559]
+    timezone: Europe/London
+    is_active: true

@@ -4,7 +4,7 @@
      data-pipeline/cities.yaml and data-pipeline/data/attractions. Do not edit by hand:
      `ingest` and `seed` rewrite it, and CI fails when it is stale. -->
 
-**52 cities** in **27 countries**, **52** live on the map, **10,736 attractions** in total.
+**60 cities** in **32 countries**, **60** live on the map, **11,760 attractions** in total.
 
 Cities are listed in the order they were added to `cities.yaml`. When a city is added,
 also record it in [CHANGELOG.md](../CHANGELOG.md). How to add one: see
@@ -20,50 +20,58 @@ number of UNESCO sites; date the data was retrieved.
 | 3 | Istanbul | Istambul | Turkey (TR) | `istanbul` | 300 | 94% | 34% | 14% | 5 | 2026-09-28 | active |
 | 4 | Rome | Roma | Italy (IT) | `rome` | 300 | 99% | 99% | 25% | 7 | 2026-09-28 | active |
 | 5 | Prague | Praga | Czech Republic (CZ) | `prague` | 300 | 100% | 14% | 15% | 0 | 2026-09-28 | active |
-| 6 | Amsterdam | Amesterdão | Netherlands (NL) | `amsterdam` | 267 | 97% | 17% | 21% | 3 | 2026-09-28 | active |
+| 6 | Amsterdam | Amesterdão | Netherlands (NL) | `amsterdam` | 269 | 97% | 17% | 21% | 3 | 2026-09-28 | active |
 | 7 | Barcelona | Barcelona | Spain (ES) | `barcelona` | 300 | 100% | 20% | 19% | 5 | 2026-09-28 | active |
 | 8 | Milan | Milão | Italy (IT) | `milan` | 300 | 98% | 16% | 19% | 1 | 2026-09-28 | active |
-| 9 | Vienna | Viena | Austria (AT) | `vienna` | 300 | 99% | 17% | 19% | 0 | 2026-09-28 | active |
+| 9 | Vienna | Viena | Austria (AT) | `vienna` | 300 | 99% | 18% | 19% | 0 | 2026-09-28 | active |
 | 10 | Madrid | Madrid | Spain (ES) | `madrid` | 300 | 100% | 42% | 15% | 0 | 2026-09-28 | active |
 | 11 | Lisbon | Lisboa | Portugal (PT) | `lisbon` | 300 | 97% | 100% | 17% | 2 | 2026-09-28 | active |
-| 12 | Porto | Porto | Portugal (PT) | `porto` | 179 | 96% | 100% | 25% | 4 | 2026-09-28 | active |
+| 12 | Porto | Porto | Portugal (PT) | `porto` | 180 | 96% | 100% | 26% | 4 | 2026-09-28 | active |
 | 13 | Berlin | Berlim | Germany (DE) | `berlin` | 300 | 99% | 33% | 30% | 4 | 2026-09-28 | active |
 | 14 | Venice | Veneza | Italy (IT) | `venice` | 300 | 99% | 20% | 11% | 9 | 2026-09-28 | active |
 | 15 | Florence | Florença | Italy (IT) | `florence` | 300 | 100% | 46% | 10% | 14 | 2026-09-28 | active |
-| 16 | Munich | Munique | Germany (DE) | `munich` | 300 | 97% | 18% | 17% | 0 | 2026-09-28 | active |
-| 17 | Dublin | Dublin | Ireland (IE) | `dublin` | 250 | 82% | 8% | 12% | 0 | 2026-09-28 | active |
-| 18 | Athens | Atenas | Greece (GR) | `athens` | 287 | 81% | 25% | 14% | 10 | 2026-09-28 | active |
-| 19 | Budapest | Budapeste | Hungary (HU) | `budapest` | 300 | 96% | 9% | 24% | 4 | 2026-09-28 | active |
-| 20 | Edinburgh | Edimburgo | United Kingdom (GB) | `edinburgh` | 227 | 94% | 16% | 11% | 1 | 2026-09-28 | active |
+| 16 | Munich | Munique | Germany (DE) | `munich` | 300 | 97% | 19% | 18% | 0 | 2026-09-28 | active |
+| 17 | Dublin | Dublin | Ireland (IE) | `dublin` | 254 | 82% | 7% | 12% | 0 | 2026-09-28 | active |
+| 18 | Athens | Atenas | Greece (GR) | `athens` | 288 | 81% | 25% | 14% | 10 | 2026-09-28 | active |
+| 19 | Budapest | Budapeste | Hungary (HU) | `budapest` | 300 | 96% | 9% | 23% | 4 | 2026-09-28 | active |
+| 20 | Edinburgh | Edimburgo | United Kingdom (GB) | `edinburgh` | 231 | 94% | 16% | 11% | 1 | 2026-09-28 | active |
 | 21 | Brussels | Bruxelas | Belgium (BE) | `brussels` | 300 | 98% | 12% | 15% | 1 | 2026-09-28 | active |
 | 22 | Copenhagen | Copenhaga | Denmark (DK) | `copenhagen` | 300 | 97% | 12% | 11% | 0 | 2026-09-28 | active |
 | 23 | Stockholm | Estocolmo | Sweden (SE) | `stockholm` | 300 | 99% | 21% | 14% | 3 | 2026-09-28 | active |
-| 24 | Nice | Nice | France (FR) | `nice` | 64 | 97% | 9% | 16% | 0 | 2026-09-28 | active |
-| 25 | Seville | Sevilha | Spain (ES) | `seville` | 141 | 99% | 16% | 9% | 2 | 2026-09-28 | active |
+| 24 | Nice | Nice | France (FR) | `nice` | 65 | 97% | 9% | 15% | 0 | 2026-09-28 | active |
+| 25 | Seville | Sevilha | Spain (ES) | `seville` | 142 | 99% | 15% | 8% | 2 | 2026-09-28 | active |
 | 26 | Kraków | Cracóvia | Poland (PL) | `krakow` | 300 | 100% | 5% | 14% | 2 | 2026-09-28 | active |
 | 27 | Warsaw | Varsóvia | Poland (PL) | `warsaw` | 300 | 99% | 9% | 13% | 1 | 2026-09-28 | active |
 | 28 | Naples | Nápoles | Italy (IT) | `naples` | 300 | 99% | 15% | 8% | 9 | 2026-09-28 | active |
-| 29 | Valencia | Valência | Spain (ES) | `valencia` | 192 | 99% | 7% | 11% | 1 | 2026-09-28 | active |
-| 30 | Zurich | Zurique | Switzerland (CH) | `zurich` | 118 | 92% | 12% | 21% | 1 | 2026-09-28 | active |
+| 29 | Valencia | Valência | Spain (ES) | `valencia` | 194 | 99% | 7% | 11% | 1 | 2026-09-28 | active |
+| 30 | Zurich | Zurique | Switzerland (CH) | `zurich` | 119 | 92% | 12% | 21% | 1 | 2026-09-28 | active |
 | 31 | Antalya | Antália | Turkey (TR) | `antalya` | 28 | 64% | 7% | 14% | 0 | 2026-09-28 | active |
-| 32 | Oslo | Oslo | Norway (NO) | `oslo` | 260 | 95% | 10% | 10% | 0 | 2026-09-28 | active |
-| 33 | Hamburg | Hamburgo | Germany (DE) | `hamburg` | 179 | 91% | 11% | 21% | 0 | 2026-09-28 | active |
-| 34 | Frankfurt | Frankfurt | Germany (DE) | `frankfurt` | 138 | 97% | 15% | 21% | 0 | 2026-09-28 | active |
-| 35 | Cologne | Colónia | Germany (DE) | `cologne` | 175 | 93% | 10% | 18% | 3 | 2026-09-28 | active |
-| 36 | Geneva | Genebra | Switzerland (CH) | `geneva` | 79 | 99% | 57% | 13% | 0 | 2026-09-28 | active |
-| 37 | Salzburg | Salzburgo | Austria (AT) | `salzburg` | 57 | 95% | 12% | 18% | 0 | 2026-09-28 | active |
-| 38 | Bruges | Bruges | Belgium (BE) | `bruges` | 93 | 99% | 11% | 14% | 3 | 2026-09-28 | active |
+| 32 | Oslo | Oslo | Norway (NO) | `oslo` | 263 | 95% | 10% | 10% | 0 | 2026-09-28 | active |
+| 33 | Hamburg | Hamburgo | Germany (DE) | `hamburg` | 180 | 91% | 11% | 21% | 0 | 2026-09-28 | active |
+| 34 | Frankfurt | Frankfurt | Germany (DE) | `frankfurt` | 139 | 97% | 15% | 22% | 0 | 2026-09-28 | active |
+| 35 | Cologne | Colónia | Germany (DE) | `cologne` | 176 | 93% | 10% | 18% | 3 | 2026-09-28 | active |
+| 36 | Geneva | Genebra | Switzerland (CH) | `geneva` | 80 | 99% | 56% | 12% | 0 | 2026-09-28 | active |
+| 37 | Salzburg | Salzburgo | Austria (AT) | `salzburg` | 58 | 95% | 12% | 17% | 0 | 2026-09-28 | active |
+| 38 | Bruges | Bruges | Belgium (BE) | `bruges` | 94 | 99% | 11% | 14% | 3 | 2026-09-28 | active |
 | 39 | Antwerp | Antuérpia | Belgium (BE) | `antwerp` | 95 | 94% | 13% | 16% | 3 | 2026-09-28 | active |
-| 40 | Rotterdam | Roterdão | Netherlands (NL) | `rotterdam` | 96 | 91% | 7% | 18% | 0 | 2026-09-28 | active |
+| 40 | Rotterdam | Roterdão | Netherlands (NL) | `rotterdam` | 98 | 91% | 7% | 17% | 0 | 2026-09-28 | active |
 | 41 | Helsinki | Helsínquia | Finland (FI) | `helsinki` | 300 | 95% | 9% | 12% | 1 | 2026-09-28 | active |
-| 42 | Reykjavík | Reykjavík | Iceland (IS) | `reykjavik` | 48 | 73% | 12% | 31% | 0 | 2026-09-28 | active |
-| 43 | Tallinn | Tallinn | Estonia (EE) | `tallinn` | 154 | 90% | 18% | 8% | 0 | 2026-09-28 | active |
-| 44 | Riga | Riga | Latvia (LV) | `riga` | 143 | 92% | 8% | 9% | 0 | 2026-09-28 | active |
-| 45 | Vilnius | Vilnius | Lithuania (LT) | `vilnius` | 185 | 96% | 5% | 13% | 0 | 2026-09-28 | active |
+| 42 | Reykjavík | Reykjavík | Iceland (IS) | `reykjavik` | 49 | 73% | 12% | 31% | 0 | 2026-09-28 | active |
+| 43 | Tallinn | Tallinn | Estonia (EE) | `tallinn` | 155 | 90% | 17% | 8% | 0 | 2026-09-28 | active |
+| 44 | Riga | Riga | Latvia (LV) | `riga` | 144 | 92% | 8% | 9% | 0 | 2026-09-28 | active |
+| 45 | Vilnius | Vilnius | Lithuania (LT) | `vilnius` | 186 | 96% | 5% | 13% | 0 | 2026-09-28 | active |
 | 46 | Dubrovnik | Dubrovnik | Croatia (HR) | `dubrovnik` | 40 | 98% | 8% | 12% | 0 | 2026-09-28 | active |
 | 47 | Split | Split | Croatia (HR) | `split` | 45 | 96% | 9% | 13% | 1 | 2026-09-28 | active |
-| 48 | Ljubljana | Liubliana | Slovenia (SI) | `ljubljana` | 107 | 82% | 4% | 8% | 4 | 2026-09-28 | active |
-| 49 | Bratislava | Bratislava | Slovakia (SK) | `bratislava` | 176 | 100% | 6% | 9% | 0 | 2026-09-28 | active |
+| 48 | Ljubljana | Liubliana | Slovenia (SI) | `ljubljana` | 108 | 82% | 4% | 8% | 4 | 2026-09-28 | active |
+| 49 | Bratislava | Bratislava | Slovakia (SK) | `bratislava` | 177 | 100% | 6% | 10% | 0 | 2026-09-28 | active |
 | 50 | Palma | Palma de Maiorca | Spain (ES) | `palma` | 74 | 97% | 9% | 9% | 0 | 2026-09-28 | active |
-| 51 | Málaga | Málaga | Spain (ES) | `malaga` | 53 | 100% | 8% | 19% | 0 | 2026-09-28 | active |
+| 51 | Málaga | Málaga | Spain (ES) | `malaga` | 54 | 100% | 7% | 19% | 0 | 2026-09-28 | active |
 | 52 | Bologna | Bolonha | Italy (IT) | `bologna` | 186 | 96% | 10% | 6% | 1 | 2026-09-28 | active |
+| 53 | Sofia | Sófia | Bulgaria (BG) | `sofia` | 98 | 95% | 14% | 18% | 1 | 2026-09-28 | active |
+| 54 | Zagreb | Zagreb | Croatia (HR) | `zagreb` | 123 | 93% | 6% | 14% | 0 | 2026-09-28 | active |
+| 55 | Nicosia | Nicósia | Cyprus (CY) | `nicosia` | 47 | 87% | 4% | 11% | 0 | 2026-09-28 | active |
+| 56 | Luxembourg | Luxemburgo | Luxembourg (LU) | `luxembourg` | 92 | 87% | 13% | 10% | 0 | 2026-09-28 | active |
+| 57 | Valletta | Valeta | Malta (MT) | `valletta` | 191 | 99% | 16% | 4% | 4 | 2026-09-28 | active |
+| 58 | Bucharest | Bucareste | Romania (RO) | `bucharest` | 189 | 85% | 10% | 14% | 0 | 2026-09-28 | active |
+| 59 | Cardiff | Cardiff | United Kingdom (GB) | `cardiff` | 173 | 95% | 7% | 5% | 0 | 2026-09-28 | active |
+| 60 | Belfast | Belfast | United Kingdom (GB) | `belfast` | 76 | 80% | 4% | 8% | 0 | 2026-09-28 | active |

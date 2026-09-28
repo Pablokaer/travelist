@@ -37,6 +37,7 @@ TYPE_ROOTS = {
     "Q7138926": ["Q7138926"],  # parliament building (Hungarian Parliament)
     "Q88372": ["Q88372"],  # promenade (Promenade des Anglais)
     "Q1060829": ["Q1060829"],  # concert hall (Elbphilharmonie)
+    "Q25550691": ["Q25550691"],  # city hall (Stockholm City Hall)
 }
 
 
@@ -57,6 +58,7 @@ TYPE_ROOTS = {
         ({"Q7138926"}, "landmark"),
         ({"Q88372"}, "landmark"),
         ({"Q1060829"}, "other"),
+        ({"Q25550691"}, "landmark"),
         (set(), None),
     ],
 )

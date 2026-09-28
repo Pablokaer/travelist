@@ -55,7 +55,7 @@ insert into public.countries (code, name_en, name_pt, currency_codes, plug_types
   ('CV', 'Cape Verde', 'Cabo Verde', array['CVE']::text[], array['C','F']::text[], 220, 50, 'right', '+238', null, '132', '130', '131', array['pt']::text[], array['Atlantic/Cape_Verde']::text[], false, false),
   ('CW', 'Curaçao', 'Curaçau', array['XCG']::text[], array['A','B']::text[], 120, 55, 'right', '+5999', '911', null, null, null, array['en','nl']::text[], array['America/Curacao']::text[], false, false),
   ('CX', 'Christmas Island', 'Ilha Christmas', array['AUD']::text[], '{}'::text[], null, null, 'left', null, null, null, null, null, array['en']::text[], array['Indian/Christmas']::text[], false, false),
-  ('CY', 'Cyprus', 'Chipre', array['EUR']::text[], array['G']::text[], 240, 50, 'left', '+357', '112', null, '1400', '199', array['el','tr']::text[], array['Asia/Nicosia','Asia/Famagusta']::text[], true, false),
+  ('CY', 'Cyprus', 'Chipre', array['EUR']::text[], array['G']::text[], 240, 50, 'left', '+357', '112', null, null, '199', array['el','tr']::text[], array['Asia/Nicosia','Asia/Famagusta']::text[], true, false),
   ('CZ', 'Czech Republic', 'Chéquia', array['CZK']::text[], array['C','E']::text[], 230, 50, 'right', '+420', '112', '158', '155', '150', array['cs']::text[], array['Europe/Prague']::text[], true, true),
   ('DE', 'Germany', 'Alemanha', array['EUR']::text[], array['C','F']::text[], 230, 50, 'right', '+49', '112', '110', null, null, array['de']::text[], array['Europe/Berlin','Europe/Busingen']::text[], true, true),
   ('DJ', 'Djibouti', 'Djibouti', array['DJF']::text[], array['C','E']::text[], 220, 50, 'right', '+253', null, '17', '19', '18', array['ar','fr']::text[], array['Africa/Djibouti']::text[], false, false),

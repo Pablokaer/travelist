@@ -146,3 +146,8 @@ LT:
 SI:
   source: 'Constitution of Slovenia art. 11: Slovene is the official language (Hungarian and Italian only in their ethnic areas)'
   languages: [sl]
+
+# --- Batch 4 (EU capitals) 2026-09-28: BG, CY, LU, MT, RO checked. BG uses EUR since 2026-01-01.
+CY:
+  source: 'Cyprus Police / Ministry of Health: emergency numbers are 112 and 199 (1400 is not an emergency line)'
+  ambulance_number: null
