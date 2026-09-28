@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
 import { Text } from '@/components/text';
+import { PlugIcon } from '@/features/checklist/plug-icon';
 import { useCountries, countryName } from '@/features/profile/api';
 import {
   formatDate,
@@ -169,11 +170,9 @@ export function PowerSection({ data }: { data: ChecklistResponse['power'] }) {
       : data.adapterNeeded === false
         ? 'ok'
         : 'info';
-  const plugs = (p: string[]) =>
-    p.length ? p.map((x) => t('checklist.power.type', { type: x })).join(', ') : '–';
   return (
     <SectionCard title={t('checklist.power.title')} tone={tone} testID="section-power">
-      <Line label={t('checklist.power.plugs')} value={plugs(data.destinationPlugs)} />
+      <PlugList label={t('checklist.power.plugs')} types={data.destinationPlugs} />
       <Line
         label={t('checklist.power.voltage')}
         value={
@@ -186,7 +185,7 @@ export function PowerSection({ data }: { data: ChecklistResponse['power'] }) {
         }
       />
       {data.homePlugs.length ? (
-        <Line label={t('checklist.power.yourPlugs')} value={plugs(data.homePlugs)} />
+        <PlugList label={t('checklist.power.yourPlugs')} types={data.homePlugs} />
       ) : null}
       <Text style={{ fontWeight: '600' }}>
         {data.adapterNeeded == null
@@ -197,6 +196,37 @@ export function PowerSection({ data }: { data: ChecklistResponse['power'] }) {
       </Text>
       {data.voltageDiffers ? <Text>{t('checklist.power.voltageWarning')}</Text> : null}
     </SectionCard>
+  );
+}
+
+function PlugList({ label, types }: { label: string; types: string[] }) {
+  const { t } = useTranslation();
+  return (
+    <View style={{ gap: spacing.xs }}>
+      <Text secondary>{label}</Text>
+      {types.length ? (
+        <View style={styles.plugs}>
+          {types.map((type) => {
+            const name = t('checklist.power.type', { type });
+            return (
+              <View
+                key={type}
+                style={styles.plug}
+                accessible
+                accessibilityRole="image"
+                accessibilityLabel={name}>
+                <PlugIcon type={type} />
+                <Text variant="caption" style={{ fontWeight: '600' }}>
+                  {name}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      ) : (
+        <Text style={styles.value}>–</Text>
+      )}
+    </View>
   );
 }
 
@@ -404,4 +434,6 @@ const styles = StyleSheet.create({
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 28 },
   value: { fontWeight: '600', textAlign: 'right', flexShrink: 1 },
   buttons: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  plugs: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  plug: { alignItems: 'center', gap: spacing.xs },
 });

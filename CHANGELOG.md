@@ -13,6 +13,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- Checklist → Power: each destination plug type is shown with an illustration of the plug face.
 - City coverage register [docs/CITIES.md](./docs/CITIES.md), generated from `cities.yaml` and the ingested data (`python -m wayfarer_pipeline cities-doc`; `ingest`, `seed` and `cities` rewrite it). CI fails when it is stale.
 - CI `docs` job (`scripts/check-docs.mjs`): pull requests that change code, data or config without a CHANGELOG entry fail; user-facing changes without a README update get a warning.
 
