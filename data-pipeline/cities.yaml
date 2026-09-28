@@ -11,6 +11,7 @@
 #   osm_relation_id OSM administrative boundary relation (null if not usable)
 #   center          [lat, lon] (Wikidata P625)
 #   bbox            [south, west, north, east] used for ingestion queries (Nominatim)
+#   timezone        IANA time zone (tzdb)
 #   is_active       inactive cities are ingested but hidden from the map
 #
 # Sources: Wikidata SPARQL + Nominatim, retrieved 2026-09-26. See docs/DATA_SOURCES.md.
@@ -25,6 +26,7 @@ cities:
     osm_relation_id: 175342 # Greater London
     center: [51.507222, -0.1275]
     bbox: [51.2867601, -0.5103751, 51.6918741, 0.3340155]
+    timezone: Europe/London
     is_active: true
 
   - slug: paris
@@ -34,6 +36,7 @@ cities:
     osm_relation_id: 7444
     center: [48.856667, 2.352222]
     bbox: [48.8155755, 2.224122, 48.902156, 2.4697602]
+    timezone: Europe/Paris
     is_active: true
 
   - slug: istanbul
@@ -44,6 +47,7 @@ cities:
     osm_relation_id: null
     center: [41.01, 28.960278]
     bbox: [40.846381, 28.8158715, 41.166381, 29.1358715]
+    timezone: Europe/Istanbul
     is_active: true
 
   - slug: rome
@@ -53,6 +57,7 @@ cities:
     osm_relation_id: 41485
     center: [41.893056, 12.482778]
     bbox: [41.6556417, 12.2344416, 42.1410285, 12.8557603]
+    timezone: Europe/Rome
     is_active: true
 
   - slug: prague
@@ -62,6 +67,7 @@ cities:
     osm_relation_id: 435514
     center: [50.0875, 14.421389]
     bbox: [49.9419006, 14.2244355, 50.1774302, 14.7067867]
+    timezone: Europe/Prague
     is_active: true
 
   - slug: amsterdam
@@ -71,6 +77,7 @@ cities:
     osm_relation_id: 271110
     center: [52.366667, 4.883333]
     bbox: [52.2781742, 4.7287776, 52.4310638, 5.0791622]
+    timezone: Europe/Amsterdam
     is_active: true
 
   - slug: barcelona
@@ -80,6 +87,7 @@ cities:
     osm_relation_id: 347950
     center: [41.3825, 2.176944]
     bbox: [41.3170354, 2.0524977, 41.4679135, 2.2283555]
+    timezone: Europe/Madrid
     is_active: true
 
   - slug: milan
@@ -89,6 +97,7 @@ cities:
     osm_relation_id: 44915
     center: [45.466944, 9.19]
     bbox: [45.3867381, 9.0408867, 45.5358482, 9.2781103]
+    timezone: Europe/Rome
     is_active: true
 
   - slug: vienna
@@ -98,6 +107,7 @@ cities:
     osm_relation_id: 109166
     center: [48.208333, 16.3725]
     bbox: [48.1179069, 16.181831, 48.3226679, 16.5775132]
+    timezone: Europe/Vienna
     is_active: true
 
   - slug: madrid
@@ -107,6 +117,7 @@ cities:
     osm_relation_id: 5326784
     center: [40.416944, -3.703333]
     bbox: [40.3119774, -3.8889539, 40.6437293, -3.5183264]
+    timezone: Europe/Madrid
     is_active: true
 
   - slug: lisbon
@@ -116,6 +127,7 @@ cities:
     osm_relation_id: 5400890
     center: [38.708042, -9.139016]
     bbox: [38.6913994, -9.2298356, 38.7967584, -9.0863328]
+    timezone: Europe/Lisbon
     is_active: true
 
   - slug: porto
@@ -125,4 +137,5 @@ cities:
     osm_relation_id: 3372453
     center: [41.15, -8.610833]
     bbox: [41.1383507, -8.691289, 41.1859353, -8.5520792]
+    timezone: Europe/Lisbon
     is_active: true

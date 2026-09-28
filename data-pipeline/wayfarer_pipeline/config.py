@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from typing import Annotated
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -32,7 +33,18 @@ class City(BaseModel):
     osm_relation_id: int | None = None
     center: tuple[Latitude, Longitude]
     bbox: tuple[Latitude, Longitude, Latitude, Longitude]
+    timezone: str | None = None
     is_active: bool = True
+
+    @field_validator("timezone")
+    @classmethod
+    def _tz(cls, v: str | None) -> str | None:
+        if v is not None:
+            try:
+                ZoneInfo(v)
+            except (ZoneInfoNotFoundError, ValueError) as exc:
+                raise ValueError(f"unknown IANA timezone {v!r}") from exc
+        return v
 
     @field_validator("slug")
     @classmethod
