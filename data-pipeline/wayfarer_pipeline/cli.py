@@ -7,6 +7,7 @@ python -m wayfarer_pipeline visa               # passport-index → data/visa.cs
 python -m wayfarer_pipeline ingest --city lisbon | --all   # → data/attractions/*.json → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
 python -m wayfarer_pipeline seed               # regenerate every seed file, no network
+python -m wayfarer_pipeline cities-doc [--check]   # docs/CITIES.md (ingest/seed/cities rewrite it)
 """
 
 from __future__ import annotations
@@ -15,14 +16,22 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import countries, seed, visa
+from . import countries, coverage, seed, visa
 from .attractions import pipeline
-from .config import DEFAULT_CITIES_FILE, load_cities
+from .config import DEFAULT_CITIES_FILE, CitiesConfig, load_cities
 from .http import HttpClient
 
 
 def _client(args: argparse.Namespace) -> HttpClient:
     return HttpClient(use_cache=not args.no_cache)
+
+
+def _coverage(config: CitiesConfig) -> str:
+    return coverage.render(config, pipeline.load_all(), countries.load())
+
+
+def _write_coverage(config: CitiesConfig) -> None:
+    print(f"wrote {coverage.write(_coverage(config))}")
 
 
 def _cmd_validate(args: argparse.Namespace) -> int:
@@ -50,6 +59,7 @@ def _cmd_cities(args: argparse.Namespace) -> int:
         print(f"ERROR: city countries missing from countries.json: {missing}", file=sys.stderr)
         return 1
     print(f"wrote {seed.write_cities(config)} ({len(config.cities)} cities)")
+    _write_coverage(config)
     return 0
 
 
@@ -82,6 +92,7 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         print(f"WARNING: {w}")
     print(f"wrote {path} (all cities in data/attractions)")
     print(f"http: {client.stats['network']} network requests, {client.stats['cache']} cached")
+    _write_coverage(config)
     print("\nQuality report\n" + "\n".join(reports))
     return 0
 
@@ -106,6 +117,22 @@ def _cmd_seed(args: argparse.Namespace) -> int:
         print(f"WARNING: {w}")
     for p in paths:
         print(f"wrote {p}")
+    _write_coverage(config)
+    return 0
+
+
+def _cmd_cities_doc(args: argparse.Namespace) -> int:
+    content = _coverage(load_cities(args.config))
+    if args.check:
+        if coverage.is_current(content):
+            print(f"OK: {coverage.CITIES_DOC} is up to date")
+            return 0
+        print(
+            f"ERROR: {coverage.CITIES_DOC} is stale; run `python -m wayfarer_pipeline cities-doc`",
+            file=sys.stderr,
+        )
+        return 1
+    print(f"wrote {coverage.write(content)}")
     return 0
 
 
@@ -132,6 +159,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("report", help="attraction quality report").set_defaults(func=_cmd_report)
     sub.add_parser("seed", help="regenerate all seed SQL offline").set_defaults(func=_cmd_seed)
+
+    doc = sub.add_parser("cities-doc", help="write docs/CITIES.md (city coverage)")
+    doc.add_argument("--check", action="store_true", help="exit 1 when docs/CITIES.md is stale")
+    doc.set_defaults(func=_cmd_cities_doc)
     return parser
 
 

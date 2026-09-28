@@ -10,6 +10,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  docs:
+    name: Changes are recorded (CHANGELOG · README)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: node scripts/check-docs.mjs origin/${{ github.base_ref }}
+
   app:
     name: Lint · typecheck · unit tests · web build · E2E
     runs-on: ubuntu-latest
@@ -87,3 +98,5 @@ jobs:
       - run: ruff format --check .
       - run: pytest
       - run: python -m wayfarer_pipeline validate-config
+      - name: docs/CITIES.md matches cities.yaml and the ingested data
+        run: python -m wayfarer_pipeline cities-doc --check

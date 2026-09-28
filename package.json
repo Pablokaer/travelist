@@ -22,6 +22,7 @@
     "db:test": "supabase test db",
     "functions:serve": "supabase functions serve --env-file .env",
     "sync:shared": "node scripts/sync-shared.mjs",
+    "docs:check": "node scripts/check-docs.mjs",
     "db:types": "supabase gen types typescript --local --schema public > apps/mobile/src/lib/database.types.ts"
   },
   "devDependencies": {

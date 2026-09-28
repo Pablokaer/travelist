@@ -3,12 +3,12 @@
 Cross-platform travel companion (iOS · Android · Web) built with Expo + Supabase.
 
 - **Before you go:** a checklist personalised to your passports (visa, passport validity, power, weather, money, safety, practical info).
-- **Explore:** a map of ~10,700 attractions in 52 European cities.
+- **Explore:** a map of attractions across European cities — full list, counts and data quality per city in [docs/CITIES.md](./docs/CITIES.md).
 - **Walk:** an optimised walking route between the places you pick, saved as a trip and opened in Google / Apple Maps.
 
-Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md)
+Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md) · Cities: [docs/CITIES.md](./docs/CITIES.md) · Changes: [CHANGELOG.md](./CHANGELOG.md)
 
-> **Keep this file current.** The [Features](#features) section is the reference for what the app does. Any change that adds, removes or changes user-visible behaviour, an Edge Function, an RPC or a limit must update it in the same commit (see [Maintaining this README](#maintaining-this-readme)).
+> **Every change is recorded and documented.** The [Features](#features) section is the reference for what the app does; [CHANGELOG.md](./CHANGELOG.md) records every change; [docs/CITIES.md](./docs/CITIES.md) lists every covered city (generated). Any change must update them in the same commit — see [Maintaining this README](#maintaining-this-readme). CI enforces the changelog and the city list.
 
 ## Contents
 
@@ -25,7 +25,7 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITEC
 - [Screens and routes](#screens-and-routes)
 - [Backend reference](#backend-reference) (Edge Functions, RPCs, tables)
 - [Limits and rules](#limits-and-rules)
-- [Launch cities](#launch-cities)
+- [Covered cities](#covered-cities)
 - [Known limitations](#known-limitations)
 - [Development](#prerequisites) (setup, deploy, scripts, pipeline)
 
@@ -75,7 +75,7 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 
 The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 
-- **City switcher** — modal list of the 52 cities. Defaults to the city of the current route tray, else the first city.
+- **City switcher** — modal list of all active cities ([docs/CITIES.md](./docs/CITIES.md)). Defaults to the city of the current route tray, else the first city.
 - **Category filters** — multi-select chips: museum, monument, church, castle, viewpoint, landmark, park, palace, other; "clear" resets. No selection = all categories.
 - **Map / List toggle**
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
@@ -229,9 +229,12 @@ Defined in `packages/shared/src/constants/index.ts` unless noted.
 | Google Maps multi-stop link  | origin + up to 9 waypoints + destination                                                              |
 | Dates                        | typed as `YYYY-MM-DD` (D-019)                                                                         |
 
-## Launch cities
+## Covered cities
 
-London, Paris, Istanbul, Rome, Prague, Amsterdam, Barcelona, Milan, Vienna, Madrid, Lisbon, Porto — configured in [`data-pipeline/cities.yaml`](./data-pipeline/cities.yaml). Adding a city needs no code change (see [Adding a new city](#adding-a-new-city)).
+The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: every city with its country, slug, number of attractions, share with images / Portuguese names / opening hours, UNESCO sites, retrieval date and status. It is generated from [`data-pipeline/cities.yaml`](./data-pipeline/cities.yaml) and `data-pipeline/data/attractions/` — never edit it by hand.
+
+- The first 12 launch cities were London, Paris, Istanbul, Rome, Prague, Amsterdam, Barcelona, Milan, Vienna, Madrid, Lisbon and Porto; later additions are listed by name in [CHANGELOG.md](./CHANGELOG.md) under **Data**.
+- Adding a city needs no code change (see [Adding a new city](#adding-a-new-city)). Inactive cities are ingested but hidden from the map.
 
 ## Known limitations
 
@@ -244,12 +247,14 @@ London, Paris, Istanbul, Rome, Prague, Amsterdam, Barcelona, Milan, Vienna, Madr
 
 ## Maintaining this README
 
+**Always:** add a line to [CHANGELOG.md](./CHANGELOG.md) under _Unreleased_ for every change to code, data or config (CI fails the pull request otherwise; run `node scripts/check-docs.mjs` locally).
+
 This README is the functional reference of the app. Update it in the same commit when you:
 
 - add, remove or change a screen, button, flow or user-visible message → [Features](#features) and [Screens and routes](#screens-and-routes);
 - add or change an Edge Function, RPC, view or table → [Backend reference](#backend-reference);
 - change a constant, validation rule or limit → [Limits and rules](#limits-and-rules);
-- add a city → [Launch cities](#launch-cities);
+- add, remove, deactivate or re-ingest a city → run the pipeline (regenerates [docs/CITIES.md](./docs/CITIES.md)), name the city in CHANGELOG under **Data**, and update any counts quoted here or in `PROGRESS.md`;
 - fix or discover a limitation → [Known limitations](#known-limitations) (and `PROGRESS.md`);
 - change setup, scripts or env variables → the development sections below.
 
@@ -285,7 +290,7 @@ pnpm functions:serve          # keep running: checklist + route-optimize Edge Fu
 pnpm dev                      # Expo dev server → w (web), i (iOS), a (Android)
 ```
 
-- Seeds in `supabase/seed/` contain all reference data (countries, 52 cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
+- Seeds in `supabase/seed/` contain all reference data (countries, all cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
 - Sign-up emails (confirmation, magic link + 6-digit code) are caught by Mailpit at http://127.0.0.1:54324. Local sign-up doesn't require confirmation.
 - Supabase Studio: http://127.0.0.1:54323.
 - Without `ORS_API_KEY` the route optimiser uses a built-in nearest-neighbour + 2-opt fallback with straight-line estimates (flagged in the UI). With a free key from openrouteservice.org you get real walking directions.
@@ -305,19 +310,20 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 
 ## Scripts (root)
 
-| Command                                      | What it does                                                          |
-| -------------------------------------------- | --------------------------------------------------------------------- |
-| `pnpm dev`                                   | Start the Expo dev server                                             |
-| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                               |
-| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests           |
-| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                |
-| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                       |
-| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                    |
-| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds        |
-| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                           |
-| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB  |
-| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                      |
-| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer` |
+| Command                                      | What it does                                                                                               |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                                   | Start the Expo dev server                                                                                  |
+| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                                                                    |
+| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests                                                |
+| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                                                     |
+| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                                                            |
+| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                                                         |
+| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds                                             |
+| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                                |
+| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                       |
+| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                                                           |
+| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                      |
+| `pnpm docs:check`                            | Fail if code/data/config changed vs `origin/main` without a CHANGELOG entry; warn if README wasn't updated |
 
 Edge Function checks: `cd supabase/functions && deno lint && deno fmt --check && deno test --allow-net=jsr.io`.
 After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy is stale, see D-005).
@@ -341,7 +347,9 @@ python -m wayfarer_pipeline ingest --all
 
 1. Add an entry to [`data-pipeline/cities.yaml`](./data-pipeline/cities.yaml) (slug, en/pt names, country code, Wikidata id, OSM relation, centre, bbox).
 2. `python -m wayfarer_pipeline validate-config`
-3. `python -m wayfarer_pipeline ingest --city <slug>` and review the quality report.
+3. `python -m wayfarer_pipeline ingest --city <slug>` and review the quality report. This also regenerates `supabase/seed/40_attractions.sql` and [docs/CITIES.md](./docs/CITIES.md).
+4. Record it: name the city under **Data** in [CHANGELOG.md](./CHANGELOG.md) (with the new totals) and update counts quoted in `PROGRESS.md`.
+5. Commit `cities.yaml`, the new `data/attractions/<slug>.json`, the seeds, `docs/CITIES.md` and `CHANGELOG.md` together. CI runs `cities-doc --check`.
 
 No code changes are needed.
 
@@ -352,5 +360,5 @@ apps/mobile          Expo app (iOS, Android, Web) — Expo Router, src/app = rou
 packages/shared      zod schemas, types, constants, i18n resources (EN/PT)
 supabase/            config, migrations, seed, pgTAP tests, Edge Functions
 data-pipeline/       Python ingestion (Wikidata, OSM, Wikipedia pageviews)
-docs/                ARCHITECTURE, DATA_SOURCES, DECISIONS
+docs/                ARCHITECTURE, DATA_SOURCES, DECISIONS, LAUNCH_CHECKLIST, CITIES (generated)
 ```
