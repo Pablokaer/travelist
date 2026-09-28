@@ -79,9 +79,9 @@ The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 - **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories.
 - **Map / List switch** — floating pill at the bottom of the screen.
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
-  - **List** — responsive grid of image cards (1 column on phones, up to 4 on desktop), sorted by popularity: photo, UNESCO badge, stop number when the place is in the route, name, category and visit time.
+  - **List** — responsive grid of image cards (1 column on phones, up to 4 on desktop), sorted by popularity: photo, UNESCO badge, name, category and visit time. A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
 - **Places count** — "N places" for the current filters (announced to screen readers).
-- **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route" and a **Build route** button.
+- **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route", the latest route notice (route full / new route started in this city) and a **Build route** button.
 - **Checklist** button (**Before you go**; icon-only on phones) — opens the pre-trip checklist for the current city.
 
 Data comes from the `attractions_in_view` RPC (bbox + categories, most popular first, up to 500 per city), cached by TanStack Query for 1 hour. Map style is `EXPO_PUBLIC_MAP_STYLE_URL` (OpenFreeMap "liberty" by default, D-008).

@@ -281,7 +281,8 @@
     "googleLimit": "O Google Maps mostra até 9 paragens intermédias; use os links por troço para as restantes.",
     "legByLeg": "Ou navegue troço a troço:",
     "leg": "{{from}} até {{to}}",
-    "stopsTitle": "Paragens"
+    "stopsTitle": "Paragens",
+    "includeNamed": "Incluir {{name}} no percurso"
   },
   "trips": {
     "title": "As minhas viagens",

@@ -12,7 +12,7 @@ import { Sheet } from '@/components/sheet';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
 import { flagEmoji } from '@/lib/format';
-import { categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
+import { palette, categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
@@ -246,51 +246,114 @@ export function AttractionCard({
   item,
   onPress,
   order,
+  onToggleRoute,
 }: {
   item: AttractionSummary;
   onPress?: () => void;
   /** Position in the current route, when the place is in it. */
   order?: number;
+  /** Shows a checkbox that adds/removes the place without opening it. */
+  onToggleRoute?: () => void;
 }) {
   const { t, i18n } = useTranslation();
-  const theme = useTheme();
   const name = localizedName(item, i18n.resolvedLanguage ?? 'en');
   return (
-    <Tappable
-      onPress={onPress}
-      disabled={!onPress}
-      pressScale={0.98}
-      accessibilityRole="button"
-      accessibilityLabel={`${name}, ${t(`category.${item.category}`)}`}
-      style={styles.card}>
-      {({ hovered }) => (
-        <>
-          <View style={styles.media}>
-            <Thumbnail uri={item.imageUrl} style={[styles.cover, hovered && styles.coverHover]} />
-            <View style={styles.overlayRow} pointerEvents="none">
-              {item.isUnesco ? <Badge label="UNESCO" tone="overlay" /> : <View />}
-              {order != null ? (
-                <View style={[styles.orderBadge, { backgroundColor: theme.primary }]}>
-                  <Text variant="helper" style={{ color: theme.onPrimary, fontWeight: '700' }}>
-                    {order}
-                  </Text>
-                </View>
-              ) : null}
+    <View>
+      <Tappable
+        onPress={onPress}
+        disabled={!onPress}
+        pressScale={0.98}
+        accessibilityRole="button"
+        accessibilityLabel={`${name}, ${t(`category.${item.category}`)}`}
+        style={styles.card}>
+        {({ hovered }) => (
+          <>
+            <View style={styles.media}>
+              <Thumbnail uri={item.imageUrl} style={[styles.cover, hovered && styles.coverHover]} />
+              <View style={styles.overlayRow} pointerEvents="none">
+                {item.isUnesco ? <Badge label="UNESCO" tone="overlay" /> : <View />}
+              </View>
             </View>
-          </View>
-          <View style={styles.cardBody}>
-            <Text variant="subtitle" numberOfLines={1}>
-              {name}
-            </Text>
-            <View style={styles.meta}>
-              <CategoryDot category={item.category} />
-              <Text variant="caption" secondary numberOfLines={1} style={styles.flex}>
-                {t(`category.${item.category}`)} ·{' '}
-                {t('attraction.visitMinutes', { minutes: item.avgVisitMinutes })}
+            <View style={styles.cardBody}>
+              <Text variant="subtitle" numberOfLines={1}>
+                {name}
               </Text>
+              <View style={styles.meta}>
+                <CategoryDot category={item.category} />
+                <Text variant="caption" secondary numberOfLines={1} style={styles.flex}>
+                  {t(`category.${item.category}`)} ·{' '}
+                  {t('attraction.visitMinutes', { minutes: item.avgVisitMinutes })}
+                </Text>
+              </View>
             </View>
-          </View>
-        </>
+          </>
+        )}
+      </Tappable>
+      {/* A sibling of the card, not a child, so its press never opens the attraction. */}
+      <View style={styles.selectSlot} pointerEvents="box-none">
+        {onToggleRoute ? (
+          <RouteCheckbox name={name} order={order} onPress={onToggleRoute} />
+        ) : order != null ? (
+          <OrderBadge order={order} />
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+function OrderBadge({ order }: { order: number }) {
+  const theme = useTheme();
+  return (
+    <View style={[styles.checkbox, { backgroundColor: theme.primary, borderColor: theme.primary }]}>
+      <Text variant="label" style={{ color: theme.onPrimary, fontWeight: '700' }}>
+        {order}
+      </Text>
+    </View>
+  );
+}
+
+/** Round checkbox over the photo; when checked it shows the stop number. */
+function RouteCheckbox({
+  name,
+  order,
+  onPress,
+}: {
+  name: string;
+  order?: number;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const shadows = useShadows();
+  const checked = order != null;
+  return (
+    <Tappable
+      accessibilityRole="checkbox"
+      accessibilityLabel={t('route.includeNamed', { name })}
+      accessibilityState={{ checked }}
+      onPress={onPress}
+      hitSlop={8}
+      pressScale={0.88}
+      testID="route-checkbox"
+      style={({ hovered }) => [
+        styles.checkbox,
+        {
+          backgroundColor: checked
+            ? theme.primary
+            : hovered
+              ? palette.light.surface
+              : 'rgba(255,255,255,0.85)',
+          borderColor: checked ? theme.primary : palette.light.surface,
+          boxShadow: shadows.floating,
+        },
+      ]}>
+      {checked ? (
+        <Text variant="label" style={{ color: theme.onPrimary, fontWeight: '700' }}>
+          {order}
+        </Text>
+      ) : (
+        // Sits on a light pill over the photo in both themes, so use the light-theme text colour.
+        <Icon name="add" size={18} color={palette.light.text} />
       )}
     </Tappable>
   );
@@ -317,7 +380,9 @@ export function AttractionRow({
       onPress={onPress}
       disabled={!onPress}
       pressScale={0.99}
-      accessibilityRole="button"
+      // Only a button when it opens something: route rows hold their own reorder buttons,
+      // and a <button> inside a <button> is invalid HTML on web.
+      accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={`${index != null ? `${index + 1}. ` : ''}${name}, ${t(`category.${item.category}`)}`}
       style={({ hovered }) => [
         styles.row,
@@ -424,13 +489,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  orderBadge: {
-    minWidth: 28,
-    height: 28,
-    borderRadius: 14,
+  selectSlot: { position: 'absolute', top: spacing.md - 4, right: spacing.md - 4 },
+  checkbox: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.xs,
   },
   cardBody: { gap: spacing.xxs, paddingHorizontal: spacing.xxs },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm - 2 },

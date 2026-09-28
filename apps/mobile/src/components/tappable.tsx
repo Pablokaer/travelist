@@ -44,6 +44,7 @@ export function Tappable({
   onHoverOut,
   onFocus,
   onBlur,
+  accessibilityState,
   ...rest
 }: TappableProps) {
   const theme = useTheme();
@@ -96,6 +97,11 @@ export function Tappable({
         { transform: [{ scale }] },
         Platform.OS === 'web' && !disabled ? ({ cursor: 'pointer' } as ViewStyle) : null,
       ]}
+      accessibilityState={accessibilityState}
+      // react-native-web ignores accessibilityState, so mirror it as ARIA for the browser.
+      aria-checked={accessibilityState?.checked}
+      aria-selected={accessibilityState?.selected}
+      aria-busy={accessibilityState?.busy}
       {...rest}>
       {typeof children === 'function' ? children(view) : children}
     </AnimatedPressable>

@@ -13,6 +13,7 @@ import { useAttractions, useCities } from '@/features/destinations/api';
 import { AttractionCard, CategoryFilters, CitySwitcher } from '@/features/destinations/components';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
+import { routeNotice } from '@/features/route/notice';
 import { useRouteStore } from '@/features/route/store';
 import { env } from '@/lib/env';
 import { categoryColors, layout, radius, spacing } from '@/theme/colors';
@@ -31,6 +32,8 @@ export default function ExploreScreen() {
   const { citySlug, setCity, categories, toggleCategory, clearCategories, view, setView } =
     useExploreStore();
   const routeStops = useRouteStore((s) => s.stops);
+  const toggleStop = useRouteStore((s) => s.toggle);
+  const [notice, setNotice] = useState<string | null>(null);
   const routeCity = useRouteStore((s) => s.citySlug);
 
   const city = cities.data?.find((c) => c.slug === citySlug) ?? cities.data?.[0];
@@ -159,6 +162,7 @@ export default function ExploreScreen() {
                   item={item}
                   order={stopOrder.get(item.id)}
                   onPress={() => openAttraction(item.id)}
+                  onToggleRoute={() => setNotice(routeNotice(toggleStop(item), t))}
                 />
               </View>
             )}
@@ -195,9 +199,16 @@ export default function ExploreScreen() {
                   {routeStops.length}
                 </Text>
               </View>
-              <Text variant="subtitle" style={styles.flex} accessibilityLiveRegion="polite">
-                {t('route.trayCount', { count: routeStops.length })}
-              </Text>
+              <View style={styles.flex}>
+                <Text variant="subtitle" accessibilityLiveRegion="polite">
+                  {t('route.trayCount', { count: routeStops.length })}
+                </Text>
+                {notice ? (
+                  <Text variant="helper" secondary accessibilityLiveRegion="polite">
+                    {notice}
+                  </Text>
+                ) : null}
+              </View>
               <Button
                 compact
                 icon="route"

@@ -28,6 +28,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 ### Fixed
 
 - Seed: an attraction that falls in two cities' bboxes (several Wikidata coordinates) is kept in the city where OSM confirms it, not the first alphabetically — Madrid Arena has a wrong second coordinate in Bilbao.
+- Web: route-stop rows are no longer rendered as buttons when they don't open anything (they contained the reorder buttons: invalid nested `<button>`); checkbox, radio and selected states now reach the browser as ARIA attributes.
 
 ### Data
 
@@ -36,6 +37,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 ### Added
 
 - Checklist → Power: each destination plug type is shown with an illustration of the plug face.
+- Explore list: a checkbox on each attraction card adds it to (or removes it from) the route without opening the attraction; checked cards show their stop number, and route notices (full route, new city) appear in the route tray.
 - City coverage register [docs/CITIES.md](./docs/CITIES.md), generated from `cities.yaml` and the ingested data (`python -m wayfarer_pipeline cities-doc`; `ingest`, `seed` and `cities` rewrite it). CI fails when it is stale.
 - CI `docs` job (`scripts/check-docs.mjs`): pull requests that change code, data or config without a CHANGELOG entry fail; user-facing changes without a README update get a warning.
 

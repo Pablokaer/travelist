@@ -281,7 +281,8 @@
     "googleLimit": "Google Maps shows up to 9 intermediate stops; use the per-leg links for the rest.",
     "legByLeg": "Or navigate one leg at a time:",
     "leg": "{{from}} to {{to}}",
-    "stopsTitle": "Stops"
+    "stopsTitle": "Stops",
+    "includeNamed": "Include {{name}} in the route"
   },
   "trips": {
     "title": "My Trips",

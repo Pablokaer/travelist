@@ -1,4 +1,3 @@
-import { ROUTE_MAX_STOPS } from '@wayfarer/shared';
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -14,6 +13,7 @@ import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { localizedName, useAttraction } from '@/features/destinations/api';
+import { routeNotice } from '@/features/route/notice';
 import { useRouteStore } from '@/features/route/store';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -24,9 +24,7 @@ export default function AttractionScreen() {
   const lang = i18n.resolvedLanguage ?? 'en';
   const attraction = useAttraction(id);
   const inRoute = useRouteStore((s) => s.stops.some((x) => x.id === id));
-  const add = useRouteStore((s) => s.add);
-  const remove = useRouteStore((s) => s.remove);
-  const clear = useRouteStore((s) => s.clear);
+  const toggle = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (attraction.isPending) return <LoadingState />;
@@ -47,19 +45,7 @@ export default function AttractionScreen() {
     ? `https://${wiki.host}.wikipedia.org/wiki/${encodeURIComponent(wiki.title.replace(/ /g, '_'))}`
     : null;
 
-  const toggleRoute = () => {
-    setNotice(null);
-    if (inRoute) return remove(a.id);
-    if (!add(a)) {
-      const stops = useRouteStore.getState().stops;
-      if (stops.length >= ROUTE_MAX_STOPS) setNotice(t('route.full', { max: ROUTE_MAX_STOPS }));
-      else {
-        clear();
-        add(a);
-        setNotice(t('route.startedNewCity'));
-      }
-    }
-  };
+  const toggleRoute = () => setNotice(routeNotice(toggle(a), t));
 
   const open = (url: string) => void WebBrowser.openBrowserAsync(url);
   const fee = a.fee
