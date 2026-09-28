@@ -62,6 +62,17 @@ def test_attractions_duplicate_qid_across_cities_is_skipped():
     assert len(rows) == 1 and len(warnings) == 1
 
 
+def test_attractions_duplicate_qid_prefers_city_confirmed_by_osm():
+    # Madrid Arena has a second, wrong Wikidata coordinate in Bilbao; only Madrid matches OSM.
+    docs = {
+        "bilbao": {"attractions": [_attraction("Q1", osm_id=None)]},
+        "madrid": {"attractions": [_attraction("Q1")]},
+    }
+    rows, warnings = seed.attractions_rows(docs)
+    assert [r[1] for r in rows] == ["madrid"]
+    assert warnings == ["Q1 in bilbao already seeded for madrid; skipped"]
+
+
 def test_attraction_uuid_is_stable():
     assert seed.attraction_uuid("Q243") == seed.attraction_uuid("Q243")
     assert seed.attraction_uuid("Q243") != seed.attraction_uuid("Q244")

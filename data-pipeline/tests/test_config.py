@@ -70,6 +70,27 @@ LAUNCH_CITIES = {
     "bucharest",
     "cardiff",
     "belfast",
+    # batch 5, 2026-09-28: major secondary cities in covered countries
+    "lyon",
+    "marseille",
+    "bordeaux",
+    "turin",
+    "verona",
+    "pisa",
+    "granada",
+    "bilbao",
+    "cordoba",
+    "manchester",
+    "liverpool",
+    "glasgow",
+    "york",
+    "gdansk",
+    "wroclaw",
+    "dresden",
+    "innsbruck",
+    "ghent",
+    "bergen",
+    "gothenburg",
 }
 
 

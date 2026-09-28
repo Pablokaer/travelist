@@ -13,6 +13,14 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Data
 
+- 20 more cities — major secondary destinations in covered countries (80 total in 32 countries, 14,222 attractions): Lyon, Marseille, Bordeaux, Turin, Verona, Pisa, Granada, Bilbao, Córdoba, Manchester, Liverpool, Glasgow, York, Gdańsk, Wrocław, Dresden, Innsbruck, Ghent, Bergen, Gothenburg. Córdoba and Gothenburg use centre-based bboxes.
+
+### Fixed
+
+- Seed: an attraction that falls in two cities' bboxes (several Wikidata coordinates) is kept in the city where OSM confirms it, not the first alphabetically — Madrid Arena has a wrong second coordinate in Bilbao.
+
+### Data
+
 - 8 more cities — the remaining EU capitals and the UK nation capitals (60 total in 32 countries, 11,760 attractions): Sofia, Zagreb, Nicosia, Luxembourg, Valletta, Bucharest, Cardiff, Belfast. Every EU capital is now covered (test). City halls became a category root (Stockholm, Oslo, Vienna, Belfast); all 60 cities re-ingested under the same rules (+35 attractions in existing cities). CY override: 1400 is not an ambulance number.
 
 ### Added

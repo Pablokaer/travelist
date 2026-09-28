@@ -28,7 +28,7 @@ Milestones from the MVP brief. Each milestone ends with lint, typecheck and all 
 ## M1–M4 — Done (2026-09-28)
 
 - **Database:** reference tables (countries, cities, attractions with PostGIS, visa rules, api_cache) and user tables (profiles, nationalities, trips, trip stops) with RLS; RPCs `attractions_in_view`, `set_nationalities`, `save_trip`, `delete_account`; profile created on sign-up; pgTAP: 24 tests.
-- **Data:** 250 countries (plugs, voltage, currency, calling code, emergency numbers, languages), 60 cities in 32 countries (12 at launch + 48 added 2026-09-28; list in [docs/CITIES.md](./docs/CITIES.md)), 39,402 visa rules, 11,760 attractions (≤ 300 per city) with images, licences, opening hours and popularity. Committed as SQL seeds (D-011).
+- **Data:** 250 countries (plugs, voltage, currency, calling code, emergency numbers, languages), 80 cities in 32 countries (12 at launch + 68 added 2026-09-28; list in [docs/CITIES.md](./docs/CITIES.md)), 39,402 visa rules, 14,222 attractions (≤ 300 per city) with images, licences, opening hours and popularity. Committed as SQL seeds (D-011).
 - **Edge Functions:** `checklist` (visa, passport validity, power, Open-Meteo weather, FX, Canada advisories, practical info, each degrading independently, cached) and `route-optimize` (ORS + fallback). Both require a signed-in user (D-015). Deno: 40 tests.
 - **App:** email/password, magic link + 6-digit code, Google/Apple (PKCE; native Apple on iOS), protected routes, 3-step onboarding, profile edit, language/units, account deletion; Explore with MapLibre map (web + native), city switcher, category filters, accessible list view, attraction detail with image credit; checklist screen; route tray (≤ 12 stops), optimisation, totals, save trip; My Trips list/detail/delete with Google/Apple Maps walking links. Jest: 12 tests. Playwright: smoke + full journey (sign-up → onboarding → checklist → route → saved trip) on desktop and mobile viewports.
 - **Verified locally (macOS, 2026-09-28):** `pnpm check`, `pnpm db:test`, `supabase db lint`, Deno lint/fmt/test, pytest (76) + ruff, `pnpm build:web`, `E2E_BACKEND=1 pnpm e2e` 6/6, map rendering on web (screenshots), live checklist for Lisbon with real providers.
@@ -44,6 +44,10 @@ Hamburg, Frankfurt, Cologne, Geneva, Salzburg, Bruges, Antwerp, Rotterdam, Helsi
 ## 2026-09-28 — 8 more cities (batch 4: EU and UK capitals)
 
 Sofia, Zagreb, Nicosia, Luxembourg, Valletta, Bucharest, Cardiff, Belfast — with these, every EU member state's capital and every UK nation capital is covered (asserted by `test_all_eu_and_uk_capitals_are_covered`). Valletta (1 km² municipality) and Cardiff (Nominatim returned a node) use centre-based bboxes. City halls added as a category root; all 60 cities re-ingested (+35 attractions in existing cities). CY override: 1400 is not an emergency line. Smaller cities: Nicosia 47, Belfast 76, Luxembourg 92, Sofia 98.
+
+## 2026-09-28 — 20 more cities (batch 5: secondary cities)
+
+Lyon, Marseille, Bordeaux, Turin, Verona, Pisa, Granada, Bilbao, Córdoba, Manchester, Liverpool, Glasgow, York, Gdańsk, Wrocław, Dresden, Innsbruck, Ghent, Bergen, Gothenburg — no new countries. Córdoba (1,250 km² mostly rural municipality) and Gothenburg (municipality includes the outer archipelago) use centre-based bboxes; Manchester, Liverpool and York OSM relations came from Nominatim (no P402 on Wikidata). Fix: items with a second Wikidata coordinate in another city are seeded where OSM confirms them (Madrid Arena). French communes are small, so counts are low: Bordeaux 58, Marseille 85. Known gaps: Bergen's Bryggen is typed "architectural ensemble" (too broad to include: its subclasses cover hamlets and schools); Marseille's Vieux-Port is a seaport.
 
 ## Remaining (M5 and launch)
 

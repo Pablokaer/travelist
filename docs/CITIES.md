@@ -4,7 +4,7 @@
      data-pipeline/cities.yaml and data-pipeline/data/attractions. Do not edit by hand:
      `ingest` and `seed` rewrite it, and CI fails when it is stale. -->
 
-**60 cities** in **32 countries**, **60** live on the map, **11,760 attractions** in total.
+**80 cities** in **32 countries**, **80** live on the map, **14,222 attractions** in total.
 
 Cities are listed in the order they were added to `cities.yaml`. When a city is added,
 also record it in [CHANGELOG.md](../CHANGELOG.md). How to add one: see
@@ -75,3 +75,23 @@ number of UNESCO sites; date the data was retrieved.
 | 58 | Bucharest | Bucareste | Romania (RO) | `bucharest` | 189 | 85% | 10% | 14% | 0 | 2026-09-28 | active |
 | 59 | Cardiff | Cardiff | United Kingdom (GB) | `cardiff` | 173 | 95% | 7% | 5% | 0 | 2026-09-28 | active |
 | 60 | Belfast | Belfast | United Kingdom (GB) | `belfast` | 76 | 80% | 4% | 8% | 0 | 2026-09-28 | active |
+| 61 | Lyon | Lyon | France (FR) | `lyon` | 147 | 96% | 10% | 14% | 1 | 2026-09-28 | active |
+| 62 | Marseille | Marselha | France (FR) | `marseille` | 85 | 94% | 11% | 13% | 0 | 2026-09-28 | active |
+| 63 | Bordeaux | Bordéus | France (FR) | `bordeaux` | 58 | 100% | 16% | 14% | 4 | 2026-09-28 | active |
+| 64 | Turin | Turim | Italy (IT) | `turin` | 139 | 97% | 15% | 24% | 8 | 2026-09-28 | active |
+| 65 | Verona | Verona | Italy (IT) | `verona` | 118 | 98% | 26% | 8% | 3 | 2026-09-28 | active |
+| 66 | Pisa | Pisa | Italy (IT) | `pisa` | 100 | 99% | 16% | 8% | 2 | 2026-09-28 | active |
+| 67 | Granada | Granada | Spain (ES) | `granada` | 66 | 98% | 44% | 17% | 2 | 2026-09-28 | active |
+| 68 | Bilbao | Bilbau | Spain (ES) | `bilbao` | 86 | 100% | 24% | 7% | 6 | 2026-09-28 | active |
+| 69 | Córdoba | Córdova | Spain (ES) | `cordoba` | 78 | 99% | 10% | 6% | 3 | 2026-09-28 | active |
+| 70 | Manchester | Manchester | United Kingdom (GB) | `manchester` | 228 | 87% | 6% | 7% | 0 | 2026-09-28 | active |
+| 71 | Liverpool | Liverpool | United Kingdom (GB) | `liverpool` | 223 | 93% | 8% | 6% | 0 | 2026-09-28 | active |
+| 72 | Glasgow | Glasgow | United Kingdom (GB) | `glasgow` | 224 | 85% | 6% | 8% | 0 | 2026-09-28 | active |
+| 73 | York | Iorque | United Kingdom (GB) | `york` | 147 | 90% | 10% | 12% | 0 | 2026-09-28 | active |
+| 74 | Gdańsk | Gdańsk | Poland (PL) | `gdansk` | 129 | 97% | 2% | 8% | 0 | 2026-09-28 | active |
+| 75 | Wrocław | Breslávia | Poland (PL) | `wroclaw` | 167 | 99% | 5% | 16% | 1 | 2026-09-28 | active |
+| 76 | Dresden | Dresden | Germany (DE) | `dresden` | 129 | 99% | 14% | 32% | 0 | 2026-09-28 | active |
+| 77 | Innsbruck | Innsbruck | Austria (AT) | `innsbruck` | 51 | 100% | 6% | 25% | 0 | 2026-09-28 | active |
+| 78 | Ghent | Gante | Belgium (BE) | `ghent` | 60 | 98% | 10% | 18% | 2 | 2026-09-28 | active |
+| 79 | Bergen | Bergen | Norway (NO) | `bergen` | 102 | 92% | 12% | 17% | 0 | 2026-09-28 | active |
+| 80 | Gothenburg | Gotemburgo | Sweden (SE) | `gothenburg` | 125 | 94% | 49% | 14% | 0 | 2026-09-28 | active |

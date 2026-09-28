@@ -132,20 +132,29 @@ ATTRACTION_COLUMNS = [
 ]
 
 
+def _osm_id(doc: dict[str, Any], qid: str) -> str | None:
+    return next((a["osm_id"] for a in doc["attractions"] if a["wikidata_id"] == qid), None)
+
+
 def attractions_rows(docs: dict[str, dict[str, Any]]) -> tuple[list[list[Any]], list[str]]:
     """Rows sorted by city then wikidata id. A wikidata id is unique across the table, so an
-    item that falls in two city bboxes is kept in the first city (alphabetical)."""
-    seen: dict[str, str] = {}
+    item that falls in two city bboxes (several Wikidata coordinates, e.g. a wrong second one)
+    is kept in the city where OSM confirms it (``osm_id`` set), else the first alphabetically."""
+    owner: dict[str, str] = {}
+    for slug in sorted(docs):
+        for a in docs[slug]["attractions"]:
+            qid = a["wikidata_id"]
+            if qid not in owner or (a["osm_id"] and not _osm_id(docs[owner[qid]], qid)):
+                owner[qid] = slug
     warnings: list[str] = []
     rows: list[list[Any]] = []
     for slug in sorted(docs):
         items = sorted(docs[slug]["attractions"], key=lambda i: int(i["wikidata_id"][1:]))
         for a in items:
             qid = a["wikidata_id"]
-            if qid in seen:
-                warnings.append(f"{qid} in {slug} already seeded for {seen[qid]}; skipped")
+            if owner[qid] != slug:
+                warnings.append(f"{qid} in {slug} already seeded for {owner[qid]}; skipped")
                 continue
-            seen[qid] = slug
             rows.append(
                 [
                     Raw(f"'{attraction_uuid(qid)}'::uuid"),
