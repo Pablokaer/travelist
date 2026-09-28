@@ -1,4 +1,4 @@
-import { SUPPORTED_LANGUAGES, UNITS } from '@wayfarer/shared';
+import { DEFAULT_THEME, SUPPORTED_LANGUAGES, THEMES, UNITS } from '@wayfarer/shared';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -140,6 +140,22 @@ export default function ProfileScreen() {
                   label={t(`profile.unitsName.${u}`)}
                   selected={(p?.units ?? 'metric') === u}
                   onPress={() => update.mutate({ units: u })}
+                />
+              ))}
+            </RowGroup>
+          </View>
+          <Text variant="label" secondary>
+            {t('profile.theme')}
+          </Text>
+          <View accessibilityRole="radiogroup">
+            <RowGroup>
+              {THEMES.map((th) => (
+                <ListRow
+                  key={th}
+                  role="radio"
+                  label={t(`profile.themeName.${th}`)}
+                  selected={(p?.theme ?? DEFAULT_THEME) === th}
+                  onPress={() => update.mutate({ theme: th })}
                 />
               ))}
             </RowGroup>

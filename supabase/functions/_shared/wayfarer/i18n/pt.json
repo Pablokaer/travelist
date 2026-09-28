@@ -247,7 +247,7 @@
     "title": "Percurso a pé",
     "titleFor": "O seu passeio em {{city}}",
     "defaultName": "Passeio em {{city}}",
-    "stopsHint": "Escolha entre {{min}} e {{max}} locais. O primeiro é o ponto de partida.",
+    "stopsHint": "Escolha entre {{min}} e {{max}} locais, por qualquer ordem. O primeiro é o ponto de partida; os restantes são ordenados para o passeio mais curto.",
     "trayCount_one": "{{count}} paragem no percurso",
     "trayCount_other": "{{count}} paragens no percurso",
     "build": "Criar percurso",
@@ -282,7 +282,25 @@
     "legByLeg": "Ou navegue troço a troço:",
     "leg": "{{from}} até {{to}}",
     "stopsTitle": "Paragens",
-    "includeNamed": "Incluir {{name}} no percurso"
+    "includeNamed": "Incluir {{name}} no percurso",
+    "optimizeMany": "Otimizar {{count}} percursos",
+    "autoOrderHint": "Ordenado para o passeio mais curto a partir da primeira paragem.",
+    "manualOrderHint": "Alterou a ordem manualmente. Os novos locais entram onde acrescentam menos caminho.",
+    "autoOrder": "Reordenar automaticamente",
+    "routeN": "Percurso {{n}}",
+    "routeStops_one": "{{count}} paragem",
+    "routeStops_other": "{{count}} paragens",
+    "legEstimate": "≈ {{distance}} a pé",
+    "splitHere": "Dividir aqui",
+    "splitHereLabel": "Dividir o percurso antes de {{name}}",
+    "splitTitle": "Dividir em vários percursos",
+    "splitBody": "Demasiado para um só passeio? Divida as paragens em percursos por proximidade; cada um é otimizado à parte.",
+    "splitParts": "Número de percursos",
+    "suggestSplit": "Sugerir divisão",
+    "merge": "Juntar num só percurso",
+    "splitName": "{{name}} · Percurso {{n}}",
+    "saveSplitHint": "Cada percurso é guardado como uma viagem.",
+    "saveMany": "Guardar {{count}} viagens"
   },
   "trips": {
     "title": "As minhas viagens",
@@ -326,7 +344,12 @@
     "deleteYes": "Sim, apagar a minha conta",
     "travelDocuments": "Documentos de viagem",
     "preferences": "Preferências",
-    "account": "Conta"
+    "account": "Conta",
+    "theme": "Tema",
+    "themeName": {
+      "light": "Claro",
+      "dark": "Escuro"
+    }
   },
   "about": {
     "title": "Sobre",

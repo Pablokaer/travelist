@@ -247,7 +247,7 @@
     "title": "Walking route",
     "titleFor": "Your walk in {{city}}",
     "defaultName": "Walk in {{city}}",
-    "stopsHint": "Pick between {{min}} and {{max}} places. The first one is your starting point.",
+    "stopsHint": "Pick between {{min}} and {{max}} places in any order. The first one is your starting point; the rest are ordered for the shortest walk.",
     "trayCount_one": "{{count}} stop in your route",
     "trayCount_other": "{{count}} stops in your route",
     "build": "Build route",
@@ -282,7 +282,25 @@
     "legByLeg": "Or navigate one leg at a time:",
     "leg": "{{from}} to {{to}}",
     "stopsTitle": "Stops",
-    "includeNamed": "Include {{name}} in the route"
+    "includeNamed": "Include {{name}} in the route",
+    "optimizeMany": "Optimise {{count}} routes",
+    "autoOrderHint": "Ordered for the shortest walk from your first stop.",
+    "manualOrderHint": "You changed the order by hand. New places are slotted in where they add the least walking.",
+    "autoOrder": "Reorder automatically",
+    "routeN": "Route {{n}}",
+    "routeStops_one": "{{count}} stop",
+    "routeStops_other": "{{count}} stops",
+    "legEstimate": "≈ {{distance}} on foot",
+    "splitHere": "Split here",
+    "splitHereLabel": "Split the route before {{name}}",
+    "splitTitle": "Split into several routes",
+    "splitBody": "Too much for one walk? Split the stops into routes by proximity; each one is optimised on its own.",
+    "splitParts": "Number of routes",
+    "suggestSplit": "Suggest a split",
+    "merge": "Join into one route",
+    "splitName": "{{name}} · Route {{n}}",
+    "saveSplitHint": "Each route is saved as its own trip.",
+    "saveMany": "Save {{count}} trips"
   },
   "trips": {
     "title": "My Trips",
@@ -326,7 +344,12 @@
     "deleteYes": "Yes, delete my account",
     "travelDocuments": "Travel documents",
     "preferences": "Preferences",
-    "account": "Account"
+    "account": "Account",
+    "theme": "Theme",
+    "themeName": {
+      "light": "Light",
+      "dark": "Dark"
+    }
   },
   "about": {
     "title": "About",

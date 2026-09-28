@@ -13,6 +13,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- Theme: the app is light by default and no longer follows the system dark-mode setting (D-021).
 - UI redesign across every screen (D-020): neutral palette with one coral accent for primary actions and selection, Inter typeface with an 8-step type scale, soft shadows and generous radii, light and dark themes.
 - Explore: search-style city pill with a searchable city picker (flags), icon category tabs, responsive image-card grid (1–4 columns), floating Map/List switch and route tray; cards show the stop number when a place is in the route.
 - Attraction: hero photo, category/UNESCO badges, "Good to know" tiles, grouped links and a sticky bottom bar with **Add to route**.
@@ -36,6 +37,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- Profile → Preferences: **Theme** (Light / Dark), saved on the profile (`profiles.theme`, new migration) and applied at once across the app (D-021).
 - Checklist → Power: each destination plug type is shown with an illustration of the plug face.
 - Explore list: a checkbox on each attraction card adds it to (or removes it from) the route without opening the attraction; checked cards show their stop number, and route notices (full route, new city) appear in the route tray.
 - City coverage register [docs/CITIES.md](./docs/CITIES.md), generated from `cities.yaml` and the ingested data (`python -m wayfarer_pipeline cities-doc`; `ingest`, `seed` and `cities` rewrite it). CI fails when it is stale.

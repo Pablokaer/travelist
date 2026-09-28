@@ -1,5 +1,6 @@
 // Design tokens (D-020): neutral surfaces, near-black text, one warm accent used only for
-// primary actions, selection and active states.
+// primary actions, selection and active states. Light by default; the user can pick dark in
+// Profile → Preferences (D-021).
 export const palette = {
   light: {
     text: '#222222',
@@ -54,7 +55,7 @@ export const MIN_TOUCH = 44;
 /** Content widths: reading column, forms and the wide grid layouts. */
 export const layout = { form: 440, content: 760, wide: 1200 } as const;
 
-/** Soft elevation. Dark mode relies on surfaces and borders instead of shadows. */
+/** Soft elevation. Dark mode relies on surfaces and borders more than on shadows. */
 export const shadows: Record<ColorScheme, { card: string; raised: string; floating: string }> = {
   light: {
     card: '0px 1px 2px rgba(0,0,0,0.06), 0px 4px 12px rgba(0,0,0,0.06)',

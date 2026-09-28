@@ -2,19 +2,21 @@ import '@/lib/i18n';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DEFAULT_THEME } from '@wayfarer/shared';
+import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { Appearance, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { LoadingState } from '@/components/states';
 import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 import { useProfile } from '@/features/profile/api';
 import { createQueryClient } from '@/lib/query-client';
-import { palette } from '@/theme/colors';
 import { fontAssets, fontFamilyFor } from '@/theme/fonts';
-import { useColorSchemeName, useTheme } from '@/theme/use-theme';
+import { navigationTheme } from '@/theme/navigation';
+import { ColorSchemeContext, useTheme } from '@/theme/use-theme';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -70,11 +72,27 @@ function RootNavigator() {
   );
 }
 
+/** Applies the profile's theme (D-021) to our tokens, navigation and native UI. */
+function ThemedApp() {
+  const profile = useProfile();
+  const scheme = profile.data?.theme ?? DEFAULT_THEME;
+  useEffect(() => {
+    // Keyboards, alerts and pickers follow the app's choice, not the system's (native only).
+    if (Platform.OS !== 'web') Appearance.setColorScheme(scheme);
+  }, [scheme]);
+
+  return (
+    <ColorSchemeContext.Provider value={scheme}>
+      <ThemeProvider value={navigationTheme(scheme)}>
+        <RootNavigator />
+        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      </ThemeProvider>
+    </ColorSchemeContext.Provider>
+  );
+}
+
 export default function RootLayout() {
   const [queryClient] = useState(createQueryClient);
-  const scheme = useColorSchemeName();
-  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
-  const colors = palette[scheme];
   const [fontsLoaded, fontError] = useFonts(fontAssets);
   const ready = fontsLoaded || !!fontError;
   useEffect(() => {
@@ -86,27 +104,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider
-          value={{
-            ...base,
-            fonts: {
-              regular: { fontFamily: fontFamilyFor('400'), fontWeight: '400' },
-              medium: { fontFamily: fontFamilyFor('500'), fontWeight: '500' },
-              bold: { fontFamily: fontFamilyFor('600'), fontWeight: '600' },
-              heavy: { fontFamily: fontFamilyFor('700'), fontWeight: '700' },
-            },
-            colors: {
-              ...base.colors,
-              primary: colors.primary,
-              background: colors.background,
-              card: colors.surface,
-              text: colors.text,
-              border: colors.border,
-            },
-          }}>
-          <RootNavigator />
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        <ThemedApp />
       </AuthProvider>
     </QueryClientProvider>
   );

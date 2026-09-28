@@ -272,6 +272,7 @@ export type Database = {
           language: string;
           onboarded_at: string | null;
           passport_expiry: string | null;
+          theme: string;
           units: string;
           updated_at: string;
         };
@@ -283,6 +284,7 @@ export type Database = {
           language?: string;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
+          theme?: string;
           units?: string;
           updated_at?: string;
         };
@@ -294,6 +296,7 @@ export type Database = {
           language?: string;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
+          theme?: string;
           units?: string;
           updated_at?: string;
         };

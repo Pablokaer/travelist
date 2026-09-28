@@ -66,7 +66,7 @@ Finishing sets `onboarded_at`, which unlocks the main app.
 
 - Shows name, email, nationalities, home country and passport expiry.
 - **Edit profile** (`edit-profile.tsx`) — the same fields as onboarding on one screen.
-- **Language** and **Units** switches — applied instantly and saved to the profile.
+- **Language**, **Units** and **Theme** (Light / Dark) switches — applied instantly and saved to the profile.
 - Links to **About**, **Sign out** and **Delete account** (with confirmation).
 
 Nationalities are saved with the `set_nationalities` RPC (replaces the whole set atomically). The country picker (`features/profile/country-picker.tsx`) lists all 250 countries with names in the current language.
@@ -150,7 +150,7 @@ Trips are saved with the `save_trip` RPC (trip + ordered stops in one transactio
 
 - **Languages:** English and Portuguese. Order: profile language → device language → English. All strings live in `packages/shared/src/i18n/{en,pt}.json` (a test enforces key parity). Attraction and city names are shown in PT when available, otherwise EN.
 - **Units:** metric (km, °C, mm) or imperial (mi, °F, in) for distances, temperatures and precipitation.
-- **Theme:** light and dark follow the system setting. Design tokens (colours, spacing, radii, shadows, breakpoints) live in `apps/mobile/src/theme`; shared components in `apps/mobile/src/components` (D-020).
+- **Theme:** light by default; users can switch to dark in Profile → Preferences (saved on the profile, `profiles.theme`). The system dark-mode setting is not followed (D-021). Design tokens (colours, spacing, radii, shadows, breakpoints) live in `apps/mobile/src/theme`; shared components in `apps/mobile/src/components` (D-020).
 - **Layout:** phones (< 600 px) get a bottom tab bar and single-column content; tablets (≥ 600 px) get card grids, centred dialogs and two-column sections; desktop (≥ 1024 px) gets a side navigation rail and map-beside-list layouts. Content is capped at 440 px (forms), 760 px (reading) or 1200 px (grids).
 - **Accessibility:** roles and labels on interactive elements, ≥ 44 pt touch targets, live regions for counts and notices, a list alternative to the map, text scales with the system font size, visible focus rings for keyboard users on web, decorative icons hidden from screen readers.
 - **States:** every data screen has loading, empty and error (with retry) states.
@@ -246,6 +246,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Portuguese attraction names exist for only ~15–55% of places outside Portugal/Rome (English shown as fallback); opening hours cover ~15–30% of places.
 - Expo Go cannot load MapLibre: iOS/Android need a development build.
 - Sentry / PostHog are not wired yet (no-op facade).
+- Dark theme: sign-in and sign-up screens are always light (the choice lives on the profile), and the map keeps its light style.
 - No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
 - The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
 

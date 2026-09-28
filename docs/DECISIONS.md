@@ -113,10 +113,17 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 
 - **Context:** the MVP UI was functional but visually plain: bordered grey boxes stacked vertically, system fonts, the same weight for primary and secondary actions.
 - **Decision:** a small in-house design system, inspired by the calm, image-led feel of marketplace travel apps (without copying any product's components or brand):
-  - **Colour:** white surfaces, near-black text (`#222`), soft greys for secondary text, dividers and muted backgrounds, and one coral accent (`#D7383B`, 4.6:1 on white) used only for primary actions, selection, active states and route markers. Status colours (success, warning, danger, info) appear only in checklist status pills and errors. Dark mode has its own tokens and relies on surfaces rather than shadows.
+  - **Colour:** white surfaces, near-black text (`#222`), soft greys for secondary text, dividers and muted backgrounds, and one coral accent (`#D7383B`, 4.6:1 on white) used only for primary actions, selection, active states and route markers. Status colours (success, warning, danger, info) appear only in checklist status pills and errors. Dark tokens exist for users who pick the dark theme (D-021).
   - **Type:** Inter (`@expo-google-fonts/inter`, SIL OFL) in four weights, loaded before the splash screen hides; an 8-step scale (display, title, heading, subtitle, body, label, caption, helper). `Text` maps `fontWeight` to the matching Inter family because custom fonts ship one family per weight.
   - **Shape and depth:** radii 8–24 px, hairline borders, `boxShadow` elevation in three levels (card, raised, floating).
   - **Interaction:** a shared `Tappable` (press-in scale via RN `Animated`, hover on web, keyboard-only focus ring), spinner-in-place loading buttons.
   - **Layout:** breakpoints at 600 / 1024 px; bottom tabs on phones, side rail on desktop; modals as page sheets on phones and centred dialogs on larger screens; content widths 440 / 760 / 1200 px.
   - **Icons:** `expo-symbols` (SF Symbols on iOS, Material Symbols on Android/web) behind an `Icon` wrapper with a fixed name map.
 - **Trade-offs:** one more dependency (the font package, ~1 MB of font files). No animation library beyond RN `Animated`, to keep Jest setup unchanged. Some SF Symbols are approximations for attraction categories.
+
+## D-021 — Light by default; dark theme as a user preference
+
+- **Context:** D-020 shipped light and dark tokens that followed the system setting. The product direction is a light, image-led look, but users asked to choose a dark theme themselves.
+- **Decision:** the theme is a **profile preference** (`profiles.theme`, `light` | `dark`, default `light`), picked in Profile → Preferences next to language and units. The system dark-mode setting is not followed. `ColorSchemeContext` (set in the root layout from the profile) drives `useTheme()`, `useShadows()`, the navigation theme and the status bar; on iOS/Android `Appearance.setColorScheme` makes keyboards and system dialogs match. The change is applied optimistically to the cached profile, so the app switches at once and rolls back if the save fails.
+- **Why the profile, not device storage:** it follows the user across devices like language and units, and needs no new storage dependency.
+- **Trade-offs:** signed-out screens (sign-in, sign-up, magic link) are always light because there is no profile yet; the map style stays light in dark mode.

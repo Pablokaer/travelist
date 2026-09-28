@@ -1,4 +1,4 @@
-import type { Language, ProfileForm, Units } from '@wayfarer/shared';
+import type { Language, ProfileForm, Theme, Units } from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '@/features/auth/auth-provider';
@@ -16,6 +16,7 @@ export type Profile = {
   homeCountry: string | null;
   language: Language;
   units: Units;
+  theme: Theme;
   passportExpiry: string | null;
   onboardedAt: string | null;
   nationalities: string[];
@@ -47,7 +48,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     await supabase
       .from('profiles')
       .select(
-        'id, display_name, home_country, language, units, passport_expiry, onboarded_at, profile_nationalities(country_code)',
+        'id, display_name, home_country, language, units, theme, passport_expiry, onboarded_at, profile_nationalities(country_code)',
       )
       .eq('id', userId)
       .single(),
@@ -58,6 +59,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     homeCountry: row.home_country,
     language: row.language as Language,
     units: row.units as Units,
+    theme: row.theme as Theme,
     passportExpiry: row.passport_expiry,
     onboardedAt: row.onboarded_at,
     nationalities: (row.profile_nationalities ?? []).map((n) => n.country_code).sort(),
@@ -99,14 +101,31 @@ export function useSaveProfile() {
   });
 }
 
-/** Lightweight update for single preferences (language, units). */
+export type PreferencesPatch = { language?: Language; units?: Units; theme?: Theme };
+
+/**
+ * Lightweight update for single preferences (language, units, theme). The cached profile is
+ * patched first so the change shows at once (a theme switch shouldn't wait for the network),
+ * and rolled back if the save fails.
+ * @example useUpdatePreferences().mutate({ theme: 'dark' })
+ */
 export function useUpdatePreferences() {
   const { session } = useAuth();
   const queryClient = useQueryClient();
+  const key = profileKeys.profile(session?.user.id ?? 'anonymous');
   return useMutation({
-    mutationFn: async (patch: { language?: Language; units?: Units }) => {
+    mutationFn: async (patch: PreferencesPatch) => {
       check(await supabase.from('profiles').update(patch).eq('id', session!.user.id));
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
+    onMutate: async (patch) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<Profile>(key);
+      if (previous) queryClient.setQueryData<Profile>(key, { ...previous, ...patch });
+      return { previous };
+    },
+    onError: (_error, _patch, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['profile'] }),
   });
 }
