@@ -61,10 +61,15 @@ test('sign up, onboard, explore, check, build and save a walk', async ({ page })
   // Route
   await byTestId('open-route').click();
   await byTestId('optimize').click();
-  await expect(byTestId('route-totals')).toContainText(/km| m/, { timeout: 30_000 });
+  // Wait for the optimiser's answer: the distance switches from "–" to a value.
+  await expect(byTestId('route-distance')).toContainText(/\d+(\.\d+)? (km|m|mi)\b/, {
+    timeout: 30_000,
+  });
   await byTestId('trip-name').fill('E2E walk');
   await byTestId('save-trip').click();
   await expect(role('heading', 'E2E walk').first()).toBeVisible();
+  // The saved trip keeps the route totals.
+  await expect(byTestId('route-distance')).toContainText(/\d+(\.\d+)? (km|m|mi)\b/);
   await expect(role('button', 'Open the whole walk in Google Maps')).toBeVisible();
 
   // My Trips

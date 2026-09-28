@@ -41,6 +41,7 @@ export function RouteTotals({
       testID="route-totals">
       <View style={styles.stats}>
         <Stat
+          testID="route-distance"
           label={t('route.distance')}
           value={distanceM != null ? formatDistance(distanceM, units, lang) : '–'}
         />
@@ -65,9 +66,9 @@ export function RouteTotals({
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, testID }: { label: string; value: string; testID?: string }) {
   return (
-    <View style={styles.stat} accessible accessibilityLabel={`${label}: ${value}`}>
+    <View style={styles.stat} accessible accessibilityLabel={`${label}: ${value}`} testID={testID}>
       <Text variant="caption" secondary>
         {label}
       </Text>

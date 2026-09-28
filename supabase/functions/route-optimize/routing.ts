@@ -166,6 +166,8 @@ export function createOrsRouting(deps: {
       `${base}/v2/directions/foot-walking/geojson`,
       {
         ...opts,
+        // The GeoJSON endpoint answers 406 unless GeoJSON is an accepted type.
+        headers: { ...opts.headers, Accept: 'application/json, application/geo+json' },
         method: 'POST',
         body: {
           coordinates: ordered.map(lngLat),

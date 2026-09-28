@@ -124,6 +124,9 @@ Deno.test('route: ORS ordering from VROOM steps, legs and geometry from directio
   // Request shapes
   const [opt, dir] = calls;
   assertEquals(opt!.options?.headers?.Authorization, 'test-key');
+  // ORS answers 406 to the GeoJSON endpoint unless GeoJSON is accepted.
+  assertEquals(dir!.options?.headers?.Authorization, 'test-key');
+  assertEquals(dir!.options?.headers?.Accept?.includes('application/geo+json'), true);
   const optBody = opt!.options?.body as {
     jobs: { id: number; location: number[]; service: number }[];
     vehicles: { profile: string; start: number[]; end?: number[] }[];

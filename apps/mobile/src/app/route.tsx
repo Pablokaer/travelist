@@ -218,7 +218,7 @@ export default function RouteScreen() {
           label={t('route.save')}
           onPress={onSave}
           loading={save.isPending}
-          disabled={stops.length < ROUTE_MIN_STOPS}
+          disabled={stops.length < ROUTE_MIN_STOPS || optimize.isPending}
           testID="save-trip"
         />
         <Button
