@@ -68,8 +68,10 @@ def test_attraction_uuid_is_stable():
 
 
 def test_cities_sql():
-    sql = seed.cities_sql(load_cities())
-    assert sql.count("  ('") == 12
+    config = load_cities()
+    sql = seed.cities_sql(config)
+    assert sql.count("  ('") == len(config.cities)
+    assert "('oslo', 'Oslo', 'Oslo', 'NO'" in sql
     assert "array[38.6913994,-9.2298356,38.7967584,-9.0863328]::double precision[]" in sql
     assert "extensions.st_makepoint(-9.139016, 38.708042)" in sql
     assert "'Europe/Lisbon'" in sql

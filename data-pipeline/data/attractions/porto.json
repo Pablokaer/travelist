@@ -1,16 +1,8 @@
 {
   "city": "porto",
   "retrieved": "2026-09-28",
-  "pageviews_range": [
-    "20250901",
-    "20260831"
-  ],
-  "sources": [
-    "wikidata",
-    "openstreetmap",
-    "wikipedia-pageviews",
-    "wikimedia-commons"
-  ],
+  "pageviews_range": ["20250901", "20260831"],
+  "sources": ["wikidata", "openstreetmap", "wikipedia-pageviews", "wikimedia-commons"],
   "attractions": [
     {
       "wikidata_id": "Q11783",
@@ -1443,6 +1435,32 @@
       "pageviews": 8715
     },
     {
+      "wikidata_id": "Q7491948",
+      "osm_id": "way/665464975",
+      "name_en": "She Changes",
+      "name_pt": "A Anémona",
+      "description_en": "sculpture by Janet Echelman",
+      "description_pt": "escultura de Janet Echelman",
+      "category": "monument",
+      "lat": 41.1734,
+      "lng": -8.6887,
+      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Porto_-_Matosinhos_-_Pra%C3%A7a_da_Cidade_de_Salvador.jpg/960px-Porto_-_Matosinhos_-_Pra%C3%A7a_da_Cidade_de_Salvador.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "image_author": "António M.L. Cabral",
+      "image_license": "CC BY 2.5",
+      "image_license_url": "https://creativecommons.org/licenses/by/2.5",
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:Porto_-_Matosinhos_-_Pra%C3%A7a_da_Cidade_de_Salvador.jpg",
+      "is_unesco": false,
+      "website": "https://www.echelman.com/project/she-changes/",
+      "wikipedia_en": "She Changes",
+      "wikipedia_pt": "She Changes",
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 20,
+      "popularity": 57,
+      "sitelinks": 3,
+      "pageviews": 4828
+    },
+    {
       "wikidata_id": "Q7826968",
       "osm_id": "way/210470750",
       "name_en": "Tower of D. Pedro Pitões",
@@ -1909,6 +1927,32 @@
       "popularity": 51,
       "sitelinks": 3,
       "pageviews": 3151
+    },
+    {
+      "wikidata_id": "Q10286958",
+      "osm_id": "way/1020120945",
+      "name_en": "Fábrica de Lanifícios de Lordelo",
+      "name_pt": "Fábrica de Lanifícios de Lordelo",
+      "description_en": "building in Porto, Porto District, Portugal",
+      "description_pt": null,
+      "category": "landmark",
+      "lat": 41.1556667,
+      "lng": -8.6517667,
+      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/F%C3%A1brica_de_Lanif%C3%ADcios_de_Lordelo.jpg/960px-F%C3%A1brica_de_Lanif%C3%ADcios_de_Lordelo.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "image_author": "JotaCartas",
+      "image_license": "CC BY-SA 3.0",
+      "image_license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:F%C3%A1brica_de_Lanif%C3%ADcios_de_Lordelo.jpg",
+      "is_unesco": false,
+      "website": null,
+      "wikipedia_en": null,
+      "wikipedia_pt": "Fábrica de Lanifícios de Lordelo",
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 20,
+      "popularity": 16,
+      "sitelinks": 2,
+      "pageviews": 256
     },
     {
       "wikidata_id": "Q10287828",

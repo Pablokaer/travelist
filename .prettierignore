@@ -15,4 +15,3 @@ test-results
 *.sql
 supabase/functions
 apps/mobile/src/lib/database.types.ts
-data-pipeline/data

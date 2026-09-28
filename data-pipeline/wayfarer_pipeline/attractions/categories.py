@@ -42,6 +42,7 @@ ROOTS: dict[str, str] = {
     "Q5003624": "monument",  # memorial
     "Q179700": "monument",  # statue
     "Q483453": "monument",  # fountain
+    "Q860861": "monument",  # sculpture (e.g. The Little Mermaid)
     # church (Christian buildings only; other places of worship are landmarks)
     "Q16970": "church",  # church building
     "Q2977": "church",  # cathedral
@@ -75,6 +76,8 @@ ROOTS: dict[str, str] = {
     "Q34627": "landmark",  # synagogue
     "Q44539": "landmark",  # temple
     "Q39614": "landmark",  # cemetery
+    "Q7138926": "landmark",  # parliament building (e.g. Hungarian Parliament)
+    "Q88372": "landmark",  # promenade (e.g. Promenade des Anglais)
     # other
     "Q43501": "other",  # zoo
     "Q2281788": "other",  # public aquarium
@@ -84,8 +87,11 @@ ROOTS: dict[str, str] = {
     "Q37654": "other",  # market
 }
 
-# Items under these classes are never attractions (they no longer exist).
+# Items under these classes are never attractions (they no longer exist)...
 EXCLUDED_ROOTS = frozenset({"Q19860854"})  # destroyed building or structure
+# ...unless they are visitable ruins (e.g. the Parthenon is a "former temple" and an
+# archaeological site).
+EXCLUSION_OVERRIDES = frozenset({"Q839954"})  # archaeological site
 
 AVG_VISIT_MINUTES: dict[str, int] = {
     "museum": 90,
@@ -107,7 +113,7 @@ def classify(types: Iterable[str], type_roots: Mapping[str, Iterable[str]]) -> s
 
     Returns ``None`` when no class reaches a root (the item is not an attraction)."""
     roots = {root for t in types for root in type_roots.get(t, ())}
-    if roots & EXCLUDED_ROOTS:
+    if roots & EXCLUDED_ROOTS and not roots & EXCLUSION_OVERRIDES:
         return None
     found = {ROOTS[root] for root in roots if root in ROOTS}
     for category in PRIORITY:

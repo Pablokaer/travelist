@@ -19,12 +19,42 @@ LAUNCH_CITIES = {
     "madrid",
     "lisbon",
     "porto",
+    # added 2026-09-28
+    "berlin",
+    "venice",
+    "florence",
+    "munich",
+    "dublin",
+    "athens",
+    "budapest",
+    "edinburgh",
+    "brussels",
+    "copenhagen",
+    "stockholm",
+    "nice",
+    "seville",
+    "krakow",
+    "warsaw",
+    "naples",
+    "valencia",
+    "zurich",
+    "antalya",
+    "oslo",
 }
 
 
 def test_launch_cities_config_is_valid():
     config = load_cities()
     assert {c.slug for c in config.cities} == LAUNCH_CITIES
+
+
+def test_norway_country_code_survives_yaml():
+    # A bare NO is parsed by YAML as boolean false; cities.yaml must quote it.
+    assert load_cities().get("oslo").country_code == "NO"
+
+
+def test_every_city_has_a_timezone():
+    assert all(c.timezone for c in load_cities().cities)
 
 
 def test_get_unknown_city_lists_known_ones():

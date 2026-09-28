@@ -1,16 +1,8 @@
 {
   "city": "istanbul",
   "retrieved": "2026-09-28",
-  "pageviews_range": [
-    "20250901",
-    "20260831"
-  ],
-  "sources": [
-    "wikidata",
-    "openstreetmap",
-    "wikipedia-pageviews",
-    "wikimedia-commons"
-  ],
+  "pageviews_range": ["20250901", "20260831"],
+  "sources": ["wikidata", "openstreetmap", "wikipedia-pageviews", "wikimedia-commons"],
   "attractions": [
     {
       "wikidata_id": "Q4484",
@@ -37,6 +29,32 @@
       "popularity": 82,
       "sitelinks": 58,
       "pageviews": 71540
+    },
+    {
+      "wikidata_id": "Q18871",
+      "osm_id": "way/331665417",
+      "name_en": "Sublime Porte",
+      "name_pt": "Sublime Porta",
+      "description_en": "synecdoche for the central government of the Ottoman Empire",
+      "description_pt": null,
+      "category": "monument",
+      "lat": 41.0111111,
+      "lng": 28.9780556,
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Bab-i_Ali.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "image_author": null,
+      "image_license": "Public domain",
+      "image_license_url": null,
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:Bab-i_Ali.jpg",
+      "is_unesco": false,
+      "website": null,
+      "wikipedia_en": "Sublime Porte",
+      "wikipedia_pt": "Sublime Porta",
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 20,
+      "popularity": 87,
+      "sitelinks": 50,
+      "pageviews": 102471
     },
     {
       "wikidata_id": "Q29635",
@@ -86,7 +104,7 @@
       "opening_hours": "Mo-Su 09:00-18:00",
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 36,
+      "popularity": 34,
       "sitelinks": 11,
       "pageviews": 2021
     },
@@ -112,7 +130,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 25,
+      "popularity": 24,
       "sitelinks": 10,
       "pageviews": 899
     },
@@ -138,7 +156,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 46,
+      "popularity": 45,
       "sitelinks": 20,
       "pageviews": 4561
     },
@@ -190,7 +208,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 68,
+      "popularity": 67,
       "sitelinks": 39,
       "pageviews": 23816
     },
@@ -216,7 +234,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 58,
+      "popularity": 57,
       "sitelinks": 32,
       "pageviews": 11285
     },
@@ -268,7 +286,7 @@
       "opening_hours": "Th-Tu 09:00-17:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 72,
+      "popularity": 71,
       "sitelinks": 34,
       "pageviews": 32299
     },
@@ -346,7 +364,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 70,
+      "popularity": 69,
       "sitelinks": 38,
       "pageviews": 27286
     },
@@ -372,7 +390,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 90,
+      "popularity": 89,
       "sitelinks": 69,
       "pageviews": 124406
     },
@@ -398,7 +416,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 64,
+      "popularity": 63,
       "sitelinks": 31,
       "pageviews": 16982
     },
@@ -450,7 +468,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 42,
+      "popularity": 41,
       "sitelinks": 18,
       "pageviews": 3321
     },
@@ -528,7 +546,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 45,
+      "popularity": 44,
       "sitelinks": 16,
       "pageviews": 4217
     },
@@ -554,7 +572,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 56,
+      "popularity": 55,
       "sitelinks": 13,
       "pageviews": 9700
     },
@@ -580,7 +598,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 56,
+      "popularity": 55,
       "sitelinks": 13,
       "pageviews": 9384
     },
@@ -632,7 +650,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 37,
+      "popularity": 35,
       "sitelinks": 8,
       "pageviews": 2181
     },
@@ -684,7 +702,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 30,
+      "popularity": 29,
       "sitelinks": 20,
       "pageviews": 1361
     },
@@ -710,7 +728,7 @@
       "opening_hours": "Mo-Su 09:00-18:30",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 57,
+      "popularity": 56,
       "sitelinks": 28,
       "pageviews": 10330
     },
@@ -736,7 +754,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 15,
       "pageviews": 3639
     },
@@ -762,7 +780,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 16,
       "pageviews": 5841
     },
@@ -814,7 +832,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 52,
+      "popularity": 51,
       "sitelinks": 31,
       "pageviews": 6849
     },
@@ -840,7 +858,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 44,
+      "popularity": 43,
       "sitelinks": 22,
       "pageviews": 3774
     },
@@ -866,7 +884,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 19,
       "pageviews": 6280
     },
@@ -892,7 +910,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 64,
+      "popularity": 63,
       "sitelinks": 27,
       "pageviews": 17380
     },
@@ -944,7 +962,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 53,
+      "popularity": 52,
       "sitelinks": 25,
       "pageviews": 7782
     },
@@ -970,7 +988,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 72,
+      "popularity": 71,
       "sitelinks": 43,
       "pageviews": 31291
     },
@@ -996,7 +1014,7 @@
       "opening_hours": "Mo-Sa 08:00-19:00; Su 09:30-19:00",
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 69,
+      "popularity": 68,
       "sitelinks": 34,
       "pageviews": 25621
     },
@@ -1022,7 +1040,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 77,
+      "popularity": 76,
       "sitelinks": 50,
       "pageviews": 45880
     },
@@ -1100,7 +1118,7 @@
       "opening_hours": "Mo-Th 10:00-16:00; Fr 10:00-13:00; Su 10:00-14:00",
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 20,
       "pageviews": 6142
     },
@@ -1152,7 +1170,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 80,
+      "popularity": 79,
       "sitelinks": 31,
       "pageviews": 58064
     },
@@ -1178,7 +1196,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 54,
+      "popularity": 53,
       "sitelinks": 19,
       "pageviews": 8229
     },
@@ -1204,7 +1222,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 14,
       "pageviews": 1291
     },
@@ -1230,7 +1248,7 @@
       "opening_hours": "Tu-Su 09:00-18:00",
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 72,
+      "popularity": 71,
       "sitelinks": 32,
       "pageviews": 31275
     },
@@ -1256,7 +1274,7 @@
       "opening_hours": "08:00-19:30",
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 54,
+      "popularity": 53,
       "sitelinks": 25,
       "pageviews": 8306
     },
@@ -1334,7 +1352,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 48,
+      "popularity": 46,
       "sitelinks": 19,
       "pageviews": 4986
     },
@@ -1386,7 +1404,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 59,
+      "popularity": 58,
       "sitelinks": 21,
       "pageviews": 11976
     },
@@ -1412,7 +1430,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 69,
+      "popularity": 68,
       "sitelinks": 23,
       "pageviews": 25834
     },
@@ -1438,7 +1456,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 68,
+      "popularity": 67,
       "sitelinks": 41,
       "pageviews": 23085
     },
@@ -1464,7 +1482,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 73,
+      "popularity": 72,
       "sitelinks": 33,
       "pageviews": 33993
     },
@@ -1542,7 +1560,7 @@
       "opening_hours": "10:00-16:00; Fr 10:00-13:00; Su 10:00-14:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 37,
+      "popularity": 36,
       "sitelinks": 16,
       "pageviews": 2254
     },
@@ -1568,7 +1586,7 @@
       "opening_hours": "Mo-Su 09:00-19:00",
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 55,
+      "popularity": 54,
       "sitelinks": 21,
       "pageviews": 8716
     },
@@ -1594,7 +1612,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 65,
+      "popularity": 64,
       "sitelinks": 33,
       "pageviews": 19121
     },
@@ -1620,7 +1638,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 11,
       "pageviews": 1287
     },
@@ -1646,7 +1664,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 52,
+      "popularity": 51,
       "sitelinks": 20,
       "pageviews": 6929
     },
@@ -1698,7 +1716,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 11,
       "pageviews": 2703
     },
@@ -1724,7 +1742,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 20,
       "pageviews": 1514
     },
@@ -1750,7 +1768,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 58,
+      "popularity": 57,
       "sitelinks": 21,
       "pageviews": 11184
     },
@@ -1776,7 +1794,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 16,
       "pageviews": 6376
     },
@@ -1828,7 +1846,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 72,
+      "popularity": 71,
       "sitelinks": 28,
       "pageviews": 32321
     },
@@ -1854,7 +1872,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 55,
+      "popularity": 54,
       "sitelinks": 16,
       "pageviews": 8885
     },
@@ -1880,7 +1898,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 62,
+      "popularity": 61,
       "sitelinks": 26,
       "pageviews": 14654
     },
@@ -1932,7 +1950,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 62,
+      "popularity": 61,
       "sitelinks": 30,
       "pageviews": 14704
     },
@@ -1958,7 +1976,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 31,
       "sitelinks": 9,
       "pageviews": 1597
     },
@@ -1984,7 +2002,7 @@
       "opening_hours": "Tu-Th, Sa-Su 10:00-18:00; Fr 10:00-20:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 23,
       "pageviews": 6404
     },
@@ -2010,9 +2028,35 @@
       "opening_hours": "Tu-Su 09:00-17:00",
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 66,
+      "popularity": 65,
       "sitelinks": 24,
       "pageviews": 20271
+    },
+    {
+      "wikidata_id": "Q1551419",
+      "osm_id": null,
+      "name_en": "Monastery of Stoudios",
+      "name_pt": "Mosteiro de Estúdio",
+      "description_en": "Greek Orthodox monastery in Constantinople",
+      "description_pt": "antigo mosteiro bizantino em Constantinopla; atualmente uma mesquita de istambul",
+      "category": "church",
+      "lat": 40.9961111,
+      "lng": 28.9286111,
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Theodore_Studite_%28Menologion_of_Basil_II%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "image_author": "Authors of Menologion of Basil II (circa 985 AC, Constantinople), Byzantine manuscript illuminators [1] : Pantoleon with Georgios, Michael the Younger, Michael of Blachernae, Symeon, Symeon of Blachernae, Menas, and Nestor ( Online on Vatican site )",
+      "image_license": "Public domain",
+      "image_license_url": null,
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:Theodore_Studite_(Menologion_of_Basil_II).jpg",
+      "is_unesco": false,
+      "website": null,
+      "wikipedia_en": "Monastery of Stoudios",
+      "wikipedia_pt": "Mosteiro de Estúdio",
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 30,
+      "popularity": 56,
+      "sitelinks": 32,
+      "pageviews": 10267
     },
     {
       "wikidata_id": "Q1560106",
@@ -2036,7 +2080,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 58,
+      "popularity": 57,
       "sitelinks": 27,
       "pageviews": 10991
     },
@@ -2062,7 +2106,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 15,
       "pageviews": 1371
     },
@@ -2088,7 +2132,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 23,
       "pageviews": 1817
     },
@@ -2114,7 +2158,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 17,
       "pageviews": 2613
     },
@@ -2140,7 +2184,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 12,
       "pageviews": 1289
     },
@@ -2166,7 +2210,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 42,
+      "popularity": 40,
       "sitelinks": 20,
       "pageviews": 3169
     },
@@ -2192,7 +2236,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 48,
+      "popularity": 47,
       "sitelinks": 33,
       "pageviews": 5351
     },
@@ -2218,7 +2262,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 30,
       "sitelinks": 19,
       "pageviews": 1451
     },
@@ -2244,7 +2288,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 38,
+      "popularity": 37,
       "sitelinks": 22,
       "pageviews": 2503
     },
@@ -2270,7 +2314,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 24,
       "pageviews": 5638
     },
@@ -2322,7 +2366,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 21,
+      "popularity": 19,
       "sitelinks": 14,
       "pageviews": 657
     },
@@ -2348,7 +2392,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 35,
+      "popularity": 34,
       "sitelinks": 7,
       "pageviews": 1964
     },
@@ -2374,7 +2418,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 47,
+      "popularity": 46,
       "sitelinks": 10,
       "pageviews": 4884
     },
@@ -2400,7 +2444,7 @@
       "opening_hours": "Tu-Su 10:00-19:00, Su 12:00-18:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 22,
       "pageviews": 6325
     },
@@ -2452,7 +2496,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 23,
       "pageviews": 5734
     },
@@ -2478,7 +2522,7 @@
       "opening_hours": "Mo-Su 08:00-22:00",
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 18,
       "pageviews": 3514
     },
@@ -2504,7 +2548,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 15,
       "pageviews": 3551
     },
@@ -2530,7 +2574,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 67,
+      "popularity": 66,
       "sitelinks": 17,
       "pageviews": 21426
     },
@@ -2556,7 +2600,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 10,
       "pageviews": 2682
     },
@@ -2582,7 +2626,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 10,
       "pageviews": 6087
     },
@@ -2608,7 +2652,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 21,
+      "popularity": 19,
       "sitelinks": 15,
       "pageviews": 646
     },
@@ -2634,7 +2678,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 42,
+      "popularity": 41,
       "sitelinks": 15,
       "pageviews": 3299
     },
@@ -2660,7 +2704,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 29,
       "pageviews": 6085
     },
@@ -2686,7 +2730,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 62,
+      "popularity": 61,
       "sitelinks": 17,
       "pageviews": 15279
     },
@@ -2712,7 +2756,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 23,
+      "popularity": 22,
       "sitelinks": 7,
       "pageviews": 774
     },
@@ -2738,7 +2782,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 26,
       "pageviews": 5875
     },
@@ -2764,7 +2808,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 42,
+      "popularity": 41,
       "sitelinks": 15,
       "pageviews": 3219
     },
@@ -2790,7 +2834,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 47,
+      "popularity": 46,
       "sitelinks": 23,
       "pageviews": 4796
     },
@@ -2816,7 +2860,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 47,
+      "popularity": 46,
       "sitelinks": 24,
       "pageviews": 4809
     },
@@ -2842,7 +2886,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 45,
+      "popularity": 44,
       "sitelinks": 25,
       "pageviews": 4017
     },
@@ -2868,7 +2912,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 25,
       "pageviews": 6022
     },
@@ -2894,7 +2938,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 41,
+      "popularity": 40,
       "sitelinks": 16,
       "pageviews": 3061
     },
@@ -2920,7 +2964,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 46,
+      "popularity": 45,
       "sitelinks": 22,
       "pageviews": 4340
     },
@@ -2946,7 +2990,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 18,
       "pageviews": 1648
     },
@@ -2972,7 +3016,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 60,
+      "popularity": 59,
       "sitelinks": 24,
       "pageviews": 12475
     },
@@ -2998,7 +3042,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 16,
       "pageviews": 1553
     },
@@ -3024,9 +3068,35 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 29,
+      "popularity": 27,
       "sitelinks": 11,
       "pageviews": 1187
+    },
+    {
+      "wikidata_id": "Q2656937",
+      "osm_id": null,
+      "name_en": "Runic inscriptions in Hagia Sophia",
+      "name_pt": null,
+      "description_en": "runic inscriptions that are left in Hagia Sophia",
+      "description_pt": null,
+      "category": "monument",
+      "lat": 41.0087,
+      "lng": 28.9791,
+      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Hagia-sofia-viking.jpg/960px-Hagia-sofia-viking.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "image_author": "Not home at English Wikipedia",
+      "image_license": "Public domain",
+      "image_license_url": null,
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:Hagia-sofia-viking.jpg",
+      "is_unesco": false,
+      "website": null,
+      "wikipedia_en": "Runic inscriptions in Hagia Sophia",
+      "wikipedia_pt": null,
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 20,
+      "popularity": 75,
+      "sitelinks": 16,
+      "pageviews": 41964
     },
     {
       "wikidata_id": "Q2705343",
@@ -3050,7 +3120,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 44,
+      "popularity": 43,
       "sitelinks": 20,
       "pageviews": 3849
     },
@@ -3076,7 +3146,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 18,
       "pageviews": 3598
     },
@@ -3102,7 +3172,7 @@
       "opening_hours": "closed",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 53,
+      "popularity": 52,
       "sitelinks": 15,
       "pageviews": 7705
     },
@@ -3128,7 +3198,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 40,
+      "popularity": 38,
       "sitelinks": 15,
       "pageviews": 2731
     },
@@ -3154,7 +3224,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 23,
       "pageviews": 5527
     },
@@ -3180,7 +3250,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 35,
+      "popularity": 34,
       "sitelinks": 16,
       "pageviews": 1953
     },
@@ -3206,7 +3276,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 28,
+      "popularity": 27,
       "sitelinks": 15,
       "pageviews": 1168
     },
@@ -3258,7 +3328,7 @@
       "opening_hours": "Tu-Fr 10:00-18:00; Sa-Su 10.00-18.30",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 11,
       "pageviews": 1821
     },
@@ -3284,7 +3354,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 40,
+      "popularity": 39,
       "sitelinks": 12,
       "pageviews": 2861
     },
@@ -3310,7 +3380,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 15,
       "pageviews": 5732
     },
@@ -3336,7 +3406,7 @@
       "opening_hours": "Mo-Su 08:30-16:30",
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 54,
+      "popularity": 53,
       "sitelinks": 18,
       "pageviews": 8115
     },
@@ -3362,7 +3432,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 7,
       "pageviews": 1728
     },
@@ -3388,7 +3458,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 46,
+      "popularity": 45,
       "sitelinks": 15,
       "pageviews": 4333
     },
@@ -3414,7 +3484,7 @@
       "opening_hours": "Mo-Su 09:00-18:00",
       "fee": "yes",
       "avg_visit_minutes": 20,
-      "popularity": 58,
+      "popularity": 57,
       "sitelinks": 19,
       "pageviews": 10825
     },
@@ -3440,7 +3510,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 4,
       "pageviews": 1750
     },
@@ -3466,7 +3536,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 50,
+      "popularity": 49,
       "sitelinks": 12,
       "pageviews": 5858
     },
@@ -3492,7 +3562,7 @@
       "opening_hours": "Th-Tu 10:00-17:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 36,
+      "popularity": 35,
       "sitelinks": 7,
       "pageviews": 2100
     },
@@ -3518,7 +3588,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 31,
       "sitelinks": 13,
       "pageviews": 1619
     },
@@ -3544,7 +3614,7 @@
       "opening_hours": null,
       "fee": "no",
       "avg_visit_minutes": 90,
-      "popularity": 32,
+      "popularity": 30,
       "sitelinks": 12,
       "pageviews": 1504
     },
@@ -3570,7 +3640,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 27,
+      "popularity": 25,
       "sitelinks": 5,
       "pageviews": 1030
     },
@@ -3596,7 +3666,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 44,
+      "popularity": 43,
       "sitelinks": 14,
       "pageviews": 3831
     },
@@ -3622,7 +3692,7 @@
       "opening_hours": "Tu-Fr 09:00-16:30; Sa-Su 10:00-17:30",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 42,
+      "popularity": 41,
       "sitelinks": 11,
       "pageviews": 3198
     },
@@ -3648,7 +3718,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 29,
+      "popularity": 28,
       "sitelinks": 14,
       "pageviews": 1257
     },
@@ -3674,7 +3744,7 @@
       "opening_hours": "Tu, Th, Fr, Su 10:00-18:00; We, Sa 10:00-22:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 44,
+      "popularity": 43,
       "sitelinks": 17,
       "pageviews": 3787
     },
@@ -3700,7 +3770,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 17,
+      "popularity": 16,
       "sitelinks": 8,
       "pageviews": 504
     },
@@ -3726,7 +3796,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 48,
+      "popularity": 47,
       "sitelinks": 13,
       "pageviews": 5070
     },
@@ -3752,7 +3822,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 48,
+      "popularity": 47,
       "sitelinks": 5,
       "pageviews": 5267
     },
@@ -3778,7 +3848,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 16,
+      "popularity": 15,
       "sitelinks": 5,
       "pageviews": 468
     },
@@ -3804,7 +3874,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 19,
+      "popularity": 17,
       "sitelinks": 8,
       "pageviews": 547
     },
@@ -3830,7 +3900,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 9,
       "pageviews": 3626
     },
@@ -3856,7 +3926,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 22,
+      "popularity": 20,
       "sitelinks": 5,
       "pageviews": 698
     },
@@ -3882,7 +3952,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 18,
+      "popularity": 16,
       "sitelinks": 5,
       "pageviews": 522
     },
@@ -3908,7 +3978,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 17,
+      "popularity": 15,
       "sitelinks": 4,
       "pageviews": 478
     },
@@ -3934,7 +4004,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 7,
       "pageviews": 1703
     },
@@ -3960,7 +4030,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 30,
       "sitelinks": 7,
       "pageviews": 1466
     },
@@ -3986,7 +4056,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 20,
+      "popularity": 18,
       "sitelinks": 4,
       "pageviews": 593
     },
@@ -4012,7 +4082,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 19,
+      "popularity": 18,
       "sitelinks": 4,
       "pageviews": 588
     },
@@ -4038,7 +4108,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 25,
+      "popularity": 23,
       "sitelinks": 7,
       "pageviews": 881
     },
@@ -4064,7 +4134,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 30,
       "sitelinks": 9,
       "pageviews": 1423
     },
@@ -4090,7 +4160,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 26,
+      "popularity": 25,
       "sitelinks": 12,
       "pageviews": 980
     },
@@ -4116,7 +4186,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 17,
+      "popularity": 15,
       "sitelinks": 5,
       "pageviews": 487
     },
@@ -4142,7 +4212,7 @@
       "opening_hours": "Th, Sa-Su 15:30-19:30",
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 36,
+      "popularity": 34,
       "sitelinks": 11,
       "pageviews": 2033
     },
@@ -4168,7 +4238,7 @@
       "opening_hours": "Mo-We,Fr-Sa 09:00-16:00",
       "fee": "no",
       "avg_visit_minutes": 90,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 11,
       "pageviews": 1781
     },
@@ -4194,7 +4264,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 16,
+      "popularity": 14,
       "sitelinks": 7,
       "pageviews": 442
     },
@@ -4220,7 +4290,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 55,
+      "popularity": 54,
       "sitelinks": 5,
       "pageviews": 9054
     },
@@ -4246,7 +4316,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 9,
       "pageviews": 1751
     },
@@ -4272,7 +4342,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 9,
       "pageviews": 2562
     },
@@ -4298,7 +4368,7 @@
       "opening_hours": "Tu-Su 09:00-16:30",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 9,
       "pageviews": 1562
     },
@@ -4324,7 +4394,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 28,
+      "popularity": 26,
       "sitelinks": 10,
       "pageviews": 1101
     },
@@ -4350,7 +4420,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 42,
+      "popularity": 41,
       "sitelinks": 13,
       "pageviews": 3309
     },
@@ -4376,7 +4446,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 44,
+      "popularity": 43,
       "sitelinks": 23,
       "pageviews": 3846
     },
@@ -4402,7 +4472,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 29,
+      "popularity": 28,
       "sitelinks": 13,
       "pageviews": 1240
     },
@@ -4428,7 +4498,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 10,
       "pageviews": 5518
     },
@@ -4454,7 +4524,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 12,
       "pageviews": 3595
     },
@@ -4480,7 +4550,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 25,
+      "popularity": 23,
       "sitelinks": 8,
       "pageviews": 887
     },
@@ -4506,7 +4576,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 7,
       "pageviews": 1774
     },
@@ -4532,7 +4602,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 25,
+      "popularity": 23,
       "sitelinks": 7,
       "pageviews": 878
     },
@@ -4558,7 +4628,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 58,
+      "popularity": 57,
       "sitelinks": 11,
       "pageviews": 11276
     },
@@ -4584,7 +4654,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 12,
       "pageviews": 3461
     },
@@ -4610,7 +4680,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 29,
+      "popularity": 28,
       "sitelinks": 9,
       "pageviews": 1253
     },
@@ -4636,7 +4706,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 11,
       "pageviews": 2595
     },
@@ -4662,7 +4732,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 45,
+      "popularity": 44,
       "sitelinks": 9,
       "pageviews": 4191
     },
@@ -4688,7 +4758,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 12,
       "pageviews": 6333
     },
@@ -4714,7 +4784,7 @@
       "opening_hours": "Tu-Su 10:00-18:00",
       "fee": "no",
       "avg_visit_minutes": 90,
-      "popularity": 24,
+      "popularity": 22,
       "sitelinks": 5,
       "pageviews": 804
     },
@@ -4740,7 +4810,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 8,
       "pageviews": 2582
     },
@@ -4766,7 +4836,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 12,
       "pageviews": 1055
     },
@@ -4792,7 +4862,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 20,
+      "popularity": 19,
       "sitelinks": 7,
       "pageviews": 630
     },
@@ -4818,7 +4888,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 7,
       "pageviews": 1065
     },
@@ -4844,7 +4914,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 28,
+      "popularity": 27,
       "sitelinks": 9,
       "pageviews": 1144
     },
@@ -4870,7 +4940,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 61,
+      "popularity": 60,
       "sitelinks": 13,
       "pageviews": 13932
     },
@@ -4896,7 +4966,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 37,
+      "popularity": 35,
       "sitelinks": 11,
       "pageviews": 2184
     },
@@ -4922,7 +4992,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 37,
+      "popularity": 36,
       "sitelinks": 5,
       "pageviews": 2323
     },
@@ -4948,7 +5018,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 45,
+      "popularity": 44,
       "sitelinks": 12,
       "pageviews": 4255
     },
@@ -4974,7 +5044,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 29,
+      "popularity": 28,
       "sitelinks": 4,
       "pageviews": 1255
     },
@@ -5000,7 +5070,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 38,
+      "popularity": 37,
       "sitelinks": 6,
       "pageviews": 2459
     },
@@ -5026,7 +5096,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 20,
+      "popularity": 18,
       "sitelinks": 9,
       "pageviews": 612
     },
@@ -5052,7 +5122,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 16,
+      "popularity": 14,
       "sitelinks": 5,
       "pageviews": 439
     },
@@ -5078,7 +5148,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 5,
       "pageviews": 1540
     },
@@ -5104,7 +5174,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 52,
+      "popularity": 51,
       "sitelinks": 15,
       "pageviews": 7082
     },
@@ -5130,7 +5200,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 8,
       "pageviews": 1051
     },
@@ -5156,7 +5226,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 54,
+      "popularity": 53,
       "sitelinks": 24,
       "pageviews": 8192
     },
@@ -5182,7 +5252,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 14,
       "pageviews": 1706
     },
@@ -5208,7 +5278,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 29,
+      "popularity": 28,
       "sitelinks": 11,
       "pageviews": 1227
     },
@@ -5234,7 +5304,7 @@
       "opening_hours": "Tu-Su 10:00-18:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 24,
+      "popularity": 22,
       "sitelinks": 5,
       "pageviews": 812
     },
@@ -5260,7 +5330,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 23,
+      "popularity": 21,
       "sitelinks": 5,
       "pageviews": 747
     },
@@ -5286,7 +5356,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 17,
       "pageviews": 1674
     },
@@ -5312,7 +5382,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 24,
+      "popularity": 23,
       "sitelinks": 12,
       "pageviews": 834
     },
@@ -5338,7 +5408,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 16,
+      "popularity": 14,
       "sitelinks": 4,
       "pageviews": 446
     },
@@ -5364,7 +5434,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 18,
+      "popularity": 16,
       "sitelinks": 5,
       "pageviews": 517
     },
@@ -5390,7 +5460,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 31,
       "sitelinks": 9,
       "pageviews": 1592
     },
@@ -5416,7 +5486,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 11,
       "pageviews": 1062
     },
@@ -5442,7 +5512,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 6,
       "pageviews": 1277
     },
@@ -5468,7 +5538,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 9,
       "pageviews": 1046
     },
@@ -5494,7 +5564,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 36,
+      "popularity": 35,
       "sitelinks": 10,
       "pageviews": 2054
     },
@@ -5520,7 +5590,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 16,
       "pageviews": 5396
     },
@@ -5546,7 +5616,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 32,
+      "popularity": 30,
       "sitelinks": 10,
       "pageviews": 1483
     },
@@ -5572,7 +5642,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 22,
+      "popularity": 20,
       "sitelinks": 4,
       "pageviews": 698
     },
@@ -5598,7 +5668,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 25,
+      "popularity": 24,
       "sitelinks": 8,
       "pageviews": 910
     },
@@ -5624,7 +5694,7 @@
       "opening_hours": "08:00 - 18:30",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 38,
+      "popularity": 36,
       "sitelinks": 5,
       "pageviews": 2328
     },
@@ -5650,7 +5720,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 7,
       "pageviews": 1294
     },
@@ -5676,7 +5746,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 38,
+      "popularity": 37,
       "sitelinks": 11,
       "pageviews": 2474
     },
@@ -5702,7 +5772,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 38,
+      "popularity": 36,
       "sitelinks": 7,
       "pageviews": 2332
     },
@@ -5728,7 +5798,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 29,
+      "popularity": 27,
       "sitelinks": 4,
       "pageviews": 1176
     },
@@ -5754,7 +5824,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 21,
+      "popularity": 19,
       "sitelinks": 8,
       "pageviews": 648
     },
@@ -5780,7 +5850,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 23,
+      "popularity": 22,
       "sitelinks": 10,
       "pageviews": 790
     },
@@ -5806,7 +5876,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 36,
+      "popularity": 34,
       "sitelinks": 9,
       "pageviews": 2012
     },
@@ -5832,7 +5902,7 @@
       "opening_hours": "closed",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 25,
+      "popularity": 23,
       "sitelinks": 8,
       "pageviews": 893
     },
@@ -5858,7 +5928,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 30,
+      "popularity": 28,
       "sitelinks": 7,
       "pageviews": 1281
     },
@@ -5884,7 +5954,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 8,
       "pageviews": 1732
     },
@@ -5910,7 +5980,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 12,
       "pageviews": 1643
     },
@@ -5936,7 +6006,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 30,
       "sitelinks": 7,
       "pageviews": 1400
     },
@@ -5962,7 +6032,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 33,
+      "popularity": 32,
       "sitelinks": 11,
       "pageviews": 1627
     },
@@ -5988,7 +6058,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 23,
+      "popularity": 21,
       "sitelinks": 7,
       "pageviews": 741
     },
@@ -6014,7 +6084,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 25,
       "sitelinks": 11,
       "pageviews": 1005
     },
@@ -6040,7 +6110,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 28,
+      "popularity": 26,
       "sitelinks": 10,
       "pageviews": 1088
     },
@@ -6066,7 +6136,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 8,
       "pageviews": 1834
     },
@@ -6092,7 +6162,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 5,
       "pageviews": 1050
     },
@@ -6118,7 +6188,7 @@
       "opening_hours": "Tu-Fr 09:00-17:00; Sa-Su 09:00-18:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 47,
+      "popularity": 46,
       "sitelinks": 16,
       "pageviews": 4909
     },
@@ -6144,7 +6214,7 @@
       "opening_hours": "We-Su 9:00-17:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 49,
+      "popularity": 48,
       "sitelinks": 12,
       "pageviews": 5771
     },
@@ -6170,7 +6240,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 19,
+      "popularity": 17,
       "sitelinks": 6,
       "pageviews": 547
     },
@@ -6196,7 +6266,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 7,
       "pageviews": 3567
     },
@@ -6222,7 +6292,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 72,
+      "popularity": 71,
       "sitelinks": 20,
       "pageviews": 31813
     },
@@ -6248,7 +6318,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 26,
+      "popularity": 25,
       "sitelinks": 7,
       "pageviews": 1001
     },
@@ -6274,7 +6344,7 @@
       "opening_hours": "Mo,PH off; Tu-Su 09:30-17:00",
       "fee": "no",
       "avg_visit_minutes": 90,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 10,
       "pageviews": 1745
     },
@@ -6300,7 +6370,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 36,
+      "popularity": 35,
       "sitelinks": 5,
       "pageviews": 2065
     },
@@ -6326,7 +6396,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 23,
+      "popularity": 22,
       "sitelinks": 6,
       "pageviews": 785
     },
@@ -6378,7 +6448,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 9,
       "pageviews": 1044
     },
@@ -6404,7 +6474,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 17,
+      "popularity": 16,
       "sitelinks": 9,
       "pageviews": 505
     },
@@ -6430,7 +6500,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 10,
       "pageviews": 1781
     },
@@ -6456,7 +6526,7 @@
       "opening_hours": "Mo-Su 09:00-16:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 34,
+      "popularity": 33,
       "sitelinks": 6,
       "pageviews": 1752
     },
@@ -6482,7 +6552,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 19,
+      "popularity": 17,
       "sitelinks": 5,
       "pageviews": 555
     },
@@ -6508,7 +6578,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 5,
       "pageviews": 1391
     },
@@ -6534,7 +6604,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 7,
       "pageviews": 1396
     },
@@ -6560,7 +6630,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 28,
+      "popularity": 27,
       "sitelinks": 10,
       "pageviews": 1132
     },
@@ -6586,7 +6656,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 35,
+      "popularity": 34,
       "sitelinks": 8,
       "pageviews": 1965
     },
@@ -6612,7 +6682,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 12,
       "pageviews": 1393
     },
@@ -6664,7 +6734,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 9,
       "pageviews": 1568
     },
@@ -6690,7 +6760,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 34,
+      "popularity": 32,
       "sitelinks": 5,
       "pageviews": 1727
     },
@@ -6716,7 +6786,7 @@
       "opening_hours": "Tu-Su 09:00-17:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 37,
+      "popularity": 35,
       "sitelinks": 5,
       "pageviews": 2156
     },
@@ -6742,7 +6812,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 22,
+      "popularity": 20,
       "sitelinks": 8,
       "pageviews": 711
     },
@@ -6768,7 +6838,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 6,
       "pageviews": 1382
     },
@@ -6794,7 +6864,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 22,
+      "popularity": 20,
       "sitelinks": 7,
       "pageviews": 702
     },
@@ -6820,7 +6890,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 47,
+      "popularity": 46,
       "sitelinks": 11,
       "pageviews": 4687
     },
@@ -6846,7 +6916,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 5,
       "pageviews": 1049
     },
@@ -6872,7 +6942,7 @@
       "opening_hours": "Tu-Su 09:00-18:00",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 24,
+      "popularity": 22,
       "sitelinks": 5,
       "pageviews": 808
     },
@@ -6898,7 +6968,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 20,
+      "popularity": 19,
       "sitelinks": 4,
       "pageviews": 631
     },
@@ -6924,7 +6994,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 16,
+      "popularity": 14,
       "sitelinks": 6,
       "pageviews": 445
     },
@@ -6950,7 +7020,7 @@
       "opening_hours": "10:00-18:00; Su off",
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 23,
+      "popularity": 21,
       "sitelinks": 5,
       "pageviews": 741
     },
@@ -6976,7 +7046,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 18,
+      "popularity": 17,
       "sitelinks": 5,
       "pageviews": 544
     },
@@ -7002,7 +7072,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 38,
+      "popularity": 36,
       "sitelinks": 7,
       "pageviews": 2345
     },
@@ -7028,7 +7098,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 39,
+      "popularity": 38,
       "sitelinks": 5,
       "pageviews": 2619
     },
@@ -7054,7 +7124,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 28,
+      "popularity": 27,
       "sitelinks": 7,
       "pageviews": 1130
     },
@@ -7080,7 +7150,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 16,
+      "popularity": 15,
       "sitelinks": 9,
       "pageviews": 458
     },
@@ -7106,7 +7176,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 75,
-      "popularity": 28,
+      "popularity": 26,
       "sitelinks": 6,
       "pageviews": 1107
     },
@@ -7158,7 +7228,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 17,
+      "popularity": 15,
       "sitelinks": 6,
       "pageviews": 473
     },
@@ -7184,7 +7254,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 27,
+      "popularity": 26,
       "sitelinks": 4,
       "pageviews": 1082
     },
@@ -7210,7 +7280,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 57,
+      "popularity": 56,
       "sitelinks": 17,
       "pageviews": 10051
     },
@@ -7236,7 +7306,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 22,
+      "popularity": 21,
       "sitelinks": 6,
       "pageviews": 719
     },
@@ -7262,7 +7332,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 39,
+      "popularity": 37,
       "sitelinks": 4,
       "pageviews": 2535
     },
@@ -7288,7 +7358,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 45,
-      "popularity": 12,
+      "popularity": 11,
       "sitelinks": 4,
       "pageviews": 338
     },
@@ -7314,7 +7384,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 30,
       "sitelinks": 10,
       "pageviews": 1453
     },
@@ -7340,7 +7410,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 25,
+      "popularity": 23,
       "sitelinks": 6,
       "pageviews": 893
     },
@@ -7366,7 +7436,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 51,
+      "popularity": 50,
       "sitelinks": 5,
       "pageviews": 6421
     },
@@ -7392,35 +7462,9 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 90,
-      "popularity": 35,
+      "popularity": 34,
       "sitelinks": 5,
       "pageviews": 1966
-    },
-    {
-      "wikidata_id": "Q96756361",
-      "osm_id": "node/11985288314",
-      "name_en": "Ara Güler Museum",
-      "name_pt": null,
-      "description_en": "museum in İstanbul",
-      "description_pt": "Museu em Şişli, Turquia",
-      "category": "museum",
-      "lat": 41.0581944,
-      "lng": 28.98075,
-      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Ara_G%C3%BCler_Museum.jpg/960px-Ara_G%C3%BCler_Museum.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "image_author": "Vano111ru",
-      "image_license": "CC BY 4.0",
-      "image_license_url": "https://creativecommons.org/licenses/by/4.0",
-      "image_page_url": "https://commons.wikimedia.org/wiki/File:Ara_G%C3%BCler_Museum.jpg",
-      "is_unesco": false,
-      "website": "http://aragulermuzesi.com/",
-      "wikipedia_en": "Ara Güler Museum",
-      "wikipedia_pt": null,
-      "opening_hours": "Mo-Sa 10:00-18:00; Su 12:00-18:00",
-      "fee": null,
-      "avg_visit_minutes": 90,
-      "popularity": 30,
-      "sitelinks": 4,
-      "pageviews": 1317
     },
     {
       "wikidata_id": "Q97162737",
@@ -7444,35 +7488,9 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 29,
+      "popularity": 27,
       "sitelinks": 6,
       "pageviews": 1198
-    },
-    {
-      "wikidata_id": "Q97403030",
-      "osm_id": null,
-      "name_en": "Agios Panteleimonas Greek Orthodox Church, Kuzguncuk",
-      "name_pt": null,
-      "description_en": "church building in İstanbul, Turkey",
-      "description_pt": null,
-      "category": "church",
-      "lat": 41.0344444,
-      "lng": 29.0302778,
-      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Kuzguncuk_Greek_Orthodox_Church02_%2834243603782%29.jpg/960px-Kuzguncuk_Greek_Orthodox_Church02_%2834243603782%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "image_author": "John Lubbock",
-      "image_license": "CC BY-SA 2.0",
-      "image_license_url": "https://creativecommons.org/licenses/by-sa/2.0",
-      "image_page_url": "https://commons.wikimedia.org/wiki/File:Kuzguncuk_Greek_Orthodox_Church02_(34243603782).jpg",
-      "is_unesco": false,
-      "website": null,
-      "wikipedia_en": "Agios Panteleimonas Greek Orthodox Church, Kuzguncuk",
-      "wikipedia_pt": null,
-      "opening_hours": null,
-      "fee": null,
-      "avg_visit_minutes": 30,
-      "popularity": 28,
-      "sitelinks": 4,
-      "pageviews": 1088
     },
     {
       "wikidata_id": "Q99397898",
@@ -7496,7 +7514,7 @@
       "opening_hours": "Tu-Su 09:00-19:00",
       "fee": "yes",
       "avg_visit_minutes": 90,
-      "popularity": 47,
+      "popularity": 45,
       "sitelinks": 8,
       "pageviews": 4630
     },
@@ -7522,7 +7540,7 @@
       "opening_hours": null,
       "fee": "no",
       "avg_visit_minutes": 90,
-      "popularity": 32,
+      "popularity": 31,
       "sitelinks": 12,
       "pageviews": 1553
     },
@@ -7548,7 +7566,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 41,
+      "popularity": 40,
       "sitelinks": 7,
       "pageviews": 2977
     },
@@ -7574,7 +7592,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 36,
+      "popularity": 34,
       "sitelinks": 5,
       "pageviews": 1999
     },
@@ -7600,7 +7618,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 12,
+      "popularity": 10,
       "sitelinks": 5,
       "pageviews": 327
     },
@@ -7626,7 +7644,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 21,
+      "popularity": 19,
       "sitelinks": 5,
       "pageviews": 649
     },
@@ -7652,7 +7670,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 43,
+      "popularity": 42,
       "sitelinks": 7,
       "pageviews": 3544
     },
@@ -7678,7 +7696,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 48,
+      "popularity": 47,
       "sitelinks": 6,
       "pageviews": 5196
     },
@@ -7704,7 +7722,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 31,
+      "popularity": 29,
       "sitelinks": 5,
       "pageviews": 1391
     },
@@ -7730,7 +7748,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 30,
-      "popularity": 11,
+      "popularity": 10,
       "sitelinks": 6,
       "pageviews": 317
     },
@@ -7756,35 +7774,9 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 25,
+      "popularity": 24,
       "sitelinks": 6,
       "pageviews": 904
-    },
-    {
-      "wikidata_id": "Q131526469",
-      "osm_id": "relation/9413187",
-      "name_en": "Surp Bogos Church",
-      "name_pt": null,
-      "description_en": "church building in İstanbul, Turkey",
-      "description_pt": null,
-      "category": "church",
-      "lat": 41.162255,
-      "lng": 29.04693,
-      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Surp_Bo%C4%9Fos_Kilisesi_-_panoramio.jpg/960px-Surp_Bo%C4%9Fos_Kilisesi_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "image_author": "Allen Turner",
-      "image_license": "CC BY-SA 3.0",
-      "image_license_url": "https://creativecommons.org/licenses/by-sa/3.0",
-      "image_page_url": "https://commons.wikimedia.org/wiki/File:Surp_Bo%C4%9Fos_Kilisesi_-_panoramio.jpg",
-      "is_unesco": false,
-      "website": null,
-      "wikipedia_en": "Surp Bogos Church",
-      "wikipedia_pt": null,
-      "opening_hours": null,
-      "fee": null,
-      "avg_visit_minutes": 30,
-      "popularity": 11,
-      "sitelinks": 6,
-      "pageviews": 314
     },
     {
       "wikidata_id": "Q132745503",
@@ -7808,7 +7800,7 @@
       "opening_hours": null,
       "fee": null,
       "avg_visit_minutes": 20,
-      "popularity": 15,
+      "popularity": 13,
       "sitelinks": 5,
       "pageviews": 409
     }

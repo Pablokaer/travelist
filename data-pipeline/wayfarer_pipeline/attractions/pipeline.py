@@ -16,7 +16,7 @@ from ..config import City
 from ..http import HttpClient
 from ..paths import ATTRACTIONS_DIR, CACHE_DIR, prettier
 from . import commons, overpass, pageviews, wikidata
-from .categories import AVG_VISIT_MINUTES, CATEGORIES, classify
+from .categories import AVG_VISIT_MINUTES, CATEGORIES, EXCLUDED_ROOTS, ROOTS, classify
 
 MAX_PER_CITY = 300
 PAGEVIEW_CANDIDATES = 350
@@ -163,11 +163,28 @@ def valid_name(name: str | None, qid: str) -> bool:
 # ----------------------------------------------------------------------------------------
 # Ingestion
 # ----------------------------------------------------------------------------------------
-def _load_class_cache() -> dict[str, list[str]]:
+def _roots_signature() -> str:
+    """Changes whenever the category roots change, so cached class → root lookups (which only
+    record roots known at the time) are recomputed instead of silently going stale."""
+    return ",".join(sorted(set(ROOTS) | EXCLUDED_ROOTS))
+
+
+def _load_class_cache(path: Path | None = None) -> dict[str, list[str]]:
+    path = path or CLASS_CACHE
     try:
-        return json.loads(CLASS_CACHE.read_text(encoding="utf-8"))
+        doc = json.loads(path.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
+    if not isinstance(doc, dict) or doc.get("roots") != _roots_signature():
+        return {}  # legacy format or different roots: start over
+    return doc.get("classes", {})
+
+
+def _save_class_cache(cache: dict[str, list[str]], path: Path | None = None) -> None:
+    path = path or CLASS_CACHE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    doc = {"roots": _roots_signature(), "classes": cache}
+    path.write_text(json.dumps(doc, sort_keys=True), encoding="utf-8")
 
 
 def ingest_city(client: HttpClient, city: City, today: dt.date | None = None) -> dict[str, Any]:
@@ -183,8 +200,7 @@ def ingest_city(client: HttpClient, city: City, today: dt.date | None = None) ->
     class_cache = _load_class_cache()
     all_types = set().union(*(c["types"] for c in candidates.values())) if candidates else set()
     type_roots = wikidata.resolve_class_roots(client, all_types, class_cache)
-    CLASS_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    CLASS_CACHE.write_text(json.dumps(class_cache, sort_keys=True), encoding="utf-8")
+    _save_class_cache(class_cache)
 
     classified = {}
     for qid, c in candidates.items():

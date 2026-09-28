@@ -139,3 +139,205 @@ cities:
     bbox: [41.1383507, -8.691289, 41.1859353, -8.5520792]
     timezone: Europe/Lisbon
     is_active: true
+
+  # --- Added 2026-09-28: 20 more of Europe's most visited cities (Euromonitor / Mastercard rankings).
+
+  - slug: berlin
+    name: { en: Berlin, pt: Berlim }
+    country_code: DE
+    wikidata_id: Q64
+    osm_relation_id: 62422
+    center: [52.516667, 13.383333]
+    bbox: [52.3382448, 13.088345, 52.6755087, 13.7611609]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: venice
+    name: { en: Venice, pt: Veneza }
+    country_code: IT
+    wikidata_id: Q641
+    osm_relation_id: 44741
+    center: [45.439722, 12.331944]
+    bbox: [45.2312466, 12.1668349, 45.5779981, 12.5965709]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: florence
+    name: { en: Florence, pt: Florença }
+    country_code: IT
+    wikidata_id: Q2044
+    osm_relation_id: 42602
+    center: [43.771389, 11.254167]
+    bbox: [43.7258716, 11.1497598, 43.8354631, 11.3389044]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: munich
+    name: { en: Munich, pt: Munique }
+    country_code: DE
+    wikidata_id: Q1726
+    osm_relation_id: 62428
+    center: [48.1375, 11.575]
+    bbox: [48.0616244, 11.360777, 48.2481162, 11.7229099]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: dublin
+    name: { en: Dublin, pt: Dublin }
+    country_code: IE
+    wikidata_id: Q1761
+    osm_relation_id: 1109531
+    center: [53.349722, -6.260278]
+    bbox: [53.2987342, -6.3870259, 53.4105416, -6.1148829]
+    timezone: Europe/Dublin
+    is_active: true
+
+  - slug: athens
+    name: { en: Athens, pt: Atenas }
+    country_code: GR
+    wikidata_id: Q1524
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [37.984167, 23.728056]
+    bbox: [37.8155648, 23.5748324, 38.1355648, 23.8948324]
+    timezone: Europe/Athens
+    is_active: true
+
+  - slug: budapest
+    name: { en: Budapest, pt: Budapeste }
+    country_code: HU
+    wikidata_id: Q1781
+    osm_relation_id: 1244004
+    center: [47.498333, 19.040833]
+    bbox: [47.3496899, 18.9251057, 47.6131468, 19.3349258]
+    timezone: Europe/Budapest
+    is_active: true
+
+  - slug: edinburgh
+    name: { en: Edinburgh, pt: Edimburgo }
+    country_code: GB
+    wikidata_id: Q23436
+    osm_relation_id: 1920901
+    center: [55.953333, -3.189167]
+    bbox: [55.8187919, -3.4495326, 56.0040837, -3.0749528]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: brussels
+    name: { en: Brussels, pt: Bruxelas }
+    country_code: BE
+    wikidata_id: Q239
+    osm_relation_id: 58274
+    center: [50.846667, 4.351667]
+    bbox: [50.7963454, 4.3137681, 50.9139045, 4.4370662]
+    timezone: Europe/Brussels
+    is_active: true
+
+  - slug: copenhagen
+    name: { en: Copenhagen, pt: Copenhaga }
+    country_code: DK
+    wikidata_id: Q1748
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [55.676111, 12.568889]
+    bbox: [55.5267243, 12.4100724, 55.8467243, 12.7300724]
+    timezone: Europe/Copenhagen
+    is_active: true
+
+  - slug: stockholm
+    name: { en: Stockholm, pt: Estocolmo }
+    country_code: SE
+    wikidata_id: Q1754
+    osm_relation_id: 398021
+    center: [59.329444, 18.068611]
+    bbox: [59.2272524, 17.7606914, 59.4402839, 18.2000781]
+    timezone: Europe/Stockholm
+    is_active: true
+
+  - slug: nice
+    name: { en: Nice, pt: Nice }
+    country_code: FR
+    wikidata_id: Q33959
+    osm_relation_id: 170100
+    center: [43.701944, 7.268333]
+    bbox: [43.6454189, 7.1819535, 43.7607635, 7.323912]
+    timezone: Europe/Paris
+    is_active: true
+
+  - slug: seville
+    name: { en: Seville, pt: Sevilha }
+    country_code: ES
+    wikidata_id: Q8717
+    osm_relation_id: 342563
+    center: [37.388611, -5.995]
+    bbox: [37.3002036, -6.0329183, 37.4529579, -5.8191571]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: krakow
+    name: { en: Kraków, pt: Cracóvia }
+    country_code: PL
+    wikidata_id: Q31487
+    osm_relation_id: 449696
+    center: [50.061389, 19.937222]
+    bbox: [49.9676668, 19.7922355, 50.1261338, 20.2173455]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: warsaw
+    name: { en: Warsaw, pt: Varsóvia }
+    country_code: PL
+    wikidata_id: Q270
+    osm_relation_id: 336075
+    center: [52.23, 21.011111]
+    bbox: [52.0978497, 20.8516882, 52.3681531, 21.2711512]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: naples
+    name: { en: Naples, pt: Nápoles }
+    country_code: IT
+    wikidata_id: Q2634
+    osm_relation_id: 40767
+    center: [40.835833, 14.248611]
+    bbox: [40.791193, 14.1320999, 40.916123, 14.3537681]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: valencia
+    name: { en: Valencia, pt: Valência }
+    country_code: ES
+    wikidata_id: Q8818
+    osm_relation_id: 344953
+    center: [39.47, -0.376389]
+    bbox: [39.2784496, -0.4325512, 39.566609, -0.2725205]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: zurich
+    name: { en: Zurich, pt: Zurique }
+    country_code: CH
+    wikidata_id: Q72
+    osm_relation_id: 1682248
+    center: [47.374444, 8.541111]
+    bbox: [47.3202184, 8.4480182, 47.434665, 8.6254529]
+    timezone: Europe/Zurich
+    is_active: true
+
+  - slug: antalya
+    name: { en: Antalya, pt: Antália }
+    country_code: TR
+    wikidata_id: Q6487
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [36.90812, 30.69556]
+    bbox: [36.7265728, 30.5430242, 37.0465728, 30.8630242]
+    timezone: Europe/Istanbul
+    is_active: true
+
+  - slug: oslo
+    name: { en: Oslo, pt: Oslo }
+    country_code: 'NO' # quoted: bare NO is YAML for false
+    wikidata_id: Q585
+    osm_relation_id: 406091
+    center: [59.913333, 10.738889]
+    bbox: [59.8093113, 10.4891652, 60.1351064, 10.9513894]
+    timezone: Europe/Oslo
+    is_active: true

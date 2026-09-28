@@ -122,3 +122,17 @@ ZW:
 CN:
   source: 'Common English short name'
   name_en: China
+
+# --- Destinations added 2026-09-28 (20 more cities). Plugs, voltage, currency, calling codes and
+# emergency numbers from Wikidata were checked and are correct; only languages needed fixing.
+GR:
+  source: 'Constitution of Greece art. 1 / official language Greek (Wikidata P37 missing)'
+  languages: [el]
+
+PL:
+  source: 'Constitution of Poland art. 27: Polish is the official language (Wikidata lists Belarusian, a minority language)'
+  languages: [pl]
+
+SE:
+  source: 'Swedish Language Act (2009:600): Swedish is the principal language; Finnish, Yiddish etc. are recognised minority languages'
+  languages: [sv]

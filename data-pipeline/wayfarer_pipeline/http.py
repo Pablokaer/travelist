@@ -101,11 +101,15 @@ class HttpClient:
         use_cache: bool = True,
         max_retries: int = 6,
         timeout: float = 300.0,
+        deadline: float = 360.0,
     ):
         self.cache_dir = cache_dir
         self.use_cache = use_cache
         self.max_retries = max_retries
         self.timeout = timeout
+        # requests' timeout is per socket read: a server trickling bytes can hold a request
+        # open forever (seen with WDQS). ``deadline`` bounds the whole request.
+        self.deadline = deadline
         self._local = threading.local()
         self._gates: dict[str, _HostGate] = {}
         self._gates_lock = threading.Lock()
@@ -119,6 +123,28 @@ class HttpClient:
             session.headers["User-Agent"] = user_agent()
             self._local.session = session
         return session
+
+    def _send(self, method: str, url: str, **kwargs: Any) -> requests.Response:
+        """``session.request`` with a wall-clock deadline. On expiry the (possibly stuck)
+        session is abandoned to its daemon thread and a fresh one is used next time."""
+        session = self._session()
+        box: dict[str, Any] = {}
+
+        def run() -> None:
+            try:
+                box["resp"] = session.request(method, url, timeout=self.timeout, **kwargs)
+            except BaseException as exc:  # noqa: BLE001 - re-raised in the caller's thread
+                box["error"] = exc
+
+        worker = threading.Thread(target=run, daemon=True)
+        worker.start()
+        worker.join(self.deadline)
+        if worker.is_alive():
+            self._local.session = None
+            raise requests.Timeout(f"no complete response within {self.deadline:.0f}s")
+        if "error" in box:
+            raise box["error"]
+        return box["resp"]
 
     def _gate(self, host: str) -> _HostGate:
         with self._gates_lock:
@@ -160,14 +186,7 @@ class HttpClient:
             with gate.sem:
                 gate.wait_turn()
                 try:
-                    resp = self._session().request(
-                        method,
-                        url,
-                        params=params,
-                        data=data,
-                        headers=headers,
-                        timeout=self.timeout,
-                    )
+                    resp = self._send(method, url, params=params, data=data, headers=headers)
                     error: Exception | None = None
                 except requests.RequestException as exc:
                     resp = None

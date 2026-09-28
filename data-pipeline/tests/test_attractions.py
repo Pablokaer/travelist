@@ -30,6 +30,12 @@ TYPE_ROOTS = {
     "Q7": ["Q12518"],  # tower
     "Q8": ["Q1440300", "Q12518"],  # observation tower
     "Q9": ["Q16560", "Q19860854"],  # destroyed palace
+    # Real classes behind landmarks that were missing (2026-09-28):
+    "Q96352513": ["Q1370598", "Q19860854"],  # Parthenon: former temple (destroyed structure)
+    "Q93342462": ["Q839954"],  # Parthenon: archaeological site
+    "Q860861": ["Q860861"],  # sculpture (The Little Mermaid)
+    "Q7138926": ["Q7138926"],  # parliament building (Hungarian Parliament)
+    "Q88372": ["Q88372"],  # promenade (Promenade des Anglais)
 }
 
 
@@ -45,6 +51,10 @@ TYPE_ROOTS = {
         ({"Q8"}, "viewpoint"),
         ({"Q6"}, None),
         ({"Q9"}, None),  # no longer exists
+        ({"Q96352513", "Q93342462"}, "landmark"),  # ruins that are an archaeological site stay
+        ({"Q860861"}, "monument"),
+        ({"Q7138926"}, "landmark"),
+        ({"Q88372"}, "landmark"),
         (set(), None),
     ],
 )
@@ -170,3 +180,21 @@ def test_pageview_month_range_and_url():
     assert pageviews.month_range(dt.date(2026, 1, 5)) == ("2025010100", "2025123100")
     url = pageviews.article_url("en.wikipedia", "St Paul's Cathedral/x", "a", "b")
     assert url.endswith("/en.wikipedia/all-access/user/St_Paul%27s_Cathedral%2Fx/monthly/a/b")
+
+
+def test_class_cache_is_dropped_when_roots_change(tmp_path, monkeypatch):
+    from wayfarer_pipeline.attractions import categories, pipeline
+
+    path = tmp_path / "class_roots.json"
+    pipeline._save_class_cache({"Q7138926": []}, path)
+    assert pipeline._load_class_cache(path) == {"Q7138926": []}
+    monkeypatch.setattr(pipeline, "ROOTS", {**categories.ROOTS, "Q999": "landmark"})
+    assert pipeline._load_class_cache(path) == {}  # stale: recomputed with the new roots
+
+
+def test_legacy_class_cache_format_is_ignored(tmp_path):
+    from wayfarer_pipeline.attractions import pipeline
+
+    path = tmp_path / "class_roots.json"
+    path.write_text('{"Q1": ["Q33506"]}', encoding="utf-8")
+    assert pipeline._load_class_cache(path) == {}

@@ -1,16 +1,8 @@
 {
   "city": "lisbon",
   "retrieved": "2026-09-28",
-  "pageviews_range": [
-    "20250901",
-    "20260831"
-  ],
-  "sources": [
-    "wikidata",
-    "openstreetmap",
-    "wikipedia-pageviews",
-    "wikimedia-commons"
-  ],
+  "pageviews_range": ["20250901", "20260831"],
+  "sources": ["wikidata", "openstreetmap", "wikipedia-pageviews", "wikimedia-commons"],
   "attractions": [
     {
       "wikidata_id": "Q10064",
@@ -1259,6 +1251,32 @@
       "popularity": 79,
       "sitelinks": 21,
       "pageviews": 24164
+    },
+    {
+      "wikidata_id": "Q1470414",
+      "osm_id": "relation/7524055",
+      "name_en": "Carmo Convent",
+      "name_pt": "Convento do Carmo",
+      "description_en": "former monastery of the Carmelite Order in Lisbon",
+      "description_pt": "antigo convento da Ordem dos Carmelitas em Lisboa",
+      "category": "church",
+      "lat": 38.7122222,
+      "lng": -9.14,
+      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Lissabon_-_Convento_do_Carmo_from_Castle.jpg/960px-Lissabon_-_Convento_do_Carmo_from_Castle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "image_author": "Ingo Mehling",
+      "image_license": "CC BY-SA 4.0",
+      "image_license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "image_page_url": "https://commons.wikimedia.org/wiki/File:Lissabon_-_Convento_do_Carmo_from_Castle.jpg",
+      "is_unesco": false,
+      "website": null,
+      "wikipedia_en": "Carmo Convent",
+      "wikipedia_pt": "Convento do Carmo (Lisboa)",
+      "opening_hours": null,
+      "fee": null,
+      "avg_visit_minutes": 30,
+      "popularity": 82,
+      "sitelinks": 18,
+      "pageviews": 33143
     },
     {
       "wikidata_id": "Q1478288",
@@ -7317,32 +7335,6 @@
       "popularity": 58,
       "sitelinks": 3,
       "pageviews": 2826
-    },
-    {
-      "wikidata_id": "Q25446831",
-      "osm_id": "way/416644501",
-      "name_en": "Capela de São Sebastião (Lisboa)",
-      "name_pt": "Capela de São Sebastião",
-      "description_en": "building in Lisbon, Lisbon District, Portugal",
-      "description_pt": "capela no Lumiar, em Lisboa, Portugal",
-      "category": "church",
-      "lat": 38.772027,
-      "lng": -9.173994,
-      "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Capela_de_S%C3%A3o_Sebasti%C3%A3o_do_Lumiar_-_Lisboa_-_Portugal_%F0%9F%87%B5%F0%9F%87%B9_%2853898314987%29.jpg/960px-Capela_de_S%C3%A3o_Sebasti%C3%A3o_do_Lumiar_-_Lisboa_-_Portugal_%F0%9F%87%B5%F0%9F%87%B9_%2853898314987%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-      "image_author": "Vitor Oliveira from Torres Vedras, PORTUGAL",
-      "image_license": "CC BY-SA 2.0",
-      "image_license_url": "https://creativecommons.org/licenses/by-sa/2.0",
-      "image_page_url": "https://commons.wikimedia.org/wiki/File:Capela_de_S%C3%A3o_Sebasti%C3%A3o_do_Lumiar_-_Lisboa_-_Portugal_%F0%9F%87%B5%F0%9F%87%B9_(53898314987).jpg",
-      "is_unesco": false,
-      "website": null,
-      "wikipedia_en": null,
-      "wikipedia_pt": "Capela de São Sebastião (Lumiar)",
-      "opening_hours": null,
-      "fee": null,
-      "avg_visit_minutes": 30,
-      "popularity": 36,
-      "sitelinks": 2,
-      "pageviews": 324
     },
     {
       "wikidata_id": "Q27522479",
