@@ -40,6 +40,27 @@ LAUNCH_CITIES = {
     "zurich",
     "antalya",
     "oslo",
+    # batch 3, 2026-09-28
+    "hamburg",
+    "frankfurt",
+    "cologne",
+    "geneva",
+    "salzburg",
+    "bruges",
+    "antwerp",
+    "rotterdam",
+    "helsinki",
+    "reykjavik",
+    "tallinn",
+    "riga",
+    "vilnius",
+    "dubrovnik",
+    "split",
+    "ljubljana",
+    "bratislava",
+    "palma",
+    "malaga",
+    "bologna",
 }
 
 

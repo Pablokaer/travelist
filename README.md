@@ -3,7 +3,7 @@
 Cross-platform travel companion (iOS · Android · Web) built with Expo + Supabase.
 
 - **Before you go:** a checklist personalised to your passports (visa, passport validity, power, weather, money, safety, practical info).
-- **Explore:** a map of ~8,300 attractions in 32 European cities.
+- **Explore:** a map of ~10,700 attractions in 52 European cities.
 - **Walk:** an optimised walking route between the places you pick, saved as a trip and opened in Google / Apple Maps.
 
 Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md)
@@ -75,7 +75,7 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 
 The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 
-- **City switcher** — modal list of the 32 cities. Defaults to the city of the current route tray, else the first city.
+- **City switcher** — modal list of the 52 cities. Defaults to the city of the current route tray, else the first city.
 - **Category filters** — multi-select chips: museum, monument, church, castle, viewpoint, landmark, park, palace, other; "clear" resets. No selection = all categories.
 - **Map / List toggle**
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
@@ -285,7 +285,7 @@ pnpm functions:serve          # keep running: checklist + route-optimize Edge Fu
 pnpm dev                      # Expo dev server → w (web), i (iOS), a (Android)
 ```
 
-- Seeds in `supabase/seed/` contain all reference data (countries, 32 cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
+- Seeds in `supabase/seed/` contain all reference data (countries, 52 cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
 - Sign-up emails (confirmation, magic link + 6-digit code) are caught by Mailpit at http://127.0.0.1:54324. Local sign-up doesn't require confirmation.
 - Supabase Studio: http://127.0.0.1:54323.
 - Without `ORS_API_KEY` the route optimiser uses a built-in nearest-neighbour + 2-opt fallback with straight-line estimates (flagged in the UI). With a free key from openrouteservice.org you get real walking directions.

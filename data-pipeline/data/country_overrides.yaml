@@ -136,3 +136,13 @@ PL:
 SE:
   source: 'Swedish Language Act (2009:600): Swedish is the principal language; Finnish, Yiddish etc. are recognised minority languages'
   languages: [sv]
+
+# --- Destinations added 2026-09-28 (batch 3): FI, IS, EE, LV, LT, HR, SI, SK checked.
+LT:
+  source: 'IEC 60038 / EU harmonised 230 V mains; Lithuanian Emergency Response Centre: 112 is the single number (02 was a legacy police line)'
+  voltage: 230
+  police_number: null
+
+SI:
+  source: 'Constitution of Slovenia art. 11: Slovene is the official language (Hungarian and Italian only in their ethnic areas)'
+  languages: [sl]

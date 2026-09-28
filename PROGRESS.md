@@ -28,7 +28,7 @@ Milestones from the MVP brief. Each milestone ends with lint, typecheck and all 
 ## M1–M4 — Done (2026-09-28)
 
 - **Database:** reference tables (countries, cities, attractions with PostGIS, visa rules, api_cache) and user tables (profiles, nationalities, trips, trip stops) with RLS; RPCs `attractions_in_view`, `set_nationalities`, `save_trip`, `delete_account`; profile created on sign-up; pgTAP: 24 tests.
-- **Data:** 250 countries (plugs, voltage, currency, calling code, emergency numbers, languages), 32 cities (12 at launch + 20 added 2026-09-28), 39,402 visa rules, 8,301 attractions (≤ 300 per city) with images, licences, opening hours and popularity. Committed as SQL seeds (D-011).
+- **Data:** 250 countries (plugs, voltage, currency, calling code, emergency numbers, languages), 52 cities (12 at launch + 40 added 2026-09-28), 39,402 visa rules, 10,736 attractions (≤ 300 per city) with images, licences, opening hours and popularity. Committed as SQL seeds (D-011).
 - **Edge Functions:** `checklist` (visa, passport validity, power, Open-Meteo weather, FX, Canada advisories, practical info, each degrading independently, cached) and `route-optimize` (ORS + fallback). Both require a signed-in user (D-015). Deno: 40 tests.
 - **App:** email/password, magic link + 6-digit code, Google/Apple (PKCE; native Apple on iOS), protected routes, 3-step onboarding, profile edit, language/units, account deletion; Explore with MapLibre map (web + native), city switcher, category filters, accessible list view, attraction detail with image credit; checklist screen; route tray (≤ 12 stops), optimisation, totals, save trip; My Trips list/detail/delete with Google/Apple Maps walking links. Jest: 12 tests. Playwright: smoke + full journey (sign-up → onboarding → checklist → route → saved trip) on desktop and mobile viewports.
 - **Verified locally (macOS, 2026-09-28):** `pnpm check`, `pnpm db:test`, `supabase db lint`, Deno lint/fmt/test, pytest (76) + ruff, `pnpm build:web`, `E2E_BACKEND=1 pnpm e2e` 6/6, map rendering on web (screenshots), live checklist for Lisbon with real providers.
@@ -36,6 +36,10 @@ Milestones from the MVP brief. Each milestone ends with lint, typecheck and all 
 ## 2026-09-28 — 20 more cities
 
 Berlin, Venice, Florence, Munich, Dublin, Athens, Budapest, Edinburgh, Brussels, Copenhagen, Stockholm, Nice, Seville, Kraków, Warsaw, Naples, Valencia, Zurich, Antalya, Oslo (same limits and filters as the launch cities). Fixes found on the way: YAML `NO` → `false` (quoted + test); GR/PL/SE language overrides; category roots for sculptures, parliament buildings and promenades, and archaeological ruins no longer dropped as "destroyed structures" (Parthenon); class-root cache invalidated when roots change; HTTP client wall-clock deadline (WDQS trickling responses hung ingestion for > 1 h). Cities below the 300 cap have fewer notable places in their area: Nice 64, Antalya 28.
+
+## 2026-09-28 — 20 more cities (batch 3)
+
+Hamburg, Frankfurt, Cologne, Geneva, Salzburg, Bruges, Antwerp, Rotterdam, Helsinki, Reykjavík, Tallinn, Riga, Vilnius, Dubrovnik, Split, Ljubljana, Bratislava, Palma, Málaga, Bologna. Hamburg and Palma use centre-based bboxes (boundaries include a North Sea island / open sea). LT and SI country overrides. Concert halls added as a category root (Elbphilharmonie); all 52 cities re-ingested under the same rules. Most of these cities are smaller: only Helsinki reaches the 300 cap; Dubrovnik has 40. Known gap: Riga's House of the Blackheads is typed only as "building" on Wikidata, too generic to include.
 
 ## Remaining (M5 and launch)
 

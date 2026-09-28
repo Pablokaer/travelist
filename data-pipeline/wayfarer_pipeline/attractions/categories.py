@@ -83,6 +83,7 @@ ROOTS: dict[str, str] = {
     "Q2281788": "other",  # public aquarium
     "Q194195": "other",  # amusement park
     "Q153562": "other",  # opera house
+    "Q1060829": "other",  # concert hall (e.g. Elbphilharmonie)
     "Q24354": "other",  # theatre building
     "Q37654": "other",  # market
 }
