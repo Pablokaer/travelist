@@ -59,6 +59,12 @@ export const VISA_RANK: Record<VisaRequirement, number> = Object.fromEntries(
 
 export const MAX_NATIONALITIES = 5;
 
+/** Star ratings are whole numbers in this range (D-028; mirrored by a DB check). */
+export const REVIEW_RATING_MIN = 1;
+export const REVIEW_RATING_MAX = 5;
+/** Longest review comment, in characters (mirrored by a DB check). */
+export const REVIEW_COMMENT_MAX = 1000;
+
 /** EU member states (ISO alpha-2). */
 export const EU_COUNTRIES = [
   'AT',

@@ -1,0 +1,81 @@
+// Five-star controls for reviews (D-028). Stars are the ★ glyph in the text colour (filled) or
+// the strong border colour (empty): one glyph renders the same on web, iOS and Android, and the
+// neutral palette keeps the coral accent for actions (D-020).
+import { REVIEW_RATING_MAX } from '@wayfarer/shared';
+import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
+
+import { Tappable } from '@/components/tappable';
+import { Text } from '@/components/text';
+import { MIN_TOUCH } from '@/theme/colors';
+import { useTheme } from '@/theme/use-theme';
+
+const STAR_VALUES = Array.from({ length: REVIEW_RATING_MAX }, (_, i) => i + 1);
+
+function StarGlyph({ filled, size }: { filled: boolean; size: number }) {
+  const theme = useTheme();
+  return (
+    <Text
+      aria-hidden
+      style={{
+        fontSize: size,
+        lineHeight: size * 1.15,
+        color: filled ? theme.text : theme.borderStrong,
+      }}>
+      ★
+    </Text>
+  );
+}
+
+/**
+ * Picks a whole rating from 1 to 5: five pressable stars, announced as a radio group.
+ * @example <StarRating value={rating} onChange={setRating} />
+ */
+export function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const { t } = useTranslation();
+  return (
+    <View
+      accessibilityRole="radiogroup"
+      accessibilityLabel={t('reviews.pickRating')}
+      style={styles.row}>
+      {STAR_VALUES.map((star) => (
+        <Tappable
+          key={star}
+          accessibilityRole="radio"
+          accessibilityLabel={t('reviews.stars', { count: star })}
+          accessibilityState={{ checked: star === value }}
+          onPress={() => onChange(star)}
+          pressScale={0.85}
+          testID={`star-${star}`}
+          style={styles.touch}>
+          <StarGlyph filled={star <= value} size={32} />
+        </Tappable>
+      ))}
+    </View>
+  );
+}
+
+/**
+ * Read-only stars for a rating, with a spoken "Rated 4 out of 5".
+ * @example <Stars rating={4} />
+ */
+export function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
+  const { t } = useTranslation();
+  return (
+    <View accessible accessibilityLabel={t('reviews.ratingLabel', { rating })} style={styles.row}>
+      {STAR_VALUES.map((star) => (
+        <StarGlyph key={star} filled={star <= rating} size={size} />
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center' },
+  touch: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

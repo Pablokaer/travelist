@@ -23,6 +23,7 @@ import { searchAttractions } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
 import { routeNotice } from '@/features/route/notice';
+import { useCityRatings } from '@/features/reviews/api';
 import { useRouteStore } from '@/features/route/store';
 import { env } from '@/lib/env';
 import { categoryColors, layout, radius, spacing } from '@/theme/colors';
@@ -48,6 +49,7 @@ export default function CityScreen() {
   const city = cities.data?.find((c) => c.slug === slug);
 
   const attractions = useAttractions(city, categories);
+  const ratings = useCityRatings(city?.slug);
   const lang = i18n.resolvedLanguage ?? 'en';
   // The grid and the map show every match of the search; the dropdown only the best few.
   const visible = useMemo(
@@ -170,6 +172,7 @@ export default function CityScreen() {
                 order={stopOrder.get(item.id)}
                 onPress={() => openAttraction(item.id)}
                 onToggleRoute={() => toggleWithNotice(item)}
+                rating={ratings.data?.get(item.id)}
               />
             )}
             empty={<EmptyState icon="search" title={t('explore.noResults')} />}

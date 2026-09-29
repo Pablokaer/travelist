@@ -92,7 +92,7 @@ The **Explore** tab is a stack (`(tabs)/(explore)/`, D-026): the **Home** (`/`) 
 - **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories. Centred when they fit; otherwise the row scrolls horizontally, edge to edge.
 - **Map / List switch** — floating pill at the bottom of the screen.
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
-  - **List** — responsive grid of image cards, sorted by popularity: as many columns of ≥ 240 px cards as the grid's width fits (1 on phones, 2 on tablets, 3–5 on desktop; `gridColumns`, `theme/grid.ts`), with photo, UNESCO badge, name, category and visit time. A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
+  - **List** — responsive grid of image cards, sorted by popularity: as many columns of ≥ 240 px cards as the grid's width fits (1 on phones, 2 on tablets, 3–5 on desktop; `gridColumns`, `theme/grid.ts`), with photo, UNESCO badge, name, category and visit time. A place with reviews shows its average beside the name, quietly, as "3.5 ★" (one decimal; nothing without reviews); screen readers hear "Rated 3.5 out of 5 from 2 reviews". The averages of the whole city come in one request (`attraction_rating_summary` filtered by city, D-028). A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
 - **Places count** — "N places" for the current filters (announced to screen readers).
 - **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route", the latest route notice (route full / new route started in this city) and a **Build route** button.
 - **Checklist** button (**Before you go**; icon-only on phones) — opens the pre-trip checklist for the current city.
@@ -106,10 +106,15 @@ Data comes from the `attractions_in_view` RPC (bbox + categories, most popular f
 - Hero photo from Wikimedia Commons with **author + licence credit** and a link to the image source page.
 - A sticky bottom bar shows the typical visit time and the **Add to route** button.
 - Localised name and description (PT falls back to EN and vice versa), category and a **UNESCO** badge when applicable.
+- **Average rating** under the name: "4.6 ★ · 128 reviews" (average of every review, one decimal; "No reviews yet" when there are none).
 - **Add to route / Remove from route**:
   - max 12 stops — shows "route is full" beyond that;
   - a route belongs to one city — adding a place from another city **starts a new route** (with a notice).
 - **Good to know:** average visit time (minutes, per category default or per place) and entry fee (yes / no / free text) as tiles; opening hours (OSM, when available) on their own row.
+- **Reviews** (D-028):
+  - **Rate this place:** five clickable stars (a whole rating from 1 to 5, required) and an optional comment (up to 1000 characters); **Publish review**. Without a rating the form says "Choose from 1 to 5 stars".
+  - One review per user and place: once published, the form shows **Your review** filled in, with **Update review** and **Delete** (asks "Delete your review of this place?" first).
+  - Every review, newest first (up to 50): avatar with initials, the author's display name ("Traveller" when they have none), a **Your review** badge on your own, stars, publication date ("· edited" when changed later) and the comment. Other people's reviews have no edit or delete controls.
 - **Learn more** links (in-app browser): official website, Wikipedia (PT article when the app is in PT and it exists, otherwise EN), image source.
 - Data credit (Wikidata / OpenStreetMap).
 
@@ -199,7 +204,7 @@ Every screen stacked above the tabs (attraction, checklist, route, trip, edit pr
 | `/city/[slug]`      | `(tabs)/(explore)/city/[slug].tsx` | onboarded                | City page: map/list, filters, search, tray  |
 | `/trips`            | `(tabs)/trips.tsx`                 | onboarded                | Saved trips                                 |
 | `/profile`          | `(tabs)/profile.tsx`               | onboarded                | Profile, documents, preferences, account    |
-| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route             |
+| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route, reviews    |
 | `/checklist/[city]` | `checklist/[city].tsx`             | onboarded (modal)        | Pre-trip checklist                          |
 | `/route`            | `route.tsx`                        | onboarded                | Route builder and save                      |
 | `/trip/[id]`        | `trip/[id].tsx`                    | onboarded                | Trip detail, navigation, delete             |
@@ -222,19 +227,23 @@ Request/response schemas live in `packages/shared/src/schemas` and are copied in
 
 ### Database RPCs and views
 
-| Name                  | Kind     | Who          | What it does                                                                                                                                                        |
-| --------------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `attractions_in_view` | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                  |
-| `attraction_details`  | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                       |
-| `city_list`           | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence) |
-| `set_nationalities`   | function | authed       | Replaces the caller's nationalities                                                                                                                                 |
-| `save_trip`           | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                               |
-| `delete_account`      | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                  |
+| Name                        | Kind     | Who          | What it does                                                                                                                                                                |
+| --------------------------- | -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `attractions_in_view`       | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                          |
+| `attraction_details`        | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                               |
+| `city_list`                 | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence)         |
+| `set_nationalities`         | function | authed       | Replaces the caller's nationalities                                                                                                                                         |
+| `save_trip`                 | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                                       |
+| `delete_account`            | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                          |
+| `save_review`               | function | authed       | Creates the caller's review of an attraction (rating 1–5, optional comment, blank → none) or updates it if there is one; returns the review id                              |
+| `list_attraction_reviews`   | function | authed       | An attraction's reviews, newest first (limit 1–100, default 50, offset): rating, comment, dates, author display name, `is_own`; security definer only to read display names |
+| `attraction_rating_summary` | view     | authed       | Per attraction: `review_count`, `rating_avg` (2 decimals, null without reviews) and `city_slug` (city pages filter on it)                                                   |
 
 ### Tables
 
 - **Reference (read-only for clients, written by the pipeline seeds):** `countries`, `cities`, `attractions` (PostGIS `geography`), `visa_requirements`, `api_cache` (service role only).
 - **User data (RLS: owner only):** `profiles`, `profile_nationalities`, `trips`, `trip_stops`.
+- **Reviews:** `attraction_reviews` (user → review → attraction, unique per user and attraction; both sides cascade). RLS: every signed-in user reads all; only the author inserts, updates or deletes; no access for anon. Deleting a review is a plain `delete` filtered by id.
 
 Migrations: `supabase/migrations`. RLS and RPC tests: `supabase/tests` (pgTAP).
 
@@ -256,6 +265,9 @@ Defined in `packages/shared/src/constants/index.ts` unless noted.
 | Weather forecast window      | arrival within 15 days; up to 7 days shown                                                            |
 | Google Maps multi-stop link  | origin + up to 9 waypoints + destination                                                              |
 | Dates                        | typed as `YYYY-MM-DD` (D-019)                                                                         |
+| Review rating                | whole number 1 – 5, required (`REVIEW_RATING_MIN`, `REVIEW_RATING_MAX`; DB check)                     |
+| Review comment               | optional, ≤ 1000 characters (`REVIEW_COMMENT_MAX`; DB check); blank is saved as no comment            |
+| Reviews per user             | 1 per attraction (unique in the DB); saving again edits it                                            |
 
 ## Covered cities
 
@@ -273,6 +285,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Sentry / PostHog are not wired yet (no-op facade).
 - Dark theme: sign-in and sign-up screens are always light (the choice lives on the profile), and the map keeps its light style.
 - Route stops are dragged only within their route (not between split routes), and there is no auto-scroll when dragging past the edge of the screen. Drag and drop is verified on web (mouse and touch emulation); iOS/Android untested on this machine (D-027).
+- Reviews: the attraction page shows the 50 newest reviews (no "load more" yet; the RPC already pages), and there is no reporting or moderation of reviews. Reviews need a signed-in user, like the rest of the app (D-028).
 - No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
 - The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
 

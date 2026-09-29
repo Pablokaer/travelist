@@ -24,6 +24,58 @@ export type Database = {
         };
         Relationships: [];
       };
+      attraction_reviews: {
+        Row: {
+          attraction_id: string;
+          comment: string | null;
+          created_at: string;
+          id: string;
+          rating: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          attraction_id: string;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          rating: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Update: {
+          attraction_id?: string;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          rating?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_details';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_rating_summary';
+            referencedColumns: ['attraction_id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attractions';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       attractions: {
         Row: {
           avg_visit_minutes: number;
@@ -338,6 +390,13 @@ export type Database = {
             foreignKeyName: 'trip_stops_attraction_id_fkey';
             columns: ['attraction_id'];
             isOneToOne: false;
+            referencedRelation: 'attraction_rating_summary';
+            referencedColumns: ['attraction_id'];
+          },
+          {
+            foreignKeyName: 'trip_stops_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
             referencedRelation: 'attractions';
             referencedColumns: ['id'];
           },
@@ -538,6 +597,30 @@ export type Database = {
           },
         ];
       };
+      attraction_rating_summary: {
+        Row: {
+          attraction_id: string | null;
+          city_slug: string | null;
+          rating_avg: number | null;
+          review_count: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attractions_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['slug'];
+          },
+          {
+            foreignKeyName: 'attractions_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'city_list';
+            referencedColumns: ['slug'];
+          },
+        ];
+      };
       city_list: {
         Row: {
           attraction_count: number | null;
@@ -592,6 +675,22 @@ export type Database = {
         }[];
       };
       delete_account: { Args: Record<PropertyKey, never>; Returns: undefined };
+      list_attraction_reviews: {
+        Args: { p_attraction_id: string; p_limit?: number; p_offset?: number };
+        Returns: {
+          author_name: string;
+          comment: string;
+          created_at: string;
+          id: string;
+          is_own: boolean;
+          rating: number;
+          updated_at: string;
+        }[];
+      };
+      save_review: {
+        Args: { p_attraction_id: string; p_comment?: string; p_rating: number };
+        Returns: string;
+      };
       save_trip: {
         Args: {
           p_attraction_ids: string[];

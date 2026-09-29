@@ -124,6 +124,33 @@
     "details": "Good to know",
     "links": "Learn more"
   },
+  "reviews": {
+    "title": "Reviews",
+    "summary_one": "{{average}} ★ · {{count}} review",
+    "summary_other": "{{average}} ★ · {{count}} reviews",
+    "summaryLabel_one": "Rated {{average}} out of 5 from {{count}} review",
+    "summaryLabel_other": "Rated {{average}} out of 5 from {{count}} reviews",
+    "none": "No reviews yet",
+    "noneBody": "Been here? Be the first to share how it was.",
+    "stars_one": "{{count}} star",
+    "stars_other": "{{count}} stars",
+    "ratingLabel": "Rated {{rating}} out of 5",
+    "pickRating": "Your rating",
+    "comment": "Your comment (optional)",
+    "commentPlaceholder": "What should other travellers know?",
+    "publish": "Publish review",
+    "update": "Update review",
+    "yourReviewTitle": "Your review",
+    "writeTitle": "Rate this place",
+    "yours": "Your review",
+    "anonymous": "Traveller",
+    "edited": "edited",
+    "delete": "Delete",
+    "deleteConfirm": "Delete your review of this place?",
+    "deleteYes": "Delete review",
+    "saved": "Thanks! Your review is published.",
+    "error": "We couldn't load the reviews. Check your connection and try again."
+  },
   "checklist": {
     "title": "Before you go",
     "titleFor": "Before you go: {{city}}",
@@ -394,7 +421,8 @@
     "nationalityRequired": "Add at least one nationality",
     "tooManyNationalities": "Add up to 5 nationalities",
     "duplicate": "Remove duplicates",
-    "tooLong": "This is too long"
+    "tooLong": "This is too long",
+    "ratingRequired": "Choose from 1 to 5 stars"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ListRow, RowGroup } from '@/components/list-row';
@@ -18,7 +19,7 @@ import {
   useProfile,
   useUpdatePreferences,
 } from '@/features/profile/api';
-import { formatDate, initials } from '@/lib/format';
+import { formatDate } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 import { useBreakpoint, useTheme } from '@/theme/use-theme';
 
@@ -60,11 +61,7 @@ export default function ProfileScreen() {
 
       {p ? (
         <Card style={styles.identity}>
-          <View style={[styles.avatar, { backgroundColor: theme.text }]}>
-            <Text variant="title" style={{ color: theme.background }}>
-              {initials(displayName)}
-            </Text>
-          </View>
+          <Avatar name={displayName} />
           <View style={styles.identityText}>
             <Text variant="heading" numberOfLines={1}>
               {displayName}
@@ -216,13 +213,6 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   identity: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flexWrap: 'wrap' },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   identityText: { flex: 1, minWidth: 140, gap: spacing.xxs },
   columns: { gap: spacing.lg },
   columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },
