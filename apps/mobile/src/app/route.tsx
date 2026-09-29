@@ -164,7 +164,9 @@ export default function RouteScreen() {
       <Section title={t('route.stopsTitle')}>
         <RouteOrderNotice manual={manualOrder} onAuto={store.autoOrder} />
         {routes.map((route, r) => (
-          <View key={routeKey(route)} style={styles.route}>
+          // Keyed by position: a key built from the stop order would rebuild the whole list (and
+          // its drag measurements) on every reorder.
+          <View key={r} style={styles.route}>
             <RouteStopList
               route={route}
               routeIndex={r}

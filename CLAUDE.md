@@ -39,6 +39,9 @@ Before committing, run `node scripts/check-docs.mjs` (compares against `origin/m
 ## Tests
 
 - Tests run with a single command: `pnpm check` (app + shared); `cd data-pipeline && pytest` (pipeline); `cd supabase/functions && deno test --allow-net=jsr.io` (Edge Functions).
+- **TDD: red → green → refactor.** Write the test first and run it to see it fail for the
+  expected reason (red); then write the minimum code that makes it pass (green); then refactor
+  with the tests green. Bug fixes start with a regression test that reproduces the bug.
 - Every new function gets a test. Bug fixes get a regression test.
 - Mock external I/O (API, DB, filesystem) with named fake classes,
   not inline stubs.
