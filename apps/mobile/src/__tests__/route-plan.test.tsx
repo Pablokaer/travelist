@@ -59,6 +59,24 @@ describe('manual order', () => {
     expect(order()).toHaveLength(4);
   });
 
+  test('dragging a stop moves it to the drop position within its route', () => {
+    addAll(placeAt('1', 0), placeAt('2', 1), placeAt('3', 2), placeAt('4', 3));
+    store().moveTo('4', 1);
+    expect(order()).toEqual(['1', '4', '2', '3']);
+    expect(store().manualOrder).toBe(true);
+    store().moveTo('1', 3);
+    expect(order()).toEqual(['4', '2', '3', '1']);
+  });
+
+  test('a drop outside the route or on the same place changes nothing', () => {
+    addAll(placeAt('1', 0), placeAt('2', 1), placeAt('3', 2));
+    store().moveTo('2', 1);
+    store().moveTo('2', 7);
+    store().moveTo('missing', 0);
+    expect(order()).toEqual(['1', '2', '3']);
+    expect(store().manualOrder).toBe(false);
+  });
+
   test('"reorder automatically" restores the shortest walk', () => {
     addAll(placeAt('1', 0), placeAt('2', 1), placeAt('3', 2));
     store().move('3', -1);

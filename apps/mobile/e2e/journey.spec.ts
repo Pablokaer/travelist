@@ -115,3 +115,26 @@ test('orders picks automatically, splits them into two routes and saves both', a
   await expect(page.getByText('E2E split · Route 1')).toBeVisible({ timeout: 20_000 });
   await expect(page.getByText('E2E split · Route 2')).toBeVisible();
 });
+
+test('reorders stops by dragging their grip', async ({ page }) => {
+  test.setTimeout(120_000);
+  const byTestId = byTestIdOn(page);
+  await signUpAndOnboard(page);
+  await addLisbonPlaces(page, 3);
+  await byTestId('open-route').click();
+
+  const grip = byTestId('drag-stop-0');
+  // "Drag {name} to reorder"
+  const first = (await grip.getAttribute('aria-label'))!.replace(/^Drag (.*) to reorder$/, '$1');
+  const last = byTestId('route-0-stop-2');
+  const from = (await grip.boundingBox())!;
+  const to = (await last.boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2, to.y + to.height - 4, { steps: 12 });
+  await page.mouse.up();
+
+  await expect(byTestId('route-order-notice')).toContainText('by hand');
+  await expect(byTestId('route-0-stop-2')).toContainText(first);
+  await expect(byTestId('drag-stop-2')).toHaveAttribute('aria-label', `Drag ${first} to reorder`);
+});

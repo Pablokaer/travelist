@@ -270,6 +270,7 @@
     "removeNamed": "Remover {{name}}",
     "moveUp": "Mover para cima",
     "moveDown": "Mover para baixo",
+    "dragNamed": "Arrastar {{name}} para mudar a ordem",
     "full": "O seu percurso já tem {{max}} paragens.",
     "startedNewCity": "Começou um novo percurso nesta cidade.",
     "optimize": "Otimizar percurso",

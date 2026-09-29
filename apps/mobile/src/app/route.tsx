@@ -65,6 +65,8 @@ export default function RouteScreen() {
   const optimize = useOptimizeRoutes();
   const save = useSaveTrips();
   const [results, setResults] = useState<Record<string, RouteResponse>>({});
+  // The page stops scrolling while a stop is dragged, so the gesture moves the stop.
+  const [dragging, setDragging] = useState(false);
   const shadows = useShadows();
   const { isDesktop } = useBreakpoint();
   const units = profile.data?.units ?? 'metric';
@@ -170,6 +172,8 @@ export default function RouteScreen() {
               splittable={stops.length >= ROUTE_SPLIT_MIN_STOPS}
               units={units}
               onMove={store.move}
+              onMoveTo={store.moveTo}
+              onDragActive={setDragging}
               onRemove={store.remove}
               onSplitAt={(position) => store.splitAt(r, position)}
             />
@@ -278,7 +282,10 @@ export default function RouteScreen() {
   );
 
   return (
-    <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
+    <Screen
+      edges={['left', 'right']}
+      width={isDesktop ? 'wide' : 'content'}
+      scrollEnabled={!dragging}>
       <PageHeader
         size="title"
         title={t('route.titleFor', { city: cityName })}

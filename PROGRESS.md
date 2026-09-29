@@ -56,6 +56,7 @@ Design system (tokens, Inter, shared components with hover/focus/press/loading s
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
+- Route stop drag and drop (D-027) is verified on web only; check it on iOS/Android with a development build (gesture vs page scroll).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
 - Native date pickers (D-019) and a map-beside-list layout for Explore on wide screens (D-007) are post-MVP polish; route and trip detail already use it (D-020).

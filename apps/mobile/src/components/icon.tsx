@@ -22,6 +22,7 @@ const ICONS = {
     android: 'directions',
     web: 'directions',
   },
+  dragHandle: { ios: 'line.3.horizontal', android: 'drag_indicator', web: 'drag_indicator' },
   error: { ios: 'exclamationmark.circle', android: 'error', web: 'error' },
   external: { ios: 'arrow.up.right.square', android: 'open_in_new', web: 'open_in_new' },
   flag: { ios: 'flag', android: 'flag', web: 'flag' },

@@ -270,6 +270,7 @@
     "removeNamed": "Remove {{name}}",
     "moveUp": "Move up",
     "moveDown": "Move down",
+    "dragNamed": "Drag {{name}} to reorder",
     "full": "Your route already has {{max}} stops.",
     "startedNewCity": "Started a new route in this city.",
     "optimize": "Optimise route",
