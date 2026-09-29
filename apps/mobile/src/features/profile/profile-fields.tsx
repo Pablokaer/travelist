@@ -33,6 +33,24 @@ export function NameAndPreferencesFields({ control }: Props) {
       />
       <Controller
         control={control}
+        name="nickname"
+        render={({ field, fieldState }) => (
+          <TextField
+            label={t('auth.nickname')}
+            hint={t('auth.nicknameHint')}
+            value={field.value}
+            onChangeText={field.onChange}
+            onBlur={field.onBlur}
+            error={fieldState.error?.message}
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={20}
+            testID="nickname"
+          />
+        )}
+      />
+      <Controller
+        control={control}
         name="language"
         render={({ field }) => (
           <View style={styles.group}>

@@ -2,25 +2,27 @@
 -- them): a group of six friends who write in English, Spanish and French, plus the "Wayfarer
 -- Team" editorial account, a moderator that owns the official walk lists. Idempotent: re-running
 -- refreshes names and profiles and keeps ids, so per-city files can reference them.
--- Every account signs in with password `wayfarer-demo`.
+-- Every account signs in with password `wayfarer-demo`, by email or by nickname (D-048): emma,
+-- oliver, lucia, mateo, camille, julien, wayfarer_team.
 begin;
 
 create temporary table demo_account (
   id uuid primary key,
   email text not null,
   display_name text not null,
+  nickname text not null,
   home_country char(2) not null,
   created_at timestamptz not null
 ) on commit drop;
 
 insert into demo_account values
-  ('d0000000-0000-4000-8000-000000000001', 'emma@demo-wayfarer.example.com',    'Emma Clarke',     'GB', '2026-06-02 09:14+00'),
-  ('d0000000-0000-4000-8000-000000000002', 'oliver@demo-wayfarer.example.com',  'Oliver Bennett',  'US', '2026-06-03 18:40+00'),
-  ('d0000000-0000-4000-8000-000000000003', 'lucia@demo-wayfarer.example.com',   'Lucía Fernández', 'ES', '2026-06-04 11:02+00'),
-  ('d0000000-0000-4000-8000-000000000004', 'mateo@demo-wayfarer.example.com',   'Mateo Rojas',     'MX', '2026-06-05 21:27+00'),
-  ('d0000000-0000-4000-8000-000000000005', 'camille@demo-wayfarer.example.com', 'Camille Dubois',  'FR', '2026-06-06 08:55+00'),
-  ('d0000000-0000-4000-8000-000000000006', 'julien@demo-wayfarer.example.com',  'Julien Moreau',   'CA', '2026-06-07 16:10+00'),
-  ('d0000000-0000-4000-8000-000000000099', 'team@demo-wayfarer.example.com',    'Wayfarer Team',   'NL', '2026-06-01 08:00+00');
+  ('d0000000-0000-4000-8000-000000000001', 'emma@demo-wayfarer.example.com',    'Emma Clarke',     'emma',          'GB', '2026-06-02 09:14+00'),
+  ('d0000000-0000-4000-8000-000000000002', 'oliver@demo-wayfarer.example.com',  'Oliver Bennett',  'oliver',        'US', '2026-06-03 18:40+00'),
+  ('d0000000-0000-4000-8000-000000000003', 'lucia@demo-wayfarer.example.com',   'Lucía Fernández', 'lucia',         'ES', '2026-06-04 11:02+00'),
+  ('d0000000-0000-4000-8000-000000000004', 'mateo@demo-wayfarer.example.com',   'Mateo Rojas',     'mateo',         'MX', '2026-06-05 21:27+00'),
+  ('d0000000-0000-4000-8000-000000000005', 'camille@demo-wayfarer.example.com', 'Camille Dubois',  'camille',       'FR', '2026-06-06 08:55+00'),
+  ('d0000000-0000-4000-8000-000000000006', 'julien@demo-wayfarer.example.com',  'Julien Moreau',   'julien',        'CA', '2026-06-07 16:10+00'),
+  ('d0000000-0000-4000-8000-000000000099', 'team@demo-wayfarer.example.com',    'Wayfarer Team',   'wayfarer_team', 'NL', '2026-06-01 08:00+00');
 
 -- GoTrue reads the token columns as strings: they must be '' rather than null for password
 -- sign-in to work on hand-inserted users.
@@ -46,7 +48,7 @@ on conflict (provider_id, provider) do nothing;
 
 -- The on_auth_user_created trigger made the profiles; finish onboarding so sign-in lands on the app.
 update public.profiles p
-   set display_name = a.display_name, home_country = a.home_country,
+   set display_name = a.display_name, nickname = a.nickname, home_country = a.home_country,
        onboarded_at = coalesce(p.onboarded_at, a.created_at)
   from demo_account a
  where p.id = a.id;

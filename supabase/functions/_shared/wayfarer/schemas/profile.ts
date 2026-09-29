@@ -9,15 +9,28 @@ export const displayNameSchema = z
   .min(1, { message: 'validation.required' })
   .max(80, { message: 'validation.tooLong' });
 
+/**
+ * Unique sign-in handle shown in the walk chat (D-048); the DB check mirrors the pattern.
+ * @example nicknameSchema.parse('  Nina_Walks ') // 'nina_walks'
+ */
+export const NICKNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+export const nicknameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(NICKNAME_PATTERN, { message: 'validation.nickname' });
+
 export const emailSchema = z.email({ message: 'validation.email' });
 export const passwordSchema = z.string().min(8, { message: 'validation.passwordLength' });
 
+/** Email or nickname: nicknames never contain "@" (see `nicknameSchema`). */
 export const signInSchema = z.object({
-  email: emailSchema,
+  login: z.string().trim().min(1, { message: 'validation.required' }),
   password: z.string().min(1, { message: 'validation.required' }),
 });
 export const signUpSchema = z.object({
   displayName: displayNameSchema,
+  nickname: nicknameSchema,
   email: emailSchema,
   password: passwordSchema,
 });
@@ -35,6 +48,7 @@ export const nationalitiesSchema = z
 /** Profile as edited in onboarding / profile screen. */
 export const profileFormSchema = z.object({
   displayName: displayNameSchema,
+  nickname: nicknameSchema,
   language: languageSchema,
   units: unitsSchema,
   homeCountry: countryCodeSchema,
@@ -45,7 +59,7 @@ export type ProfileForm = z.infer<typeof profileFormSchema>;
 
 /** Onboarding steps validate subsets of the profile. */
 export const onboardingStepSchemas = [
-  profileFormSchema.pick({ displayName: true, language: true, units: true }),
+  profileFormSchema.pick({ displayName: true, nickname: true, language: true, units: true }),
   profileFormSchema.pick({ homeCountry: true, nationalities: true }),
   profileFormSchema.pick({ passportExpiry: true }),
 ] as const;

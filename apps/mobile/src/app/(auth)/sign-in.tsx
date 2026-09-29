@@ -7,7 +7,7 @@ import type { z } from 'zod';
 
 import { Button } from '@/components/button';
 import { TextField } from '@/components/text-field';
-import { signInWithPassword } from '@/features/auth/api';
+import { NicknameLockedError, signInWithLogin } from '@/features/auth/api';
 import {
   AuthFooter,
   AuthLayout,
@@ -23,15 +23,16 @@ export default function SignInScreen() {
   const [error, setError] = useState<string | null>(null);
   const { control, handleSubmit, formState } = useForm<Form>({
     resolver: zodResolver(signInSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { login: '', password: '' },
   });
 
-  const onSubmit = handleSubmit(async ({ email, password }) => {
+  const onSubmit = handleSubmit(async ({ login, password }) => {
     setError(null);
     try {
-      await signInWithPassword(email.trim(), password);
+      await signInWithLogin(login, password);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('errors.generic'));
+      if (e instanceof NicknameLockedError) setError(t('auth.nicknameLocked'));
+      else setError(e instanceof Error ? e.message : t('errors.generic'));
     }
   });
 
@@ -42,19 +43,20 @@ export default function SignInScreen() {
       footer={<AuthFooter />}>
       <Controller
         control={control}
-        name="email"
+        name="login"
         render={({ field, fieldState }) => (
+          // Email or nickname (D-048). The testID stays "email" for existing E2E helpers.
           <TextField
-            label={t('auth.email')}
+            label={t('auth.login')}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
             error={fieldState.error?.message}
             autoCapitalize="none"
+            autoCorrect={false}
             icon="mail"
-            autoComplete="email"
-            keyboardType="email-address"
-            textContentType="emailAddress"
+            autoComplete="username"
+            textContentType="username"
             testID="email"
           />
         )}

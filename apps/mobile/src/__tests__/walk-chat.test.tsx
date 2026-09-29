@@ -106,6 +106,8 @@ const message = (over: Partial<ChatMessage> = {}): ChatMessage => ({
   authorAvatarUrl: null,
   isOwn: false,
   authorPublicId: 'pub-ben',
+  // No nickname: these tests keep the name / "You" labels (nicknames: nicknames.test.tsx).
+  authorNickname: null,
   ...over,
 });
 
@@ -164,6 +166,7 @@ describe('chat rows (D-043)', () => {
       authorName: null,
       authorAvatarUrl: null,
       authorPublicId: null,
+      authorNickname: null,
       isOwn: true,
     });
   });

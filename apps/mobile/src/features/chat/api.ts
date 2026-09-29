@@ -27,6 +27,8 @@ export type ChatMessage = {
   authorAvatarUrl: string | null;
   /** Opens the author's public profile (D-045). */
   authorPublicId: string | null;
+  /** Shown as @nickname on every message, own ones included (D-048). */
+  authorNickname: string | null;
   isOwn: boolean;
 };
 
@@ -38,6 +40,7 @@ type MessageRow = {
   author_avatar_path: string | null;
   is_own: boolean;
   author_public_id?: string | null;
+  author_nickname?: string | null;
 };
 
 export const chatKeys = { messages: (tripId: string) => ['walkChat', tripId] as const };
@@ -53,6 +56,7 @@ export function messageFromRow(r: MessageRow): ChatMessage {
     authorName: r.author_name,
     authorAvatarUrl: avatarUrl(r.author_avatar_path),
     authorPublicId: r.author_public_id ?? null,
+    authorNickname: r.author_nickname ?? null,
     isOwn: r.is_own,
   };
 }

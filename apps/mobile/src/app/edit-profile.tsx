@@ -10,7 +10,7 @@ import { Card } from '@/components/card';
 import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { FormError } from '@/features/auth/components';
-import { useProfile, useSaveProfile, type Profile } from '@/features/profile/api';
+import { profileSaveError, useProfile, useSaveProfile, type Profile } from '@/features/profile/api';
 import {
   NameAndPreferencesFields,
   NationalityFields,
@@ -26,6 +26,7 @@ function EditProfileForm({ profile }: { profile: Profile }) {
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       displayName: profile.displayName ?? '',
+      nickname: profile.nickname ?? '',
       language: profile.language,
       units: profile.units,
       homeCountry: profile.homeCountry ?? '',
@@ -67,7 +68,7 @@ function EditProfileForm({ profile }: { profile: Profile }) {
           <PassportFields control={control} />
         </Card>
       </Section>
-      <FormError message={save.error ? save.error.message : null} />
+      <FormError message={profileSaveError(save.error, t)} />
     </Screen>
   );
 }

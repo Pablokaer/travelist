@@ -50,6 +50,7 @@ const photo: PickedPhoto = { uri: 'file:///tmp/me.jpg', mimeType: 'image/jpeg' }
 const profile = (avatarPath: string | null): Profile => ({
   id: USER,
   displayName: 'Emma Clarke',
+  nickname: 'emma',
   homeCountry: 'GB',
   language: 'en',
   units: 'metric',

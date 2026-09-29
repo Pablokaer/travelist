@@ -1,5 +1,6 @@
 // A walk list's group chat (D-043): messages oldest first (own ones on the right), and a field
 // to write. New messages from anyone arrive live (useWalkChatLive).
+import type { TFunction } from 'i18next';
 import { useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -20,16 +21,27 @@ import {
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
+/**
+ * Who wrote a message: their @nickname (yours too, D-048), else "You" or their name.
+ * @example messageAuthorLabel(message, t) // '@nina_walks'
+ */
+export function messageAuthorLabel(message: ChatMessage, t: TFunction): string {
+  if (message.authorNickname) return `@${message.authorNickname}`;
+  return message.isOwn ? t('chat.you') : (message.authorName ?? t('reviews.anonymous'));
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const name = message.isOwn ? t('chat.you') : (message.authorName ?? t('reviews.anonymous'));
+  const name = messageAuthorLabel(message, t);
   const time = new Intl.DateTimeFormat(t('common.locale'), { timeStyle: 'short' }).format(
     new Date(message.createdAt),
   );
   return (
     <View testID={`chat-message-${message.id}`} style={[styles.row, message.isOwn && styles.own]}>
-      {message.isOwn ? null : <Avatar name={name} size={32} uri={message.authorAvatarUrl} />}
+      {message.isOwn ? null : (
+        <Avatar name={message.authorName ?? name} size={32} uri={message.authorAvatarUrl} />
+      )}
       <View
         style={[
           styles.bubble,

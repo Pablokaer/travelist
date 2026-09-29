@@ -7,7 +7,7 @@ import type { z } from 'zod';
 
 import { Button } from '@/components/button';
 import { TextField } from '@/components/text-field';
-import { signUp } from '@/features/auth/api';
+import { nicknameAvailable, signUp } from '@/features/auth/api';
 import {
   AuthFooter,
   AuthLayout,
@@ -22,14 +22,24 @@ export default function SignUpScreen() {
   const { t, i18n } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
-  const { control, handleSubmit, formState } = useForm<Form>({
+  const {
+    control,
+    handleSubmit,
+    formState,
+    setError: setFieldError,
+  } = useForm<Form>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { displayName: '', email: '', password: '' },
+    defaultValues: { displayName: '', nickname: '', email: '', password: '' },
   });
 
   const onSubmit = handleSubmit(async (form) => {
     setError(null);
     try {
+      // Checked first so a taken nickname is fixed here, not left empty by the DB (D-048).
+      if (!(await nicknameAvailable(form.nickname))) {
+        setFieldError('nickname', { message: 'validation.nicknameTaken' });
+        return;
+      }
       const needsConfirmation = await signUp({
         ...form,
         email: form.email.trim(),
@@ -66,6 +76,26 @@ export default function SignUpScreen() {
             autoComplete="name"
             textContentType="name"
             testID="displayName"
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="nickname"
+        render={({ field, fieldState }) => (
+          <TextField
+            label={t('auth.nickname')}
+            hint={t('auth.nicknameHint')}
+            value={field.value}
+            onChangeText={field.onChange}
+            onBlur={field.onBlur}
+            error={fieldState.error?.message}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="username-new"
+            textContentType="username"
+            maxLength={20}
+            testID="nickname"
           />
         )}
       />
