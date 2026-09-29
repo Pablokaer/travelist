@@ -124,6 +124,33 @@
     "details": "Informações úteis",
     "links": "Saber mais"
   },
+  "reviews": {
+    "title": "Avaliações",
+    "summary_one": "{{average}} ★ · {{count}} avaliação",
+    "summary_other": "{{average}} ★ · {{count}} avaliações",
+    "summaryLabel_one": "Nota {{average}} de 5 em {{count}} avaliação",
+    "summaryLabel_other": "Nota {{average}} de 5 em {{count}} avaliações",
+    "none": "Ainda sem avaliações",
+    "noneBody": "Já esteve aqui? Seja o primeiro a contar como foi.",
+    "stars_one": "{{count}} estrela",
+    "stars_other": "{{count}} estrelas",
+    "ratingLabel": "Nota {{rating}} de 5",
+    "pickRating": "A sua nota",
+    "comment": "O seu comentário (opcional)",
+    "commentPlaceholder": "O que outros viajantes devem saber?",
+    "publish": "Publicar avaliação",
+    "update": "Atualizar avaliação",
+    "yourReviewTitle": "A sua avaliação",
+    "writeTitle": "Avalie este lugar",
+    "yours": "A sua avaliação",
+    "anonymous": "Viajante",
+    "edited": "editada",
+    "delete": "Eliminar",
+    "deleteConfirm": "Eliminar a sua avaliação deste lugar?",
+    "deleteYes": "Eliminar avaliação",
+    "saved": "Obrigado! A sua avaliação foi publicada.",
+    "error": "Não foi possível carregar as avaliações. Verifique a ligação e tente novamente."
+  },
   "checklist": {
     "title": "Antes de partir",
     "titleFor": "Antes de partir: {{city}}",
@@ -394,7 +421,8 @@
     "nationalityRequired": "Adicione pelo menos uma nacionalidade",
     "tooManyNationalities": "Adicione até 5 nacionalidades",
     "duplicate": "Remova os duplicados",
-    "tooLong": "É demasiado longo"
+    "tooLong": "É demasiado longo",
+    "ratingRequired": "Escolha de 1 a 5 estrelas"
   },
   "errors": {
     "generic": "Algo correu mal. Tente novamente.",

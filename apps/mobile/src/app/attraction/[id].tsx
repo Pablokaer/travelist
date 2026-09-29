@@ -14,6 +14,9 @@ import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { localizedName, useAttraction } from '@/features/destinations/api';
 import { routeNotice } from '@/features/route/notice';
+import { useRatingSummary } from '@/features/reviews/api';
+import { RatingSummaryLine } from '@/features/reviews/components';
+import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useRouteStore } from '@/features/route/store';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -23,6 +26,7 @@ export default function AttractionScreen() {
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage ?? 'en';
   const attraction = useAttraction(id);
+  const rating = useRatingSummary(id);
   const inRoute = useRouteStore((s) => s.stops.some((x) => x.id === id));
   const toggle = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
@@ -102,8 +106,9 @@ export default function AttractionScreen() {
         </View>
       ) : null}
 
-      <View style={styles.titleBlock}>
+      <View style={styles.titleBlock} testID="attraction-title">
         <Text variant="display">{name}</Text>
+        {rating.data ? <RatingSummaryLine summary={rating.data} /> : null}
         <View style={styles.badges}>
           <Badge icon={categoryIcon(a.category)} label={t(`category.${a.category}`)} />
           {a.isUnesco ? <Badge icon="globe" label={t('attraction.unesco')} /> : null}
@@ -132,6 +137,8 @@ export default function AttractionScreen() {
           />
         </RowGroup>
       </Section>
+
+      <ReviewsSection attractionId={a.id} />
 
       {a.website || wikipediaUrl || a.imagePageUrl ? (
         <Section title={t('attraction.links')}>

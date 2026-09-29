@@ -11,6 +11,8 @@ import { Icon, categoryIcon } from '@/components/icon';
 import { Sheet } from '@/components/sheet';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
+import type { RatingSummary } from '@/features/reviews/api';
+import { CardRating, ratingLabel } from '@/features/reviews/components';
 import { flagEmoji } from '@/lib/format';
 import { palette, categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
@@ -254,6 +256,7 @@ export function AttractionCard({
   onPress,
   order,
   onToggleRoute,
+  rating,
 }: {
   item: AttractionSummary;
   onPress?: () => void;
@@ -261,9 +264,12 @@ export function AttractionCard({
   order?: number;
   /** Shows a checkbox that adds/removes the place without opening it. */
   onToggleRoute?: () => void;
+  /** Average rating shown beside the name; omitted for places without reviews (D-028). */
+  rating?: RatingSummary;
 }) {
   const { t, i18n } = useTranslation();
   const name = localizedName(item, i18n.resolvedLanguage ?? 'en');
+  const spokenRating = ratingLabel(rating, t('common.locale'), t)?.spoken;
   return (
     <View>
       <Tappable
@@ -271,7 +277,9 @@ export function AttractionCard({
         disabled={!onPress}
         pressScale={0.98}
         accessibilityRole="button"
-        accessibilityLabel={`${name}, ${t(`category.${item.category}`)}`}
+        accessibilityLabel={[name, t(`category.${item.category}`), spokenRating]
+          .filter(Boolean)
+          .join(', ')}
         style={styles.card}>
         {({ hovered }) => (
           <>
@@ -282,9 +290,12 @@ export function AttractionCard({
               </View>
             </View>
             <View style={styles.cardBody}>
-              <Text variant="subtitle" numberOfLines={1}>
-                {name}
-              </Text>
+              <View style={styles.cardTitle}>
+                <Text variant="subtitle" numberOfLines={1} style={styles.flex}>
+                  {name}
+                </Text>
+                <CardRating summary={rating} />
+              </View>
               <View style={styles.meta}>
                 <CategoryDot category={item.category} />
                 <Text variant="caption" secondary numberOfLines={1} style={styles.flex}>
@@ -511,6 +522,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardBody: { gap: spacing.xxs },
+  cardTitle: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm - 2 },
   row: {
     flexDirection: 'row',

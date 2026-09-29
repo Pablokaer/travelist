@@ -85,3 +85,14 @@ export function initials(name: string): string {
     .map((w) => w[0]!.toUpperCase())
     .join('');
 }
+
+/**
+ * A star average with exactly one decimal, in the UI language.
+ * @example formatRating(4.56, 'pt') // '4,6'
+ */
+export function formatRating(average: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(average);
+}

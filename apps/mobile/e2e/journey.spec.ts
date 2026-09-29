@@ -138,3 +138,46 @@ test('reorders stops by dragging their grip', async ({ page }) => {
   await expect(byTestId('route-0-stop-2')).toContainText(first);
   await expect(byTestId('drag-stop-2')).toHaveAttribute('aria-label', `Drag ${first} to reorder`);
 });
+
+test('publishes, edits and deletes a review of an attraction', async ({ page }) => {
+  test.setTimeout(120_000);
+  const byTestId = byTestIdOn(page);
+  const role = roleOn(page);
+  await signUpAndOnboard(page);
+  await byTestId('city-search').fill('Lisb');
+  await byTestId('city-card-lisbon').click();
+  await page.getByRole('radio', { name: 'List' }).or(role('checkbox', 'List')).click();
+  const list = byTestId('attraction-list');
+  await list.getByRole('button').first().click();
+
+  // Unique per run: other E2E users may have reviewed the same place.
+  const comment = `E2E review ${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+  const form = byTestId('review-form');
+  // Published review cards (review-<uuid>), not the form's text box.
+  const cards = page.getByTestId(/^review-[0-9a-f-]{36}$/).filter({ visible: true });
+  await form.getByLabel('4 stars').click();
+  await form.getByLabel('Your comment (optional)').fill(comment);
+  await byTestId('save-review').click();
+  await expect(cards.filter({ hasText: comment })).toHaveCount(1, { timeout: 15_000 });
+  await expect(byTestId('rating-summary').first()).toContainText('★ ·');
+  await expect(form.getByLabel('4 stars')).toBeChecked();
+  await expect(form.getByRole('button', { name: 'Update review' })).toBeVisible();
+
+  // Back on the city page, the card of the reviewed place shows its average beside the name.
+  await page.goBack();
+  await expect(list.getByRole('button').first().getByTestId('card-rating')).toHaveText(
+    /^\d\.\d ★$/,
+    { timeout: 15_000 },
+  );
+  await list.getByRole('button').first().click();
+
+  await form.getByLabel('5 stars').click();
+  await byTestId('save-review').click();
+  await expect(byTestId('review-form').getByLabel('5 stars')).toBeChecked({ timeout: 15_000 });
+  await expect(cards.filter({ hasText: comment }).getByLabel('Rated 5 out of 5')).toBeVisible();
+
+  await byTestId('delete-review').click();
+  await role('button', 'Delete review').click();
+  await expect(cards.filter({ hasText: comment })).toHaveCount(0, { timeout: 15_000 });
+  await expect(byTestId('save-review')).toHaveText('Publish review');
+});

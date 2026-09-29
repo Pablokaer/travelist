@@ -53,10 +53,15 @@ Lyon, Marseille, Bordeaux, Turin, Verona, Pisa, Granada, Bilbao, Córdoba, Manch
 
 Design system (tokens, Inter, shared components with hover/focus/press/loading states) and every screen reworked: Explore card grid with floating Map/List switch and route tray, attraction hero with sticky CTA, desktop map-beside-list for route and trip detail, card grid for trips, grouped profile, two-column checklist, centred auth. Bottom tabs on phones, side rail on desktop. Verified on web at desktop and phone widths (unit tests + full E2E journey); native rendering not yet checked.
 
+## 2026-09-29 — Attraction reviews (D-028)
+
+1–5 star ratings with optional comments on every attraction, average + count next to the name, one review per user (edit / delete own only). Postgres table with RLS, `save_review` / `list_attraction_reviews` RPCs and `attraction_rating_summary` view; 24 pgTAP tests, unit/component tests and an E2E journey (publish → edit → delete) on web.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
 - Route stop drag and drop (D-027) is verified on web only; check it on iOS/Android with a development build (gesture vs page scroll).
+- Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
 - Native date pickers (D-019) and a map-beside-list layout for Explore on wide screens (D-007) are post-MVP polish; route and trip detail already use it (D-020).

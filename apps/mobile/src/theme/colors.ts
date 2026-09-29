@@ -22,6 +22,8 @@ export const palette = {
     success: '#1E7F4F',
     warning: '#B25E09',
     info: '#1F5FAD',
+    /** Filled rating stars (D-028): gold, the one warm colour besides the accent. */
+    star: '#E5A50A',
     overlay: 'rgba(0,0,0,0.4)',
   },
   dark: {
@@ -40,6 +42,7 @@ export const palette = {
     success: '#5FD39A',
     warning: '#F5B35C',
     info: '#7DB3F5',
+    star: '#F5C542',
     overlay: 'rgba(0,0,0,0.6)',
   },
 } as const;
