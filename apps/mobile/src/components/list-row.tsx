@@ -1,9 +1,12 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Children, Fragment, isValidElement, type PropsWithChildren } from 'react';
+import { StyleSheet, View } from 'react-native';
 
+import { Icon, type IconName } from './icon';
+import { Tappable } from './tappable';
 import { Text } from './text';
 
 import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
-import { useTheme } from '@/theme/use-theme';
+import { useShadows, useTheme } from '@/theme/use-theme';
 
 type Props = {
   label: string;
@@ -12,8 +15,12 @@ type Props = {
   onPress?: () => void;
   accessibilityHint?: string;
   role?: 'button' | 'radio' | 'link';
+  icon?: IconName;
+  /** Opens outside the app: shows an external-link glyph instead of a chevron. */
+  external?: boolean;
 };
 
+/** A settings-style row. Place rows inside a `RowGroup` for the grouped card look. */
 export function ListRow({
   label,
   value,
@@ -21,58 +28,90 @@ export function ListRow({
   onPress,
   accessibilityHint,
   role = 'button',
+  icon,
+  external,
 }: Props) {
   const theme = useTheme();
   return (
-    <Pressable
+    <Tappable
       onPress={onPress}
       disabled={!onPress}
+      pressScale={1}
       accessibilityRole={role}
       accessibilityLabel={value ? `${label}, ${value}` : label}
       accessibilityHint={accessibilityHint}
       accessibilityState={role === 'radio' ? { checked: !!selected } : undefined}
-      style={({ pressed }) => [
+      style={({ pressed, hovered }) => [
         styles.row,
-        {
-          backgroundColor: theme.surface,
-          borderColor: selected ? theme.primary : theme.border,
-          opacity: pressed ? 0.7 : 1,
-        },
+        { backgroundColor: pressed || hovered ? theme.surfaceMuted : 'transparent' },
       ]}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.right}>
-        {value ? <Text secondary>{value}</Text> : null}
-        {role === 'radio' ? (
-          <View
-            style={[styles.radio, { borderColor: selected ? theme.primary : theme.border }]}
-            importantForAccessibility="no">
-            {selected ? <View style={[styles.dot, { backgroundColor: theme.primary }]} /> : null}
-          </View>
-        ) : null}
+      {icon ? (
+        <View style={[styles.iconTile, { backgroundColor: theme.surfaceMuted }]}>
+          <Icon name={icon} size={18} />
+        </View>
+      ) : null}
+      <View style={styles.text}>
+        <Text variant={value ? 'caption' : 'body'} secondary={!!value}>
+          {label}
+        </Text>
+        {value ? <Text style={styles.value}>{value}</Text> : null}
       </View>
-    </Pressable>
+      {role === 'radio' ? (
+        <View
+          style={[
+            styles.radio,
+            { borderColor: selected ? theme.primary : theme.borderStrong },
+            selected && { borderWidth: 6 },
+          ]}
+          importantForAccessibility="no"
+        />
+      ) : onPress ? (
+        <Icon name={external ? 'external' : 'chevronRight'} size={16} color={theme.textSecondary} />
+      ) : null}
+    </Tappable>
+  );
+}
+
+/** Groups rows into a single rounded card with hairline dividers. */
+export function RowGroup({ children }: PropsWithChildren) {
+  const theme = useTheme();
+  const shadows = useShadows();
+  const items = Children.toArray(children).filter(isValidElement);
+  return (
+    <View
+      style={[
+        styles.group,
+        { backgroundColor: theme.surface, borderColor: theme.border, boxShadow: shadows.card },
+      ]}>
+      {items.map((child, i) => (
+        <Fragment key={child.key ?? i}>
+          {i > 0 ? <View style={[styles.divider, { backgroundColor: theme.border }]} /> : null}
+          {child}
+        </Fragment>
+      ))}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
-    minHeight: MIN_TOUCH + 8,
+    minHeight: MIN_TOUCH + 12,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
-    borderWidth: 1,
+    paddingVertical: spacing.sm + 2,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: spacing.md,
   },
-  label: { flexShrink: 1 },
-  right: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
+  iconTile: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.sm + 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dot: { width: 10, height: 10, borderRadius: 5 },
+  text: { flex: 1, gap: spacing.xxs },
+  value: { fontWeight: '500' },
+  radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2 },
+  group: { borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden' },
+  divider: { height: StyleSheet.hairlineWidth, marginLeft: spacing.md },
 });

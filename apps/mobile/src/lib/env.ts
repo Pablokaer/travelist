@@ -16,11 +16,24 @@ const envSchema = z.object({
   sentryDsn: z.preprocess(emptyToUndefined, z.string().optional()),
   posthogKey: z.preprocess(emptyToUndefined, z.string().optional()),
   posthogHost: z.preprocess(emptyToUndefined, z.url().default('https://eu.i.posthog.com')),
+  /** OAuth providers enabled in Supabase Auth, e.g. "google,apple". Hidden in the UI otherwise. */
+  authProviders: z.preprocess(
+    (v) =>
+      typeof v === 'string'
+        ? v
+            .split(',')
+            .map((s) => s.trim().toLowerCase())
+            .filter(Boolean)
+        : [],
+    z.array(z.enum(['google', 'apple'])),
+  ),
 });
 
 export type AppEnv = z.infer<typeof envSchema>;
 
-export function parseEnv(raw: Record<keyof AppEnv, string | undefined>): AppEnv {
+export function parseEnv(
+  raw: Omit<Record<keyof AppEnv, string | undefined>, 'authProviders'> & { authProviders?: string },
+): AppEnv {
   const result = envSchema.safeParse(raw);
   if (!result.success) {
     throw new Error(`Invalid EXPO_PUBLIC_* configuration: ${z.prettifyError(result.error)}`);
@@ -35,4 +48,5 @@ export const env: AppEnv = parseEnv({
   sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY,
   posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST,
+  authProviders: process.env.EXPO_PUBLIC_AUTH_PROVIDERS,
 });

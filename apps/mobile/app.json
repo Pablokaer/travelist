@@ -10,7 +10,8 @@
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.finperiti.wayfarer",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +37,10 @@
           "imageWidth": 76
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-secure-store",
+      "@maplibre/maplibre-react-native",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

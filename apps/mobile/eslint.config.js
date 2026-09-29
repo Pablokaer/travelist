@@ -5,6 +5,14 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*', '.expo/*', 'ios/*', 'android/*', 'playwright-report/*', 'test-results/*'],
+    ignores: [
+      'src/lib/database.types.ts',
+      'dist/*',
+      '.expo/*',
+      'ios/*',
+      'android/*',
+      'playwright-report/*',
+      'test-results/*',
+    ],
   },
 ]);

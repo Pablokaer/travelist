@@ -11,6 +11,7 @@
 #   osm_relation_id OSM administrative boundary relation (null if not usable)
 #   center          [lat, lon] (Wikidata P625)
 #   bbox            [south, west, north, east] used for ingestion queries (Nominatim)
+#   timezone        IANA time zone (tzdb)
 #   is_active       inactive cities are ingested but hidden from the map
 #
 # Sources: Wikidata SPARQL + Nominatim, retrieved 2026-09-26. See docs/DATA_SOURCES.md.
@@ -25,6 +26,7 @@ cities:
     osm_relation_id: 175342 # Greater London
     center: [51.507222, -0.1275]
     bbox: [51.2867601, -0.5103751, 51.6918741, 0.3340155]
+    timezone: Europe/London
     is_active: true
 
   - slug: paris
@@ -34,6 +36,7 @@ cities:
     osm_relation_id: 7444
     center: [48.856667, 2.352222]
     bbox: [48.8155755, 2.224122, 48.902156, 2.4697602]
+    timezone: Europe/Paris
     is_active: true
 
   - slug: istanbul
@@ -44,6 +47,7 @@ cities:
     osm_relation_id: null
     center: [41.01, 28.960278]
     bbox: [40.846381, 28.8158715, 41.166381, 29.1358715]
+    timezone: Europe/Istanbul
     is_active: true
 
   - slug: rome
@@ -53,6 +57,7 @@ cities:
     osm_relation_id: 41485
     center: [41.893056, 12.482778]
     bbox: [41.6556417, 12.2344416, 42.1410285, 12.8557603]
+    timezone: Europe/Rome
     is_active: true
 
   - slug: prague
@@ -62,6 +67,7 @@ cities:
     osm_relation_id: 435514
     center: [50.0875, 14.421389]
     bbox: [49.9419006, 14.2244355, 50.1774302, 14.7067867]
+    timezone: Europe/Prague
     is_active: true
 
   - slug: amsterdam
@@ -71,6 +77,7 @@ cities:
     osm_relation_id: 271110
     center: [52.366667, 4.883333]
     bbox: [52.2781742, 4.7287776, 52.4310638, 5.0791622]
+    timezone: Europe/Amsterdam
     is_active: true
 
   - slug: barcelona
@@ -80,6 +87,7 @@ cities:
     osm_relation_id: 347950
     center: [41.3825, 2.176944]
     bbox: [41.3170354, 2.0524977, 41.4679135, 2.2283555]
+    timezone: Europe/Madrid
     is_active: true
 
   - slug: milan
@@ -89,6 +97,7 @@ cities:
     osm_relation_id: 44915
     center: [45.466944, 9.19]
     bbox: [45.3867381, 9.0408867, 45.5358482, 9.2781103]
+    timezone: Europe/Rome
     is_active: true
 
   - slug: vienna
@@ -98,6 +107,7 @@ cities:
     osm_relation_id: 109166
     center: [48.208333, 16.3725]
     bbox: [48.1179069, 16.181831, 48.3226679, 16.5775132]
+    timezone: Europe/Vienna
     is_active: true
 
   - slug: madrid
@@ -107,6 +117,7 @@ cities:
     osm_relation_id: 5326784
     center: [40.416944, -3.703333]
     bbox: [40.3119774, -3.8889539, 40.6437293, -3.5183264]
+    timezone: Europe/Madrid
     is_active: true
 
   - slug: lisbon
@@ -116,6 +127,7 @@ cities:
     osm_relation_id: 5400890
     center: [38.708042, -9.139016]
     bbox: [38.6913994, -9.2298356, 38.7967584, -9.0863328]
+    timezone: Europe/Lisbon
     is_active: true
 
   - slug: porto
@@ -125,4 +137,693 @@ cities:
     osm_relation_id: 3372453
     center: [41.15, -8.610833]
     bbox: [41.1383507, -8.691289, 41.1859353, -8.5520792]
+    timezone: Europe/Lisbon
+    is_active: true
+
+  # --- Added 2026-09-28: 20 more of Europe's most visited cities (Euromonitor / Mastercard rankings).
+
+  - slug: berlin
+    name: { en: Berlin, pt: Berlim }
+    country_code: DE
+    wikidata_id: Q64
+    osm_relation_id: 62422
+    center: [52.516667, 13.383333]
+    bbox: [52.3382448, 13.088345, 52.6755087, 13.7611609]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: venice
+    name: { en: Venice, pt: Veneza }
+    country_code: IT
+    wikidata_id: Q641
+    osm_relation_id: 44741
+    center: [45.439722, 12.331944]
+    bbox: [45.2312466, 12.1668349, 45.5779981, 12.5965709]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: florence
+    name: { en: Florence, pt: Florença }
+    country_code: IT
+    wikidata_id: Q2044
+    osm_relation_id: 42602
+    center: [43.771389, 11.254167]
+    bbox: [43.7258716, 11.1497598, 43.8354631, 11.3389044]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: munich
+    name: { en: Munich, pt: Munique }
+    country_code: DE
+    wikidata_id: Q1726
+    osm_relation_id: 62428
+    center: [48.1375, 11.575]
+    bbox: [48.0616244, 11.360777, 48.2481162, 11.7229099]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: dublin
+    name: { en: Dublin, pt: Dublin }
+    country_code: IE
+    wikidata_id: Q1761
+    osm_relation_id: 1109531
+    center: [53.349722, -6.260278]
+    bbox: [53.2987342, -6.3870259, 53.4105416, -6.1148829]
+    timezone: Europe/Dublin
+    is_active: true
+
+  - slug: athens
+    name: { en: Athens, pt: Atenas }
+    country_code: GR
+    wikidata_id: Q1524
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [37.984167, 23.728056]
+    bbox: [37.8155648, 23.5748324, 38.1355648, 23.8948324]
+    timezone: Europe/Athens
+    is_active: true
+
+  - slug: budapest
+    name: { en: Budapest, pt: Budapeste }
+    country_code: HU
+    wikidata_id: Q1781
+    osm_relation_id: 1244004
+    center: [47.498333, 19.040833]
+    bbox: [47.3496899, 18.9251057, 47.6131468, 19.3349258]
+    timezone: Europe/Budapest
+    is_active: true
+
+  - slug: edinburgh
+    name: { en: Edinburgh, pt: Edimburgo }
+    country_code: GB
+    wikidata_id: Q23436
+    osm_relation_id: 1920901
+    center: [55.953333, -3.189167]
+    bbox: [55.8187919, -3.4495326, 56.0040837, -3.0749528]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: brussels
+    name: { en: Brussels, pt: Bruxelas }
+    country_code: BE
+    wikidata_id: Q239
+    osm_relation_id: 58274
+    center: [50.846667, 4.351667]
+    bbox: [50.7963454, 4.3137681, 50.9139045, 4.4370662]
+    timezone: Europe/Brussels
+    is_active: true
+
+  - slug: copenhagen
+    name: { en: Copenhagen, pt: Copenhaga }
+    country_code: DK
+    wikidata_id: Q1748
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [55.676111, 12.568889]
+    bbox: [55.5267243, 12.4100724, 55.8467243, 12.7300724]
+    timezone: Europe/Copenhagen
+    is_active: true
+
+  - slug: stockholm
+    name: { en: Stockholm, pt: Estocolmo }
+    country_code: SE
+    wikidata_id: Q1754
+    osm_relation_id: 398021
+    center: [59.329444, 18.068611]
+    bbox: [59.2272524, 17.7606914, 59.4402839, 18.2000781]
+    timezone: Europe/Stockholm
+    is_active: true
+
+  - slug: nice
+    name: { en: Nice, pt: Nice }
+    country_code: FR
+    wikidata_id: Q33959
+    osm_relation_id: 170100
+    center: [43.701944, 7.268333]
+    bbox: [43.6454189, 7.1819535, 43.7607635, 7.323912]
+    timezone: Europe/Paris
+    is_active: true
+
+  - slug: seville
+    name: { en: Seville, pt: Sevilha }
+    country_code: ES
+    wikidata_id: Q8717
+    osm_relation_id: 342563
+    center: [37.388611, -5.995]
+    bbox: [37.3002036, -6.0329183, 37.4529579, -5.8191571]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: krakow
+    name: { en: Kraków, pt: Cracóvia }
+    country_code: PL
+    wikidata_id: Q31487
+    osm_relation_id: 449696
+    center: [50.061389, 19.937222]
+    bbox: [49.9676668, 19.7922355, 50.1261338, 20.2173455]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: warsaw
+    name: { en: Warsaw, pt: Varsóvia }
+    country_code: PL
+    wikidata_id: Q270
+    osm_relation_id: 336075
+    center: [52.23, 21.011111]
+    bbox: [52.0978497, 20.8516882, 52.3681531, 21.2711512]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: naples
+    name: { en: Naples, pt: Nápoles }
+    country_code: IT
+    wikidata_id: Q2634
+    osm_relation_id: 40767
+    center: [40.835833, 14.248611]
+    bbox: [40.791193, 14.1320999, 40.916123, 14.3537681]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: valencia
+    name: { en: Valencia, pt: Valência }
+    country_code: ES
+    wikidata_id: Q8818
+    osm_relation_id: 344953
+    center: [39.47, -0.376389]
+    bbox: [39.2784496, -0.4325512, 39.566609, -0.2725205]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: zurich
+    name: { en: Zurich, pt: Zurique }
+    country_code: CH
+    wikidata_id: Q72
+    osm_relation_id: 1682248
+    center: [47.374444, 8.541111]
+    bbox: [47.3202184, 8.4480182, 47.434665, 8.6254529]
+    timezone: Europe/Zurich
+    is_active: true
+
+  - slug: antalya
+    name: { en: Antalya, pt: Antália }
+    country_code: TR
+    wikidata_id: Q6487
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [36.90812, 30.69556]
+    bbox: [36.7265728, 30.5430242, 37.0465728, 30.8630242]
+    timezone: Europe/Istanbul
+    is_active: true
+
+  - slug: oslo
+    name: { en: Oslo, pt: Oslo }
+    country_code: 'NO' # quoted: bare NO is YAML for false
+    wikidata_id: Q585
+    osm_relation_id: 406091
+    center: [59.913333, 10.738889]
+    bbox: [59.8093113, 10.4891652, 60.1351064, 10.9513894]
+    timezone: Europe/Oslo
+    is_active: true
+
+  # --- Added 2026-09-28 (batch 3): 20 more European cities.
+
+  - slug: hamburg
+    name: { en: Hamburg, pt: Hamburgo }
+    country_code: DE
+    wikidata_id: Q1055
+    osm_relation_id: null # centre-based bbox: OSM boundary includes the North Sea island of Neuwerk
+    center: [53.55, 10.0]
+    bbox: [53.39, 9.84, 53.71, 10.16]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: frankfurt
+    name: { en: Frankfurt, pt: Frankfurt }
+    country_code: DE
+    wikidata_id: Q1794
+    osm_relation_id: 62400
+    center: [50.110556, 8.682222]
+    bbox: [50.0153529, 8.4727605, 50.2271424, 8.8004049]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: cologne
+    name: { en: Cologne, pt: Colónia }
+    country_code: DE
+    wikidata_id: Q365
+    osm_relation_id: 62578
+    center: [50.942222, 6.957778]
+    bbox: [50.8304399, 6.7725303, 51.0849743, 7.162028]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: geneva
+    name: { en: Geneva, pt: Genebra }
+    country_code: CH
+    wikidata_id: Q71
+    osm_relation_id: 1685488
+    center: [46.2, 6.15]
+    bbox: [46.1777742, 6.1102325, 46.2318859, 6.1758454]
+    timezone: Europe/Zurich
+    is_active: true
+
+  - slug: salzburg
+    name: { en: Salzburg, pt: Salzburgo }
+    country_code: AT
+    wikidata_id: Q34713
+    osm_relation_id: 86538
+    center: [47.8, 13.045]
+    bbox: [47.7512115, 12.9856478, 47.8543925, 13.1275256]
+    timezone: Europe/Vienna
+    is_active: true
+
+  - slug: bruges
+    name: { en: Bruges, pt: Bruges }
+    country_code: BE
+    wikidata_id: Q12994
+    osm_relation_id: 562654
+    center: [51.208889, 3.224167]
+    bbox: [51.1582193, 3.1341748, 51.363347, 3.3098982]
+    timezone: Europe/Brussels
+    is_active: true
+
+  - slug: antwerp
+    name: { en: Antwerp, pt: Antuérpia }
+    country_code: BE
+    wikidata_id: Q12892
+    osm_relation_id: 59518
+    center: [51.221111, 4.399722]
+    bbox: [51.1432868, 4.2175769, 51.3776356, 4.5090543]
+    timezone: Europe/Brussels
+    is_active: true
+
+  - slug: rotterdam
+    name: { en: Rotterdam, pt: Roterdão }
+    country_code: NL
+    wikidata_id: Q34370
+    osm_relation_id: 1411101
+    center: [51.92, 4.48]
+    bbox: [51.8616672, 4.3793095, 51.9942735, 4.6018092]
+    timezone: Europe/Amsterdam
+    is_active: true
+
+  - slug: helsinki
+    name: { en: Helsinki, pt: Helsínquia }
+    country_code: FI
+    wikidata_id: Q1757
+    osm_relation_id: 34914
+    center: [60.170833, 24.9375]
+    bbox: [59.922486, 24.7828026, 60.2978497, 25.2545116]
+    timezone: Europe/Helsinki
+    is_active: true
+
+  - slug: reykjavik
+    name: { en: Reykjavík, pt: Reykjavík }
+    country_code: IS
+    wikidata_id: Q1764
+    osm_relation_id: 2580605
+    center: [64.1475, -21.935]
+    bbox: [64.0404021, -21.9838299, 64.3153711, -21.4019991]
+    timezone: Atlantic/Reykjavik
+    is_active: true
+
+  - slug: tallinn
+    name: { en: Tallinn, pt: Tallinn }
+    country_code: EE
+    wikidata_id: Q1770
+    osm_relation_id: 2164745
+    center: [59.437222, 24.745]
+    bbox: [59.3518076, 24.55017, 59.5915769, 24.9262831]
+    timezone: Europe/Tallinn
+    is_active: true
+
+  - slug: riga
+    name: { en: Riga, pt: Riga }
+    country_code: LV
+    wikidata_id: Q1773
+    osm_relation_id: 13048688
+    center: [56.9475, 24.106944]
+    bbox: [56.8573462, 23.9325504, 57.0861068, 24.3245042]
+    timezone: Europe/Riga
+    is_active: true
+
+  - slug: vilnius
+    name: { en: Vilnius, pt: Vilnius }
+    country_code: LT
+    wikidata_id: Q216
+    osm_relation_id: 1529146
+    center: [54.687222, 25.28]
+    bbox: [54.5689058, 25.0245351, 54.83232, 25.4814574]
+    timezone: Europe/Vilnius
+    is_active: true
+
+  - slug: dubrovnik
+    name: { en: Dubrovnik, pt: Dubrovnik }
+    country_code: HR
+    wikidata_id: Q1722
+    osm_relation_id: 8796464
+    center: [42.640278, 18.108333]
+    bbox: [42.6208867, 17.7655924, 42.7803608, 18.1581147]
+    timezone: Europe/Zagreb
+    is_active: true
+
+  - slug: split
+    name: { en: Split, pt: Split }
+    country_code: HR
+    wikidata_id: Q1663
+    osm_relation_id: 11153757
+    center: [43.51, 16.44]
+    bbox: [43.4985847, 16.3877955, 43.5322835, 16.5303557]
+    timezone: Europe/Zagreb
+    is_active: true
+
+  - slug: ljubljana
+    name: { en: Ljubljana, pt: Liubliana }
+    country_code: SI
+    wikidata_id: Q437
+    osm_relation_id: 1675898
+    center: [46.051389, 14.506111]
+    bbox: [45.9740637, 14.408617, 46.1459968, 14.755332]
+    timezone: Europe/Ljubljana
+    is_active: true
+
+  - slug: bratislava
+    name: { en: Bratislava, pt: Bratislava }
+    country_code: SK
+    wikidata_id: Q1780
+    osm_relation_id: 1702499
+    center: [48.14816, 17.10674]
+    bbox: [48.0066643, 16.946044, 48.2650685, 17.284531]
+    timezone: Europe/Bratislava
+    is_active: true
+
+  - slug: palma
+    name: { en: Palma, pt: Palma de Maiorca }
+    country_code: ES
+    wikidata_id: Q8826
+    osm_relation_id: null # centre-based bbox: OSM boundary extends far out to sea
+    center: [39.566667, 2.649722]
+    bbox: [39.4066667, 2.4897222, 39.7266667, 2.8097222]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: malaga
+    name: { en: Málaga, pt: Málaga }
+    country_code: ES
+    wikidata_id: Q8851
+    osm_relation_id: 340746
+    center: [36.716667, -4.416667]
+    bbox: [36.6356619, -4.5878887, 36.8940412, -4.2604897]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: bologna
+    name: { en: Bologna, pt: Bolonha }
+    country_code: IT
+    wikidata_id: Q1891
+    osm_relation_id: 43172
+    center: [44.493889, 11.342778]
+    bbox: [44.4210532, 11.2296206, 44.556094, 11.4334471]
+    timezone: Europe/Rome
+    is_active: true
+
+  # --- Added 2026-09-28 (batch 4): remaining EU capitals + UK nation capitals.
+
+  - slug: sofia
+    name: { en: Sofia, pt: Sófia }
+    country_code: BG
+    wikidata_id: Q472
+    osm_relation_id: 4283101
+    center: [42.697886, 23.321726]
+    bbox: [42.5579851, 23.167997, 42.864302, 23.6215817]
+    timezone: Europe/Sofia
+    is_active: true
+
+  - slug: zagreb
+    name: { en: Zagreb, pt: Zagreb }
+    country_code: HR
+    wikidata_id: Q1435
+    osm_relation_id: 226224
+    center: [45.813056, 15.977222]
+    bbox: [45.6139895, 15.7732052, 45.9691466, 16.2395548]
+    timezone: Europe/Zagreb
+    is_active: true
+
+  - slug: nicosia
+    name: { en: Nicosia, pt: Nicósia }
+    country_code: CY
+    wikidata_id: Q3856
+    osm_relation_id: 2628521
+    center: [35.1725, 33.365]
+    bbox: [35.1521717, 33.3358797, 35.2017784, 33.4182382]
+    timezone: Asia/Nicosia
+    is_active: true
+
+  - slug: luxembourg
+    name: { en: Luxembourg, pt: Luxemburgo }
+    country_code: LU
+    wikidata_id: Q1842
+    osm_relation_id: 407489
+    center: [49.611389, 6.13]
+    bbox: [49.5609875, 6.06917, 49.6548682, 6.2036491]
+    timezone: Europe/Luxembourg
+    is_active: true
+
+  - slug: valletta
+    name: { en: Valletta, pt: Valeta }
+    country_code: MT
+    wikidata_id: Q23800
+    osm_relation_id: null # municipality is 1 km²: ±0.04° covers the Grand Harbour, Floriana and the Three Cities
+    center: [35.897778, 14.5125]
+    bbox: [35.8577778, 14.4725, 35.9377778, 14.5525]
+    timezone: Europe/Malta
+    is_active: true
+
+  - slug: bucharest
+    name: { en: Bucharest, pt: Bucareste }
+    country_code: RO
+    wikidata_id: Q19660
+    osm_relation_id: 377733
+    center: [44.413361, 26.097778]
+    bbox: [44.3342466, 25.9666745, 44.5413964, 26.2255768]
+    timezone: Europe/Bucharest
+    is_active: true
+
+  - slug: cardiff
+    name: { en: Cardiff, pt: Cardiff }
+    country_code: GB
+    wikidata_id: Q10690
+    osm_relation_id: null # Nominatim returned a node: centre-based bbox (like istanbul)
+    center: [51.481667, -3.179167]
+    bbox: [51.3216546, -3.3391934, 51.6416546, -3.0191934]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: belfast
+    name: { en: Belfast, pt: Belfast }
+    country_code: GB
+    wikidata_id: Q10686
+    osm_relation_id: 19414244
+    center: [54.596667, -5.93]
+    bbox: [54.5305618, -6.0601801, 54.6649674, -5.8073559]
+    timezone: Europe/London
+    is_active: true
+
+  # --- Added 2026-09-28 (batch 5): major secondary cities in covered countries.
+
+  - slug: lyon
+    name: { en: Lyon, pt: Lyon }
+    country_code: FR
+    wikidata_id: Q456
+    osm_relation_id: 120965
+    center: [45.7675, 4.835]
+    bbox: [45.7073666, 4.7718132, 45.8082628, 4.8984161]
+    timezone: Europe/Paris
+    is_active: true
+
+  - slug: marseille
+    name: { en: Marseille, pt: Marselha }
+    country_code: FR
+    wikidata_id: Q23482
+    osm_relation_id: 76469
+    center: [43.296667, 5.376389]
+    bbox: [43.1696228, 5.2287864, 43.3910329, 5.5324758]
+    timezone: Europe/Paris
+    is_active: true
+
+  - slug: bordeaux
+    name: { en: Bordeaux, pt: Bordéus }
+    country_code: FR
+    wikidata_id: Q1479
+    osm_relation_id: 105270
+    center: [44.837778, -0.579444]
+    bbox: [44.8107802, -0.6386987, 44.9161806, -0.5336838]
+    timezone: Europe/Paris
+    is_active: true
+
+  - slug: turin
+    name: { en: Turin, pt: Turim }
+    country_code: IT
+    wikidata_id: Q495
+    osm_relation_id: 43992
+    center: [45.079167, 7.676111]
+    bbox: [45.0067924, 7.5778348, 45.1402175, 7.7733388]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: verona
+    name: { en: Verona, pt: Verona }
+    country_code: IT
+    wikidata_id: Q2028
+    osm_relation_id: 44830
+    center: [45.438611, 10.992778]
+    bbox: [45.3494402, 10.8768512, 45.5418375, 11.1239]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: pisa
+    name: { en: Pisa, pt: Pisa }
+    country_code: IT
+    wikidata_id: Q13375
+    osm_relation_id: 42527
+    center: [43.716667, 10.4]
+    bbox: [43.5807231, 10.2684553, 43.7507749, 10.4562831]
+    timezone: Europe/Rome
+    is_active: true
+
+  - slug: granada
+    name: { en: Granada, pt: Granada }
+    country_code: ES
+    wikidata_id: Q8810
+    osm_relation_id: 344685
+    center: [37.175, -3.6]
+    bbox: [37.1367032, -3.7003616, 37.2250172, -3.4963241]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: bilbao
+    name: { en: Bilbao, pt: Bilbau }
+    country_code: ES
+    wikidata_id: Q8692
+    osm_relation_id: 339549
+    center: [43.263056, -2.935]
+    bbox: [43.2137176, -2.9859808, 43.2901315, -2.8802639]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: cordoba
+    name: { en: Córdoba, pt: Córdova }
+    country_code: ES
+    wikidata_id: Q5818
+    osm_relation_id: null # centre-based bbox: municipality is 1,250 km², mostly rural; ±0.16° still covers Medina Azahara
+    center: [37.89, -4.78]
+    bbox: [37.73, -4.94, 38.05, -4.62]
+    timezone: Europe/Madrid
+    is_active: true
+
+  - slug: manchester
+    name: { en: Manchester, pt: Manchester }
+    country_code: GB
+    wikidata_id: Q18125
+    osm_relation_id: 146656
+    center: [53.479444, -2.245278]
+    bbox: [53.3401044, -2.3199185, 53.5445923, -2.1468288]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: liverpool
+    name: { en: Liverpool, pt: Liverpool }
+    country_code: GB
+    wikidata_id: Q24826
+    osm_relation_id: 172987
+    center: [53.407222, -2.991667]
+    bbox: [53.3115427, -3.0191726, 53.4749885, -2.8180003]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: glasgow
+    name: { en: Glasgow, pt: Glasgow }
+    country_code: GB
+    wikidata_id: Q4093
+    osm_relation_id: 1906767
+    center: [55.861111, -4.25]
+    bbox: [55.7812791, -4.3932006, 55.9296388, -4.0717169]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: york
+    name: { en: York, pt: Iorque }
+    country_code: GB
+    wikidata_id: Q42462
+    osm_relation_id: 134353
+    center: [53.95, -1.083333]
+    bbox: [53.8745672, -1.223712, 54.0568664, -0.9196707]
+    timezone: Europe/London
+    is_active: true
+
+  - slug: gdansk
+    name: { en: Gdańsk, pt: Gdańsk }
+    country_code: PL
+    wikidata_id: Q1792
+    osm_relation_id: 2597485
+    center: [54.348291, 18.654023]
+    bbox: [54.2749189, 18.4294955, 54.4664485, 18.9502437]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: wroclaw
+    name: { en: Wrocław, pt: Breslávia }
+    country_code: PL
+    wikidata_id: Q1799
+    osm_relation_id: 2805690
+    center: [51.11, 17.0325]
+    bbox: [51.0426686, 16.8073393, 51.2100604, 17.1762192]
+    timezone: Europe/Warsaw
+    is_active: true
+
+  - slug: dresden
+    name: { en: Dresden, pt: Dresden }
+    country_code: DE
+    wikidata_id: Q1731
+    osm_relation_id: 191645
+    center: [51.049329, 13.738144]
+    bbox: [50.9749317, 13.5793237, 51.1776864, 13.9660626]
+    timezone: Europe/Berlin
+    is_active: true
+
+  - slug: innsbruck
+    name: { en: Innsbruck, pt: Innsbruck }
+    country_code: AT
+    wikidata_id: Q1735
+    osm_relation_id: 4835169
+    center: [47.268333, 11.393333]
+    bbox: [47.2107727, 11.3016374, 47.3601261, 11.4559615]
+    timezone: Europe/Vienna
+    is_active: true
+
+  - slug: ghent
+    name: { en: Ghent, pt: Gante }
+    country_code: BE
+    wikidata_id: Q1296
+    osm_relation_id: 897671
+    center: [51.053611, 3.725278]
+    bbox: [50.9795422, 3.5797616, 51.188891, 3.8493413]
+    timezone: Europe/Brussels
+    is_active: true
+
+  - slug: bergen
+    name: { en: Bergen, pt: Bergen }
+    country_code: 'NO'
+    wikidata_id: Q26793
+    osm_relation_id: 404159
+    center: [60.3925, 5.323333]
+    bbox: [60.1760905, 5.1445788, 60.5360925, 5.6867918]
+    timezone: Europe/Oslo
+    is_active: true
+
+  - slug: gothenburg
+    name: { en: Gothenburg, pt: Gotemburgo }
+    country_code: SE
+    wikidata_id: Q25287
+    osm_relation_id: null # centre-based bbox: municipality includes the outer archipelago and open sea
+    center: [57.7075, 11.9675]
+    bbox: [57.5475, 11.8075, 57.8675, 12.1275]
+    timezone: Europe/Stockholm
     is_active: true
