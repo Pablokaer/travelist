@@ -14,11 +14,13 @@ import { CityHero } from '@/features/destinations/city-hero';
 import { CityNotFound } from '@/features/destinations/city-not-found';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { CityWalklistsSection } from '@/features/trips/city-walklists-section';
+import { UpcomingMeetupsSection } from '@/features/trips/upcoming-meetups-section';
 import { spacing } from '@/theme/colors';
 
 /**
  * City page (`/short/[slug]`, D-033): the hub of a city, opened from its card on the Home —
- * photo, rating, About, community and official walk lists, Before you go and reviews.
+ * photo, rating, About, upcoming meetups (D-041), community and official walk lists, Before you
+ * go and reviews.
  * "Explore attractions" opens the Map / List page (`/city/[slug]`).
  */
 export default function CityHubScreen() {
@@ -39,6 +41,7 @@ export default function CityHubScreen() {
       />
       <CityHero city={city} onExplore={openAttractions} />
       <AboutSection city={city} />
+      <UpcomingMeetupsSection city={city} />
       <CityWalklistsSection city={city} kind="community" />
       <CityWalklistsSection city={city} kind="official" />
       <BeforeYouGoSection citySlug={city.slug} />

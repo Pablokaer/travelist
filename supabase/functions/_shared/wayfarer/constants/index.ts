@@ -89,6 +89,8 @@ export type WalklistSort = (typeof WALKLIST_SORTS)[number];
 export const WALKLIST_PAGE_SIZE = 20;
 /** Lists in each preview section of the city page (community, official). */
 export const WALKLIST_PREVIEW_COUNT = 6;
+/** Soonest meetups ranked on the city page (D-041). */
+export const MEETUP_PREVIEW_COUNT = 5;
 
 /** EU member states (ISO alpha-2). */
 export const EU_COUNTRIES = [

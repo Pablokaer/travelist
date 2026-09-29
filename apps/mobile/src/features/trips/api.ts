@@ -25,6 +25,8 @@ export type TripSummary = {
 export type TripDetail = Omit<TripSummary, 'cover'> & {
   /** Marked official by a moderator (D-035). */
   isOfficial: boolean;
+  /** Meetup start (D-041); null without a time. */
+  startsAt: string | null;
   geometry: LineString | null;
   isFallback: boolean;
   provider: string | null;
@@ -125,6 +127,7 @@ export type TripRow = {
   provider: string | null;
   visibility: TripVisibility;
   is_official: boolean;
+  starts_at: string | null;
   created_at: string;
 };
 
@@ -144,6 +147,7 @@ export function tripDetailFromRow(trip: TripRow, stops: AttractionSummary[]): Tr
     stopCount: stops.length,
     visibility: trip.visibility,
     isOfficial: trip.is_official,
+    startsAt: trip.starts_at,
     geometry: (trip.route_geometry as LineString | null) ?? null,
     isFallback: trip.is_fallback,
     provider: trip.provider,
@@ -189,6 +193,8 @@ export type SaveTripInput = {
   citySlug: string;
   stops: AttractionSummary[];
   route: RouteResponse | null;
+  /** Meetup start (D-041), an ISO moment; null without a time. */
+  startsAt: string | null;
 };
 
 /** Saves one trip through the `save_trip` RPC and returns its id. */
@@ -205,6 +211,7 @@ async function saveTrip(input: SaveTripInput): Promise<string> {
       p_visit_minutes: input.stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0),
       p_is_fallback: input.route?.isFallback ?? false,
       p_provider: input.route?.provider ?? undefined,
+      p_starts_at: input.startsAt ?? undefined,
     }),
   );
 }

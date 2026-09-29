@@ -353,7 +353,9 @@
     "merge": "Juntar num só percurso",
     "splitName": "{{name}} · Percurso {{n}}",
     "saveSplitHint": "Cada percurso é guardado como uma viagem.",
-    "saveMany": "Guardar {{count}} viagens"
+    "saveMany": "Guardar {{count}} viagens",
+    "startTime": "Hora de início",
+    "startTimeHint": "Opcional. Com data e hora, uma lista pública torna-se um encontro."
   },
   "trips": {
     "title": "As minhas viagens",
@@ -483,7 +485,10 @@
     "tooLong": "É demasiado longo",
     "ratingRequired": "Escolha de 1 a 5 estrelas",
     "tripPasswordRequired": "Escolha uma palavra-passe para esta lista",
-    "tripPasswordLength": "Use de 4 a 72 caracteres"
+    "tripPasswordLength": "Use de 4 a 72 caracteres",
+    "time": "Use HH:MM, 24 horas (p. ex. 09:30).",
+    "timeNeedsDate": "Escolha uma data para esta hora.",
+    "startInPast": "Escolha uma data e hora no futuro."
   },
   "errors": {
     "generic": "Algo correu mal. Tente novamente.",
@@ -538,5 +543,70 @@
     "markOfficial": "Marcar como oficial",
     "unmarkOfficial": "Retirar selo oficial",
     "officialNeedsPublic": "Só listas públicas podem ser oficiais."
+  },
+  "meetups": {
+    "title": "Próximos encontros",
+    "subtitle": "Listas públicas com data e hora — junte-se e caminhem juntos.",
+    "viewAll": "Ver todos os encontros",
+    "empty": "Sem encontros marcados",
+    "emptyBody": "Dê data e hora a uma lista pública para convidar outros viajantes a fazê-la consigo.",
+    "error": "Não foi possível carregar os encontros. Tente novamente.",
+    "pageTitle": "Encontros em {{city}}",
+    "pageSubtitle": "As horas estão na hora de {{city}}.",
+    "startsIn": "Começa daqui a {{time}}",
+    "started": "Já começou",
+    "days": "{{days}} d {{hours}} h",
+    "hours": "{{hours}} h {{minutes}} min",
+    "minutes": "{{minutes}} min",
+    "going_one": "{{count}} vai",
+    "going_other": "{{count}} vão",
+    "join": "Quero participar",
+    "leave": "Cancelar participação",
+    "rank": "Número {{rank}}",
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
+    "cityTime": "hora de {{city}}",
+    "meetupTitle": "Caminhar juntos",
+    "organiser": "Organizado por {{name}}",
+    "attendError": "Não foi possível atualizar a sua participação. Tente novamente."
+  },
+  "schedule": {
+    "title": "Data e hora",
+    "hint": "Opcional. Na hora de {{city}}. Com hora, uma lista pública aparece como encontro a que outros se podem juntar.",
+    "date": "Data (AAAA-MM-DD)",
+    "time": "Hora de início (HH:MM)",
+    "save": "Guardar data e hora",
+    "remove": "Remover hora",
+    "saved": "Data e hora guardadas.",
+    "notPublic": "Só as listas públicas aparecem como encontros."
+  },
+  "chat": {
+    "title": "Conversa de grupo",
+    "subtitle": "Quem vai e o organizador. As mensagens chegam na hora.",
+    "open": "Abrir conversa de grupo",
+    "you": "Você",
+    "placeholder": "Escreva uma mensagem",
+    "send": "Enviar",
+    "empty": "Ainda sem mensagens. Diga olá!",
+    "error": "Não foi possível carregar as mensagens. Tente novamente.",
+    "sendError": "Mensagem não enviada. Tente novamente.",
+    "notMemberTitle": "Só quem vai pode conversar",
+    "notMemberBody": "Diga que vai a este passeio para entrar na conversa de grupo.",
+    "openList": "Abrir a lista",
+    "joinHint": "Ao participar entra na conversa de grupo. Prefere não? Guarde apenas a lista.",
+    "people_one": "{{count}} pessoa: {{names}}",
+    "people_other": "{{count}} pessoas: {{names}}",
+    "organiserTag": "{{name}} (organizador)"
+  },
+  "traveller": {
+    "title": "Viajante",
+    "memberSince": "Membro desde {{date}}",
+    "walklists_one": "{{count}} lista pública",
+    "walklists_other": "{{count}} listas públicas",
+    "walklistsTitle": "Listas públicas",
+    "noWalklists": "Ainda sem listas públicas",
+    "notFound": "Viajante não encontrado",
+    "notFoundBody": "Este perfil não existe ou foi apagado.",
+    "self": "Este é o seu perfil público, tal como os outros viajantes o veem."
   }
 }

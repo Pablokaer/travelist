@@ -68,14 +68,25 @@ export async function addLisbonPlaces(page: Page, count: number) {
   await expect(page.getByText(`${count} stops in your route`)).toBeVisible();
 }
 
-/** Saves a two-stop Lisbon walk and returns its id (the owner stays on the trip page). */
-export async function saveWalk(page: Page, name: string): Promise<string> {
+/**
+ * Saves a two-stop Lisbon walk and returns its id (the owner stays on the trip page); with
+ * `start` (Lisbon date and time) it is a meetup (D-041).
+ */
+export async function saveWalk(
+  page: Page,
+  name: string,
+  start?: { date: string; time: string },
+): Promise<string> {
   const byTestId = byTestIdOn(page);
   await addLisbonPlaces(page, 2);
   await byTestId('open-route').click();
   await byTestId('optimize').click();
   await expect(byTestId('route-distance')).toContainText(/\d/, { timeout: 30_000 });
   await byTestId('trip-name').fill(name);
+  if (start) {
+    await byTestId('trip-date').fill(start.date);
+    await byTestId('trip-time').fill(start.time);
+  }
   await byTestId('save-trip').click();
   await expect(page).toHaveURL(/\/trip\/[0-9a-f-]{36}$/);
   return page.url().split('/').pop()!;

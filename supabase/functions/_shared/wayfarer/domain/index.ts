@@ -1,4 +1,5 @@
 export * from './geo.ts';
+export * from './meetup.ts';
 export * from './navigation.ts';
 export * from './passport.ts';
 export * from './power.ts';

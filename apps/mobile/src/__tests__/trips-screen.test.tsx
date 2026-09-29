@@ -74,6 +74,10 @@ const savedList: WalklistCard = {
   createdAt: '2026-09-02T10:00:00Z',
   isSaved: true,
   isOwn: false,
+  startsAt: null,
+  attendeeCount: 0,
+  isAttending: false,
+  authorPublicId: 'pub-ana',
   cover: null,
 };
 

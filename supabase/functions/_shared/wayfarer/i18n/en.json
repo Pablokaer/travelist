@@ -353,7 +353,9 @@
     "merge": "Join into one route",
     "splitName": "{{name}} · Route {{n}}",
     "saveSplitHint": "Each route is saved as its own trip.",
-    "saveMany": "Save {{count}} trips"
+    "saveMany": "Save {{count}} trips",
+    "startTime": "Start time",
+    "startTimeHint": "Optional. With a date and time, a public list becomes a meetup."
   },
   "trips": {
     "title": "My Trips",
@@ -483,7 +485,10 @@
     "tooLong": "This is too long",
     "ratingRequired": "Choose from 1 to 5 stars",
     "tripPasswordRequired": "Choose a password for this list",
-    "tripPasswordLength": "Use 4 to 72 characters"
+    "tripPasswordLength": "Use 4 to 72 characters",
+    "time": "Use HH:MM, 24-hour (e.g. 09:30).",
+    "timeNeedsDate": "Choose a date for this time.",
+    "startInPast": "Choose a date and time in the future."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -538,5 +543,70 @@
     "markOfficial": "Mark as official",
     "unmarkOfficial": "Remove official badge",
     "officialNeedsPublic": "Only public lists can be official."
+  },
+  "meetups": {
+    "title": "Upcoming meetups",
+    "subtitle": "Public walk lists with a date and time — join and walk together.",
+    "viewAll": "View all meetups",
+    "empty": "No meetups planned",
+    "emptyBody": "Give a public walk list a date and time to invite other travellers to walk it with you.",
+    "error": "We couldn't load the meetups. Try again.",
+    "pageTitle": "Meetups in {{city}}",
+    "pageSubtitle": "Times are in {{city}} time.",
+    "startsIn": "Starts in {{time}}",
+    "started": "Started",
+    "days": "{{days}} d {{hours}} h",
+    "hours": "{{hours}} h {{minutes}} min",
+    "minutes": "{{minutes}} min",
+    "going_one": "{{count}} going",
+    "going_other": "{{count}} going",
+    "join": "I'm going",
+    "leave": "Not going",
+    "rank": "Number {{rank}}",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "cityTime": "{{city}} time",
+    "meetupTitle": "Walk together",
+    "organiser": "Organised by {{name}}",
+    "attendError": "We couldn't update your participation. Try again."
+  },
+  "schedule": {
+    "title": "Date and time",
+    "hint": "Optional. In {{city}} time. With a time, a public list is listed as a meetup others can join.",
+    "date": "Date (YYYY-MM-DD)",
+    "time": "Start time (HH:MM)",
+    "save": "Save date and time",
+    "remove": "Remove time",
+    "saved": "Date and time saved.",
+    "notPublic": "Only public lists are listed as meetups."
+  },
+  "chat": {
+    "title": "Group chat",
+    "subtitle": "Everyone going, and the organiser. Messages arrive instantly.",
+    "open": "Open group chat",
+    "you": "You",
+    "placeholder": "Write a message",
+    "send": "Send",
+    "empty": "No messages yet. Say hello!",
+    "error": "We couldn't load the messages. Try again.",
+    "sendError": "Message not sent. Try again.",
+    "notMemberTitle": "Only people going can chat",
+    "notMemberBody": "Say you're going to this walk to join its group chat.",
+    "openList": "Open the walk list",
+    "joinHint": "Going adds you to the group chat. Rather not? Just save the list.",
+    "people_one": "{{count}} person: {{names}}",
+    "people_other": "{{count}} people: {{names}}",
+    "organiserTag": "{{name}} (organiser)"
+  },
+  "traveller": {
+    "title": "Traveller",
+    "memberSince": "Member since {{date}}",
+    "walklists_one": "{{count}} public walk list",
+    "walklists_other": "{{count}} public walk lists",
+    "walklistsTitle": "Public walk lists",
+    "noWalklists": "No public walk lists yet",
+    "notFound": "Traveller not found",
+    "notFoundBody": "This profile does not exist or was deleted.",
+    "self": "This is your public profile, as other travellers see it."
   }
 }

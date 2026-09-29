@@ -13,6 +13,7 @@ class MockSharedTripServer {
   static moderator = false;
   static officialSet: boolean[] = [];
   static saves: { id: string; saved: boolean }[] = [];
+  static joins: { id: string; attending: boolean }[] = [];
 
   static reset() {
     MockSharedTripServer.answers = new Map();
@@ -22,6 +23,7 @@ class MockSharedTripServer {
     MockSharedTripServer.moderator = false;
     MockSharedTripServer.officialSet = [];
     MockSharedTripServer.saves = [];
+    MockSharedTripServer.joins = [];
   }
 }
 
@@ -37,6 +39,17 @@ jest.mock('@/features/trips/sharing-api', () => ({
     return { isPending: false, isError: false, data: MockSharedTripServer.answers.get(password) };
   },
 }));
+jest.mock('@/features/destinations/api', () => ({
+  ...jest.requireActual('@/features/destinations/api'),
+  useCities: () => ({
+    data: [
+      jest
+        .requireActual('@/testing/fixtures')
+        .fakeCity({ slug: 'lisbon', nameEn: 'Lisbon', timezone: 'Europe/Lisbon' }),
+    ],
+  }),
+}));
+jest.mock('@/lib/use-now', () => ({ useNow: () => new Date('2026-10-01T10:00:00Z') }));
 jest.mock('@/features/auth/auth-provider', () => ({
   useAuth: () => ({ session: MockSharedTripServer.signedIn ? { user: { id: 'u1' } } : null }),
 }));
@@ -57,6 +70,10 @@ jest.mock('@/features/trips/community-api', () => ({
     isPending: false,
     error: null,
     mutate: (official: boolean) => MockSharedTripServer.officialSet.push(official),
+  }),
+  useToggleAttendance: () => ({
+    isPending: false,
+    mutate: (input: { id: string; attending: boolean }) => MockSharedTripServer.joins.push(input),
   }),
   useToggleSavedWalklist: () => ({
     isPending: false,
@@ -86,6 +103,9 @@ const trip = (isOwner: boolean, over: Partial<SharedTripDetail> = {}): SharedTri
     authorName: 'Olga',
     rating: { count: 0, average: null },
     isSaved: false,
+    startsAt: null,
+    attendeeCount: 0,
+    isAttending: false,
     stops: [
       {
         id: 'a1',
@@ -222,4 +242,51 @@ test('a visitor only views a shared list: no editing, visibility, sharing or del
     expect(screen.queryByRole('button', { name })).toBeNull();
   expect(screen.queryByRole('radio', { name: 'Private' })).toBeNull();
   expect(screen.queryAllByTestId(/^drag-stop-/)).toHaveLength(0);
+});
+
+describe('meetups (D-041)', () => {
+  const meetup = { startsAt: '2026-10-04T09:00:00Z', attendeeCount: 2 };
+
+  test('a list with a time says when it starts, in the city time, and how many are going', () => {
+    MockSharedTripServer.answers.set(null, trip(false, meetup));
+    render(<SharedTripScreen />);
+    const banner = screen.getByTestId('meetup-banner');
+    expect(banner).toHaveTextContent(/Sun 4 Oct, 10:00/);
+    expect(banner).toHaveTextContent(/Lisbon time/);
+    expect(banner).toHaveTextContent(/Starts in 2 d 23 h/);
+    expect(banner).toHaveTextContent(/2 going/);
+    // Signed out: no joining.
+    expect(screen.queryByRole('button', { name: "I'm going" })).toBeNull();
+  });
+
+  test('a signed-in traveller joins the meetup', async () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.answers.set(null, trip(false, meetup));
+    render(<SharedTripScreen />);
+    await userEvent.press(screen.getByRole('button', { name: "I'm going" }));
+    expect(MockSharedTripServer.joins).toEqual([{ id: 't1', attending: true }]);
+  });
+
+  // D-044: any public list can be joined, before or after its start; its chat stays open.
+  test('a meetup that has started can still be joined', () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.answers.set(
+      null,
+      trip(false, { startsAt: '2026-10-01T09:00:00Z', attendeeCount: 2 }),
+    );
+    render(<SharedTripScreen />);
+    expect(screen.getByTestId('meetup-banner')).toHaveTextContent(/Started/);
+    expect(screen.getByRole('button', { name: "I'm going" })).toBeOnTheScreen();
+  });
+
+  test('a public list without a time can be joined too; a protected one cannot', () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.answers.set(null, trip(false));
+    const { rerender } = render(<SharedTripScreen />);
+    expect(screen.getByTestId('meetup-banner')).toHaveTextContent(/0 going/);
+    expect(screen.getByRole('button', { name: "I'm going" })).toBeOnTheScreen();
+    MockSharedTripServer.answers.set(null, trip(false, { visibility: 'password' }));
+    rerender(<SharedTripScreen />);
+    expect(screen.queryByTestId('meetup-banner')).toBeNull();
+  });
 });

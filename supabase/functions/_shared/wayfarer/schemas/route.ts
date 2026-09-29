@@ -48,12 +48,24 @@ export const routeResponseSchema = z.object({
 });
 export type RouteResponse = z.infer<typeof routeResponseSchema>;
 
-export const saveTripFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: 'validation.required' })
-    .max(80, { message: 'validation.tooLong' }),
-  tripDate: isoDateSchema.nullable(),
-});
+/** A wall-clock time, 24 h: "09:30". */
+export const clockTimeSchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'validation.time' });
+
+export const saveTripFormSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: 'validation.required' })
+      .max(80, { message: 'validation.tooLong' }),
+    tripDate: isoDateSchema.nullable(),
+    /** Optional start time in the city (D-041); with the date it makes the list a meetup. */
+    startTime: clockTimeSchema.nullable(),
+  })
+  .refine((f) => !f.startTime || f.tripDate, {
+    path: ['tripDate'],
+    message: 'validation.timeNeedsDate',
+  });
 export type SaveTripForm = z.infer<typeof saveTripFormSchema>;

@@ -53,6 +53,10 @@ export const sharedTripSchema = z.object({
   rating_avg: z.number().nullable(),
   /** The signed-in caller saved it (always false signed out). */
   is_saved: z.boolean(),
+  /** Meetup (D-041): start, how many are going, whether the caller is. */
+  starts_at: z.string().nullable(),
+  attendee_count: z.number().int(),
+  is_attending: z.boolean(),
   stop_ids: z.array(z.string()),
 });
 export type SharedTrip = z.infer<typeof sharedTripSchema>;

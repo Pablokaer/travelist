@@ -88,6 +88,8 @@ jobs:
         working-directory: data-pipeline
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the data gate compares with the base branch
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -100,3 +102,8 @@ jobs:
       - run: python -m wayfarer_pipeline validate-config
       - name: docs/CITIES.md matches cities.yaml and the ingested data
         run: python -m wayfarer_pipeline cities-doc --check
+      # Texts, photos and facts must not get worse, and no city may lose many places (D-042).
+      # An intended big change (e.g. a city re-scoped) is merged with the `data-gate-override` label.
+      - name: Data gate against the base branch
+        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'data-gate-override')
+        run: python -m wayfarer_pipeline gate --base origin/${{ github.base_ref }}

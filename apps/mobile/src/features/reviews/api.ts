@@ -23,6 +23,8 @@ export type Review = {
   isOwn: boolean;
   /** The author's profile photo (D-039); null shows their initials. */
   authorAvatarUrl: string | null;
+  /** Opens the author's public profile (D-045); null for an author without one. */
+  authorPublicId: string | null;
 };
 
 export type RatingSummary = {
@@ -42,6 +44,7 @@ type ReviewRow = {
   author_name: string | null;
   is_own: boolean;
   author_avatar_path: string | null;
+  author_public_id?: string | null;
 };
 
 type SummaryRow = {
@@ -87,6 +90,7 @@ export function reviewFromRow(r: ReviewRow): Review {
     authorName: r.author_name,
     isOwn: r.is_own,
     authorAvatarUrl: avatarUrl(r.author_avatar_path),
+    authorPublicId: r.author_public_id ?? null,
   };
 }
 

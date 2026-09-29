@@ -1,6 +1,7 @@
 // Community and official walk lists (D-035): other people's public trips, listed through the
 // `list_walklists` RPC (author, stops and rating in one query, paged by offset); saved in
-// `saved_trips` (a reference to the original list); marked official by moderators.
+// `saved_trips` (a reference to the original list); marked official by moderators. Lists with a
+// date and time are meetups others join (`walk_attendees`, D-041).
 import {
   WALKLIST_PAGE_SIZE,
   WALKLIST_PREVIEW_COUNT,
@@ -41,6 +42,12 @@ export type WalklistCard = {
   isOwn: boolean;
   /** Photo of the starting point (D-038). */
   cover: PhotoCover | null;
+  /** Meetup (D-041): when it starts (null: no time), how many are going, whether the caller is. */
+  startsAt: string | null;
+  attendeeCount: number;
+  isAttending: boolean;
+  /** Opens the author's public profile (D-045). */
+  authorPublicId: string | null;
 };
 
 /** Which lists to show: a city's public lists (official or not, by name), or the saved ones. */
@@ -49,7 +56,11 @@ export type WalklistQuery = {
   official?: boolean;
   saved?: boolean;
   search?: string;
-  sort?: WalklistSort;
+  sort?: WalklistSort | 'soonest';
+  /** Only lists whose start is still to come (meetups, D-041). */
+  upcoming?: boolean;
+  /** Only the public lists of one traveller (their public profile, D-045). */
+  authorPublicId?: string;
 };
 
 /** A `list_walklists` row. The generated type misses that several columns can be null. */
@@ -70,6 +81,10 @@ type WalklistRow = {
   is_saved: boolean;
   is_own: boolean;
   cover: unknown;
+  starts_at: string | null;
+  attendee_count: number;
+  is_attending: boolean;
+  author_public_id?: string | null;
 };
 
 export const walklistKeys = {
@@ -99,6 +114,10 @@ export function walklistFromRow(r: WalklistRow): WalklistCard {
     isSaved: r.is_saved,
     isOwn: r.is_own,
     cover: walklistCoverFrom(r.cover),
+    startsAt: r.starts_at,
+    attendeeCount: r.attendee_count,
+    isAttending: r.is_attending,
+    authorPublicId: r.author_public_id ?? null,
   };
 }
 
@@ -113,6 +132,8 @@ export function walklistParams(query: WalklistQuery, limit: number, offset: numb
     ...(query.official !== undefined ? { p_official: query.official } : {}),
     ...(query.saved ? { p_saved: true } : {}),
     ...(search ? { p_search: search } : {}),
+    ...(query.upcoming ? { p_upcoming: true } : {}),
+    ...(query.authorPublicId ? { p_author: query.authorPublicId } : {}),
     p_sort: query.sort ?? 'top',
     p_limit: limit,
     p_offset: offset,
@@ -140,15 +161,12 @@ async function fetchWalklists(query: WalklistQuery, limit: number, offset: numbe
  * fetched to know it, not a count).
  * @example useWalklistPreview({ citySlug: 'lisbon', official: false }).data?.hasMore
  */
-export function useWalklistPreview(query: WalklistQuery) {
+export function useWalklistPreview(query: WalklistQuery, count: number = WALKLIST_PREVIEW_COUNT) {
   return useQuery({
-    queryKey: walklistKeys.list(query, WALKLIST_PREVIEW_COUNT),
+    queryKey: walklistKeys.list(query, count),
     queryFn: async () => {
-      const rows = await fetchWalklists(query, WALKLIST_PREVIEW_COUNT + 1, 0);
-      return {
-        items: rows.slice(0, WALKLIST_PREVIEW_COUNT),
-        hasMore: rows.length > WALKLIST_PREVIEW_COUNT,
-      };
+      const rows = await fetchWalklists(query, count + 1, 0);
+      return { items: rows.slice(0, count), hasMore: rows.length > count };
     },
   });
 }
@@ -209,6 +227,42 @@ export function useSetTripOfficial(tripId: string) {
   return useMutation({
     mutationFn: async (official: boolean) => {
       check(await supabase.rpc('set_trip_official', { p_trip_id: tripId, p_official: official }));
+    },
+    onSuccess: invalidate,
+  });
+}
+
+/**
+ * Joins a public walk list of someone else, or leaves it (D-044), through the idempotent
+ * `set_walk_attendance`: repeating it never fails or duplicates. Whatever the outcome — success
+ * or a lost request — the screens are refreshed from the server, so they never show a
+ * participation that did not happen (or hide one that did).
+ * @example toggle.mutate({ id: list.id, attending: !list.isAttending })
+ */
+export function useToggleAttendance() {
+  const invalidate = useInvalidateWalklists();
+  return useMutation({
+    mutationFn: async ({ id, attending }: { id: string; attending: boolean }) => {
+      unwrap(await supabase.rpc('set_walk_attendance', { p_trip_id: id, p_attending: attending }));
+    },
+    onSettled: invalidate,
+  });
+}
+
+/**
+ * Sets, moves or (null) removes the start of the owner's list; it must be in the future.
+ * @example setSchedule.mutate('2026-10-04T09:00:00.000Z')
+ */
+export function useSetTripSchedule(tripId: string) {
+  const invalidate = useInvalidateWalklists();
+  return useMutation({
+    mutationFn: async (startsAt: string | null) => {
+      check(
+        await supabase.rpc('set_trip_schedule', {
+          p_trip_id: tripId,
+          p_starts_at: startsAt as string,
+        }),
+      );
     },
     onSuccess: invalidate,
   });

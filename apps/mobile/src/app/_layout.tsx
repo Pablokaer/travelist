@@ -59,6 +59,10 @@ function RootNavigator() {
         <Stack.Screen name="route" options={{ title: t('route.title') }} />
         <Stack.Screen name="trip/[id]" options={{ title: t('trips.detailTitle') }} />
         <Stack.Screen name="edit-profile" options={{ title: t('profile.edit') }} />
+        {/* A walk list's group chat (D-043): /walk-chat?id=…, members only. */}
+        <Stack.Screen name="walk-chat" options={{ title: t('chat.title') }} />
+        {/* A traveller's public profile (D-045): /traveller?id=<public id>. */}
+        <Stack.Screen name="traveller" options={{ title: t('traveller.title') }} />
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !onboarded}>
         <Stack.Screen

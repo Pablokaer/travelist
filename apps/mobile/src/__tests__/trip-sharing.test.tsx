@@ -168,6 +168,9 @@ describe('sharedTripDetail', () => {
       review_count: 3,
       rating_avg: 4.33,
       is_saved: true,
+      starts_at: '2026-10-04T09:00:00+00:00',
+      attendee_count: 2,
+      is_attending: false,
       stop_ids: ['a1'],
     };
     expect(sharedTripDetail(trip, [stop])).toEqual({
@@ -190,6 +193,9 @@ describe('sharedTripDetail', () => {
       authorName: 'Olga',
       rating: { count: 3, average: 4.33 },
       isSaved: true,
+      startsAt: '2026-10-04T09:00:00+00:00',
+      attendeeCount: 2,
+      isAttending: false,
     });
   });
 });

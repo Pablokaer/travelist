@@ -6,6 +6,7 @@ import {
   saveTripFormSchema,
   type RouteResponse,
   type SaveTripForm,
+  meetupStart,
 } from '@wayfarer/shared';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -31,6 +32,7 @@ import { RouteOrderNotice, RouteStopList, SplitPanel } from '@/features/route/ro
 import { useRouteStore } from '@/features/route/store';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { useSaveTrips } from '@/features/trips/api';
+import { FALLBACK_TIME_ZONE } from '@/features/trips/meetup-time';
 import { env } from '@/lib/env';
 import { radius, spacing } from '@/theme/colors';
 import { useBreakpoint, useShadows } from '@/theme/use-theme';
@@ -72,9 +74,13 @@ export default function RouteScreen() {
   const units = profile.data?.units ?? 'metric';
 
   const cityName = city ? (i18n.resolvedLanguage === 'pt' ? city.namePt : city.nameEn) : '';
-  const { control, handleSubmit } = useForm<SaveTripForm>({
+  const { control, handleSubmit, setError } = useForm<SaveTripForm>({
     resolver: zodResolver(saveTripFormSchema),
-    defaultValues: { name: t('route.defaultName', { city: cityName }), tripDate: null },
+    defaultValues: {
+      name: t('route.defaultName', { city: cityName }),
+      tripDate: null,
+      startTime: null,
+    },
   });
 
   const colorOf = useRouteColor();
@@ -123,11 +129,15 @@ export default function RouteScreen() {
     );
   };
 
-  const onSave = handleSubmit((form) =>
+  const onSave = handleSubmit((form) => {
+    // The time is the city's wall-clock time (D-041); it must still be to come.
+    const start = meetupStart(form, city?.timezone ?? FALLBACK_TIME_ZONE, new Date());
+    if ('error' in start) return setError('startTime', { message: start.error });
     save.mutate(
       routes.map((route, i) => ({
-        ...form,
         name: routes.length > 1 ? t('route.splitName', { name: form.name, n: i + 1 }) : form.name,
+        tripDate: form.tripDate,
+        startsAt: start.startsAt,
         citySlug: citySlug!,
         stops: route,
         route: routeResults[i] ?? null,
@@ -139,8 +149,8 @@ export default function RouteScreen() {
           else router.replace('/trips');
         },
       },
-    ),
-  );
+    );
+  });
 
   const fallbackBounds: [number, number, number, number] = city
     ? [city.bbox[1], city.bbox[0], city.bbox[3], city.bbox[2]]
@@ -251,6 +261,24 @@ export default function RouteScreen() {
               onChangeText={(v) => field.onChange(v.trim() === '' ? null : v.trim())}
               error={fieldState.error?.message}
               maxLength={10}
+              testID="trip-date"
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="startTime"
+          render={({ field, fieldState }) => (
+            <TextField
+              icon="clock"
+              label={t('route.startTime')}
+              placeholder={`HH:MM · ${t('checklist.optional')}`}
+              hint={t('route.startTimeHint')}
+              value={field.value ?? ''}
+              onChangeText={(v) => field.onChange(v.trim() === '' ? null : v.trim())}
+              error={fieldState.error?.message}
+              maxLength={5}
+              testID="trip-time"
             />
           )}
         />

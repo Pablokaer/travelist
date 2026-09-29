@@ -9,6 +9,7 @@ import ExploreLayout from '../app/(tabs)/(explore)/_layout';
 import CityScreen from '../app/(tabs)/(explore)/city/[slug]';
 import HomeScreen from '../app/(tabs)/(explore)/index';
 import CityHubScreen from '../app/(tabs)/(explore)/short/[slug]/index';
+import CityMeetupsScreen from '../app/(tabs)/(explore)/short/[slug]/meetups';
 import CityWalklistsScreen from '../app/(tabs)/(explore)/short/[slug]/walklists';
 
 import { cityRow } from '@/testing/fixtures';
@@ -68,8 +69,17 @@ function walklistRow(id: string, name: string, over: Record<string, unknown> = {
     created_at: '2026-09-01T10:00:00Z',
     is_saved: false,
     is_own: false,
+    cover: null,
+    starts_at: null,
+    attendee_count: 0,
+    is_attending: false,
     ...over,
   };
+}
+
+/** A start `minutes` from now. */
+function soon(minutes: number) {
+  return new Date(Date.now() + minutes * 60_000).toISOString();
 }
 
 /** Fake RPCs: attractions, walk lists (by official flag and name), reviews, moderator. */
@@ -85,10 +95,20 @@ class FakeHubRpc {
       walklistRow('t2', 'Canal walk'),
     ];
     FakeHubRpc.official = [walklistRow('o1', 'Amsterdam highlights', { is_official: true })];
+    FakeHubRpc.meetups = [
+      walklistRow('u1', 'Canal meetup', { starts_at: soon(45), attendee_count: 2 }),
+      walklistRow('u2', 'Tomorrow walk', { starts_at: soon(26 * 60), attendee_count: 0 }),
+    ];
   }
+
+  static meetups = [
+    walklistRow('u1', 'Canal meetup', { starts_at: soon(45), attendee_count: 2 }),
+    walklistRow('u2', 'Tomorrow walk', { starts_at: soon(26 * 60), attendee_count: 0 }),
+  ];
 
   static walklists(args: Record<string, unknown>) {
     FakeHubRpc.walklistCalls.push(args);
+    if (args.p_upcoming) return FakeHubRpc.meetups;
     const rows = args.p_official === true ? FakeHubRpc.official : FakeHubRpc.community;
     const search = String(args.p_search ?? '').toLowerCase();
     return rows.filter((r) => r.name.toLowerCase().includes(search));
@@ -150,6 +170,7 @@ const routes = {
   '(tabs)/(explore)/city/[slug]': CityScreen,
   '(tabs)/(explore)/short/[slug]/index': CityHubScreen,
   '(tabs)/(explore)/short/[slug]/walklists': CityWalklistsScreen,
+  '(tabs)/(explore)/short/[slug]/meetups': CityMeetupsScreen,
 };
 
 test('a city card opens the city page: photo, country, rating and About', async () => {
@@ -241,4 +262,40 @@ test('an unknown city shows a way back to the Home', async () => {
   expect(await screen.findByText('City not found')).toBeOnTheScreen();
   await userEvent.press(screen.getByRole('button', { name: 'See all destinations' }));
   expect(app.getPathname()).toBe('/');
+});
+
+test('the city page ranks the next meetups with a countdown (D-041)', async () => {
+  renderRouter(routes, { initialUrl: '/short/amsterdam' });
+  const section = await screen.findByTestId('meetups-upcoming');
+  expect(await within(section).findByText('Canal meetup')).toBeOnTheScreen();
+  expect(within(section).getByTestId('meetup-rank-1')).toHaveTextContent(/Starts in 4\d min/);
+  expect(within(section).getByTestId('meetup-rank-2')).toHaveTextContent(/Tomorrow walk/);
+  expect(FakeHubRpc.walklistCalls).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        p_city_slug: 'amsterdam',
+        p_upcoming: true,
+        p_sort: 'soonest',
+        p_limit: 6,
+      }),
+    ]),
+  );
+});
+
+test('View all meetups lists every upcoming meetup of the city by day', async () => {
+  const app = renderRouter(routes, { initialUrl: '/short/amsterdam' });
+  await userEvent.press(await screen.findByRole('button', { name: 'View all meetups' }));
+  expect(app.getPathname()).toBe('/short/amsterdam/meetups');
+  expect(await screen.findByText('Meetups in Amsterdam')).toBeOnTheScreen();
+  const page = screen.getByTestId('meetups-page');
+  expect(await within(page).findByText('Canal meetup')).toBeOnTheScreen();
+  expect(within(page).getByText('Tomorrow walk')).toBeOnTheScreen();
+  expect(within(page).getAllByRole('header').length).toBeGreaterThan(0);
+});
+
+test('a city without meetups still shows the rest of its page', async () => {
+  FakeHubRpc.meetups = [];
+  renderRouter(routes, { initialUrl: '/short/amsterdam' });
+  expect(await screen.findByText('No meetups planned')).toBeOnTheScreen();
+  expect(screen.getByText('Top community walk lists')).toBeOnTheScreen();
 });

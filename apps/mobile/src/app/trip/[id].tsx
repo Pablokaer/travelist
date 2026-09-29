@@ -17,6 +17,7 @@ import {
   type ShareOutcome,
 } from '@/features/trips/share-link';
 import { useSetTripVisibility } from '@/features/trips/sharing-api';
+import { ScheduleEditor } from '@/features/trips/schedule-editor';
 import { TripView } from '@/features/trips/trip-view';
 import { VisibilityEditor } from '@/features/trips/visibility-editor';
 import { ModeratorOfficialToggle } from '@/features/trips/walklist-community';
@@ -96,6 +97,7 @@ export default function TripScreen() {
   return (
     <TripView trip={trip.data} units={profile.data?.units ?? 'metric'} onOpenStop={openStop}>
       <TripSharing trip={trip.data} />
+      <ScheduleEditor trip={trip.data} />
       {/* Travellers rate shared lists (D-035); the owner reads what they said. */}
       <ReviewsSection target={{ kind: 'trip', id: trip.data.id }} canReview={false} />
       <ModeratorOfficialToggle trip={trip.data} />

@@ -15,6 +15,9 @@ export type SharedTripDetail = TripDetail & {
   rating: RatingSummary;
   /** The signed-in visitor saved it (D-035). */
   isSaved: boolean;
+  /** Meetup (D-041): how many are going and whether the visitor is. */
+  attendeeCount: number;
+  isAttending: boolean;
 };
 
 export type SharedTripView =
@@ -31,6 +34,8 @@ export function sharedTripDetail(trip: SharedTrip, stops: AttractionSummary[]): 
     authorName: trip.author_name,
     rating: { count: trip.review_count, average: trip.rating_avg },
     isSaved: trip.is_saved,
+    attendeeCount: trip.attendee_count,
+    isAttending: trip.is_attending,
   };
 }
 

@@ -56,6 +56,7 @@ const review = (over: Partial<Review> = {}): Review => ({
   authorName: 'Carla',
   isOwn: false,
   authorAvatarUrl: null,
+  authorPublicId: null,
   ...over,
 });
 
@@ -102,6 +103,7 @@ describe('mapping server rows', () => {
       authorName: null,
       isOwn: true,
       authorAvatarUrl: null,
+      authorPublicId: null,
     });
   });
 

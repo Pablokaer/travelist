@@ -19,6 +19,7 @@ python -m wayfarer_pipeline ingest --city lisbon   # one city → data/attractio
 python -m wayfarer_pipeline ingest --all           # every city (≈ 30–60 min cold, seconds cached)
 python -m wayfarer_pipeline report                 # quality report from data/attractions/*.json
 python -m wayfarer_pipeline seed                   # regenerate ALL seed SQL offline (no network)
+python -m wayfarer_pipeline gate --base origin/main # data gate vs a git ref; --fix restores, see D-042
 
 pytest && ruff check . && ruff format --check .
 ```

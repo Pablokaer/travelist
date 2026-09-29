@@ -17,6 +17,7 @@ import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useSharedTrip, type SharedTripDetail } from '@/features/trips/sharing-api';
 import { TripPasswordPrompt } from '@/features/trips/trip-password-prompt';
 import { TripView } from '@/features/trips/trip-view';
+import { MeetupBanner } from '@/features/trips/meetup-banner';
 import { ModeratorOfficialToggle, WalklistByline } from '@/features/trips/walklist-community';
 import { spacing } from '@/theme/colors';
 
@@ -58,6 +59,7 @@ function OpenedTrip({ trip, signedIn }: { trip: SharedTripDetail; signedIn: bool
       notice={
         <>
           <WalklistByline trip={trip} canSave={signedIn} />
+          <MeetupBanner trip={trip} canJoin={signedIn} />
           {trip.isOwner ? <OwnerNotice tripId={trip.id} /> : null}
         </>
       }>

@@ -300,6 +300,7 @@ export type Database = {
           language: string;
           onboarded_at: string | null;
           passport_expiry: string | null;
+          public_id: string;
           theme: string;
           units: string;
           updated_at: string;
@@ -313,6 +314,7 @@ export type Database = {
           language?: string;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
+          public_id?: string;
           theme?: string;
           units?: string;
           updated_at?: string;
@@ -326,6 +328,7 @@ export type Database = {
           language?: string;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
+          public_id?: string;
           theme?: string;
           units?: string;
           updated_at?: string;
@@ -529,6 +532,7 @@ export type Database = {
           name: string;
           provider: string | null;
           route_geometry: Json | null;
+          starts_at: string | null;
           trip_date: string | null;
           updated_at: string;
           user_id: string;
@@ -547,6 +551,7 @@ export type Database = {
           name: string;
           provider?: string | null;
           route_geometry?: Json | null;
+          starts_at?: string | null;
           trip_date?: string | null;
           updated_at?: string;
           user_id?: string;
@@ -564,6 +569,7 @@ export type Database = {
           name?: string;
           provider?: string | null;
           route_geometry?: Json | null;
+          starts_at?: string | null;
           trip_date?: string | null;
           updated_at?: string;
           user_id?: string;
@@ -614,6 +620,64 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      walk_attendees: {
+        Row: {
+          created_at: string;
+          trip_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          trip_id: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          trip_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'walk_attendees_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      walk_messages: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          trip_id: string;
+          user_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          trip_id: string;
+          user_id?: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          trip_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'walk_messages_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: {
@@ -846,6 +910,7 @@ export type Database = {
       };
       delete_account: { Args: Record<PropertyKey, never>; Returns: undefined };
       is_moderator: { Args: Record<PropertyKey, never>; Returns: boolean };
+      is_walk_chat_member: { Args: { p_trip_id: string }; Returns: boolean };
       list_reviews: {
         Args: {
           p_attraction_id?: string;
@@ -857,6 +922,7 @@ export type Database = {
         Returns: {
           author_avatar_path: string;
           author_name: string;
+          author_public_id: string;
           comment: string;
           created_at: string;
           id: string;
@@ -865,8 +931,30 @@ export type Database = {
           updated_at: string;
         }[];
       };
+      list_walk_messages: {
+        Args: { p_before?: string; p_limit?: number; p_trip_id: string };
+        Returns: {
+          author_avatar_path: string;
+          author_name: string;
+          author_public_id: string;
+          body: string;
+          created_at: string;
+          id: string;
+          is_own: boolean;
+        }[];
+      };
+      list_walk_participants: {
+        Args: { p_trip_id: string };
+        Returns: {
+          avatar_path: string;
+          is_organiser: boolean;
+          is_self: boolean;
+          name: string;
+        }[];
+      };
       list_walklists: {
         Args: {
+          p_author?: string;
           p_city_slug?: string;
           p_limit?: number;
           p_official?: boolean;
@@ -874,26 +962,32 @@ export type Database = {
           p_saved?: boolean;
           p_search?: string;
           p_sort?: string;
+          p_upcoming?: boolean;
         };
         Returns: {
+          attendee_count: number;
           author_name: string;
+          author_public_id: string;
           city_slug: string;
           cover: Json;
           created_at: string;
           distance_m: number;
           id: string;
+          is_attending: boolean;
           is_official: boolean;
           is_own: boolean;
           is_saved: boolean;
           name: string;
           rating_avg: number;
           review_count: number;
+          starts_at: string;
           stop_count: number;
           visibility: string;
           visit_minutes: number;
           walking_seconds: number;
         }[];
       };
+      public_profile: { Args: { p_public_id: string }; Returns: Json };
       save_review: {
         Args: {
           p_attraction_id?: string;
@@ -913,6 +1007,7 @@ export type Database = {
           p_name: string;
           p_provider?: string;
           p_route_geometry?: Json;
+          p_starts_at?: string;
           p_trip_date?: string;
           p_visit_minutes?: number;
           p_walking_seconds?: number;
@@ -921,13 +1016,16 @@ export type Database = {
       };
       set_nationalities: { Args: { codes: string[] }; Returns: undefined };
       set_trip_official: { Args: { p_official: boolean; p_trip_id: string }; Returns: undefined };
+      set_trip_schedule: { Args: { p_starts_at: string; p_trip_id: string }; Returns: undefined };
       set_trip_visibility: {
         Args: { p_password?: string; p_trip_id: string; p_visibility: string };
         Returns: undefined;
       };
+      set_walk_attendance: { Args: { p_attending: boolean; p_trip_id: string }; Returns: Json };
       shared_trip: { Args: { p_password?: string; p_trip_id: string }; Returns: Json };
       trip_open_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
       trip_visible_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
+      walk_open_to_join: { Args: { p_trip_id: string }; Returns: boolean };
       walklist_cover: {
         Args: { p_trip: Database['public']['Tables']['trips']['Row'] };
         Returns: Json;

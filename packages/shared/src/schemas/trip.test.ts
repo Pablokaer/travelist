@@ -81,6 +81,9 @@ describe('sharedTripResultSchema', () => {
     review_count: 2,
     rating_avg: 4.5,
     is_saved: true,
+    starts_at: null,
+    attendee_count: 0,
+    is_attending: false,
     stop_ids: ['a1', 'a2'],
   };
 

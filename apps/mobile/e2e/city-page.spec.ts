@@ -85,3 +85,76 @@ test('a public walk list is found on the city page, saved and rated by another t
   await role('radio', 'Saved').click();
   await expect(other.getByText(name)).toBeVisible();
 });
+
+test('a walk list with a date and time is a meetup other travellers join', async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(240_000);
+  const name = `E2E meetup ${unique()}`;
+  // Tomorrow in Lisbon at 10:00: always in the future.
+  const date = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  await signUpAndOnboard(page);
+  await saveWalk(page, name, { date, time: '10:00' });
+  await expect(byTestIdOn(page)('schedule-time')).toHaveValue('10:00');
+  await chooseVisibility(page, 'Public');
+  await expect(roleOn(page)('button', 'Share list')).toBeVisible();
+
+  const other = await (await browser.newContext()).newPage();
+  const role = roleOn(other);
+  await signUpAndOnboard(other);
+  await openLisbon(other);
+  await expect(byTestIdOn(other)('meetups-upcoming')).toBeVisible();
+  await role('button', 'View all meetups').click();
+  await expect(other).toHaveURL(/\/short\/lisbon\/meetups$/);
+  const row = byTestIdOn(other)('meetups-page').getByRole('button', { name: new RegExp(name) });
+  await expect(row).toBeVisible({ timeout: 20_000 });
+  await expect(row).toContainText('10:00');
+  await expect(row).toContainText(/Starts in/);
+
+  await row.click();
+  await expect(other).toHaveURL(/\/shared\?id=/);
+  const banner = byTestIdOn(other)('meetup-banner');
+  await expect(banner).toContainText('0 going');
+  await role('button', "I'm going").click();
+  await expect(banner).toContainText('1 going');
+  await expect(role('button', 'Not going')).toBeVisible();
+});
+
+test('going opens the group chat, where messages arrive instantly (D-043)', async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(240_000);
+  const name = `E2E chat walk ${unique()}`;
+  const date = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  await signUpAndOnboard(page);
+  const tripId = await saveWalk(page, name, { date, time: '10:00' });
+  await chooseVisibility(page, 'Public');
+  await expect(roleOn(page)('button', 'Share list')).toBeVisible();
+
+  // Someone else opens the list: no chat before going.
+  const other = await (await browser.newContext()).newPage();
+  const role = roleOn(other);
+  await signUpAndOnboard(other);
+  await other.goto(`/shared?id=${tripId}`);
+  await expect(role('button', 'Open group chat')).toHaveCount(0);
+  await role('button', "I'm going").click();
+  await role('button', 'Open group chat').click();
+  await expect(other).toHaveURL(/\/walk-chat\?id=/);
+  await expect(other.getByText('No messages yet. Say hello!')).toBeVisible();
+
+  // The organiser opens the same chat from the list page.
+  await roleOn(page)('button', 'Open group chat').click();
+  await expect(page).toHaveURL(/\/walk-chat\?id=/);
+
+  const hello = `Hello from the square ${unique()}`;
+  await byTestIdOn(other)('chat-input').fill(hello);
+  await role('button', 'Send').click();
+  await expect(page.getByText(hello)).toBeVisible({ timeout: 15_000 });
+
+  const reply = `See you at 10 ${unique()}`;
+  await byTestIdOn(page)('chat-input').fill(reply);
+  await roleOn(page)('button', 'Send').click();
+  await expect(other.getByText(reply)).toBeVisible({ timeout: 15_000 });
+});

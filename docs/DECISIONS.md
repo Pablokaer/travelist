@@ -315,3 +315,74 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - **Reviews of a private list** were still readable by anyone who guessed its id (table, `rating_summary`, `list_reviews`). They are now visible only to the owner (`trip_visible_to_caller` in the select policy and in `list_reviews`).
 - **Alternatives:** a 403-style "you are not the owner" message on `/trip/[id]` — it would tell a guesser that the id exists.
 - **Trade-offs:** password lists keep their D-031 behaviour (link + password to view); their reviews stay readable by signed-in users with the id.
+
+## D-041 — Walk meetups: a date and time on a walk list, and "I'm going"
+
+- **Context:** the owner wants walk lists to optionally carry a date and time so travellers can walk them together: the city page ranks the next ones with a countdown, and a page lists every meetup of the coming days. Choices made with the owner: people say they are going; the owner can set or change the time after creating the list; only public lists are listed.
+- **Decision:**
+  - **A moment, shown in the city's time.** `trips.starts_at` is a `timestamptz`. The owner types a wall-clock date and time in the city's time zone (`cities.timezone`), converted with `Intl` (`zonedToUtc`, shared package; on the night the clocks go back the first occurrence is taken, a skipped time is read with the earlier offset). Everyone sees "Sat 4 Oct, 10:00 (Lisbon time)", wherever they are. A trigger keeps `trip_date` as the start's local day, so there is one source of truth.
+  - **Same entity and listing:** a meetup is a public trip with a future `starts_at`. `list_walklists` gains `p_upcoming` and the `soonest` sort and returns `starts_at`, `attendee_count` and `is_attending` — no parallel RPC. The city page ranks 5 (6 fetched to know if there are more); `/short/[slug]/meetups` groups them by local day (Today, Tomorrow, dates) and pages with **Load more**.
+  - **Going:** `walk_attendees` (trip, user). RLS: users see and delete only their own rows; insert only for public lists with a future start that are not theirs (`meetup_open_to_caller`). Counts come from the security definer RPCs, so nobody sees who else is going. The organiser is not an attendee.
+  - **Setting the time:** optional date + start time when saving a route (`save_trip(p_starts_at)`), and later on the list page (`set_trip_schedule`, owner only). Both refuse a start in the past (`22023`); removing the time ends the meetup.
+  - **Countdown:** computed on the device from `starts_at`, refreshed every 30 s (minutes precision).
+- **Alternatives:** a separate `meetups` table pointing at a trip — a second entity for one optional field; a date plus a local `time` column — needs the zone at every read and breaks on clock changes; showing the viewer's own time — confusing when planning a walk in another city.
+- **Trade-offs:** no reminders or notifications; attendees are kept when the owner moves the time; a list that becomes private or loses its time keeps its attendee rows (hidden); no list of who is going (only how many); no end time (a meetup leaves the list at its start).
+- **Revised by D-044:** "I'm going" is no longer limited to future meetups: any public list of someone else can be joined (the meetup listings still show only future starts).
+
+## D-042 — Scheduled data refresh through a pull request, behind a data gate
+
+- **Context:** reference data (countries, visa rules, city texts, attractions) only changed when someone ran the pipeline by hand. Automating the refresh must not let a bad day at a source (an outage, a vandalised Wikidata label, a disambiguation page) replace texts and facts that were fine.
+- **Decision:**
+  - **Monthly GitHub Action** (`data-refresh.yml`): fetch, then `gate --base HEAD --fix`, then `seed`, then a **pull request**. Merging it is the human gate, and CI runs the gate again on the PR.
+  - **The gate** compares every snapshot with the committed one. It **restores** what got worse: texts judged by rules in `gates/text.py`, photos as a group with their credit, and country facts that vanished. It lists changed safety-relevant facts **for review**. It **blocks** big losses and too many restores, since a broken source should not quietly ship stale data everywhere.
+  - **Visa rules are never restored:** an old rule may be wrong today, so losses and waves of changes block and a human decides.
+  - **Weekly live-provider check** (`providers-check.yml` → `checklist/live-check.ts`, the production providers with no cache): opens an issue when a source breaks.
+- **Alternatives:**
+  - Auto-merge or auto-deploy after the gate (rejected: reference data feeds visa and safety advice);
+  - a hard failure on any regression with no repair (rejected: every month would need hand fixes for a handful of Wikidata edits);
+  - keeping the old value for every changed field (rejected: it would also freeze legitimate updates);
+  - pg_cron inside Supabase (rejected: the pipeline is Python with committed snapshots, and review happens in git).
+- **Trade-offs:**
+  - Thresholds are guesses tuned on today's data (`gates/limits.py`), and an intended big change needs the `data-gate-override` label.
+  - A PR opened with `GITHUB_TOKEN` does not trigger CI, so a `DATA_REFRESH_TOKEN` secret is needed.
+  - The visa source is archived, so its refresh is a no-op until it is replaced.
+
+## D-043 — A group chat per walk list, for its organiser and everyone going
+
+- **Context:** saying "I'm going" to a walk list (D-041) should give access to a group chat where everyone going and the organiser exchange instant messages. People who do not want the chat can just save the public list (D-035) instead; saving and rating stay open to every signed-in user.
+- **Decision:**
+  - **Membership is attendance:** a chat member is the list's organiser, or someone in `walk_attendees` while the list is public (`is_walk_chat_member`). "Not going" leaves the chat; a list made private keeps only its organiser in it. No separate membership table.
+  - **Messages:** `walk_messages` (trip, author, body 1–1000 characters stored trimmed, time). RLS: members read and insert as themselves; nobody updates or deletes (privileges revoked). `list_walk_messages` (security definer) adds each author's public name and photo, newest first (up to 200; the app loads 100).
+  - **Instant delivery: Supabase Realtime** `postgres_changes` on `walk_messages` (added to the `supabase_realtime` publication), which applies the same select policy to each subscriber, so non-members receive nothing. The app follows one chat while its screen is open and refetches on each insert and once the subscription is confirmed (a message posted between the first read and that moment was missed otherwise — found by the two-browser E2E). The client is behind a small interface (`lib/realtime.ts`) so tests use a fake.
+  - **Where:** `/walk-chat?id=…` (a query parameter, like `/shared`, so static hosts need no rewrite), opened from **Open group chat** on the shared list's meetup banner (members) and on the organiser's list page. Non-members see "Only people going can chat".
+- **Alternatives:** Realtime _broadcast_ channels without storing messages — no history for late joiners and no RLS; a third-party chat service — another provider, data and account model for a small feature; polling — not instant and more requests.
+- **Trade-offs:** no editing, deleting, reporting or moderation of messages yet; no push notifications (messages arrive only while the chat is open); only the newest 100 messages are shown; messages stay after their author leaves the meetup.
+- **Revised by D-044:** delivery no longer relies on Realtime events alone, and any public list can be joined.
+
+## D-044 — Participation and group chat as one reliable flow
+
+- **Context:** the owner reported the walk list participation and group chat "not working perfectly" and asked for the whole flow to be audited: "I'm going" on a public walk list makes you a participant; all participants share one chat of that list; messages persist and reach everyone.
+- **Findings** (reproduced with three users against the local stack):
+  - **Root cause — delivery relied on Realtime events only.** Supabase Realtime delivers `postgres_changes` at most once; after the Realtime service (re)starts, the first subscriber is told `SUBSCRIBED` before changes flow, and messages sent then never reached anyone (reproduced deterministically by restarting the service). The app re-read the chat only on its own sends and on subscribe, so a lost event left the message invisible until someone wrote again or the chat was reopened.
+  - Joining was not idempotent: a repeated request failed with a duplicate key (`23505`), and the button showed no error and kept a stale state.
+  - "I'm going" existed only on future meetups (D-041): public lists without a time, or whose time had passed, could not be joined, so they had no chat.
+  - Members could not see who was in the chat.
+  - Checked and correct: one chat per list by construction (the chat is the list, `walk_messages.trip_id`; there is no chat row that two joins could create twice), the same history for every member, isolation between lists, persistence across reloads, and denial for non-participants, participants of other lists and signed-out users (RLS, also through direct API calls). `channel()` reusing an existing topic was checked and does not lose the subscription on remount.
+- **Decision:**
+  - **Reconcile with the server:** the chat query is always re-read when the chat opens, on focus (on iOS/Android through React Query's focus manager wired to `AppState`, off for other queries) and every 10 s while open (`CHAT_RECONCILE_MS`), on top of Realtime and the re-read on subscribe. Realtime keeps it instant; the re-read guarantees a message shows within ~10 s when an event is lost — verified with Realtime stopped.
+  - **`set_walk_attendance(trip, attending)`** (security definer): idempotent join/leave (`on conflict do nothing`; the primary key also guards simultaneous joins), returns the caller's state and the count; `42501` for private, own or missing lists. The app refreshes the list, shared page and listings after success **or** failure, and shows an error on failure, so the screen never claims a participation that did not happen.
+  - **Any public list of someone else can be joined** (`walk_open_to_join`), with or without a time, before or after the start; the **Walk together** card (join, count, chat) is on every public list. Meetup listings are unchanged (future starts only).
+  - **`list_walk_participants`** (members only) for "3 people: Ana (organiser), You, Cid" in the chat. The chat keeps its field above the keyboard on phones (`KeyboardAvoidingView`).
+- **Alternatives:** replacing Realtime with polling alone — slower for everyone; Realtime _broadcast_ with an acknowledgement protocol — more moving parts for the same guarantee; a separate `chats` table with a unique `trip_id` — a second entity for an identity the list already has.
+- **Trade-offs:** a lost event shows up to ~10 s late; each open chat makes one small request every 10 s; joining a list whose meetup has ended is allowed (harmless, keeps the chat reachable).
+
+## D-045 — Public traveller profiles, linked from reviews and chat messages
+
+- **Context:** the owner wants the author's name on a review or a chat message to open that person's profile: name, photo, when the account was created and their public walk lists ("playlists" in the request).
+- **Decision:**
+  - **A public id, not the account id:** `profiles.public_id` (random, unique) is what `list_reviews`, `list_walk_messages` and `list_walklists` return (`author_public_id`) and what `/traveller?id=…` uses, so the account id still never leaves the database (D-028).
+  - **`public_profile(public_id)`** (security definer, signed-in users only, like reviews and chats) returns only name, photo path, member since (`profiles.created_at`), number of public walk lists and whether it is the caller; the profiles table stays owner-only (no nationality, passport or email). Unknown ids are `not_found`.
+  - **Walk lists on the profile** reuse `list_walklists` with a new `p_author` filter: public lists only (never private or password ones), newest first, with the usual cards (View / Save) and **Load more**.
+  - **Links:** one `AuthorName` component — the name as a link (role `link`) on review cards and on other people's chat messages; authors without a public id stay plain text.
+- **Alternatives:** exposing the account id (simpler, but reverses D-028 and ties links to auth); a username/handle (users would have to choose one).
+- **Trade-offs:** profiles need an account to view; walk list card bylines and the chat's participant list do not link yet; the profile shows no reviews or bio.

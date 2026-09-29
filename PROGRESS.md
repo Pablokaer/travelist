@@ -89,6 +89,30 @@ Walk list cards (My Trips, city page, View all) show the starting point's photo 
 
 Users add, change and remove a profile photo on Edit profile. It is cropped to a square, resized to 512 px and uploaded to the public `avatars` bucket (per-user folder policies), and shown on the Profile screen and next to their reviews. pgTAP: 9 new tests (144 in all); app: 10 new tests (231 in all). Verified on web: upload, change (old file deleted), remove, and the photo on another user's view of the reviews. Next: check the native picker on iOS/Android; the author photo on walk list cards.
 
+## 2026-09-29 — Walk meetups (D-041)
+
+Walk lists can have a date and time (city time); the city page ranks the next public meetups with a countdown, `/short/{slug}/meetups` lists them by day, and travellers say "I'm going". pgTAP: 27 new tests (184 in all); shared: time-zone and countdown tests (DST included); app: 254 tests; E2E: a meetup created by one traveller and joined by another, desktop and phone widths.
+
+## 2026-09-29 — Scheduled data refresh and data gate (D-042)
+
+- **Monthly** refresh of countries, visa rules, city texts and attractions as a pull request, behind a data gate that restores texts, photos and facts that got worse and blocks big losses. The same gate runs in CI on every PR.
+- **Weekly** live check of the weather, exchange-rate and advisory providers.
+- **Tests:** pipeline 24 new (128 in all), Edge Functions 3 new.
+- **Verified locally:** the gate on real data with injected damage (disambiguation text, a Q-id name, a lost photo, lost plugs, Porto −40%), a real `city-summaries` fetch with gate and seed in a scratch worktree, and the live check against the real APIs. The workflows pass `actionlint` but have not run on GitHub yet (no remote).
+- **Next:** a maintained visa source; publishing merged data to the hosted project.
+
+## 2026-09-29 — Walk list group chat (D-043)
+
+Going to a meetup opens its group chat with the organiser and everyone else going; messages arrive instantly through Supabase Realtime (RLS-checked per subscriber). pgTAP: 21 new tests (205 in all); app: 263 tests; E2E: two browsers exchange messages without reloading, desktop and phone widths (26 E2E in all).
+
+## 2026-09-29 — Walk list participation and chat audit (D-044)
+
+Reproduced with three users: lost Realtime events hid messages (root cause), joining was not idempotent and failed silently, and lists without a future time could not be joined. Fixed with server reconciliation (re-read on open/focus/every 10 s), `set_walk_attendance`, joining any public list and a participants list. pgTAP: 34 new tests (239 in all); app: 275 tests; E2E: three browsers share one live chat that survives a reload (28 E2E in all); validated with Realtime restarted and stopped.
+
+## 2026-09-29 — Public traveller profiles (D-045)
+
+Authors' names on reviews and chat messages open their public profile (photo, name, member since, public walk lists) by a public id that is not the account id. pgTAP: 16 new tests (255 in all); app: 283 tests; E2E: a chat author and a reviewer opened by another traveller, desktop and phone widths (30 E2E in all).
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
@@ -96,6 +120,7 @@ Users add, change and remove a profile photo on Edit profile. It is cropped to a
 - Map: clustering for dense areas; check photo markers and the card popup on iOS/Android (D-029).
 - Walk list sharing: limit password attempts; revoke a link without going private; check the native share sheet on iOS/Android (D-031).
 - Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028); city and walk list reviews share the same gap (D-034).
+- Meetups: reminders/notifications and a time picker (D-041); chat push notifications, message reporting/moderation and older-message paging (D-043).
 - Walk lists: an admin screen for moderators (today: SQL), a count of lists on the city page, and a check of the city page on iOS/Android (D-033, D-035).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
