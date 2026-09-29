@@ -30,7 +30,9 @@ const ICONS = {
   grid: { ios: 'square.grid.2x2', android: 'apps', web: 'apps' },
   home: { ios: 'house', android: 'home', web: 'home' },
   info: { ios: 'info.circle', android: 'info', web: 'info' },
+  key: { ios: 'key', android: 'key', web: 'key' },
   list: { ios: 'list.bullet', android: 'list', web: 'list' },
+  lock: { ios: 'lock', android: 'lock', web: 'lock' },
   logout: {
     ios: 'rectangle.portrait.and.arrow.right',
     android: 'logout',
@@ -53,6 +55,7 @@ const ICONS = {
   ruler: { ios: 'ruler', android: 'straighten', web: 'straighten' },
   search: { ios: 'magnifyingglass', android: 'search', web: 'search' },
   split: { ios: 'scissors', android: 'content_cut', web: 'content_cut' },
+  share: { ios: 'square.and.arrow.up', android: 'share', web: 'share' },
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   ticket: { ios: 'ticket', android: 'confirmation_number', web: 'confirmation_number' },
   trash: { ios: 'trash', android: 'delete', web: 'delete' },

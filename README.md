@@ -164,12 +164,20 @@ The tray itself (`features/route/store.ts`, Zustand) is in-memory client state: 
 
 ### 7. My Trips
 
-- **List** (`(tabs)/trips.tsx`) — grid of trip cards, newest first: city (with flag) and date, name, number of stops, distance and walking time. Pull to refresh. Empty state links back to Explore.
+- **List** (`(tabs)/trips.tsx`) — grid of trip cards, newest first: city (with flag) and date, name, number of stops, distance and walking time, and **Public** / **With password** for lists others can open (private lists have no badge). Pull to refresh. Empty state links back to Explore.
 - **Detail** (`trip/[id].tsx`) — map with numbered stops and the saved route line (beside the details on desktop), totals, stop list (tap to open the attraction).
 - **Navigate:**
   - **Open in Google Maps** — one walking route through all stops (Google allows up to 9 waypoints; longer routes are truncated, with a note).
   - **Leg by leg** — per-leg walking links for Google Maps and Apple Maps.
+- **Who can see this list** (owner only; D-031) — every saved trip (walk list) is:
+  - **Private** (default) — only the owner can see it; the link shows "Walk list not available" to anyone else, the same as a missing list, so it never reveals that the list exists.
+  - **Public** — anyone with the link can see it, signed in or not.
+  - **With password** — anyone with the link can open it after typing the password the owner chose (4–72 characters). Saving again with the field blank keeps the current password; switching away from _With password_ forgets it, so protecting the list again needs a new one.
+  - Pick one and **Save visibility**; the owner can change it at any time. The hint under the choice says who can see the list.
+  - **Share list** (only when the saved visibility is Public or With password) — opens the share sheet on iOS/Android and in browsers that have one; otherwise the link is copied ("Link copied."). The link is `<EXPO_PUBLIC_WEB_URL>/shared?id=<trip id>` when the web address is configured, else the app's own link (web origin, or `wayfarer://shared?id=…`).
 - **Delete trip** (with confirmation).
+
+**Shared link** (`shared.tsx`, `/shared?id=<trip id>`, open to everyone): a public list opens straight away; a protected one asks for the password ("This walk list is protected" → **Open list**; "Wrong password. Try again."); a private or missing one says "Walk list not available". An opened list shows the map, totals, stops and the Google / Apple Maps links, read-only. Signed-out visitors get **Plan your own walks** (sign-up) and stops are not tappable (attraction pages need an account); signed-in visitors can open the stops. The owner sees "This is your list, as others see it." with **Edit list**. The password is only kept on screen while the list is open, never stored on the device.
 
 Trips are saved with the `save_trip` RPC (trip + ordered stops in one transaction; every stop must belong to the trip's city).
 
@@ -194,23 +202,24 @@ Expo Router, files in `apps/mobile/src/app`.
 
 Every screen stacked above the tabs (attraction, checklist, route, trip, edit profile, about) has an **app menu** at the right of its header: the Wayfarer logo with a menu icon. It opens a menu with **Explore**, **My Trips**, **Profile** and **About**, so a page opened from a link (e.g. `/trip/…`) is never a dead end. It is shown only to signed-in, onboarded users.
 
-| Route               | File                               | Access                   | Purpose                                     |
-| ------------------- | ---------------------------------- | ------------------------ | ------------------------------------------- |
-| `/sign-in`          | `(auth)/sign-in.tsx`               | signed out               | Email + password, links to magic link/OAuth |
-| `/sign-up`          | `(auth)/sign-up.tsx`               | signed out               | Create account                              |
-| `/magic-link`       | `(auth)/magic-link.tsx`            | signed out               | Magic link + 6-digit code                   |
-| `/auth/callback`    | `auth/callback.tsx`                | always                   | OAuth / magic link / confirmation landing   |
-| `/onboarding`       | `onboarding.tsx`                   | signed in, not onboarded | 3-step profile setup                        |
-| `/` (Explore tab)   | `(tabs)/(explore)/index.tsx`       | onboarded                | Home: searchable grid of destinations       |
-| `/city/[slug]`      | `(tabs)/(explore)/city/[slug].tsx` | onboarded                | City page: map/list, filters, search, tray  |
-| `/trips`            | `(tabs)/trips.tsx`                 | onboarded                | Saved trips                                 |
-| `/profile`          | `(tabs)/profile.tsx`               | onboarded                | Profile, documents, preferences, account    |
-| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route, reviews    |
-| `/checklist/[city]` | `checklist/[city].tsx`             | onboarded (modal)        | Pre-trip checklist                          |
-| `/route`            | `route.tsx`                        | onboarded                | Route builder and save                      |
-| `/trip/[id]`        | `trip/[id].tsx`                    | onboarded                | Trip detail, navigation, delete             |
-| `/edit-profile`     | `edit-profile.tsx`                 | onboarded                | Edit profile                                |
-| `/about`            | `about.tsx`                        | always                   | Data sources and version                    |
+| Route               | File                               | Access                   | Purpose                                            |
+| ------------------- | ---------------------------------- | ------------------------ | -------------------------------------------------- |
+| `/sign-in`          | `(auth)/sign-in.tsx`               | signed out               | Email + password, links to magic link/OAuth        |
+| `/sign-up`          | `(auth)/sign-up.tsx`               | signed out               | Create account                                     |
+| `/magic-link`       | `(auth)/magic-link.tsx`            | signed out               | Magic link + 6-digit code                          |
+| `/auth/callback`    | `auth/callback.tsx`                | always                   | OAuth / magic link / confirmation landing          |
+| `/onboarding`       | `onboarding.tsx`                   | signed in, not onboarded | 3-step profile setup                               |
+| `/` (Explore tab)   | `(tabs)/(explore)/index.tsx`       | onboarded                | Home: searchable grid of destinations              |
+| `/city/[slug]`      | `(tabs)/(explore)/city/[slug].tsx` | onboarded                | City page: map/list, filters, search, tray         |
+| `/trips`            | `(tabs)/trips.tsx`                 | onboarded                | Saved trips                                        |
+| `/profile`          | `(tabs)/profile.tsx`               | onboarded                | Profile, documents, preferences, account           |
+| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route, reviews           |
+| `/checklist/[city]` | `checklist/[city].tsx`             | onboarded (modal)        | Pre-trip checklist                                 |
+| `/route`            | `route.tsx`                        | onboarded                | Route builder and save                             |
+| `/trip/[id]`        | `trip/[id].tsx`                    | onboarded                | Trip detail, navigation, visibility, share, delete |
+| `/shared?id=…`      | `shared.tsx`                       | always                   | A walk list opened by its link (D-031)             |
+| `/edit-profile`     | `edit-profile.tsx`                 | onboarded                | Edit profile                                       |
+| `/about`            | `about.tsx`                        | always                   | Data sources and version                           |
 
 Deep link scheme: `wayfarer://` (e.g. `wayfarer://auth/callback`).
 
@@ -228,22 +237,25 @@ Request/response schemas live in `packages/shared/src/schemas` and are copied in
 
 ### Database RPCs and views
 
-| Name                        | Kind     | Who          | What it does                                                                                                                                                                |
-| --------------------------- | -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `attractions_in_view`       | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                          |
-| `attraction_details`        | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                               |
-| `city_list`                 | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence)         |
-| `set_nationalities`         | function | authed       | Replaces the caller's nationalities                                                                                                                                         |
-| `save_trip`                 | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                                       |
-| `delete_account`            | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                          |
-| `save_review`               | function | authed       | Creates the caller's review of an attraction (rating 1–5, optional comment, blank → none) or updates it if there is one; returns the review id                              |
-| `list_attraction_reviews`   | function | authed       | An attraction's reviews, newest first (limit 1–100, default 50, offset): rating, comment, dates, author display name, `is_own`; security definer only to read display names |
-| `attraction_rating_summary` | view     | authed       | Per attraction: `review_count`, `rating_avg` (2 decimals, null without reviews) and `city_slug` (city pages filter on it)                                                   |
+| Name                        | Kind     | Who          | What it does                                                                                                                                                                                                                                 |
+| --------------------------- | -------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `attractions_in_view`       | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                                                                                           |
+| `attraction_details`        | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                                                                                                |
+| `city_list`                 | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence)                                                                          |
+| `set_nationalities`         | function | authed       | Replaces the caller's nationalities                                                                                                                                                                                                          |
+| `set_trip_visibility`       | function | authed       | Owner only: sets a trip to `private`, `public` or `password` (with `p_password`, 4–72 characters, stored as a bcrypt hash; omitted → keeps the current one); errors `P0002` (not the caller's trip) and `22023` (bad visibility or password) |
+| `shared_trip`               | function | anon, authed | A trip by link: `{status}` = `ok` (+ `trip`: columns, `stop_ids` in order, `is_owner`), `not_found` (missing, or private and not the owner), `password_required` or `wrong_password`; the owner always gets `ok`; security definer           |
+| `save_trip`                 | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                                                                                                        |
+| `delete_account`            | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                                                                                           |
+| `save_review`               | function | authed       | Creates the caller's review of an attraction (rating 1–5, optional comment, blank → none) or updates it if there is one; returns the review id                                                                                               |
+| `list_attraction_reviews`   | function | authed       | An attraction's reviews, newest first (limit 1–100, default 50, offset): rating, comment, dates, author display name, `is_own`; security definer only to read display names                                                                  |
+| `attraction_rating_summary` | view     | authed       | Per attraction: `review_count`, `rating_avg` (2 decimals, null without reviews) and `city_slug` (city pages filter on it)                                                                                                                    |
 
 ### Tables
 
 - **Reference (read-only for clients, written by the pipeline seeds):** `countries`, `cities`, `attractions` (PostGIS `geography`), `visa_requirements`, `api_cache` (service role only).
-- **User data (RLS: owner only):** `profiles`, `profile_nationalities`, `trips`, `trip_stops`.
+- **User data (RLS: owner only):** `profiles`, `profile_nationalities`, `trips` (with `visibility`: `private` default, `public`, `password`), `trip_stops`. Others open a trip only through `shared_trip`.
+- **Trip passwords:** `trip_passwords` (trip → bcrypt hash; cascades with the trip). RLS on, no policies, no grants: no client role can read it, owners included; only `set_trip_visibility` / `shared_trip` use it. A trigger deletes the hash when a trip leaves `password`.
 - **Reviews:** `attraction_reviews` (user → review → attraction, unique per user and attraction; both sides cascade). RLS: every signed-in user reads all; only the author inserts, updates or deletes; no access for anon. Deleting a review is a plain `delete` filtered by id.
 
 Migrations: `supabase/migrations`. RLS and RPC tests: `supabase/tests` (pgTAP).
@@ -252,23 +264,25 @@ Migrations: `supabase/migrations`. RLS and RPC tests: `supabase/tests` (pgTAP).
 
 Defined in `packages/shared/src/constants/index.ts` unless noted.
 
-| Rule                         | Value                                                                                                 |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Stops per route / trip       | 2 – 12 (`ROUTE_MIN_STOPS`, `ROUTE_MAX_STOPS`; also enforced in `save_trip`)                           |
-| Cities per route             | 1                                                                                                     |
-| Split routes                 | offered from 5 stops (`ROUTE_SPLIT_MIN_STOPS`); ≥ 2 stops per route, so at most 6 routes              |
-| Nationalities per profile    | 1 – 5 (`MAX_NATIONALITIES`)                                                                           |
-| Display name / trip name     | 1 – 80 characters                                                                                     |
-| Password                     | ≥ 8 characters                                                                                        |
-| Magic-link code              | 6 digits, valid 1 h (`supabase/config.toml`)                                                          |
-| Walking model (fallback)     | 4.5 km/h, straight line × 1.3                                                                         |
-| Default visit time (minutes) | museum 90, castle 90, palace 75, park 45, church 30, other 30, monument 20, landmark 20, viewpoint 15 |
-| Weather forecast window      | arrival within 15 days; up to 7 days shown                                                            |
-| Google Maps multi-stop link  | origin + up to 9 waypoints + destination                                                              |
-| Dates                        | typed as `YYYY-MM-DD` (D-019)                                                                         |
-| Review rating                | whole number 1 – 5, required (`REVIEW_RATING_MIN`, `REVIEW_RATING_MAX`; DB check)                     |
-| Review comment               | optional, ≤ 1000 characters (`REVIEW_COMMENT_MAX`; DB check); blank is saved as no comment            |
-| Reviews per user             | 1 per attraction (unique in the DB); saving again edits it                                            |
+| Rule                         | Value                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Stops per route / trip       | 2 – 12 (`ROUTE_MIN_STOPS`, `ROUTE_MAX_STOPS`; also enforced in `save_trip`)                                                        |
+| Cities per route             | 1                                                                                                                                  |
+| Split routes                 | offered from 5 stops (`ROUTE_SPLIT_MIN_STOPS`); ≥ 2 stops per route, so at most 6 routes                                           |
+| Nationalities per profile    | 1 – 5 (`MAX_NATIONALITIES`)                                                                                                        |
+| Display name / trip name     | 1 – 80 characters                                                                                                                  |
+| Password                     | ≥ 8 characters                                                                                                                     |
+| Magic-link code              | 6 digits, valid 1 h (`supabase/config.toml`)                                                                                       |
+| Walking model (fallback)     | 4.5 km/h, straight line × 1.3                                                                                                      |
+| Default visit time (minutes) | museum 90, castle 90, palace 75, park 45, church 30, other 30, monument 20, landmark 20, viewpoint 15                              |
+| Weather forecast window      | arrival within 15 days; up to 7 days shown                                                                                         |
+| Google Maps multi-stop link  | origin + up to 9 waypoints + destination                                                                                           |
+| Dates                        | typed as `YYYY-MM-DD` (D-019)                                                                                                      |
+| Review rating                | whole number 1 – 5, required (`REVIEW_RATING_MIN`, `REVIEW_RATING_MAX`; DB check)                                                  |
+| Review comment               | optional, ≤ 1000 characters (`REVIEW_COMMENT_MAX`; DB check); blank is saved as no comment                                         |
+| Walk list visibility         | `private` (default), `public`, `password` (`TRIP_VISIBILITIES`; DB check; D-031)                                                   |
+| Walk list password           | 4 – 72 characters, not trimmed (`TRIP_PASSWORD_MIN`, `TRIP_PASSWORD_MAX`; bcrypt reads 72 bytes; checked in `set_trip_visibility`) |
+| Reviews per user             | 1 per attraction (unique in the DB); saving again edits it                                                                         |
 
 ## Covered cities
 
@@ -286,6 +300,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Sentry / PostHog are not wired yet (no-op facade).
 - Dark theme: sign-in and sign-up screens are always light (the choice lives on the profile), and the map keeps its light style.
 - Route stops are dragged only within their route (not between split routes), and there is no auto-scroll when dragging past the edge of the screen. Drag and drop is verified on web (mouse and touch emulation); iOS/Android untested on this machine (D-027).
+- Walk list sharing (D-031): there is no limit on password attempts (bcrypt makes each one slow, but a short password can still be guessed by someone with the link); no list of people a list was shared with, and changing to private is the only way to revoke a link. Shared links use `/shared?id=…` because `/trip/[id]`-style dynamic pages need host rewrite rules on static hosts (`expo serve` returns 404 for them when opened directly). Sharing is verified on web (desktop and phone widths); the native share sheet is untested on this machine.
 - Reviews: the attraction page shows the 50 newest reviews (no "load more" yet; the RPC already pages), and there is no reporting or moderation of reviews. Reviews need a signed-in user, like the rest of the app (D-028).
 - No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
 - The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
@@ -438,23 +453,24 @@ The tabs (`(tabs)/_layout.tsx`) are a bottom bar on phones and a 96 px side rail
 
 **Feature folders.** Anything that is not a route lives in `src/features/<feature>/`:
 
-| Feature        | Contents                                                                                         |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| `auth`         | `AuthProvider` (session from Supabase Auth), sign-in/up/magic-link/OAuth calls, auth form parts  |
-| `profile`      | profile query + mutations (optimistic updates), country picker, profile fields                   |
-| `destinations` | cities, attractions in a bbox, attraction detail; Home cards, city header, search, Explore store |
-| `map`          | `MapView` with a web and a native implementation and a shared contract (see below)               |
-| `checklist`    | calls the `checklist` Edge Function; sections and plug icons                                     |
-| `route`        | route tray store, route plan and split, drag and drop of stops, `route-optimize` call            |
-| `trips`        | list, detail, save (`save_trip` RPC, one trip per split route) and delete                        |
-| `reviews`      | reviews list, star rating, review form, rating summaries (per attraction and per city)           |
+| Feature        | Contents                                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `auth`         | `AuthProvider` (session from Supabase Auth), sign-in/up/magic-link/OAuth calls, auth form parts                                 |
+| `profile`      | profile query + mutations (optimistic updates), country picker, profile fields                                                  |
+| `destinations` | cities, attractions in a bbox, attraction detail; Home cards, city header, search, Explore store                                |
+| `map`          | `MapView` with a web and a native implementation and a shared contract (see below)                                              |
+| `checklist`    | calls the `checklist` Edge Function; sections and plug icons                                                                    |
+| `route`        | route tray store, route plan and split, drag and drop of stops, `route-optimize` call                                           |
+| `trips`        | list, detail, save (`save_trip` RPC, one trip per split route), delete; visibility, share link and the shared-list view (D-031) |
+| `reviews`      | reviews list, star rating, review form, rating summaries (per attraction and per city)                                          |
 
 Each feature's `api.ts` owns its query keys (e.g. `destinationKeys`, `tripKeys`, `reviewKeys`) and invalidates them after mutations. Cross-cutting code is in `src/lib/`: `env.ts` (zod-validated `EXPO_PUBLIC_*`), `supabase.ts` (the single client plus `unwrap` / `check` helpers that turn Supabase errors into thrown errors for TanStack Query), `secure-storage.ts`, `i18n.ts`, `query-client.ts`, `format.ts` (units, dates), `observability.ts`.
 
 **Data access.** Screens never call Supabase directly; they use the hooks in `features/*/api.ts`:
 
 - **Reads** go straight to PostgREST — views (`city_list`, `attraction_details`, `attraction_rating_summary`), RPCs (`attractions_in_view`, `list_attraction_reviews`) and owner-only tables. RLS decides what each user can see.
-- **Writes** that touch several rows use RPCs so they are atomic and validated in SQL (`save_trip`, `set_nationalities`, `save_review`, `delete_account`).
+- **Writes** that touch several rows use RPCs so they are atomic and validated in SQL (`save_trip`, `set_nationalities`, `save_review`, `set_trip_visibility`, `delete_account`).
+- **Reads across users** go through `security definer` RPCs that return only what may be shown (`list_attraction_reviews`, `shared_trip`), while the tables stay owner-only.
 - **Anything with secrets, rate limits or third-party APIs** goes through an Edge Function via `supabase.functions.invoke` (`checklist`, `route-optimize`).
 
 **State.** Server data lives only in TanStack Query. Zustand holds UI state that must survive navigation: `features/route/store.ts` (the route tray — one city, 2–12 stops, split routes, manual order) and `features/destinations/store.ts` (category filters, map/list view). The tray is in memory only (not persisted).
@@ -484,12 +500,13 @@ It ships as source with explicit `.ts` import extensions, so no build step is ne
 
 **Database.** Migrations in `supabase/migrations` build the schema in order: extensions and the shared `set_updated_at` trigger → reference data → user data → later features (profile theme, city covers, reviews). Every table has RLS:
 
-| Group          | Tables                                                     | Access                                                                |
-| -------------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
-| Reference data | `countries`, `cities`, `attractions`, `visa_requirements`  | read by everyone (only active cities); written only by seeds          |
-| Cache          | `api_cache`                                                | service role only (Edge Functions)                                    |
-| User data      | `profiles`, `profile_nationalities`, `trips`, `trip_stops` | owner only (`auth.uid()`); rows cascade when the auth user is deleted |
-| Reviews        | `attraction_reviews`                                       | signed-in users read all; only the author writes                      |
+| Group          | Tables                                                     | Access                                                                                                             |
+| -------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Reference data | `countries`, `cities`, `attractions`, `visa_requirements`  | read by everyone (only active cities); written only by seeds                                                       |
+| Cache          | `api_cache`                                                | service role only (Edge Functions)                                                                                 |
+| User data      | `profiles`, `profile_nationalities`, `trips`, `trip_stops` | owner only (`auth.uid()`); rows cascade when the auth user is deleted; shared trips are read through `shared_trip` |
+| Trip passwords | `trip_passwords`                                           | no client access at all (bcrypt hashes; used by security definer RPCs)                                             |
+| Reviews        | `attraction_reviews`                                       | signed-in users read all; only the author writes                                                                   |
 
 A profile row is created by a trigger on `auth.users` insert. Attractions are `geography(Point, 4326)` with a GiST index; `attractions_in_view` returns the places inside the map's bbox, most popular first. See [Backend reference](#backend-reference) for every RPC and view.
 
@@ -534,6 +551,7 @@ Attraction ingestion per city: **Wikidata SPARQL** in the city's bbox (+ ~200 m 
 - **Opening a city page:** `/city/[slug]` reads the city from `city_list` (cached), then `attractions_in_view` for its bbox and the selected categories, and `attraction_rating_summary` filtered by `city_slug` for the card ratings. The map draws the points; tapping one opens its card; **+** adds it to the Zustand route tray.
 - **Building a route:** `/route` reads the tray, orders the stops locally with the shared domain logic, then calls `route-optimize` for each route; the function returns the order, legs, line geometry, distance and times (from cache, ORS, or the fallback). **Save** calls the `save_trip` RPC and invalidates the trips list.
 - **Pre-trip checklist:** `/checklist/[city]` sends the city, the profile's nationalities, home country, dates and passport expiry to `checklist`, which reads visa rules and country data from Postgres, fetches weather, FX and advisories in parallel (each cached) and returns seven sections.
+- **Sharing a walk list:** the owner saves the visibility with `set_trip_visibility` and shares `/shared?id=<id>`; the visitor's screen calls `shared_trip(id, password)` — signed in or not — and, for `ok`, loads the stops from `attraction_details` (readable by everyone). A typed password is sent again with each request and kept only in the screen's state.
 - **Reviews:** the attraction page lists reviews with `list_attraction_reviews` and the average from `attraction_rating_summary`; publishing calls `save_review` (insert or update), deleting is a plain `delete` allowed by RLS only for the author.
 
 ### Testing and CI
@@ -639,7 +657,7 @@ After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy 
 
 ## Environment variables
 
-See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, OAuth secrets) are only for Edge Functions / Supabase Auth: set them with `supabase secrets set` or in the dashboard for hosted projects. Sentry / PostHog are no-ops when their keys are empty. `EXPO_PUBLIC_AUTH_PROVIDERS=google,apple` shows the OAuth buttons once the providers are enabled in Supabase.
+See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, OAuth secrets) are only for Edge Functions / Supabase Auth: set them with `supabase secrets set` or in the dashboard for hosted projects. Sentry / PostHog are no-ops when their keys are empty. `EXPO_PUBLIC_AUTH_PROVIDERS=google,apple` shows the OAuth buttons once the providers are enabled in Supabase. `EXPO_PUBLIC_WEB_URL` (optional, e.g. `https://wayfarer.app`) is the public web address used in shared walk-list links, so a link shared from iOS/Android opens in any browser; empty, the app's own link is shared.
 
 ## Data pipeline
 

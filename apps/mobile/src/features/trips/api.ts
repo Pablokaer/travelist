@@ -1,4 +1,4 @@
-import type { LineString, RouteResponse } from '@wayfarer/shared';
+import type { LineString, RouteResponse, TripVisibility } from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AttractionSummary } from '@/features/destinations/api';
@@ -14,6 +14,8 @@ export type TripSummary = {
   visitMinutes: number | null;
   stopCount: number;
   createdAt: string;
+  /** Who can open the trip by link (D-031). */
+  visibility: TripVisibility;
 };
 
 export type TripDetail = TripSummary & {
@@ -36,7 +38,7 @@ export function useTrips() {
         await supabase
           .from('trips')
           .select(
-            'id, name, city_slug, trip_date, distance_m, walking_seconds, visit_minutes, created_at, trip_stops(count)',
+            'id, name, city_slug, trip_date, distance_m, walking_seconds, visit_minutes, created_at, visibility, trip_stops(count)',
           )
           .order('created_at', { ascending: false }),
       );
@@ -49,6 +51,7 @@ export function useTrips() {
         walkingSeconds: r.walking_seconds,
         visitMinutes: r.visit_minutes,
         createdAt: r.created_at,
+        visibility: r.visibility as TripVisibility,
         stopCount: (r.trip_stops as unknown as { count: number }[])[0]?.count ?? 0,
       }));
     },
@@ -68,49 +71,80 @@ export function useTrip(id: string | undefined) {
           .single(),
       );
       const stopRows = [...trip.trip_stops].sort((a, b) => a.position - b.position);
-      const ids = stopRows.map((s) => s.attraction_id);
-      const details = unwrap(
-        await supabase
-          .from('attraction_details')
-          .select(
-            'id, city_slug, name_en, name_pt, category, lat, lng, popularity, avg_visit_minutes, image_url, is_unesco',
-          )
-          .in('id', ids),
-      );
-      const byId = new Map(details.map((d) => [d.id, d]));
-      const stops = ids
-        .map((aid) => byId.get(aid))
-        .filter((d): d is NonNullable<typeof d> => !!d)
-        .map((d) => ({
-          id: d.id!,
-          citySlug: d.city_slug!,
-          nameEn: d.name_en!,
-          namePt: d.name_pt,
-          category: d.category!,
-          lat: d.lat!,
-          lng: d.lng!,
-          popularity: d.popularity ?? 0,
-          avgVisitMinutes: d.avg_visit_minutes ?? 30,
-          imageUrl: d.image_url,
-          isUnesco: d.is_unesco ?? false,
-        }));
-      return {
-        id: trip.id,
-        name: trip.name,
-        citySlug: trip.city_slug,
-        tripDate: trip.trip_date,
-        distanceM: trip.distance_m,
-        walkingSeconds: trip.walking_seconds,
-        visitMinutes: trip.visit_minutes,
-        createdAt: trip.created_at,
-        stopCount: stops.length,
-        geometry: (trip.route_geometry as LineString | null) ?? null,
-        isFallback: trip.is_fallback,
-        provider: trip.provider,
-        stops,
-      };
+      const stops = await fetchTripStops(stopRows.map((s) => s.attraction_id));
+      return tripDetailFromRow({ ...trip, visibility: trip.visibility as TripVisibility }, stops);
     },
   });
+}
+
+/** A trip's columns, as `trips` and `shared_trip` both return them. */
+export type TripRow = {
+  id: string;
+  name: string;
+  city_slug: string;
+  trip_date: string | null;
+  route_geometry: unknown;
+  distance_m: number | null;
+  walking_seconds: number | null;
+  visit_minutes: number | null;
+  is_fallback: boolean;
+  provider: string | null;
+  visibility: TripVisibility;
+  created_at: string;
+};
+
+/**
+ * @example tripDetailFromRow(row, await fetchTripStops(ids)).stopCount // ids.length
+ */
+export function tripDetailFromRow(trip: TripRow, stops: AttractionSummary[]): TripDetail {
+  return {
+    id: trip.id,
+    name: trip.name,
+    citySlug: trip.city_slug,
+    tripDate: trip.trip_date,
+    distanceM: trip.distance_m,
+    walkingSeconds: trip.walking_seconds,
+    visitMinutes: trip.visit_minutes,
+    createdAt: trip.created_at,
+    stopCount: stops.length,
+    visibility: trip.visibility,
+    geometry: (trip.route_geometry as LineString | null) ?? null,
+    isFallback: trip.is_fallback,
+    provider: trip.provider,
+    stops,
+  };
+}
+
+/**
+ * Loads the stops' attraction details (readable by everyone) and keeps the order of `ids`.
+ * @example const stops = await fetchTripStops(['a2', 'a1']); // [a2, a1]
+ */
+export async function fetchTripStops(ids: string[]): Promise<AttractionSummary[]> {
+  const details = unwrap(
+    await supabase
+      .from('attraction_details')
+      .select(
+        'id, city_slug, name_en, name_pt, category, lat, lng, popularity, avg_visit_minutes, image_url, is_unesco',
+      )
+      .in('id', ids),
+  );
+  const byId = new Map(details.map((d) => [d.id, d]));
+  return ids
+    .map((aid) => byId.get(aid))
+    .filter((d): d is NonNullable<typeof d> => !!d)
+    .map((d) => ({
+      id: d.id!,
+      citySlug: d.city_slug!,
+      nameEn: d.name_en!,
+      namePt: d.name_pt,
+      category: d.category!,
+      lat: d.lat!,
+      lng: d.lng!,
+      popularity: d.popularity ?? 0,
+      avgVisitMinutes: d.avg_visit_minutes ?? 30,
+      imageUrl: d.image_url,
+      isUnesco: d.is_unesco ?? false,
+    }));
 }
 
 export type SaveTripInput = {

@@ -424,6 +424,7 @@ export type Database = {
           user_id: string;
           visit_minutes: number | null;
           walking_seconds: number | null;
+          visibility: string;
         };
         Insert: {
           city_slug: string;
@@ -439,6 +440,7 @@ export type Database = {
           user_id?: string;
           visit_minutes?: number | null;
           walking_seconds?: number | null;
+          visibility?: string;
         };
         Update: {
           city_slug?: string;
@@ -454,6 +456,7 @@ export type Database = {
           user_id?: string;
           visit_minutes?: number | null;
           walking_seconds?: number | null;
+          visibility?: string;
         };
         Relationships: [
           {
@@ -707,6 +710,11 @@ export type Database = {
         Returns: string;
       };
       set_nationalities: { Args: { codes: string[] }; Returns: undefined };
+      set_trip_visibility: {
+        Args: { p_password?: string; p_trip_id: string; p_visibility: string };
+        Returns: undefined;
+      };
+      shared_trip: { Args: { p_password?: string; p_trip_id: string }; Returns: Json };
     };
     Enums: {
       attraction_category:

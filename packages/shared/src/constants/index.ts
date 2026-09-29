@@ -65,6 +65,17 @@ export const REVIEW_RATING_MAX = 5;
 /** Longest review comment, in characters (mirrored by a DB check). */
 export const REVIEW_COMMENT_MAX = 1000;
 
+/**
+ * Who can open a saved trip (walk list) by its link (D-031): only the owner, anyone, or anyone
+ * with the password. Mirrored by a DB check on `trips.visibility`.
+ */
+export const TRIP_VISIBILITIES = ['private', 'public', 'password'] as const;
+export type TripVisibility = (typeof TRIP_VISIBILITIES)[number];
+export const DEFAULT_TRIP_VISIBILITY: TripVisibility = 'private';
+/** Trip password length, in characters; bcrypt reads at most 72 bytes (`set_trip_visibility`). */
+export const TRIP_PASSWORD_MIN = 4;
+export const TRIP_PASSWORD_MAX = 72;
+
 /** EU member states (ISO alpha-2). */
 export const EU_COUNTRIES = [
   'AT',

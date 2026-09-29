@@ -13,6 +13,7 @@ import { Text } from '@/components/text';
 import { useCities, type City } from '@/features/destinations/api';
 import { useProfile } from '@/features/profile/api';
 import { useTrips, type TripSummary } from '@/features/trips/api';
+import { visibilityBadge } from '@/features/trips/visibility-editor';
 import { flagEmoji, formatDate, formatDistance, formatDuration } from '@/lib/format';
 import { layout, radius, spacing } from '@/theme/colors';
 import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
@@ -103,6 +104,8 @@ function TripCard({ trip, city, lang }: { trip: TripSummary; city?: City; lang: 
       icon: 'walk',
       label: t('trips.walk', { duration: formatDuration(trip.walkingSeconds) }),
     });
+  const badge = visibilityBadge(trip.visibility);
+  if (badge) meta.push({ icon: badge.icon, label: t(badge.label as never) });
 
   return (
     <Tappable

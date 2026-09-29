@@ -358,6 +358,38 @@
     "deleteYes": "Sim, apagar viagem",
     "subtitle": "Os seus percursos a pé guardados, prontos para o dia."
   },
+  "sharing": {
+    "visibilityTitle": "Quem pode ver esta lista",
+    "visibilityLabel": "Visibilidade",
+    "visibility": {
+      "private": "Privada",
+      "public": "Pública",
+      "password": "Com palavra-passe"
+    },
+    "hint": {
+      "private": "Esta lista só é visível para si.",
+      "public": "Qualquer pessoa com o link pode ver esta lista.",
+      "password": "Qualquer pessoa com o link e a palavra-passe pode ver esta lista."
+    },
+    "password": "Palavra-passe",
+    "passwordHint": "Diga-a às pessoas com quem partilhar o link.",
+    "keepPassword": "Deixe em branco para manter a palavra-passe atual.",
+    "save": "Guardar visibilidade",
+    "saved": "Visibilidade guardada.",
+    "share": "Partilhar lista",
+    "copied": "Link copiado.",
+    "shareFailed": "Não foi possível partilhar o link. Tente novamente.",
+    "protectedTitle": "Esta lista está protegida",
+    "protectedBody": "Introduza a palavra-passe que o dono lhe deu.",
+    "open": "Abrir lista",
+    "wrongPassword": "Palavra-passe errada. Tente novamente.",
+    "notFoundTitle": "Lista indisponível",
+    "notFoundBody": "Esta lista é privada ou já não existe.",
+    "ownList": "Esta é a sua lista, tal como os outros a veem.",
+    "editOwn": "Editar lista",
+    "planYourOwn": "Planeie os seus passeios",
+    "sharedTitle": "Lista de passeio"
+  },
   "profile": {
     "title": "Perfil",
     "edit": "Editar perfil",
@@ -422,7 +454,9 @@
     "tooManyNationalities": "Adicione até 5 nacionalidades",
     "duplicate": "Remova os duplicados",
     "tooLong": "É demasiado longo",
-    "ratingRequired": "Escolha de 1 a 5 estrelas"
+    "ratingRequired": "Escolha de 1 a 5 estrelas",
+    "tripPasswordRequired": "Escolha uma palavra-passe para esta lista",
+    "tripPasswordLength": "Use de 4 a 72 caracteres"
   },
   "errors": {
     "generic": "Algo correu mal. Tente novamente.",

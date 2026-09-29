@@ -70,6 +70,8 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+      {/* Shared walk lists open for anyone with the link, signed in or not (D-031). */}
+      <Stack.Screen name="shared" options={{ title: t('sharing.sharedTitle') }} />
       <Stack.Screen name="about" options={{ title: t('about.title') }} />
     </Stack>
   );

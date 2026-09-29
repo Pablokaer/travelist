@@ -358,6 +358,38 @@
     "deleteYes": "Yes, delete trip",
     "subtitle": "Your saved walking routes, ready for the day."
   },
+  "sharing": {
+    "visibilityTitle": "Who can see this list",
+    "visibilityLabel": "Visibility",
+    "visibility": {
+      "private": "Private",
+      "public": "Public",
+      "password": "With password"
+    },
+    "hint": {
+      "private": "Only you can see this list.",
+      "public": "Anyone with the link can see this list.",
+      "password": "Anyone with the link and the password can see this list."
+    },
+    "password": "Password",
+    "passwordHint": "Tell it to the people you share the link with.",
+    "keepPassword": "Leave blank to keep the current password.",
+    "save": "Save visibility",
+    "saved": "Visibility saved.",
+    "share": "Share list",
+    "copied": "Link copied.",
+    "shareFailed": "Couldn't share the link. Please try again.",
+    "protectedTitle": "This walk list is protected",
+    "protectedBody": "Enter the password the owner gave you.",
+    "open": "Open list",
+    "wrongPassword": "Wrong password. Try again.",
+    "notFoundTitle": "Walk list not available",
+    "notFoundBody": "This list is private or no longer exists.",
+    "ownList": "This is your list, as others see it.",
+    "editOwn": "Edit list",
+    "planYourOwn": "Plan your own walks",
+    "sharedTitle": "Walk list"
+  },
   "profile": {
     "title": "Profile",
     "edit": "Edit profile",
@@ -422,7 +454,9 @@
     "tooManyNationalities": "Add up to 5 nationalities",
     "duplicate": "Remove duplicates",
     "tooLong": "This is too long",
-    "ratingRequired": "Choose from 1 to 5 stars"
+    "ratingRequired": "Choose from 1 to 5 stars",
+    "tripPasswordRequired": "Choose a password for this list",
+    "tripPasswordLength": "Use 4 to 72 characters"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

@@ -57,10 +57,15 @@ Design system (tokens, Inter, shared components with hover/focus/press/loading s
 
 1–5 star ratings with optional comments on every attraction, average + count next to the name, one review per user (edit / delete own only). Postgres table with RLS, `save_review` / `list_attraction_reviews` RPCs and `attraction_rating_summary` view; 24 pgTAP tests, unit/component tests and an E2E journey (publish → edit → delete) on web.
 
+## 2026-09-29 — Walk list visibility and sharing (D-031)
+
+Saved trips are private (default), public or password-protected; the owner switches between them and shares the link (`/shared?id=…`), which opens read-only for anyone allowed, signed in or not. pgTAP: 28 tests (RLS, hashes unreadable, owner-only changes, anon access); unit/component tests; an E2E that goes private → public (link copied and opened signed out) → password (wrong, then right) → private, on desktop and phone widths.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
 - Route stop drag and drop (D-027) is verified on web only; check it on iOS/Android with a development build (gesture vs page scroll).
+- Walk list sharing: limit password attempts; revoke a link without going private; check the native share sheet on iOS/Android (D-031).
 - Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
