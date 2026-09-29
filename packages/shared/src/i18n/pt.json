@@ -22,6 +22,10 @@
     "signInSubtitle": "Inicie sessão para planear o seu próximo passeio.",
     "signUpTitle": "Criar conta",
     "email": "Email",
+    "login": "Email ou nickname",
+    "nickname": "Nickname",
+    "nicknameHint": "3 a 20 letras minúsculas, números ou _. Pode usá-lo para entrar e aparece nos chats das caminhadas.",
+    "nicknameLocked": "Demasiadas tentativas com este nickname. Aguarde 15 minutos ou entre com o seu email.",
     "password": "Palavra-passe",
     "passwordHint": "Pelo menos 8 caracteres.",
     "signIn": "Iniciar sessão",
@@ -355,7 +359,8 @@
     "saveSplitHint": "Cada percurso é guardado como uma viagem.",
     "saveMany": "Guardar {{count}} viagens",
     "startTime": "Hora de início",
-    "startTimeHint": "Opcional. Com data e hora, uma lista pública torna-se um encontro."
+    "startTimeHint": "Opcional. Com data e hora, uma lista pública torna-se um encontro.",
+    "legWalk": "{{distance}} · {{duration}} a pé"
   },
   "trips": {
     "title": "As minhas viagens",
@@ -477,6 +482,8 @@
     "countryCode": "Escolha um país válido",
     "date": "Introduza uma data válida (AAAA-MM-DD)",
     "email": "Introduza um email válido",
+    "nickname": "Use 3 a 20 letras minúsculas, números ou _",
+    "nicknameTaken": "Este nickname já está a ser usado. Experimente outro.",
     "passwordLength": "Use pelo menos 8 caracteres",
     "otp": "Introduza o código de 6 dígitos",
     "nationalityRequired": "Adicione pelo menos uma nacionalidade",
@@ -608,5 +615,39 @@
     "notFound": "Viajante não encontrado",
     "notFoundBody": "Este perfil não existe ou foi apagado.",
     "self": "Este é o seu perfil público, tal como os outros viajantes o veem."
+  },
+  "plans": {
+    "upgrade": "Upgrade",
+    "title": "Planos",
+    "subtitle": "Listas de passeio para cada viagem. Escolha o plano que combina com a sua forma de viajar.",
+    "name": {
+      "free": "Grátis",
+      "premium": "Premium"
+    },
+    "freePrice": "{{price}}",
+    "per": {
+      "month": "{{price}} / mês",
+      "year": "{{price}} / ano"
+    },
+    "lists_one": "Até {{count}} lista",
+    "lists_other": "Até {{count}} listas",
+    "unlimitedLists": "Listas ilimitadas",
+    "items_one": "Até {{count}} local por lista",
+    "items_other": "Até {{count}} locais por lista",
+    "unlimitedItems": "Locais ilimitados por lista",
+    "deleteLists": "Apagar as suas listas",
+    "recommended": "Recomendado",
+    "current": "Plano atual",
+    "upgradeCta": "Mudar para Premium",
+    "comingSoon": "Os pagamentos chegam em breve: ainda não é possível comprar o Premium na app. Nada foi cobrado.",
+    "routeNote": "Cada percurso a pé tem até {{max}} locais, em qualquer plano.",
+    "listsReached": "Atingiu o limite do plano {{plan}}: {{count}} listas.",
+    "itemsReached": "As contas {{plan}} podem ter até {{count}} locais por lista.",
+    "deleteLocked": "Apagar listas é uma funcionalidade Premium.",
+    "settingsTitle": "Subscrição",
+    "currentPlan": "Plano atual: {{plan}}",
+    "validUntil": "Válido até: {{date}}",
+    "manage": "Gerir subscrição",
+    "seePlans": "Ver planos"
   }
 }

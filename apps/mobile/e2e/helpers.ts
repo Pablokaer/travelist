@@ -1,4 +1,8 @@
 // Shared steps of the backend E2E specs (journey, sharing).
+// Playwright runs these in Node (makePremium reads the local stack's keys with `supabase status`).
+/// <reference types="node" />
+import { execSync } from 'node:child_process';
+
 import { expect } from '@playwright/test';
 
 export type Page = import('@playwright/test').Page;
@@ -18,6 +22,10 @@ export async function signUpAndOnboard(page: Page) {
   await page.goto('/sign-up');
   await byTestId('displayName').fill('E2E Traveller');
   await byTestId('email').fill(email);
+  // Nicknames are unique, 3–20 of a-z 0-9 _ (D-048).
+  await byTestId('nickname').fill(
+    `e2e_${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`,
+  );
   await byTestId('password').fill('correct-horse-battery');
   await role('button', 'Create account').click();
 
@@ -98,4 +106,49 @@ export async function chooseVisibility(page: Page, label: string, password?: str
   await role('radio', label).click();
   if (password) await byTestIdOn(page)('trip-password').fill(password);
   await role('button', 'Save visibility').click();
+}
+
+/** The local stack's API URL and service-role key (from `supabase status`), read once. */
+let localStack: { url: string; serviceKey: string } | null = null;
+function localSupabase() {
+  if (localStack) return localStack;
+  const status = JSON.parse(
+    execSync('npx supabase status -o json', {
+      cwd: '../..',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString(),
+  ) as { API_URL: string; SERVICE_ROLE_KEY: string };
+  localStack = { url: status.API_URL, serviceKey: status.SERVICE_ROLE_KEY };
+  return localStack;
+}
+
+/**
+ * Gives the signed-in user of `page` an active Premium subscription (D-047), as the payment
+ * side will: a `subscriptions` row written with the service role. Local stack only.
+ */
+export async function makePremium(page: Page) {
+  const userId = await page.evaluate(() => {
+    const key = Object.keys(localStorage).find((k) => k.endsWith('-auth-token'));
+    return key
+      ? (JSON.parse(localStorage.getItem(key)!) as { user: { id: string } }).user.id
+      : null;
+  });
+  if (!userId) throw new Error('makePremium: no signed-in user in this page');
+  const { url, serviceKey } = localSupabase();
+  const res = await fetch(`${url}/rest/v1/subscriptions`, {
+    method: 'POST',
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      plan_id: 'premium',
+      status: 'active',
+      current_period_end: new Date(Date.now() + 30 * 86_400_000).toISOString(),
+    }),
+  });
+  if (!res.ok) throw new Error(`makePremium: HTTP ${res.status} ${await res.text()}`);
+  await page.reload();
 }

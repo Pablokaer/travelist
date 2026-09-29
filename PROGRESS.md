@@ -113,6 +113,20 @@ Reproduced with three users: lost Realtime events hid messages (root cause), joi
 
 Authors' names on reviews and chat messages open their public profile (photo, name, member since, public walk lists) by a public id that is not the account id. pgTAP: 16 new tests (255 in all); app: 283 tests; E2E: a chat author and a reviewer opened by another traveller, desktop and phone widths (30 E2E in all).
 
+## 2026-09-29 — Walking routes along the streets (D-046)
+
+Straight-line routes reproduced (ORS optimisation over quota: 403) and fixed with a cascade: optimisation → local order + ORS foot-walking directions → straight lines only as a last resort; three real-API issues found and covered by regression tests (406 without the GeoJSON Accept, 404 for stops far from a footway, no segments without instructions). Manual order is kept. Deno: 56 tests; app: 288; E2E: a route checked on the real ORS and on the map (32 E2E in all).
+
+## 2026-09-29 — Free and Premium plans, first version (D-047)
+
+`plans` (the single source of the limits) and `subscriptions` (history, status, provider ids) tables; Free: 5 lists, 5 places per list, no deleting; Premium: €5/month, unlimited, deletes own lists. Enforced by database triggers and `delete_trip`; the app explains the limits (Upgrade, Plans page, Settings → Subscription). No payments yet. pgTAP: 31 new tests (286 in all); shared: plan rules; app: 312 tests; E2E: Free limits in the app and the database, then Premium (34 E2E in all).
+
+## 2026-09-29 — Nicknames (D-048)
+
+- **What:** a nickname at sign-up (or in onboarding and Edit profile), sign-in with **Email or nickname**, and `@nickname` on every walk chat message, yours included.
+- **Tests:** pgTAP 19 new, shared 4 new, app 13 new or updated (325 in all).
+- **Verified on web:** Lucía signed in as `Lucia` and Emma as `emma`; each sees their own messages as `@nickname` and the other's replies with that person's nickname.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
@@ -120,6 +134,8 @@ Authors' names on reviews and chat messages open their public profile (photo, na
 - Map: clustering for dense areas; check photo markers and the card popup on iOS/Android (D-029).
 - Walk list sharing: limit password attempts; revoke a link without going private; check the native share sheet on iOS/Android (D-031).
 - Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028); city and walk list reviews share the same gap (D-034).
+- Plans: payment provider (checkout, webhooks writing `subscriptions`, renewal, cancellation, billing portal) (D-047).
+- Routes: rebuild trips saved earlier as straight-line estimates; a higher ORS quota for launch (D-046).
 - Meetups: reminders/notifications and a time picker (D-041); chat push notifications, message reporting/moderation and older-message paging (D-043).
 - Walk lists: an admin screen for moderators (today: SQL), a count of lists on the city page, and a check of the city page on iOS/Android (D-033, D-035).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.

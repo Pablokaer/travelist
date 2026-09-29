@@ -386,3 +386,50 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - **Links:** one `AuthorName` component — the name as a link (role `link`) on review cards and on other people's chat messages; authors without a public id stay plain text.
 - **Alternatives:** exposing the account id (simpler, but reverses D-028 and ties links to auth); a username/handle (users would have to choose one).
 - **Trade-offs:** profiles need an account to view; walk list card bylines and the chat's participant list do not link yet; the profile shows no reviews or bio.
+
+## D-046 — Walking routes always follow the streets when OpenRouteService answers
+
+- **Context:** the owner saw routes drawn as straight lines between destinations and asked for paths that follow the streets that can be walked, like Google Maps, so the user can follow them on the map.
+- **Findings** (reproduced by calling the running function):
+  - Every route came back as the labelled straight-line estimate: the ORS `/optimization` endpoint answered **403 "Quota exceeded"** (its free daily quota is small and the E2E runs use it), and the route geometry came only from that call, so any optimisation failure dropped the street path too.
+  - The ORS directions endpoint (separate, larger quota) was not used at all. Once used, three more real-API issues showed: the GeoJSON endpoint answers **406** to `Accept: application/json`; a stop far from any footway (Lisbon's 25 de Abril Bridge, mid-river) fails the whole route (**404, error 2010**) unless stops may snap (`radiuses: -1`); and per-leg segments only come with `instructions: true`.
+  - In manual order, "Optimise" reordered the stops anyway, so the path could differ from the order the user set; the walk between stops in the list was always a straight-line estimate.
+- **Decision:**
+  - **A cascade that keeps the street path:** automatic order → ORS optimisation (order + path); if it fails → the local shortest straight-line order walked with **ORS foot-walking directions**; straight lines only when neither answers (labelled, not cached). Directions results are cached 30 days (`route:ors-path`) and a local-order path one day (`route:ors-local`), so the optimiser is tried again soon.
+  - **`keepOrder`** in the request: an order set by hand is kept and only its path is computed (directions, cached by that order).
+  - Directions requests send `Accept: application/geo+json, application/json`, `radiuses: -1` per stop (snap to the nearest walkable point) and `instructions: true` (per-leg segments). Each is covered by a regression test.
+  - The stop list shows each leg's street distance and time once computed ("1.5 km · 18 min on foot"); "≈" estimates only before.
+- **Alternatives:** a public OSRM/Valhalla demo server — no service agreement for production use; self-hosting a router — heavy for this stage; paying for a higher ORS quota — useful later, but the cascade is needed anyway for any outage.
+- **Trade-offs:** when the optimiser is unavailable the order is shortest by straight-line distance, not by walking distance; a snapped stop's path ends at the nearest footway, not at its marker (e.g. a bridge seen from the shore); routes saved before as estimates keep their straight lines until rebuilt; the free directions quota still bounds usage.
+
+## D-047 — Free and Premium plans, first version, without payments
+
+- **Context:** the owner wants a first subscription layer: Free (€0: up to 5 lists, 5 places per list, no deleting lists) and Premium (€5/month: unlimited lists and places, deletes own lists), enforced by the backend, with a plans page, "Upgrade" in the top bar and Settings → Subscription — and no Stripe, checkout or billing yet, but a model ready for them.
+- **Decision:**
+  - **Plans are data:** a `plans` table (price in cents, currency, interval, `max_lists`, `max_items_per_list` with null = unlimited, `can_delete_lists`, one default). It is the single source for the database and the app — no limit or price is written in code or UI text; a new plan is a new row.
+  - **Subscriptions apart from the user:** `subscriptions` holds one row per subscription (history), with status (`active`, `cancelled`, `expired`, `past_due`), start, end of period, cancellation time and the provider's ids — room for Stripe or another provider (User → Subscription → Plan → Payment provider). Only the service role writes it (the payment side, later webhooks); users read their own. No row = Free, so existing accounts need no migration of data.
+  - **One rule for "has the plan":** `subscription_grants_plan(status, period_end)` — today only `active` and unexpired; cancelled-until-period-end, grace periods and the like change it in one place. `effective_plan(user)` and `my_subscription()` build on it.
+  - **Enforced in the database for user requests:** triggers on `trips` (lists, `WF001`) and `trip_stops` (places, counted after the statement so a whole list saved at once is checked, `WF002`), the `trips` delete policy plus `delete_trip` (`WF003`). They act when the request runs as `authenticated`; admin writes (service role, seeds, migrations) are not limited. Data over a limit is never removed — only new lists, new places and deletes are refused. Account deletion still cascades.
+  - **The app reads the same rules:** `@wayfarer/shared` has pure checks (`canCreateList`, `canAddItemToList`, `canDeleteList`, `itemCapacity`) over the plan from `my_subscription`, and maps `WF001`–`WF003` to `PlanLimitError`; the route tray holds as many places as the plan allows, saving checks lists and places first, and the trip page shows deleting as a Premium feature. One `PlanLimitNotice` explains each limit from the plan's values and links to the plans page.
+  - **Checkout is a stub:** `startCheckout(planId)` answers "unavailable"; "Upgrade to Premium" says payments are coming soon. The next round replaces it with the provider's checkout and writes subscriptions from its webhooks.
+  - **Premium's "unlimited places"** stays within the walking route limit of 20 places (D-030), a routing limit on every plan (said on the plans page).
+- **Alternatives:** a `plan` column on `profiles` — no history, status or provider ids, and users could update their own profile row; limits as constants in the shared package — a second source the database could disagree with; enforcing in the app only — bypassable with a direct API call.
+- **Trade-offs:** each list/place insert reads the plan (cheap, indexed); limits are checked per request, so two simultaneous saves at the edge of a limit could both pass (acceptable for a first version); Premium is not purchasable yet.
+
+## D-048 — Nicknames: sign in with a handle, checked in the database before Supabase Auth
+
+- **Context:** users want a nickname at sign-up, to sign in with it instead of the email and to be recognised in the walk chat (own messages included, instead of "You"). Supabase Auth signs in only by email or phone.
+- **Decision:**
+  - **The nickname** is `profiles.nickname`: unique, lowercase `a-z 0-9 _`, 3–20 characters, never containing `@`. That makes the sign-in field unambiguous (Email or nickname).
+  - **Signing in with a nickname** calls `login_email_for_nickname(nickname, password)`. It checks the password against `auth.users` (bcrypt) and only then returns that account's email. The app then calls Supabase Auth's normal password sign-in, so sessions, rate limits and email confirmation stay Supabase's.
+  - **Brute force:** because the function checks passwords outside the Auth rate limit, 10 failures per nickname in 15 minutes lock it (`nickname_login_failures`, no client access).
+  - **The sign-up nickname** travels in the user metadata. `handle_new_user` keeps it only when it is valid and free, so a race never fails the sign-up; onboarding asks again.
+  - **The chat** shows `@nickname` for every author.
+- **Alternatives:**
+  - an RPC returning the email for any nickname (rejected: anyone could read anyone's email);
+  - an Edge Function proxying the Auth password grant (rejected: every sign-in would share the function's IP for the Auth rate limit, plus an extra service);
+  - making the nickname the email local part, or a fake `nick@…` email (rejected: breaks email confirmation, magic links and recovery).
+- **Trade-offs:**
+  - Nickname sign-in takes two requests.
+  - The lock can be used to block someone's nickname sign-in for 15 minutes (email sign-in is unaffected).
+  - Nicknames are public, and `nickname_available` confirms whether one exists.

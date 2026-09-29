@@ -257,6 +257,60 @@ export type Database = {
         };
         Relationships: [];
       };
+      nickname_login_failures: {
+        Row: {
+          failed_at: string;
+          nickname: string;
+        };
+        Insert: {
+          failed_at?: string;
+          nickname: string;
+        };
+        Update: {
+          failed_at?: string;
+          nickname?: string;
+        };
+        Relationships: [];
+      };
+      plans: {
+        Row: {
+          billing_interval: string | null;
+          can_delete_lists: boolean;
+          created_at: string;
+          currency: string;
+          id: string;
+          is_default: boolean;
+          max_items_per_list: number | null;
+          max_lists: number | null;
+          price_cents: number;
+          sort_order: number;
+        };
+        Insert: {
+          billing_interval?: string | null;
+          can_delete_lists: boolean;
+          created_at?: string;
+          currency?: string;
+          id: string;
+          is_default?: boolean;
+          max_items_per_list?: number | null;
+          max_lists?: number | null;
+          price_cents: number;
+          sort_order?: number;
+        };
+        Update: {
+          billing_interval?: string | null;
+          can_delete_lists?: boolean;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          is_default?: boolean;
+          max_items_per_list?: number | null;
+          max_lists?: number | null;
+          price_cents?: number;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       profile_nationalities: {
         Row: {
           country_code: string;
@@ -298,6 +352,7 @@ export type Database = {
           home_country: string | null;
           id: string;
           language: string;
+          nickname: string | null;
           onboarded_at: string | null;
           passport_expiry: string | null;
           public_id: string;
@@ -312,6 +367,7 @@ export type Database = {
           home_country?: string | null;
           id: string;
           language?: string;
+          nickname?: string | null;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
           public_id?: string;
@@ -326,6 +382,7 @@ export type Database = {
           home_country?: string | null;
           id?: string;
           language?: string;
+          nickname?: string | null;
           onboarded_at?: string | null;
           passport_expiry?: string | null;
           public_id?: string;
@@ -444,6 +501,56 @@ export type Database = {
             columns: ['trip_id'];
             isOneToOne: false;
             referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      subscriptions: {
+        Row: {
+          cancelled_at: string | null;
+          created_at: string;
+          current_period_end: string | null;
+          id: string;
+          plan_id: string;
+          provider: string | null;
+          provider_subscription_id: string | null;
+          started_at: string;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          cancelled_at?: string | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          id?: string;
+          plan_id: string;
+          provider?: string | null;
+          provider_subscription_id?: string | null;
+          started_at?: string;
+          status: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          cancelled_at?: string | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          id?: string;
+          plan_id?: string;
+          provider?: string | null;
+          provider_subscription_id?: string | null;
+          started_at?: string;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'subscriptions_plan_id_fkey';
+            columns: ['plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'plans';
             referencedColumns: ['id'];
           },
         ];
@@ -908,7 +1015,51 @@ export type Database = {
           popularity: number;
         }[];
       };
+      current_subscription: {
+        Args: { p_user_id: string };
+        Returns: {
+          cancelled_at: string | null;
+          created_at: string;
+          current_period_end: string | null;
+          id: string;
+          plan_id: string;
+          provider: string | null;
+          provider_subscription_id: string | null;
+          started_at: string;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'subscriptions';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       delete_account: { Args: Record<PropertyKey, never>; Returns: undefined };
+      delete_trip: { Args: { p_trip_id: string }; Returns: undefined };
+      effective_plan: {
+        Args: { p_user_id: string };
+        Returns: {
+          billing_interval: string | null;
+          can_delete_lists: boolean;
+          created_at: string;
+          currency: string;
+          id: string;
+          is_default: boolean;
+          max_items_per_list: number | null;
+          max_lists: number | null;
+          price_cents: number;
+          sort_order: number;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'plans';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       is_moderator: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_walk_chat_member: { Args: { p_trip_id: string }; Returns: boolean };
       list_reviews: {
@@ -936,6 +1087,7 @@ export type Database = {
         Returns: {
           author_avatar_path: string;
           author_name: string;
+          author_nickname: string;
           author_public_id: string;
           body: string;
           created_at: string;
@@ -987,6 +1139,14 @@ export type Database = {
           walking_seconds: number;
         }[];
       };
+      login_email_for_nickname: {
+        Args: { p_nickname: string; p_password: string };
+        Returns: string;
+      };
+      my_subscription: { Args: Record<PropertyKey, never>; Returns: Json };
+      nickname_available: { Args: { p_nickname: string }; Returns: boolean };
+      normalize_nickname: { Args: { p_nickname: string }; Returns: string };
+      plan_allows_deleting_lists: { Args: Record<PropertyKey, never>; Returns: boolean };
       public_profile: { Args: { p_public_id: string }; Returns: Json };
       save_review: {
         Args: {
@@ -1023,6 +1183,10 @@ export type Database = {
       };
       set_walk_attendance: { Args: { p_attending: boolean; p_trip_id: string }; Returns: Json };
       shared_trip: { Args: { p_password?: string; p_trip_id: string }; Returns: Json };
+      subscription_grants_plan: {
+        Args: { p_period_end: string; p_status: string };
+        Returns: boolean;
+      };
       trip_open_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
       trip_visible_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
       walk_open_to_join: { Args: { p_trip_id: string }; Returns: boolean };

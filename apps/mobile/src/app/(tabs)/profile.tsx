@@ -23,6 +23,7 @@ import {
 import { formatDate } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 import { useBreakpoint, useTheme } from '@/theme/use-theme';
+import { SubscriptionSection } from '@/features/subscription/subscription-section';
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -67,8 +68,8 @@ export default function ProfileScreen() {
             <Text variant="heading" numberOfLines={1}>
               {displayName}
             </Text>
-            <Text variant="caption" secondary numberOfLines={1}>
-              {session?.user.email}
+            <Text variant="caption" secondary numberOfLines={1} testID="profile-login">
+              {p.nickname ? `@${p.nickname} · ${session?.user.email}` : session?.user.email}
             </Text>
           </View>
           <Button
@@ -160,6 +161,8 @@ export default function ProfileScreen() {
           </View>
         </Section>
       </View>
+
+      <SubscriptionSection />
 
       <Section title={t('profile.account')}>
         <RowGroup>
