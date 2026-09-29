@@ -304,6 +304,10 @@ Non-trivial choices go to [docs/DECISIONS.md](./docs/DECISIONS.md); milestone st
 
 ## Quick start (local, everything on your machine)
 
+**One command:** with Docker, Node 22 and pnpm installed, `./run-project.sh` does all of the steps below — starts Docker if needed (macOS), installs dependencies, starts the local Supabase stack (retrying while its containers boot), creates `.env` from `.env.example` and writes the local API URL, anon and service-role keys into it (a `.env` pointing at a hosted project is left as is), links `apps/mobile/.env`, serves the Edge Functions in the background (log: `.turbo/functions-serve.log`) and opens the app on the web at http://localhost:8081. Ctrl+C stops the app and the functions; the Supabase stack keeps running until `./run-project.sh --stop`.
+
+Step by step:
+
 ```bash
 corepack enable
 pnpm install
@@ -341,6 +345,7 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 
 | Command                                      | What it does                                                                                               |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `./run-project.sh` / `--stop`                | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                        |
 | `pnpm dev`                                   | Start the Expo dev server                                                                                  |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                                                                    |
 | `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests                                                |
