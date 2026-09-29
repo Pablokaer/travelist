@@ -10,6 +10,7 @@ import type { RatingSummary, Review } from '@/features/reviews/api';
 import { Stars } from '@/features/reviews/star-rating';
 import { formatDate, formatRating } from '@/lib/format';
 import { spacing } from '@/theme/colors';
+import { useTheme } from '@/theme/use-theme';
 
 /** Edits within a minute of publishing are not worth an "edited" note. */
 const EDIT_GRACE_MS = 60_000;
@@ -20,6 +21,25 @@ const EDIT_GRACE_MS = 60_000;
  */
 export function wasEdited(review: Pick<Review, 'createdAt' | 'updatedAt'>): boolean {
   return Date.parse(review.updatedAt) - Date.parse(review.createdAt) > EDIT_GRACE_MS;
+}
+
+/**
+ * Renders a translated rating string with its ★ in gold and the rest in the text colour.
+ * @example <GoldStar text="4.6 ★ · 128 reviews" />
+ */
+function GoldStar({ text }: { text: string }) {
+  const theme = useTheme();
+  const at = text.indexOf('★');
+  if (at < 0) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <Text testID="rating-star" style={{ color: theme.star }}>
+        ★
+      </Text>
+      {text.slice(at + 1)}
+    </>
+  );
 }
 
 /**
@@ -48,7 +68,7 @@ export function RatingSummaryLine({
       variant={variant}
       testID="rating-summary"
       accessibilityLabel={t('reviews.summaryLabel', values)}>
-      {t('reviews.summary', values)}
+      <GoldStar text={t('reviews.summary', values)} />
     </Text>
   );
 }
@@ -63,7 +83,7 @@ export function CardRating({ summary }: { summary: RatingSummary | undefined }) 
   if (!label) return null;
   return (
     <Text variant="caption" testID="card-rating" accessibilityLabel={label.spoken}>
-      {label.shown}
+      <GoldStar text={label.shown} />
     </Text>
   );
 }

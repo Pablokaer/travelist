@@ -1,6 +1,5 @@
-// Five-star controls for reviews (D-028). Stars are the ★ glyph in the text colour (filled) or
-// the strong border colour (empty): one glyph renders the same on web, iOS and Android, and the
-// neutral palette keeps the coral accent for actions (D-020).
+// Five-star controls for reviews (D-028). Stars are the ★ glyph in gold (filled, `theme.star`)
+// or the strong border colour (empty): one glyph renders the same on web, iOS and Android.
 import { REVIEW_RATING_MAX } from '@wayfarer/shared';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -17,10 +16,11 @@ function StarGlyph({ filled, size }: { filled: boolean; size: number }) {
   return (
     <Text
       aria-hidden
+      testID={filled ? 'star-glyph-filled' : 'star-glyph-empty'}
       style={{
         fontSize: size,
         lineHeight: size * 1.15,
-        color: filled ? theme.text : theme.borderStrong,
+        color: filled ? theme.star : theme.borderStrong,
       }}>
       ★
     </Text>

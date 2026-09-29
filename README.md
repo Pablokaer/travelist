@@ -112,7 +112,7 @@ Data comes from the `attractions_in_view` RPC (bbox + categories, most popular f
   - a route belongs to one city — adding a place from another city **starts a new route** (with a notice).
 - **Good to know:** average visit time (minutes, per category default or per place) and entry fee (yes / no / free text) as tiles; opening hours (OSM, when available) on their own row.
 - **Reviews** (D-028):
-  - **Rate this place:** five clickable stars (a whole rating from 1 to 5, required) and an optional comment (up to 1000 characters); **Publish review**. Without a rating the form says "Choose from 1 to 5 stars".
+  - **Rate this place:** five clickable gold stars (a whole rating from 1 to 5, required) and an optional comment (up to 1000 characters); **Publish review**. Without a rating the form says "Choose from 1 to 5 stars".
   - One review per user and place: once published, the form shows **Your review** filled in, with **Update review** and **Delete** (asks "Delete your review of this place?" first).
   - Every review, newest first (up to 50): avatar with initials, the author's display name ("Traveller" when they have none), a **Your review** badge on your own, stars, publication date ("· edited" when changed later) and the comment. Other people's reviews have no edit or delete controls.
 - **Learn more** links (in-app browser): official website, Wikipedia (PT article when the app is in PT and it exists, otherwise EN), image source.
