@@ -139,8 +139,9 @@ A disclaimer at the bottom reminds the user to confirm requirements with officia
 
 - **Automatic order:** places can be picked in any order. The first pick is the starting point; every new pick is slotted into the walk and the route is re-ordered for the shortest total walk (exact shortest path on straight-line distance, `orderFromStart` in `packages/shared/src/domain/route-plan.ts`, D-025) — not simply sorted by distance from the start. A notice says the order is automatic (D-022).
 - Map of the selected stops, numbered per route and coloured per route, and, after optimising, each route's walking line. On desktop the map sits beside the stop list.
-- Stop list in walking order with the estimated walk between consecutive stops (straight line × 1.3) and **move up / move down / remove** controls.
-  - Moving a stop switches to **manual order**: the notice changes and new picks are inserted where they add the least walking, without re-sorting. **Reorder automatically** goes back to the shortest walk.
+- Stop list in walking order with the estimated walk between consecutive stops (straight line × 1.3) and **drag grip / move up / move down / remove** controls.
+  - **Drag and drop:** press the grip (⋮⋮) and drag the stop to its new place within the route; the other stops slide to make room and the page doesn't scroll while dragging (web: mouse or touch; iOS/Android: touch). A stop can't be dragged into another route of a split — use **Split here** / **Join into one route** for that (D-027).
+  - Moving a stop (buttons or drag) switches to **manual order**: the notice changes and new picks are inserted where they add the least walking, without re-sorting. **Reorder automatically** goes back to the shortest walk.
 - **Split into several routes** (from 5 stops, `ROUTE_SPLIT_MIN_STOPS`): each route keeps ≥ 2 stops and is independent.
   - **Split here** between two stops cuts the route at that point.
   - **Suggest a split** into 2–6 routes (as many as 2-stop routes allow) makes **balanced** routes, each meant for a day or a part of the trip (D-023): it weighs short walks (nearby places stay together) against routes of similar length in time — visits plus walking. It starts from the best cuts of the walking order, then moves and swaps stops between routes while that improves the score `walking minutes + 0.5 × Σ |route time − average route time|` (`splitRoute`, `splitCost`). Neighbourhoods far apart are never merged just to even out the count. The first route keeps the starting point; the others start where their walk is shortest.
@@ -271,6 +272,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Expo Go cannot load MapLibre: iOS/Android need a development build.
 - Sentry / PostHog are not wired yet (no-op facade).
 - Dark theme: sign-in and sign-up screens are always light (the choice lives on the profile), and the map keeps its light style.
+- Route stops are dragged only within their route (not between split routes), and there is no auto-scroll when dragging past the edge of the screen. Drag and drop is verified on web (mouse and touch emulation); iOS/Android untested on this machine (D-027).
 - No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
 - The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
 

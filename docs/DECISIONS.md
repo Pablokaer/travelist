@@ -177,3 +177,12 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - **Search:** two contexts, two functions over already loaded data — `searchCities` on the Home (city names EN/PT, then countries), `searchAttractions` on the city page — sharing the matching rules and a `SearchField` component.
   - **Shared pieces:** `BrowseHeader` (logo, optional lead, search, optional action, content below) serves both pages, `CardGrid` both grids (D-024 rules), `CityCard` reuses the attraction card's image treatment (`Thumbnail`).
 - **Trade-offs:** a city's cover is whatever its most popular photographed attraction looks like (e.g. an aerial photo of the Anne Frank House for Amsterdam), not a curated skyline; curating covers would need new data. The Home lists cities A–Z; no ranking or featured cities yet.
+
+## D-027 — Drag and drop for route stops with PanResponder
+
+- **Context:** the route builder only reordered stops with move up / move down, one place per tap; moving the last of 12 stops to the start took 11 taps.
+- **Decision:**
+  - A **grip** on each stop row (next to the arrows, which stay for accessibility and precise moves) starts a drag; the row follows the pointer, the rows it passes slide by its height, and the drop calls the store's new `moveTo(id, to)` (`move` is now built on it).
+  - The drop position is pure maths over the rows' measured boxes (`dropIndex`, `rowShift` in `features/route/stop-drag.tsx`): the number of other rows whose centre is above the dragged row's centre.
+  - Built on React Native's core **PanResponder**, not `react-native-gesture-handler` + Reanimated: it works on web, iOS and Android without adding a `GestureHandlerRootView` at the app root, and a list of at most 12 rows doesn't need UI-thread animation. The page's `ScrollView` is paused (`Screen scrollEnabled`) while a drag is active so the gesture isn't taken over by scrolling; on web the grip sets `touch-action: none`.
+- **Trade-offs:** the drag runs on the JS thread (one re-render per move), fine for ≤ 12 rows. Stops move only within their route; dragging between split routes is not supported. No auto-scroll when dragging past the visible edge of a long list on a small screen.

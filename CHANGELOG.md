@@ -13,6 +13,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- Route builder: stops can be reordered by **dragging** their grip (⋮⋮) as well as with move up / move down (D-027). The dragged stop follows the pointer, the others slide to make room, the page stops scrolling during the drag, and dropping switches to manual order like the buttons do.
 - `./run-project.sh`: one command to run the project locally — starts Docker, installs dependencies, starts Supabase, fills `.env` with the local keys, serves the Edge Functions and opens the web app; `--stop` stops the Supabase stack.
 - Home page (D-026): after sign-in the app opens on a grid of the destinations it covers (only active cities with data) — cover photo with its credit, city, country and number of places — with a **Search cities** field (city names in EN/PT, then countries). A city card opens the city page at `/city/{slug}` (e.g. `/city/amsterdam`), which is the former Explore screen, now driven by the city in the URL; the logo, the Explore tab and back return to the Home. `city_list` gains the country names and a cover photo (new migration).
 

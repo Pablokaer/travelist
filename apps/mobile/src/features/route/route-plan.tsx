@@ -20,6 +20,7 @@ import { localizedName } from '@/features/destinations/api';
 import { AttractionRow } from '@/features/destinations/components';
 import { formatDistance } from '@/lib/format';
 import { useRouteColor } from '@/features/route/route-colors';
+import { DragHandle, rowShift, useStopDrag, type StopDragState } from '@/features/route/stop-drag';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -83,20 +84,33 @@ function LegConnector({
 
 function StopActions({
   stop,
-  isFirst,
+  index,
   isLast,
   onMove,
   onRemove,
+  onDragMove,
+  onDragEnd,
 }: {
   stop: Stop;
-  isFirst: boolean;
+  index: number;
   isLast: boolean;
   onMove: (id: string, direction: -1 | 1) => void;
   onRemove: (id: string) => void;
+  onDragMove: (state: StopDragState) => void;
+  onDragEnd: (from: number, dy: number) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isFirst = index === 0;
   return (
     <View style={styles.rowActions}>
+      <DragHandle
+        index={index}
+        accessibilityLabel={t('route.dragNamed', {
+          name: localizedName(stop, i18n.resolvedLanguage ?? 'en'),
+        })}
+        onDragMove={onDragMove}
+        onDragEnd={onDragEnd}
+      />
       <IconButton
         icon="arrowUp"
         accessibilityLabel={t('route.moveUp')}
@@ -120,7 +134,8 @@ function StopActions({
 
 /**
  * One route's stops in walking order, numbered in the route's colour, with the estimated walk
- * between consecutive stops and optional "Split here" points.
+ * between consecutive stops and optional "Split here" points. Stops are reordered with the
+ * up / down buttons or by dragging their grip.
  * @example <RouteStopList route={routes[0]} routeIndex={0} routeCount={2} … />
  */
 export function RouteStopList({
@@ -130,8 +145,10 @@ export function RouteStopList({
   splittable,
   units,
   onMove,
+  onMoveTo,
   onRemove,
   onSplitAt,
+  onDragActive,
 }: {
   route: Stop[];
   routeIndex: number;
@@ -140,15 +157,40 @@ export function RouteStopList({
   splittable: boolean;
   units: Units;
   onMove: (id: string, direction: -1 | 1) => void;
+  onMoveTo: (id: string, to: number) => void;
   onRemove: (id: string) => void;
   onSplitAt: (position: number) => void;
+  /** Called with true when a drag starts and false when it ends (e.g. to pause page scrolling). */
+  onDragActive?: (active: boolean) => void;
 }) {
   const colorOf = useRouteColor();
+  const drag = useStopDrag((from, to) => onMoveTo(route[from]!.id, to));
+  const onDragMove = (state: StopDragState) => {
+    if (!drag.drag) onDragActive?.(true);
+    drag.move(state);
+  };
+  const onDragEnd = (from: number, dy: number) => {
+    onDragActive?.(false);
+    drag.end(from, dy);
+  };
+  const offsetOf = (i: number) => {
+    if (!drag.drag || drag.target == null) return 0;
+    if (i === drag.drag.from) return drag.drag.dy;
+    return rowShift(i, drag.drag.from, drag.target, drag.heightOf(drag.drag.from), spacing.xs);
+  };
   return (
     <View style={styles.list} testID={`route-${routeIndex}`}>
       {routeCount > 1 ? <RouteHeading routeIndex={routeIndex} stopCount={route.length} /> : null}
       {route.map((stop, i) => (
-        <View key={stop.id} style={styles.list}>
+        <View
+          key={stop.id}
+          onLayout={drag.measure(i)}
+          testID={`route-${routeIndex}-stop-${i}`}
+          style={[
+            styles.list,
+            { transform: [{ translateY: offsetOf(i) }] },
+            drag.drag?.from === i && styles.dragged,
+          ]}>
           {i > 0 ? (
             <LegConnector
               from={route[i - 1]!}
@@ -164,10 +206,12 @@ export function RouteStopList({
             trailing={
               <StopActions
                 stop={stop}
-                isFirst={i === 0}
+                index={i}
                 isLast={i === route.length - 1}
                 onMove={onMove}
                 onRemove={onRemove}
+                onDragMove={onDragMove}
+                onDragEnd={onDragEnd}
               />
             }
           />
@@ -276,7 +320,9 @@ const styles = StyleSheet.create({
     minHeight: 32,
   },
   rail: { width: 2, alignSelf: 'stretch', marginRight: spacing.sm, borderRadius: 1 },
-  rowActions: { flexDirection: 'row' },
+  rowActions: { flexDirection: 'row', alignItems: 'center' },
+  // Lifted above its neighbours while it follows the pointer.
+  dragged: { zIndex: 1, opacity: 0.92 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
   splitActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

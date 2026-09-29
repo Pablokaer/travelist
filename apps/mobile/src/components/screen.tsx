@@ -11,6 +11,8 @@ type Width = keyof typeof layout;
 
 type ScreenProps = PropsWithChildren<{
   scroll?: boolean;
+  /** Pauses scrolling (e.g. while a list row is being dragged) without unmounting the ScrollView. */
+  scrollEnabled?: boolean;
   /** Maximum content width: `form` for auth/forms, `content` for reading, `wide` for grids. */
   width?: Width;
   /** Sticky action bar pinned to the bottom (e.g. the main call to action). */
@@ -29,6 +31,7 @@ export function useGutter() {
 export function Screen({
   children,
   scroll = true,
+  scrollEnabled = true,
   width = 'content',
   footer,
   centered,
@@ -51,6 +54,7 @@ export function Screen({
       {scroll ? (
         <ScrollView
           contentContainerStyle={styles.scroll}
+          scrollEnabled={scrollEnabled}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag">
           {content}

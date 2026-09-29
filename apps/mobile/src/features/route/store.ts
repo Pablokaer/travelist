@@ -34,6 +34,11 @@ type RouteState = {
   toggle: (stop: Stop) => ToggleOutcome;
   /** Moves a stop one place within its route; switches to manual order. */
   move: (id: string, direction: -1 | 1) => void;
+  /**
+   * Moves a stop to position `to` within its route (drag and drop); switches to manual order.
+   * @example useRouteStore.getState().moveTo('a1', 0); // 'a1' becomes the route's start
+   */
+  moveTo: (id: string, to: number) => void;
   /** Back to the automatic (shortest-walk) order for every route. */
   autoOrder: () => void;
   /** Splits route `routeIndex` before its stop at `position` (both sides keep ≥ 2 stops). */
@@ -120,14 +125,17 @@ export const useRouteStore = create<RouteState>((set, get) => ({
       const next = withRoutes(removeStop(s.routes, id, s.manualOrder));
       return next.stops.length ? next : { ...next, citySlug: null, manualOrder: false };
     }),
-  move: (id, direction) =>
+  move: (id, direction) => {
+    const route = get().routes.find((r) => r.some((x) => x.id === id)) ?? [];
+    get().moveTo(id, route.findIndex((x) => x.id === id) + direction);
+  },
+  moveTo: (id, to) =>
     set((s) => {
       const routeIndex = s.routes.findIndex((r) => r.some((x) => x.id === id));
       const route = [...(s.routes[routeIndex] ?? [])];
-      const i = route.findIndex((x) => x.id === id);
-      const j = i + direction;
-      if (i < 0 || j < 0 || j >= route.length) return s;
-      [route[i], route[j]] = [route[j]!, route[i]!];
+      const from = route.findIndex((x) => x.id === id);
+      if (from < 0 || from === to || to < 0 || to >= route.length) return s;
+      route.splice(to, 0, ...route.splice(from, 1));
       return {
         manualOrder: true,
         ...withRoutes(s.routes.map((r, k) => (k === routeIndex ? route : r))),
