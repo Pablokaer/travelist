@@ -67,6 +67,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Docs
 
+- README: new **Stack and architecture** section — technologies and versions per layer, detailed repository layout, app architecture (routes and guards, feature folders, data access, state, maps, auth, theme, i18n), shared package, backend (tables and RLS, seeds, Edge Function request lifecycle and providers), pipeline commands and ingestion, end-to-end flows, testing and CI; replaces the short _Repository layout_.
 - `CLAUDE.md` → Tests: development follows TDD (red → green → refactor); bug fixes start with a failing regression test.
 - README rewritten as the functional reference of the app: every feature, screen/route, Edge Function, RPC, table, limit and known limitation, plus a "Maintaining this README" checklist.
 - `CLAUDE.md` with the documentation rules for coding agents.

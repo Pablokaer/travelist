@@ -6,7 +6,7 @@ Cross-platform travel companion (iOS · Android · Web) built with Expo + Supaba
 - **Explore:** a map of attractions across European cities — full list, counts and data quality per city in [docs/CITIES.md](./docs/CITIES.md).
 - **Walk:** an optimised walking route between the places you pick, saved as a trip and opened in Google / Apple Maps.
 
-Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md) · Cities: [docs/CITIES.md](./docs/CITIES.md) · Changes: [CHANGELOG.md](./CHANGELOG.md)
+Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and architecture](#stack-and-architecture) · [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md) · Cities: [docs/CITIES.md](./docs/CITIES.md) · Changes: [CHANGELOG.md](./CHANGELOG.md)
 
 > **Every change is recorded and documented.** The [Features](#features) section is the reference for what the app does; [CHANGELOG.md](./CHANGELOG.md) records every change; [docs/CITIES.md](./docs/CITIES.md) lists every covered city (generated). Any change must update them in the same commit — see [Maintaining this README](#maintaining-this-readme). CI enforces the changelog and the city list.
 
@@ -27,6 +27,7 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITEC
 - [Limits and rules](#limits-and-rules)
 - [Covered cities](#covered-cities)
 - [Known limitations](#known-limitations)
+- [Stack and architecture](#stack-and-architecture) (technologies, repository layout, app, shared package, backend, pipeline, flows, testing and CI)
 - [Development](#prerequisites) (setup, deploy, scripts, pipeline)
 
 ---
@@ -300,9 +301,268 @@ This README is the functional reference of the app. Update it in the same commit
 - change a constant, validation rule or limit → [Limits and rules](#limits-and-rules);
 - add, remove, deactivate or re-ingest a city → run the pipeline (regenerates [docs/CITIES.md](./docs/CITIES.md)), name the city in CHANGELOG under **Data**, and update any counts quoted here or in `PROGRESS.md`;
 - fix or discover a limitation → [Known limitations](#known-limitations) (and `PROGRESS.md`);
+- add, remove or upgrade a library, provider or tool, add a folder or module, or change how a layer works → [Stack and architecture](#stack-and-architecture) (and `docs/DECISIONS.md` for the reason);
 - change setup, scripts or env variables → the development sections below.
 
 Non-trivial choices go to [docs/DECISIONS.md](./docs/DECISIONS.md); milestone status to [PROGRESS.md](./PROGRESS.md).
+
+## Stack and architecture
+
+How Wayfarer is built: the technologies in each layer, how the code is organised, and how a request travels from a screen to the database or a third-party API. Why each choice was made is in [docs/DECISIONS.md](./docs/DECISIONS.md) (referenced as `D-0xx`).
+
+### Overview
+
+Wayfarer is a **pnpm + Turborepo monorepo** with four deployable parts:
+
+| Part              | What it is                                                                                              | Runs on                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `apps/mobile`     | The app: one Expo / React Native codebase for iOS, Android and Web                                      | devices (EAS builds), any static web host (web export) |
+| `packages/shared` | Pure TypeScript shared by the app and the Edge Functions: schemas, types, constants, i18n, domain logic | bundled into the app; copied into the Edge Functions   |
+| `supabase/`       | Backend: Postgres + PostGIS (schema, RLS, RPCs), Auth, and Deno Edge Functions                          | Supabase (local Docker stack or hosted project)        |
+| `data-pipeline/`  | Offline Python ingestion that builds the reference data (countries, cities, visa rules, attractions)    | a developer machine; output is committed as SQL seeds  |
+
+```
+┌──────────────── apps/mobile (Expo SDK 57, Expo Router) — iOS · Android · Web ────────────────┐
+│ Screens (src/app) → feature folders (src/features/*) → components / theme                    │
+│ TanStack Query (server state) · Zustand (client state) · react-hook-form + zod (forms)       │
+│ i18next (EN/PT) · MapView: maplibre-gl (web) / MapLibre React Native (iOS, Android)          │
+└────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────┘
+         │ supabase-js: tables, views, │ supabase.functions.invoke   │ map style + tiles
+         │ RPCs (anon key + user JWT)  │ (user JWT)                  │ (public URL)
+         ▼                             ▼                             ▼
+┌──────────── Supabase ─────────────────────────────────────┐   ┌───────────────────────────┐
+│ Auth: email + password, magic link / 6-digit code, OAuth  │   │ OpenFreeMap (default) or  │
+│ Postgres 17 + PostGIS — RLS on every table                │   │ any MapLibre style URL    │
+│   reference data (read-only) · user data (owner only)     │   └───────────────────────────┘
+│   reviews (signed-in read, author write) · api_cache      │
+│ Edge Functions (Deno): checklist · route-optimize · health│──► Open-Meteo, Frankfurter / ER-API,
+│   verify user → validate (zod) → cache → provider → reply │    Global Affairs Canada, OpenRouteService
+└──────────────────────────▲────────────────────────────────┘
+                           │ committed SQL seeds (supabase/seed/*.sql), loaded by db reset / db push
+┌──────────────────────────┴─── data-pipeline (Python 3.11+) ──────────────────────────────────┐
+│ cities.yaml → Wikidata SPARQL + Overpass + Wikipedia pageviews + Commons → dedupe → score    │
+│ → data/attractions/<slug>.json → supabase/seed/40_attractions.sql + docs/CITIES.md           │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Technology stack
+
+**App (`apps/mobile`)**
+
+| Concern            | Technology                                                                                      | Notes                                                                                                |
+| ------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Framework          | Expo SDK 57, React Native 0.86, React 19.2, `react-native-web` 0.21                             | one codebase for iOS, Android and Web (D-002); React Compiler and typed routes enabled in `app.json` |
+| Language           | TypeScript 6 (`strict`, `noUncheckedIndexedAccess`)                                             | path alias `@/*` → `src/*`                                                                           |
+| Routing            | Expo Router 57 (file-based, `src/app`)                                                          | `Stack.Protected` guards; JS `Tabs` on every platform (D-007); deep links `wayfarer://`              |
+| Server state       | TanStack Query 5                                                                                | `staleTime` 60 s, 2 retries, no refetch on focus (`src/lib/query-client.ts`)                         |
+| Client state       | Zustand 5                                                                                       | route tray, Explore filters and view mode; never holds server data                                   |
+| Forms / validation | react-hook-form 7 + `@hookform/resolvers` + zod 4                                               | schemas from `@wayfarer/shared`, the same ones the backend validates with                            |
+| Backend client     | `@supabase/supabase-js` 2                                                                       | typed with the generated `src/lib/database.types.ts` (`pnpm db:types`)                               |
+| Maps               | `maplibre-gl` 6 (web), `@maplibre/maplibre-react-native` 11 (iOS/Android)                       | style: OpenFreeMap "liberty" by default (D-008); native needs a development build (not Expo Go)      |
+| i18n               | i18next 26 + react-i18next 17, `expo-localization`                                              | resources in `packages/shared/src/i18n/{en,pt}.json`                                                 |
+| Auth helpers       | `expo-secure-store`, `expo-web-browser`, `expo-linking`, `expo-apple-authentication`            | sessions in SecureStore, chunked (D-017); OAuth via Supabase-hosted PKCE flows (D-016)               |
+| UI                 | `expo-image`, `expo-symbols`, Inter (`@expo-google-fonts/inter`), Reanimated 4, Gesture Handler | own design system in `src/components` + `src/theme` (D-020)                                          |
+| Observability      | facade in `src/lib/observability.ts`                                                            | Sentry / PostHog not wired yet: no-op                                                                |
+
+**Backend (`supabase/`)**
+
+| Concern        | Technology                                                                      | Notes                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Database       | Postgres 17 + PostGIS (`geography(Point, 4326)`, GiST index)                    | schema, RLS and RPCs in `supabase/migrations`                                                                |
+| Auth           | Supabase Auth                                                                   | email + password, magic link with 6-digit code, Google / Apple (optional); templates in `supabase/templates` |
+| API            | PostgREST (tables, views, RPCs) exposed on the `public` schema, `max_rows` 1000 | called directly from the app with the anon key + the user's JWT                                              |
+| Edge Functions | Deno 2 (Supabase edge runtime), `zod`, `supabase-js` from npm                   | `supabase/functions/deno.json`; formatted with `deno fmt`                                                    |
+| Local stack    | Supabase CLI (dev dependency) on Docker                                         | API 54321, DB 54322, Studio 54323, Mailpit 54324                                                             |
+
+**Data pipeline (`data-pipeline/`)**: Python ≥ 3.11, `requests`, `pydantic` 2, `PyYAML`; `ruff` (lint + format) and `pytest` (D-009).
+
+**Tooling**: Node 22 (`.nvmrc`), pnpm 10 with `nodeLinker: hoisted` (D-003), Turborepo 2 (`lint`, `typecheck`, `test`, `build:web` across workspaces), Prettier 3, ESLint 9 flat config (`eslint-config-expo` in the app, `typescript-eslint` in shared; D-006), GitHub Actions, EAS Build / Submit (`apps/mobile/eas.json`: `development`, `preview`, `production` profiles).
+
+**Tests**: Jest 29 + `jest-expo` + React Native Testing Library (app), Vitest 4 (shared), Deno test (Edge Functions), pgTAP (database), pytest (pipeline), Playwright (web E2E, desktop and Pixel 7 Chromium) — see [Testing and CI](#testing-and-ci).
+
+### Repository layout
+
+```
+.
+├── apps/mobile/                   Expo app (@wayfarer/mobile)
+│   ├── app.json · eas.json        Expo config (scheme, bundle ids, plugins) · EAS build profiles
+│   ├── src/app/                   routes (Expo Router) — see "Screens and routes"
+│   ├── src/features/<feature>/    code per feature: api.ts (queries/mutations), components, stores
+│   ├── src/components/            design-system primitives (button, card, chip, sheet, text…)
+│   ├── src/theme/                 colour tokens (light/dark), fonts, grid maths, navigation theme
+│   ├── src/lib/                   cross-cutting: env, supabase client, i18n, query client, format…
+│   ├── src/testing/               test helpers (fake Supabase query builder, session, fixtures)
+│   ├── src/__tests__/             Jest + React Native Testing Library tests
+│   ├── e2e/                       Playwright specs (smoke + full journey)
+│   ├── public/maplibre/           maplibre-gl worker for web (copied by scripts/, D-018)
+│   └── AGENTS.md                  Expo-specific notes for coding agents
+├── packages/shared/               @wayfarer/shared — TypeScript source, no build step (D-005)
+│   └── src/{constants,domain,schemas,i18n}
+├── supabase/
+│   ├── config.toml                local stack configuration (ports, auth, seeds)
+│   ├── migrations/                ordered SQL: schema, PostGIS, RLS policies, views, RPCs
+│   ├── seed/                      generated reference data (00…40_*.sql) — never edit by hand
+│   ├── tests/                     pgTAP tests (RLS, RPCs, views)
+│   ├── templates/                 auth email templates (confirmation, magic link)
+│   └── functions/                 Deno Edge Functions
+│       ├── _shared/               auth, cache, CORS, env, HTTP and Supabase helpers
+│       ├── _shared/wayfarer/      generated copy of packages/shared/src (pnpm sync:shared)
+│       ├── checklist/             index.ts (wiring) · handler.ts · providers.ts · db.ts · types.ts
+│       ├── route-optimize/        index.ts · handler.ts · routing.ts (ORS + fallback) · polyline.ts
+│       └── health/
+├── data-pipeline/
+│   ├── cities.yaml                source of truth for covered cities (D-010)
+│   ├── data/                      committed inputs/outputs: attractions/<slug>.json, countries, visa
+│   ├── wayfarer_pipeline/         CLI, config, HTTP client, SQL/seed writers, coverage doc
+│   │   └── attractions/           wikidata, overpass, pageviews, commons, categories, pipeline
+│   └── tests/                     pytest (with fixtures)
+├── docs/                          ARCHITECTURE, DECISIONS, DATA_SOURCES, LAUNCH_CHECKLIST, CITIES (generated)
+├── scripts/                       check-docs.mjs (CHANGELOG gate) · sync-shared.mjs (shared → functions)
+├── .github/workflows/ci.yml       CI jobs
+├── run-project.sh                 one-command local run
+└── package.json · turbo.json · pnpm-workspace.yaml · tsconfig.base.json · .prettierrc.json
+```
+
+### App architecture
+
+**Routes and guards.** Every file in `src/app` is a route. `src/app/_layout.tsx` is the root: it loads the Inter fonts (holding the splash screen until they are ready), creates the TanStack Query client and wraps the app in `AuthProvider` and the theme providers. The root `Stack` uses `Stack.Protected` with three guards, so each user only reaches the screens that fit their state:
+
+| State                    | Reachable routes                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| signed out               | `(auth)`: sign-in, sign-up, magic link                                               |
+| signed in, not onboarded | `onboarding`                                                                         |
+| signed in and onboarded  | `(tabs)` (Explore, Trips, Profile), attraction, checklist, route, trip, edit profile |
+| always                   | `auth/callback`, `about`                                                             |
+
+The tabs (`(tabs)/_layout.tsx`) are a bottom bar on phones and a 96 px side rail on desktop web. Explore is a nested stack (`(tabs)/(explore)`): the Home grid and `city/[slug]` — the city is part of the URL (D-026). Attraction and checklist open as modals.
+
+**Feature folders.** Anything that is not a route lives in `src/features/<feature>/`:
+
+| Feature        | Contents                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| `auth`         | `AuthProvider` (session from Supabase Auth), sign-in/up/magic-link/OAuth calls, auth form parts  |
+| `profile`      | profile query + mutations (optimistic updates), country picker, profile fields                   |
+| `destinations` | cities, attractions in a bbox, attraction detail; Home cards, city header, search, Explore store |
+| `map`          | `MapView` with a web and a native implementation and a shared contract (see below)               |
+| `checklist`    | calls the `checklist` Edge Function; sections and plug icons                                     |
+| `route`        | route tray store, route plan and split, drag and drop of stops, `route-optimize` call            |
+| `trips`        | list, detail, save (`save_trip` RPC, one trip per split route) and delete                        |
+| `reviews`      | reviews list, star rating, review form, rating summaries (per attraction and per city)           |
+
+Each feature's `api.ts` owns its query keys (e.g. `destinationKeys`, `tripKeys`, `reviewKeys`) and invalidates them after mutations. Cross-cutting code is in `src/lib/`: `env.ts` (zod-validated `EXPO_PUBLIC_*`), `supabase.ts` (the single client plus `unwrap` / `check` helpers that turn Supabase errors into thrown errors for TanStack Query), `secure-storage.ts`, `i18n.ts`, `query-client.ts`, `format.ts` (units, dates), `observability.ts`.
+
+**Data access.** Screens never call Supabase directly; they use the hooks in `features/*/api.ts`:
+
+- **Reads** go straight to PostgREST — views (`city_list`, `attraction_details`, `attraction_rating_summary`), RPCs (`attractions_in_view`, `list_attraction_reviews`) and owner-only tables. RLS decides what each user can see.
+- **Writes** that touch several rows use RPCs so they are atomic and validated in SQL (`save_trip`, `set_nationalities`, `save_review`, `delete_account`).
+- **Anything with secrets, rate limits or third-party APIs** goes through an Edge Function via `supabase.functions.invoke` (`checklist`, `route-optimize`).
+
+**State.** Server data lives only in TanStack Query. Zustand holds UI state that must survive navigation: `features/route/store.ts` (the route tray — one city, 2–12 stops, split routes, manual order) and `features/destinations/store.ts` (category filters, map/list view). The tray is in memory only (not persisted).
+
+**Maps.** `features/map/map-view.tsx` (web, `maplibre-gl`) and `map-view.native.tsx` (iOS/Android, MapLibre React Native) implement the same `MapViewProps` from `map-view.types.ts`; Metro picks the right file by extension. The contract covers bounds, points (dots or photo markers), route lines, selection and a popup; shared paint styles and helpers (GeoJSON conversion, popup panning) live in the `.types.ts` file so both platforms draw the same map. On web the maplibre worker is served from `public/maplibre` (D-018).
+
+**Auth and session.** One PKCE Supabase client. On iOS/Android the session is stored in the Keychain / Keystore through `expo-secure-store`, split into ~1.8 KB chunks because SecureStore values are limited (D-017), and tokens refresh only while the app is in the foreground. On web the session uses the browser's storage. OAuth and magic links land on `/auth/callback` (`wayfarer://auth/callback` on native).
+
+**Theme and layout.** Tokens (colours for light and dark, spacing, radii, shadows) are in `src/theme/colors.ts`. The app is light by default; dark is a profile preference and the system setting is not followed (D-021). `useTheme()` returns the active tokens and `useBreakpoint()` the layout size (tablet ≥ 600 px, desktop ≥ 1024 px). Card grids take their column count from the width they actually have (`theme/grid.ts`, D-024).
+
+**i18n.** English and Portuguese. Language = profile preference → device locale → English. Resources are in `packages/shared` so Edge Functions can localise too; a test enforces that both languages have the same keys.
+
+### Shared package (`packages/shared`)
+
+Pure TypeScript with no React or platform APIs, imported as `@wayfarer/shared` by the app and by the Edge Functions:
+
+| Folder       | What is there                                                                                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `constants/` | limits and defaults (route stops, nationalities, review rating/comment, visit minutes per category, languages, themes)                                          |
+| `schemas/`   | zod request/response schemas (`checklist`, `route`, `profile`, `review`, common types such as ISO dates)                                                        |
+| `domain/`    | logic used on both sides: visa best option, passport validity, power plugs, geo distance, route ordering, split and fallback estimates, Google/Apple Maps links |
+| `i18n/`      | `en.json`, `pt.json` and the resource index                                                                                                                     |
+
+It ships as source with explicit `.ts` import extensions, so no build step is needed (D-005). The Supabase edge runtime only sees files under `supabase/functions`, so `pnpm sync:shared` copies `src/` (without tests) into `supabase/functions/_shared/wayfarer`; CI fails when the copy is stale.
+
+### Backend architecture
+
+**Database.** Migrations in `supabase/migrations` build the schema in order: extensions and the shared `set_updated_at` trigger → reference data → user data → later features (profile theme, city covers, reviews). Every table has RLS:
+
+| Group          | Tables                                                     | Access                                                                |
+| -------------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| Reference data | `countries`, `cities`, `attractions`, `visa_requirements`  | read by everyone (only active cities); written only by seeds          |
+| Cache          | `api_cache`                                                | service role only (Edge Functions)                                    |
+| User data      | `profiles`, `profile_nationalities`, `trips`, `trip_stops` | owner only (`auth.uid()`); rows cascade when the auth user is deleted |
+| Reviews        | `attraction_reviews`                                       | signed-in users read all; only the author writes                      |
+
+A profile row is created by a trigger on `auth.users` insert. Attractions are `geography(Point, 4326)` with a GiST index; `attractions_in_view` returns the places inside the map's bbox, most popular first. See [Backend reference](#backend-reference) for every RPC and view.
+
+**Seeds.** Reference data is committed as SQL in `supabase/seed/` (`10_countries`, `20_cities`, `30_visa`, `40_attractions`), generated by the pipeline (D-011). `pnpm db:reset` (local) or `supabase db push --include-seed` (hosted) loads a complete database without running the pipeline.
+
+**Edge Functions.** Each function has a thin `index.ts` that wires real dependencies (Supabase client, `fetch`, cache, env) into a `createHandler(deps)` in `handler.ts`; tests call the handler with fakes. A request goes through:
+
+1. CORS preflight (`_shared/cors.ts`);
+2. **user check** — the `Authorization` token must belong to a real user, asked of Supabase Auth, not just a valid JWT (the anon key is rejected; `_shared/auth.ts`, D-015);
+3. **input validation** with the shared zod schema;
+4. **cache** lookup in `api_cache` — key = SHA-256 of the normalised input (stable JSON), per-source TTL; cache errors are logged and never fail the request (`_shared/cache.ts`);
+5. **providers** — third-party HTTP calls with a User-Agent and an 8 s timeout (`_shared/http.ts`);
+6. a typed response; when a provider fails, a degraded but valid answer.
+
+| Function         | Providers                                                                                                                                                                                 | Degraded answer                                                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `checklist`      | visa rules and country data from the DB; Open-Meteo (forecast, and archive for climate); Frankfurter (ECB) then ExchangeRate-API for FX (D-013); Global Affairs Canada advisories (D-012) | each of the 7 sections is `ok` or `unavailable` independently         |
+| `route-optimize` | OpenRouteService optimisation + walking directions when `ORS_API_KEY` is set (D-014, D-025)                                                                                               | exact shortest-path order with straight-line estimates (`isFallback`) |
+| `health`         | —                                                                                                                                                                                         | —                                                                     |
+
+Providers sit behind small function types (`RoutingProvider`, the checklist providers), so a provider can be swapped without changing the app.
+
+### Data pipeline internals
+
+`python -m wayfarer_pipeline <command>` (see [Data pipeline](#data-pipeline) for setup):
+
+| Command                          | Output                                                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `validate-config`                | checks `cities.yaml`                                                                                       |
+| `countries`                      | fetches countries (Wikidata + `country_overrides.yaml` + tz zone.tab) → `10_countries.sql`                 |
+| `cities`                         | `cities.yaml` → `20_cities.sql`                                                                            |
+| `visa`                           | passport-index dataset → `30_visa.sql`                                                                     |
+| `ingest --city <slug>` / `--all` | attractions for one or all cities → `data/attractions/<slug>.json`, `40_attractions.sql`, `docs/CITIES.md` |
+| `report`                         | per-city quality report                                                                                    |
+| `seed`                           | regenerates all seed SQL offline from the committed data                                                   |
+| `cities-doc [--check]`           | writes (or checks, in CI) `docs/CITIES.md`                                                                 |
+
+Attraction ingestion per city: **Wikidata SPARQL** in the city's bbox (+ ~200 m margin) and categories → labels EN/PT, coordinates, image, UNESCO, website → **Overpass** (OSM) for opening hours and fees → **Wikipedia pageviews** for a 0–100 popularity score → **deduplicate** (OSM link, or name similarity ≥ 0.85 within 75 m) → **Commons** for image author and licence → default visit time per category. At most 300 places per city. Attraction ids are UUIDv5 of the Wikidata entity, so re-ingesting keeps ids (and therefore trips and reviews) stable. HTTP responses are cached in `data-pipeline/.cache`; requests are rate-limited and identify themselves (`PIPELINE_CONTACT_EMAIL`). Sources and licences: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md).
+
+### Main flows end to end
+
+- **Opening a city page:** `/city/[slug]` reads the city from `city_list` (cached), then `attractions_in_view` for its bbox and the selected categories, and `attraction_rating_summary` filtered by `city_slug` for the card ratings. The map draws the points; tapping one opens its card; **+** adds it to the Zustand route tray.
+- **Building a route:** `/route` reads the tray, orders the stops locally with the shared domain logic, then calls `route-optimize` for each route; the function returns the order, legs, line geometry, distance and times (from cache, ORS, or the fallback). **Save** calls the `save_trip` RPC and invalidates the trips list.
+- **Pre-trip checklist:** `/checklist/[city]` sends the city, the profile's nationalities, home country, dates and passport expiry to `checklist`, which reads visa rules and country data from Postgres, fetches weather, FX and advisories in parallel (each cached) and returns seven sections.
+- **Reviews:** the attraction page lists reviews with `list_attraction_reviews` and the average from `attraction_rating_summary`; publishing calls `save_review` (insert or update), deleting is a plain `delete` allowed by RLS only for the author.
+
+### Testing and CI
+
+| Layer              | Tool                                              | Where                              | Run                                                                 |
+| ------------------ | ------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------- |
+| Shared logic       | Vitest                                            | `packages/shared/src/**/*.test.ts` | `pnpm test`                                                         |
+| Components/screens | Jest (`jest-expo`) + React Native Testing Library | `apps/mobile/src/__tests__`        | `pnpm test`                                                         |
+| Database           | pgTAP                                             | `supabase/tests`                   | `pnpm db:test`                                                      |
+| Edge Functions     | `deno test`                                       | `supabase/functions/**/*.test.ts`  | `cd supabase/functions && deno test --allow-net=jsr.io`             |
+| Pipeline           | pytest + ruff                                     | `data-pipeline/tests`              | `cd data-pipeline && pytest`                                        |
+| Web E2E            | Playwright (desktop + Pixel 7 Chromium)           | `apps/mobile/e2e`                  | `pnpm build:web && pnpm e2e` (`E2E_BACKEND=1` for the full journey) |
+
+External I/O is replaced by named fakes (e.g. the fake Supabase query builder in `src/testing/test-utils.tsx`, injected fetch/cache/verifier in the Edge Function handlers). Work follows TDD: a failing test first, then the code.
+
+CI (`.github/workflows/ci.yml`) runs five jobs on every pull request and on pushes to `main`:
+
+1. **docs** (PRs only) — `scripts/check-docs.mjs`: code, data or config changed without a CHANGELOG entry → fail; user-facing code changed without README → warning.
+2. **app** — `format:check`, shared-copy check, lint, typecheck, unit tests, web build, Playwright E2E.
+3. **database** — starts Supabase, runs pgTAP and `supabase db lint`.
+4. **functions** — `deno lint`, `deno fmt --check`, `deno test`.
+5. **pipeline** — `ruff check`, `ruff format --check`, `pytest`, `validate-config`, `cities-doc --check`.
+
+### Conventions
+
+- Formatters: Prettier for TypeScript/JSON/Markdown (`pnpm format`), `deno fmt` for `supabase/functions`, `ruff format` for the pipeline. Generated files (seeds, `docs/CITIES.md`, `database.types.ts`, `_shared/wayfarer`) are regenerated, never edited.
+- Small functions and modules, one responsibility each, explicit types, dependencies injected (see [CLAUDE.md](./CLAUDE.md) for the full code style).
+- Platform-specific code uses `.native.tsx` / `.web.tsx` (or plain `.tsx` for web) files next to a shared `.types.ts` contract.
+- Every change updates CHANGELOG.md (and this README when behaviour changes) in the same commit — see [Maintaining this README](#maintaining-this-readme).
 
 ---
 
@@ -401,13 +661,3 @@ python -m wayfarer_pipeline ingest --all
 5. Commit `cities.yaml`, the new `data/attractions/<slug>.json`, the seeds, `docs/CITIES.md` and `CHANGELOG.md` together. CI runs `cities-doc --check`.
 
 No code changes are needed.
-
-## Repository layout
-
-```
-apps/mobile          Expo app (iOS, Android, Web) — Expo Router, src/app = routes
-packages/shared      zod schemas, types, constants, i18n resources (EN/PT)
-supabase/            config, migrations, seed, pgTAP tests, Edge Functions
-data-pipeline/       Python ingestion (Wikidata, OSM, Wikipedia pageviews)
-docs/                ARCHITECTURE, DATA_SOURCES, DECISIONS, LAUNCH_CHECKLIST, CITIES (generated)
-```
