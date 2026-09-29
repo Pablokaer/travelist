@@ -236,7 +236,8 @@ export function CategoryDot({ category }: { category: string }) {
   );
 }
 
-function Thumbnail({ uri, style }: { uri: string | null; style: object }) {
+/** Photo, or a neutral placeholder with a photo glyph when there is none. */
+export function Thumbnail({ uri, style }: { uri: string | null; style: object }) {
   const theme = useTheme();
   return uri ? (
     <Image source={uri} style={style} contentFit="cover" accessible={false} transition={200} />

@@ -1,13 +1,10 @@
 import { Image } from 'expo-image';
 import { useRef, useState } from 'react';
 import {
-  Platform,
   StyleSheet,
-  TextInput,
   View,
   type NativeSyntheticEvent,
   type TextInputKeyPressEventData,
-  type TextStyle,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -16,10 +13,10 @@ import { searchAttractions } from './search';
 
 import { IconButton } from '@/components/button';
 import { Icon } from '@/components/icon';
+import { SEARCH_FIELD_HEIGHT, SearchField } from '@/components/search-field';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
-import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
-import { fontFamilyFor } from '@/theme/fonts';
+import { radius, spacing } from '@/theme/colors';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
 /** Suggestions shown in the dropdown; the grid below shows every match. */
@@ -75,41 +72,21 @@ export function AttractionSearch(props: Props) {
 
   return (
     <View style={styles.wrap}>
-      <View
-        style={[
-          styles.field,
-          { backgroundColor: theme.surfaceMuted, borderColor: open ? theme.text : theme.border },
-        ]}>
-        <Icon name="search" size={18} color={theme.textSecondary} />
-        <TextInput
-          value={query}
-          onChangeText={change}
-          onFocus={() => {
-            if (blurTimer.current) clearTimeout(blurTimer.current);
-            setOpen(true);
-          }}
-          onBlur={() => {
-            blurTimer.current = setTimeout(() => setOpen(false), BLUR_CLOSE_DELAY_MS);
-          }}
-          onKeyPress={onKeyPress}
-          placeholder={t('explore.searchPlaceholder', { city: cityName })}
-          accessibilityLabel={t('explore.searchPlaceholder', { city: cityName })}
-          placeholderTextColor={theme.textSecondary}
-          returnKeyType="search"
-          autoCorrect={false}
-          testID="attraction-search"
-          style={[styles.input, noWebOutline, { color: theme.text }]}
-        />
-        {query ? (
-          <IconButton
-            icon="close"
-            size={14}
-            accessibilityLabel={t('explore.clearSearch')}
-            onPress={() => change('')}
-            style={styles.clear}
-          />
-        ) : null}
-      </View>
+      <SearchField
+        value={query}
+        onChangeText={change}
+        label={t('explore.searchPlaceholder', { city: cityName })}
+        testID="attraction-search"
+        highlighted={open}
+        onFocus={() => {
+          if (blurTimer.current) clearTimeout(blurTimer.current);
+          setOpen(true);
+        }}
+        onBlur={() => {
+          blurTimer.current = setTimeout(() => setOpen(false), BLUR_CLOSE_DELAY_MS);
+        }}
+        onKeyPress={onKeyPress}
+      />
 
       {showDropdown ? (
         <View
@@ -219,27 +196,11 @@ function Suggestion({
   );
 }
 
-// The field draws its own focus border, so drop the browser's input outline.
-const noWebOutline =
-  Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
-
 const styles = StyleSheet.create({
   wrap: { zIndex: 10 },
-  field: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    minHeight: MIN_TOUCH + 4,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.xs,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-  },
-  input: { flex: 1, alignSelf: 'stretch', fontSize: 16, fontFamily: fontFamilyFor('400') },
-  clear: { width: 32, height: 32 },
   dropdown: {
     position: 'absolute',
-    top: MIN_TOUCH + 12,
+    top: SEARCH_FIELD_HEIGHT + spacing.sm,
     left: 0,
     right: 0,
     paddingVertical: spacing.xs,

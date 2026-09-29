@@ -1,21 +1,18 @@
 import type { AttractionCategory } from '@wayfarer/shared';
 import { create } from 'zustand';
 
+/** Explore filters and view mode, kept while moving between cities (the city is in the URL). */
 type ExploreState = {
-  citySlug: string | null;
   categories: AttractionCategory[];
   view: 'map' | 'list';
-  setCity: (slug: string) => void;
   toggleCategory: (c: AttractionCategory) => void;
   clearCategories: () => void;
   setView: (view: 'map' | 'list') => void;
 };
 
 export const useExploreStore = create<ExploreState>((set) => ({
-  citySlug: null,
   categories: [],
   view: 'map',
-  setCity: (citySlug) => set({ citySlug }),
   toggleCategory: (c) =>
     set((s) => ({
       categories: s.categories.includes(c)

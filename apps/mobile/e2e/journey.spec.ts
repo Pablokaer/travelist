@@ -40,12 +40,13 @@ async function signUpAndOnboard(page: Page) {
   await role('button', 'Start exploring').click();
 }
 
-/** Switches Explore to Lisbon in list view and adds the first `count` places to the route. */
+/** Opens Lisbon from the Home in list view and adds the first `count` places to the route. */
 async function addLisbonPlaces(page: Page, count: number) {
   const byTestId = byTestIdOn(page);
   const role = roleOn(page);
-  await byTestId('city-switcher').click();
-  await role('radio', 'Lisbon').click();
+  await byTestId('city-search').fill('Lisb');
+  await byTestId('city-card-lisbon').click();
+  await expect(page).toHaveURL(/\/city\/lisbon$/);
   await page.getByRole('radio', { name: 'List' }).or(role('checkbox', 'List')).click();
   const list = byTestId('attraction-list');
   await expect(list.getByRole('button').first()).toBeVisible({ timeout: 20_000 });

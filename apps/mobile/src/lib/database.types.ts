@@ -543,6 +543,11 @@ export type Database = {
           attraction_count: number | null;
           bbox: number[] | null;
           country_code: string | null;
+          country_name_en: string | null;
+          country_name_pt: string | null;
+          cover_image_author: string | null;
+          cover_image_license: string | null;
+          cover_image_url: string | null;
           lat: number | null;
           lng: number | null;
           name_en: string | null;
@@ -550,30 +555,6 @@ export type Database = {
           slug: string | null;
           timezone: string | null;
           wikidata_id: string | null;
-        };
-        Insert: {
-          attraction_count?: never;
-          bbox?: number[] | null;
-          country_code?: string | null;
-          lat?: never;
-          lng?: never;
-          name_en?: string | null;
-          name_pt?: string | null;
-          slug?: string | null;
-          timezone?: string | null;
-          wikidata_id?: string | null;
-        };
-        Update: {
-          attraction_count?: never;
-          bbox?: number[] | null;
-          country_code?: string | null;
-          lat?: never;
-          lng?: never;
-          name_en?: string | null;
-          name_pt?: string | null;
-          slug?: string | null;
-          timezone?: string | null;
-          wikidata_id?: string | null;
         };
         Relationships: [
           {

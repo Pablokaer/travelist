@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -58,7 +59,16 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: theme.background },
       }}>
       <Tabs.Screen
-        name="index"
+        name="(explore)"
+        // Pressing Explore while on it (e.g. on a city page) goes back to the Home; from another
+        // tab it returns to where the user left off.
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            if (!navigation.isFocused()) return;
+            e.preventDefault();
+            router.navigate('/');
+          },
+        })}
         options={{
           title: t('tabs.explore'),
           tabBarIcon: ({ color }) => <TabIcon name="search" color={String(color)} />,

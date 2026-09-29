@@ -11,6 +11,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Added
+
+- Home page (D-026): after sign-in the app opens on a grid of the destinations it covers (only active cities with data) — cover photo with its credit, city, country and number of places — with a **Search cities** field (city names in EN/PT, then countries). A city card opens the city page at `/city/{slug}` (e.g. `/city/amsterdam`), which is the former Explore screen, now driven by the city in the URL; the logo, the Explore tab and back return to the Home. `city_list` gains the country names and a cover photo (new migration).
+
 ### Changed
 
 - Route optimisation (D-025): on-device ordering, split routes and the offline fallback now find the exact shortest walk (Held-Karp) instead of nearest neighbour + 2-opt, which walked up to 21% further on 46% of random 12-stop routes (about 2% on average); `route-optimize` makes one OpenRouteService request per route instead of two (the optimisation returns the geometry and leg totals); the ORS cache matches the same places in any order, so optimising again after the app applied the order is a cache hit; the route screen only re-sends routes that changed.

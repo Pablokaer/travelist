@@ -15,7 +15,7 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [docs/ARCHITEC
 - [Features](#features)
   - [Account and sign-in](#1-account-and-sign-in)
   - [Onboarding and profile](#2-onboarding-and-profile)
-  - [Explore: map and attractions](#3-explore-map-and-attractions)
+  - [Explore: Home and city pages](#3-explore-home-and-city-pages)
   - [Attraction detail](#4-attraction-detail)
   - [Pre-trip checklist](#5-pre-trip-checklist)
   - [Route builder](#6-route-builder)
@@ -71,13 +71,23 @@ Finishing sets `onboarded_at`, which unlocks the main app.
 
 Nationalities are saved with the `set_nationalities` RPC (replaces the whole set atomically). The country picker (`features/profile/country-picker.tsx`) lists all 250 countries with names in the current language.
 
-### 3. Explore: map and attractions
+### 3. Explore: Home and city pages
 
-The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
+The **Explore** tab is a stack (`(tabs)/(explore)/`, D-026): the **Home** (`/`) lists the destinations; a city card opens the **city page** (`/city/[slug]`) with its attractions. After sign-in (and onboarding) the app opens on the Home.
 
-- **Header** (`features/destinations/explore-header.tsx`, D-024) — the Wayfarer logo, the city pill + search group and the checklist button. When the page is wide enough (desktop windows from about 1110 px) they share one row, with the city + search group centred (max 640 px); narrower tablets/desktops show logo + checklist on top and the group below; phones show the logo mark, city pill and checklist icon in one row and the search below. The category tabs follow. Header and grid share one container (max 1440 px + gutter).
+**Home** (`(tabs)/(explore)/index.tsx`)
 
-- **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count. Defaults to the city of the current route tray, else the first city.
+- **Header** — the Wayfarer logo and a **Search cities** field, in one row (the search centred, max 640 px); on phones the logo mark sits next to the search. No category tabs: they belong to city pages.
+- **"Where to next?"** and the number of destinations shown, then a responsive grid of **city cards** (same grid as the attractions: as many ≥ 240 px columns as fit).
+- **City card** (`features/destinations/city-card.tsx`) — cover photo, city name, flag + country and number of places; the whole card opens the city. The cover is the photo of the city's most popular attraction that has one, shown with its **author + licence** (Commons credit). Only active cities with data are listed (`city_list`), A–Z in the UI language.
+- **Search cities** — filters the grid as you type: city names in English and Portuguese, then countries ("ital" → Italian cities), accents ignored (`searchCities`). "No cities match your search." when nothing does.
+
+**City page** (`(tabs)/(explore)/city/[slug].tsx`) — the city comes from the URL, so any city page can be linked directly; an unknown slug shows "City not found" with **See all destinations**.
+
+- **Back to the Home:** the **logo** in the header (a link on every browse page), the **Explore** tab (pressing it on a city page returns to the Home; from another tab it returns to where you left), or the back button / browser back.
+- **Header** (`features/destinations/browse-header.tsx` + `city-header.tsx`, D-024) — the Wayfarer logo, the city pill + search group and the checklist button. When the page is wide enough (desktop windows from about 1110 px) they share one row, with the city + search group centred (max 640 px); narrower tablets/desktops show logo + checklist on top and the group below; phones show the logo mark, city pill and checklist icon in one row and the search below. The category tabs follow. Header and grid share one container (max 1440 px + gutter).
+
+- **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count; picking a city switches the page (and its URL) to it.
 - **Search** — a search bar beside the city pill (below it on phones) ("Search places in {city}"). While typing, up to 8 **autocomplete** suggestions from the city's attractions appear (accents ignored, English and Portuguese names; names starting with the text first, then a word starting with it, then any match, most popular first). Picking a suggestion adds the place to the route or removes it, like the card checkbox, and it stays in the list with its stop number; the arrow opens the attraction. On web, ↑/↓ move through suggestions, Enter picks, Escape closes. The grid and the map show every match; clearing the search or changing city shows everything again.
 - **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories. Centred when they fit; otherwise the row scrolls horizontally, edge to edge.
 - **Map / List switch** — floating pill at the bottom of the screen.
@@ -177,22 +187,23 @@ Expo Router, files in `apps/mobile/src/app`.
 
 Every screen stacked above the tabs (attraction, checklist, route, trip, edit profile, about) has an **app menu** at the right of its header: the Wayfarer logo with a menu icon. It opens a menu with **Explore**, **My Trips**, **Profile** and **About**, so a page opened from a link (e.g. `/trip/…`) is never a dead end. It is shown only to signed-in, onboarded users.
 
-| Route               | File                    | Access                   | Purpose                                     |
-| ------------------- | ----------------------- | ------------------------ | ------------------------------------------- |
-| `/sign-in`          | `(auth)/sign-in.tsx`    | signed out               | Email + password, links to magic link/OAuth |
-| `/sign-up`          | `(auth)/sign-up.tsx`    | signed out               | Create account                              |
-| `/magic-link`       | `(auth)/magic-link.tsx` | signed out               | Magic link + 6-digit code                   |
-| `/auth/callback`    | `auth/callback.tsx`     | always                   | OAuth / magic link / confirmation landing   |
-| `/onboarding`       | `onboarding.tsx`        | signed in, not onboarded | 3-step profile setup                        |
-| `/` (Explore tab)   | `(tabs)/index.tsx`      | onboarded                | Map/list, filters, city switcher, tray      |
-| `/trips`            | `(tabs)/trips.tsx`      | onboarded                | Saved trips                                 |
-| `/profile`          | `(tabs)/profile.tsx`    | onboarded                | Profile, documents, preferences, account    |
-| `/attraction/[id]`  | `attraction/[id].tsx`   | onboarded (modal)        | Attraction detail, add to route             |
-| `/checklist/[city]` | `checklist/[city].tsx`  | onboarded (modal)        | Pre-trip checklist                          |
-| `/route`            | `route.tsx`             | onboarded                | Route builder and save                      |
-| `/trip/[id]`        | `trip/[id].tsx`         | onboarded                | Trip detail, navigation, delete             |
-| `/edit-profile`     | `edit-profile.tsx`      | onboarded                | Edit profile                                |
-| `/about`            | `about.tsx`             | always                   | Data sources and version                    |
+| Route               | File                               | Access                   | Purpose                                     |
+| ------------------- | ---------------------------------- | ------------------------ | ------------------------------------------- |
+| `/sign-in`          | `(auth)/sign-in.tsx`               | signed out               | Email + password, links to magic link/OAuth |
+| `/sign-up`          | `(auth)/sign-up.tsx`               | signed out               | Create account                              |
+| `/magic-link`       | `(auth)/magic-link.tsx`            | signed out               | Magic link + 6-digit code                   |
+| `/auth/callback`    | `auth/callback.tsx`                | always                   | OAuth / magic link / confirmation landing   |
+| `/onboarding`       | `onboarding.tsx`                   | signed in, not onboarded | 3-step profile setup                        |
+| `/` (Explore tab)   | `(tabs)/(explore)/index.tsx`       | onboarded                | Home: searchable grid of destinations       |
+| `/city/[slug]`      | `(tabs)/(explore)/city/[slug].tsx` | onboarded                | City page: map/list, filters, search, tray  |
+| `/trips`            | `(tabs)/trips.tsx`                 | onboarded                | Saved trips                                 |
+| `/profile`          | `(tabs)/profile.tsx`               | onboarded                | Profile, documents, preferences, account    |
+| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route             |
+| `/checklist/[city]` | `checklist/[city].tsx`             | onboarded (modal)        | Pre-trip checklist                          |
+| `/route`            | `route.tsx`                        | onboarded                | Route builder and save                      |
+| `/trip/[id]`        | `trip/[id].tsx`                    | onboarded                | Trip detail, navigation, delete             |
+| `/edit-profile`     | `edit-profile.tsx`                 | onboarded                | Edit profile                                |
+| `/about`            | `about.tsx`                        | always                   | Data sources and version                    |
 
 Deep link scheme: `wayfarer://` (e.g. `wayfarer://auth/callback`).
 
@@ -210,14 +221,14 @@ Request/response schemas live in `packages/shared/src/schemas` and are copied in
 
 ### Database RPCs and views
 
-| Name                  | Kind     | Who          | What it does                                                                       |
-| --------------------- | -------- | ------------ | ---------------------------------------------------------------------------------- |
-| `attractions_in_view` | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000) |
-| `attraction_details`  | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                      |
-| `city_list`           | view     | anon, authed | Active cities with centre, bbox, time zone and attraction count                    |
-| `set_nationalities`   | function | authed       | Replaces the caller's nationalities                                                |
-| `save_trip`           | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id              |
-| `delete_account`      | function | authed       | Deletes the caller's auth user; owned rows cascade                                 |
+| Name                  | Kind     | Who          | What it does                                                                                                                                                        |
+| --------------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `attractions_in_view` | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                  |
+| `attraction_details`  | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                       |
+| `city_list`           | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence) |
+| `set_nationalities`   | function | authed       | Replaces the caller's nationalities                                                                                                                                 |
+| `save_trip`           | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                               |
+| `delete_account`      | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                  |
 
 ### Tables
 

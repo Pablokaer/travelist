@@ -1,6 +1,7 @@
 import type { AttractionCategory } from '@wayfarer/shared';
 import { useQuery } from '@tanstack/react-query';
 
+import type { Database } from '@/lib/database.types';
 import { supabase, unwrap } from '@/lib/supabase';
 
 export type City = {
@@ -14,7 +15,13 @@ export type City = {
   bbox: [number, number, number, number];
   timezone: string | null;
   attractionCount: number;
+  countryNameEn: string;
+  countryNamePt: string;
+  /** Photo of the city's most popular attraction that has one, with its required credit. */
+  cover: CityCover | null;
 };
+
+export type CityCover = { url: string; author: string | null; license: string | null };
 
 export type AttractionSummary = {
   id: string;
@@ -56,23 +63,58 @@ export function localizedName(item: { nameEn: string; namePt: string | null }, l
   return language === 'pt' && item.namePt ? item.namePt : item.nameEn;
 }
 
+/**
+ * City name in the UI language.
+ * @example cityName(lisbon, 'pt') // 'Lisboa'
+ */
+export function cityName(city: City, language: string): string {
+  return language === 'pt' ? city.namePt : city.nameEn;
+}
+
+/**
+ * Country of a city in the UI language.
+ * @example countryOf(amsterdam, 'pt') // 'Países Baixos'
+ */
+export function countryOf(city: City, language: string): string {
+  return language === 'pt' ? city.countryNamePt : city.countryNameEn;
+}
+
+type CityRow = Database['public']['Views']['city_list']['Row'];
+
+function coverFrom(row: CityRow): CityCover | null {
+  if (!row.cover_image_url) return null;
+  return {
+    url: row.cover_image_url,
+    author: row.cover_image_author,
+    license: row.cover_image_license,
+  };
+}
+
+/** Maps a `city_list` row (every column is nullable in a view's generated type). */
+export function cityFromRow(r: CityRow): City {
+  return {
+    slug: r.slug!,
+    nameEn: r.name_en!,
+    namePt: r.name_pt!,
+    countryCode: r.country_code!,
+    lat: r.lat!,
+    lng: r.lng!,
+    bbox: r.bbox as City['bbox'],
+    timezone: r.timezone,
+    attractionCount: r.attraction_count ?? 0,
+    countryNameEn: r.country_name_en ?? r.country_code!,
+    countryNamePt: r.country_name_pt ?? r.country_code!,
+    cover: coverFrom(r),
+  };
+}
+
 export function useCities() {
   return useQuery({
     queryKey: destinationKeys.cities,
     staleTime: 3600_000,
     queryFn: async (): Promise<City[]> => {
       const rows = unwrap(await supabase.from('city_list').select('*').order('name_en'));
-      return rows.map((r) => ({
-        slug: r.slug!,
-        nameEn: r.name_en!,
-        namePt: r.name_pt!,
-        countryCode: r.country_code!,
-        lat: r.lat!,
-        lng: r.lng!,
-        bbox: r.bbox as City['bbox'],
-        timezone: r.timezone,
-        attractionCount: r.attraction_count ?? 0,
-      }));
+      return rows.map(cityFromRow);
     },
   });
 }

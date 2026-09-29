@@ -84,6 +84,16 @@
     "noMatches": "No places match “{{query}}”.",
     "openNamed": "Open {{name}}"
   },
+  "home": {
+    "citiesCount_one": "{{count}} destination",
+    "citiesCount_other": "{{count}} destinations",
+    "openCity": "{{city}}, {{country}}, {{places}}",
+    "photoCredit": "Photo © {{author}} · {{license}}",
+    "goHome": "Wayfarer — all destinations",
+    "cityNotFound": "City not found",
+    "cityNotFoundBody": "This destination isn't available. Pick one of the cities we cover.",
+    "backHome": "See all destinations"
+  },
   "category": {
     "museum": "Museums",
     "monument": "Monuments",

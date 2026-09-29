@@ -1,4 +1,4 @@
-import { localizedName, type AttractionSummary } from './api';
+import { cityName, localizedName, type AttractionSummary, type City } from './api';
 
 /** Lower-case, accent-free text for matching ("Jerónimos" → "jeronimos"). */
 export function normalizeSearch(text: string): string {
@@ -13,9 +13,9 @@ function matchRank(name: string, query: string): number | null {
   return text.includes(query) ? 2 : null;
 }
 
-/** Best rank over the English and Portuguese names. */
-function bestRank(item: AttractionSummary, query: string): number | null {
-  const ranks = [item.nameEn, item.namePt]
+/** Best rank over several names (e.g. the English and Portuguese ones). */
+function bestRank(names: readonly (string | null)[], query: string): number | null {
+  const ranks = names
     .filter((n): n is string => !!n)
     .map((n) => matchRank(n, query))
     .filter((r): r is number => r !== null);
@@ -37,7 +37,7 @@ export function searchAttractions(
   const q = normalizeSearch(query);
   if (!q) return [];
   return items
-    .map((item) => ({ item, rank: bestRank(item, q) }))
+    .map((item) => ({ item, rank: bestRank([item.nameEn, item.namePt], q) }))
     .filter((m): m is { item: AttractionSummary; rank: number } => m.rank !== null)
     .sort(
       (a, b) =>
@@ -47,4 +47,34 @@ export function searchAttractions(
     )
     .slice(0, limit)
     .map((m) => m.item);
+}
+
+/** Country matches rank after every city-name match ("ita" → Italian cities after "Ita…"). */
+const COUNTRY_RANK_OFFSET = 3;
+
+function cityRank(city: City, query: string): number | null {
+  const byName = bestRank([city.nameEn, city.namePt], query);
+  if (byName !== null) return byName;
+  const byCountry = bestRank([city.countryNameEn, city.countryNamePt], query);
+  return byCountry === null ? null : byCountry + COUNTRY_RANK_OFFSET;
+}
+
+/**
+ * Cities whose name or country (EN or PT, accents ignored) matches `query`, best matches first
+ * (same ranking as attractions; country matches last), ties by the localised name. An empty
+ * query matches nothing.
+ * @example searchCities(cities, 'amst', 'en') // [Amsterdam]
+ */
+export function searchCities(cities: readonly City[], query: string, language: string): City[] {
+  const q = normalizeSearch(query);
+  if (!q) return [];
+  return cities
+    .map((city) => ({ city, rank: cityRank(city, q) }))
+    .filter((m): m is { city: City; rank: number } => m.rank !== null)
+    .sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        cityName(a.city, language).localeCompare(cityName(b.city, language), language),
+    )
+    .map((m) => m.city);
 }
