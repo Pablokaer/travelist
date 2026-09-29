@@ -36,6 +36,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- CI: `pnpm typecheck` failed on a fresh checkout (`TS2882` on the `maplibre-gl` CSS import) because the `*.css` module types came only from the git-ignored `expo-env.d.ts` that `expo start` generates; `apps/mobile/tsconfig.json` now loads `expo/types` itself.
 - Seed: an attraction that falls in two cities' bboxes (several Wikidata coordinates) is kept in the city where OSM confirms it, not the first alphabetically — Madrid Arena has a wrong second coordinate in Bilbao.
 - Web: route-stop rows are no longer rendered as buttons when they don't open anything (they contained the reorder buttons: invalid nested `<button>`); checkbox, radio and selected states now reach the browser as ARIA attributes.
 
