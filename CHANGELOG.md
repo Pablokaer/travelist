@@ -17,8 +17,15 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 - `./run-project.sh`: one command to run the project locally — starts Docker, installs dependencies, starts Supabase, fills `.env` with the local keys, serves the Edge Functions and opens the web app; `--stop` stops the Supabase stack.
 - Home page (D-026): after sign-in the app opens on a grid of the destinations it covers (only active cities with data) — cover photo with its credit, city, country and number of places — with a **Search cities** field (city names in EN/PT, then countries). A city card opens the city page at `/city/{slug}` (e.g. `/city/amsterdam`), which is the former Explore screen, now driven by the city in the URL; the logo, the Explore tab and back return to the Home. `city_list` gains the country names and a cover photo (new migration).
 
+### Fixed
+
+- Route builder: after removing a stop, dragging another stop to the last place did nothing (the removed stop's row still counted as a drop slot).
+- Route builder: a drag interrupted by the system (e.g. a notification gesture) no longer moves the stop; only releasing the grip drops it.
+- Route builder: the remove button's screen-reader label uses the stop's name in the app language (it was always English).
+
 ### Changed
 
+- Route builder performance: reordering a stop updates the list in place instead of rebuilding every row (the route list was keyed by its stop order), and while dragging the list only re-renders when the hovered slot changes, not on every pointer move (D-027).
 - Route optimisation (D-025): on-device ordering, split routes and the offline fallback now find the exact shortest walk (Held-Karp) instead of nearest neighbour + 2-opt, which walked up to 21% further on 46% of random 12-stop routes (about 2% on average); `route-optimize` makes one OpenRouteService request per route instead of two (the optimisation returns the geometry and leg totals); the ORS cache matches the same places in any order, so optimising again after the app applied the order is a cache hit; the route screen only re-sends routes that changed.
 - Explore layout (D-024): the header shows the Wayfarer logo and fits logo, city + search and **Before you go** in one row on wide screens (about 70 px shorter on desktop); the search is a centred group capped at 640 px instead of spanning the page; category tabs are a centred group that scrolls edge to edge on phones; header and card grid share one container (1440 px), and the grid picks its columns from its own width (3–5 on desktop instead of the window-based 1–4). The desktop rail is narrower (96 px) and lines up with the header.
 - Route builder: "Suggest a split" makes balanced routes — similar time each (visits + walking) with the shortest walks — instead of minimising walking only (D-023).
@@ -58,6 +65,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Docs
 
+- `CLAUDE.md` → Tests: development follows TDD (red → green → refactor); bug fixes start with a failing regression test.
 - README rewritten as the functional reference of the app: every feature, screen/route, Edge Function, RPC, table, limit and known limitation, plus a "Maintaining this README" checklist.
 - `CLAUDE.md` with the documentation rules for coding agents.
 - `CLAUDE.md`: code style, comments, tests, dependencies, structure, formatting and logging rules.

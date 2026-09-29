@@ -7,7 +7,7 @@ import {
   type Units,
 } from '@wayfarer/shared';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button, IconButton } from '@/components/button';
@@ -20,7 +20,7 @@ import { localizedName } from '@/features/destinations/api';
 import { AttractionRow } from '@/features/destinations/components';
 import { formatDistance } from '@/lib/format';
 import { useRouteColor } from '@/features/route/route-colors';
-import { DragHandle, rowShift, useStopDrag, type StopDragState } from '@/features/route/stop-drag';
+import { DragHandle, useStopDrag, type DragGesture } from '@/features/route/stop-drag';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -88,29 +88,21 @@ function StopActions({
   isLast,
   onMove,
   onRemove,
-  onDragMove,
-  onDragEnd,
+  gesture,
 }: {
   stop: Stop;
   index: number;
   isLast: boolean;
   onMove: (id: string, direction: -1 | 1) => void;
   onRemove: (id: string) => void;
-  onDragMove: (state: StopDragState) => void;
-  onDragEnd: (from: number, dy: number) => void;
+  gesture: DragGesture;
 }) {
   const { t, i18n } = useTranslation();
   const isFirst = index === 0;
+  const name = localizedName(stop, i18n.resolvedLanguage ?? 'en');
   return (
     <View style={styles.rowActions}>
-      <DragHandle
-        index={index}
-        accessibilityLabel={t('route.dragNamed', {
-          name: localizedName(stop, i18n.resolvedLanguage ?? 'en'),
-        })}
-        onDragMove={onDragMove}
-        onDragEnd={onDragEnd}
-      />
+      <DragHandle index={index} accessibilityLabel={t('route.dragNamed', { name })} {...gesture} />
       <IconButton
         icon="arrowUp"
         accessibilityLabel={t('route.moveUp')}
@@ -125,7 +117,7 @@ function StopActions({
       />
       <IconButton
         icon="close"
-        accessibilityLabel={t('route.removeNamed', { name: stop.nameEn })}
+        accessibilityLabel={t('route.removeNamed', { name })}
         onPress={() => onRemove(stop.id)}
       />
     </View>
@@ -164,32 +156,24 @@ export function RouteStopList({
   onDragActive?: (active: boolean) => void;
 }) {
   const colorOf = useRouteColor();
-  const drag = useStopDrag((from, to) => onMoveTo(route[from]!.id, to));
-  const onDragMove = (state: StopDragState) => {
-    if (!drag.drag) onDragActive?.(true);
-    drag.move(state);
-  };
-  const onDragEnd = (from: number, dy: number) => {
-    onDragActive?.(false);
-    drag.end(from, dy);
-  };
-  const offsetOf = (i: number) => {
-    if (!drag.drag || drag.target == null) return 0;
-    if (i === drag.drag.from) return drag.drag.dy;
-    return rowShift(i, drag.drag.from, drag.target, drag.heightOf(drag.drag.from), spacing.xs);
-  };
+  const drag = useStopDrag(
+    route.length,
+    spacing.xs,
+    (from, to) => onMoveTo(route[from]!.id, to),
+    onDragActive,
+  );
   return (
     <View style={styles.list} testID={`route-${routeIndex}`}>
       {routeCount > 1 ? <RouteHeading routeIndex={routeIndex} stopCount={route.length} /> : null}
       {route.map((stop, i) => (
-        <View
+        <Animated.View
           key={stop.id}
           onLayout={drag.measure(i)}
           testID={`route-${routeIndex}-stop-${i}`}
           style={[
             styles.list,
-            { transform: [{ translateY: offsetOf(i) }] },
-            drag.drag?.from === i && styles.dragged,
+            { transform: [{ translateY: drag.offsetOf(i) }] },
+            drag.isDragged(i) && styles.dragged,
           ]}>
           {i > 0 ? (
             <LegConnector
@@ -210,12 +194,11 @@ export function RouteStopList({
                 isLast={i === route.length - 1}
                 onMove={onMove}
                 onRemove={onRemove}
-                onDragMove={onDragMove}
-                onDragEnd={onDragEnd}
+                gesture={drag.gesture}
               />
             }
           />
-        </View>
+        </Animated.View>
       ))}
     </View>
   );
