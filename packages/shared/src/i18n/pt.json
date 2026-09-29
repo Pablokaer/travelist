@@ -78,7 +78,11 @@
     "noCities": "Ainda sem destinos",
     "noCitiesBody": "Os dados de referência não foram carregados. Execute os seeds do pipeline de dados e tente novamente.",
     "searchCities": "Pesquisar cidades",
-    "noCityMatch": "Nenhuma cidade corresponde à pesquisa."
+    "noCityMatch": "Nenhuma cidade corresponde à pesquisa.",
+    "searchPlaceholder": "Pesquisar locais em {{city}}",
+    "clearSearch": "Limpar pesquisa",
+    "noMatches": "Nenhum local corresponde a “{{query}}”.",
+    "openNamed": "Abrir {{name}}"
   },
   "category": {
     "museum": "Museus",
@@ -385,5 +389,8 @@
     "generic": "Algo correu mal. Tente novamente.",
     "notFound": "Este ecrã não existe.",
     "goHome": "Ir para o ecrã inicial"
+  },
+  "menu": {
+    "open": "Abrir menu"
   }
 }

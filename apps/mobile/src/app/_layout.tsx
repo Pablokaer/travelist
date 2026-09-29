@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { Appearance, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { AppMenuButton } from '@/components/app-menu';
 import { LoadingState } from '@/components/states';
 import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 import { useProfile } from '@/features/profile/api';
@@ -45,6 +46,8 @@ function RootNavigator() {
         headerBackButtonDisplayMode: 'minimal',
         headerTitleStyle: { fontFamily: fontFamilyFor('600'), fontSize: 16 },
         contentStyle: { backgroundColor: theme.background },
+        // Logo + menu on every stacked screen, so a deep link (e.g. /trip/…) is never a dead end.
+        headerRight: signedIn && onboarded ? () => <AppMenuButton /> : undefined,
       }}>
       <Stack.Protected guard={signedIn && onboarded}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

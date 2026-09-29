@@ -9,8 +9,15 @@ import { useGutter } from '@/components/screen';
 import { Segmented } from '@/components/segmented';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
-import { useAttractions, useCities } from '@/features/destinations/api';
+import {
+  useAttractions,
+  useCities,
+  type AttractionSummary,
+  type City,
+} from '@/features/destinations/api';
+import { AttractionSearch } from '@/features/destinations/attraction-search';
 import { AttractionCard, CategoryFilters, CitySwitcher } from '@/features/destinations/components';
+import { searchAttractions } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
 import { routeNotice } from '@/features/route/notice';
@@ -21,8 +28,10 @@ import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
 
 const GRID_GAP = spacing.lg;
 
+const cityLabel = (city: City, lang: string) => (lang === 'pt' ? city.namePt : city.nameEn);
+
 export default function ExploreScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const shadows = useShadows();
   const gutter = useGutter();
@@ -34,6 +43,7 @@ export default function ExploreScreen() {
   const routeStops = useRouteStore((s) => s.stops);
   const toggleStop = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   const routeCity = useRouteStore((s) => s.citySlug);
 
   const city = cities.data?.find((c) => c.slug === citySlug) ?? cities.data?.[0];
@@ -42,10 +52,19 @@ export default function ExploreScreen() {
   }, [citySlug, cities.data, routeCity, setCity]);
 
   const attractions = useAttractions(city, categories);
+  const lang = i18n.resolvedLanguage ?? 'en';
+  // The grid and the map show every match of the search; the dropdown only the best few.
+  const visible = useMemo(
+    () =>
+      query.trim()
+        ? searchAttractions(attractions.data ?? [], query, lang)
+        : (attractions.data ?? []),
+    [attractions.data, query, lang],
+  );
   const stopOrder = useMemo(() => new Map(routeStops.map((s, i) => [s.id, i + 1])), [routeStops]);
   const points = useMemo(
     () =>
-      (attractions.data ?? []).map((a) => ({
+      visible.map((a) => ({
         id: a.id,
         lat: a.lat,
         lng: a.lng,
@@ -53,7 +72,7 @@ export default function ExploreScreen() {
         selected: stopOrder.has(a.id),
         order: stopOrder.get(a.id),
       })),
-    [attractions.data, stopOrder],
+    [visible, stopOrder],
   );
 
   if (cities.isPending) return <LoadingState />;
@@ -66,6 +85,11 @@ export default function ExploreScreen() {
   const [south, west, north, east] = city.bbox;
   const openAttraction = (id: string) =>
     router.push({ pathname: '/attraction/[id]', params: { id } });
+  const toggleWithNotice = (item: AttractionSummary) => setNotice(routeNotice(toggleStop(item), t));
+  const selectCity = (slug: string) => {
+    setQuery('');
+    setCity(slug);
+  };
   const openChecklist = () =>
     router.push({ pathname: '/checklist/[city]', params: { city: city.slug } });
 
@@ -76,7 +100,7 @@ export default function ExploreScreen() {
     : undefined;
   const count = attractions.isPending
     ? t('common.loading')
-    : t('explore.placesCount', { count: attractions.data?.length ?? 0 });
+    : t('explore.placesCount', { count: visible.length });
 
   return (
     <SafeAreaView
@@ -89,7 +113,7 @@ export default function ExploreScreen() {
         ]}>
         <View style={[styles.inner, inner, styles.headerRow]}>
           <View style={styles.search}>
-            <CitySwitcher cities={cities.data} current={city} onSelect={setCity} />
+            <CitySwitcher cities={cities.data} current={city} onSelect={selectCity} />
           </View>
           {isTablet ? (
             <Button
@@ -109,6 +133,17 @@ export default function ExploreScreen() {
               testID="open-checklist"
             />
           )}
+        </View>
+        <View style={[styles.inner, inner, styles.searchRow]}>
+          <AttractionSearch
+            items={attractions.data ?? []}
+            cityName={cityLabel(city, lang)}
+            query={query}
+            onQueryChange={setQuery}
+            routeOrder={stopOrder}
+            onToggle={toggleWithNotice}
+            onOpen={(item) => openAttraction(item.id)}
+          />
         </View>
         <View style={[styles.inner, inner]}>
           <CategoryFilters
@@ -146,7 +181,7 @@ export default function ExploreScreen() {
           <FlatList
             key={columns}
             testID="attraction-list"
-            data={attractions.data}
+            data={visible}
             keyExtractor={(a) => a.id}
             numColumns={columns}
             columnWrapperStyle={columns > 1 ? { gap: GRID_GAP } : undefined}
@@ -162,7 +197,7 @@ export default function ExploreScreen() {
                   item={item}
                   order={stopOrder.get(item.id)}
                   onPress={() => openAttraction(item.id)}
-                  onToggleRoute={() => setNotice(routeNotice(toggleStop(item), t))}
+                  onToggleRoute={() => toggleWithNotice(item)}
                 />
               </View>
             )}
@@ -234,6 +269,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     zIndex: 1,
   },
+  searchRow: { zIndex: 10 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md - 4 },
   search: { flex: 1, maxWidth: 560, flexDirection: 'row' },
   body: { flex: 1 },

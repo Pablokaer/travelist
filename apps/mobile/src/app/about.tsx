@@ -2,11 +2,12 @@ import Constants from 'expo-constants';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { BrandMark } from '@/components/app-menu';
 import { Card } from '@/components/card';
 import { Icon } from '@/components/icon';
 import { Screen, Section } from '@/components/screen';
 import { Text } from '@/components/text';
-import { radius, spacing } from '@/theme/colors';
+import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
 const SOURCES = [
@@ -28,8 +29,8 @@ export default function AboutScreen() {
   return (
     <Screen edges={['left', 'right']}>
       <View style={styles.hero}>
-        <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-          <Icon name="map" size={28} color={theme.onPrimary} />
+        <View style={styles.logo}>
+          <BrandMark size={64} />
         </View>
         <Text variant="title">{t('common.appName')}</Text>
         <Text secondary style={styles.center}>
@@ -62,14 +63,7 @@ export default function AboutScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md },
-  logo: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
+  logo: { marginBottom: spacing.sm },
   center: { textAlign: 'center', maxWidth: 420 },
   sources: { paddingVertical: 0, gap: 0 },
   source: {

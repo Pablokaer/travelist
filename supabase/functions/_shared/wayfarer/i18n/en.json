@@ -78,7 +78,11 @@
     "noCities": "No destinations yet",
     "noCitiesBody": "Reference data has not been loaded. Run the data pipeline seeds and try again.",
     "searchCities": "Search cities",
-    "noCityMatch": "No cities match your search."
+    "noCityMatch": "No cities match your search.",
+    "searchPlaceholder": "Search places in {{city}}",
+    "clearSearch": "Clear search",
+    "noMatches": "No places match “{{query}}”.",
+    "openNamed": "Open {{name}}"
   },
   "category": {
     "museum": "Museums",
@@ -385,5 +389,8 @@
     "generic": "Something went wrong. Please try again.",
     "notFound": "This screen doesn't exist.",
     "goHome": "Go to the home screen"
+  },
+  "menu": {
+    "open": "Open menu"
   }
 }

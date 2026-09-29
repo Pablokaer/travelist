@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { signInWithOAuth, type OAuthProvider } from './api';
 
+import { BrandMark } from '@/components/app-menu';
 import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icon';
@@ -54,16 +55,10 @@ export function AuthLayout({
   const theme = useTheme();
   const shadows = useShadows();
   const { isTablet } = useBreakpoint();
-  const { t } = useTranslation();
   return (
     <Screen width="form" centered>
       <View style={styles.brand}>
-        <View style={[styles.logo, { backgroundColor: theme.primary }]}>
-          <Icon name="map" size={22} color={theme.onPrimary} />
-        </View>
-        <Text variant="subtitle" style={{ color: theme.primary }}>
-          {t('common.appName')}
-        </Text>
+        <BrandMark size={40} withName />
       </View>
       <View
         style={[
@@ -167,14 +162,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   link: { fontSize: 15, paddingVertical: spacing.sm, textDecorationLine: 'underline' },
-  brand: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, alignSelf: 'center' },
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  brand: { alignSelf: 'center' },
   panel: { gap: spacing.md },
   card: {
     padding: spacing.xl,

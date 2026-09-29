@@ -37,6 +37,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- Header app menu: the logo with a menu icon on every stacked screen (attraction, checklist, route, trip, edit profile, about) opens Explore, My Trips, Profile and About — no more dead ends on pages opened from a link.
+- Explore search: a search bar with autocomplete over the city's attractions (accent-insensitive, EN/PT names); picking a suggestion adds the place to the route, the grid and map show every match.
 - Profile → Preferences: **Theme** (Light / Dark), saved on the profile (`profiles.theme`, new migration) and applied at once across the app (D-021).
 - Checklist → Power: each destination plug type is shown with an illustration of the plug face.
 - Explore list: a checkbox on each attraction card adds it to (or removes it from) the route without opening the attraction; checked cards show their stop number, and route notices (full route, new city) appear in the route tray.

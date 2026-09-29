@@ -76,6 +76,7 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 
 - **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count. Defaults to the city of the current route tray, else the first city.
+- **Search** — a search bar under the city pill ("Search places in {city}"). While typing, up to 8 **autocomplete** suggestions from the city's attractions appear (accents ignored, English and Portuguese names; names starting with the text first, then a word starting with it, then any match, most popular first). Picking a suggestion adds the place to the route or removes it, like the card checkbox, and it stays in the list with its stop number; the arrow opens the attraction. On web, ↑/↓ move through suggestions, Enter picks, Escape closes. The grid and the map show every match; clearing the search or changing city shows everything again.
 - **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories.
 - **Map / List switch** — floating pill at the bottom of the screen.
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
@@ -164,6 +165,8 @@ Trips are saved with the `save_trip` RPC (trip + ordered stops in one transactio
 ## Screens and routes
 
 Expo Router, files in `apps/mobile/src/app`.
+
+Every screen stacked above the tabs (attraction, checklist, route, trip, edit profile, about) has an **app menu** at the right of its header: the Wayfarer logo with a menu icon. It opens a menu with **Explore**, **My Trips**, **Profile** and **About**, so a page opened from a link (e.g. `/trip/…`) is never a dead end. It is shown only to signed-in, onboarded users.
 
 | Route               | File                    | Access                   | Purpose                                     |
 | ------------------- | ----------------------- | ------------------------ | ------------------------------------------- |

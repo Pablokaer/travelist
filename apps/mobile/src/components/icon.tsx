@@ -38,6 +38,7 @@ const ICONS = {
   luggage: { ios: 'suitcase', android: 'luggage', web: 'luggage' },
   mail: { ios: 'envelope', android: 'mail', web: 'mail' },
   map: { ios: 'map', android: 'map', web: 'map' },
+  menu: { ios: 'line.3.horizontal', android: 'menu', web: 'menu' },
   passport: { ios: 'person.text.rectangle', android: 'badge', web: 'badge' },
   person: { ios: 'person.crop.circle', android: 'account_circle', web: 'account_circle' },
   photo: { ios: 'photo', android: 'image', web: 'image' },
