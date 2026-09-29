@@ -1,4 +1,6 @@
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { PlanLimitError } from '@/features/subscription/api';
+import { freeSubscription, premiumSubscription } from '@/testing/subscription';
 import { zonedToUtc } from '@wayfarer/shared';
 import { act } from 'react';
 
@@ -14,10 +16,13 @@ class MockServerHooks {
   /** The cities `useCities` returns (none by default) and the trips sent to save. */
   static cities: unknown[] | undefined;
   static saved: unknown[] = [];
+  static optimized: unknown[] = [];
+  static subscription: unknown = jest.requireActual('@/testing/subscription').freeSubscription();
+  static saveError: Error | null = null;
   static save = () => ({
     mutate: (inputs: unknown) => MockServerHooks.saved.push(inputs),
     isPending: false,
-    error: null,
+    error: MockServerHooks.saveError,
   });
 }
 
@@ -26,10 +31,18 @@ jest.mock('@/features/destinations/api', () => ({
   useCities: () => ({ data: MockServerHooks.cities }),
 }));
 jest.mock('@/features/profile/api', () => ({ useProfile: () => MockServerHooks.query() }));
+jest.mock('@/features/subscription/api', () => ({
+  ...jest.requireActual('@/features/subscription/api'),
+  useMySubscription: () => ({ data: MockServerHooks.subscription }),
+}));
 jest.mock('@/features/trips/api', () => ({ useSaveTrips: () => MockServerHooks.save() }));
 jest.mock('@/features/route/api', () => ({
   ...jest.requireActual('@/features/route/api'),
-  useOptimizeRoutes: () => MockServerHooks.mutation(),
+  useOptimizeRoutes: () => ({
+    mutate: (input: unknown) => MockServerHooks.optimized.push(input),
+    isPending: false,
+    error: null,
+  }),
 }));
 
 const place = (id: string, km: number): AttractionSummary => ({
@@ -49,6 +62,9 @@ const place = (id: string, km: number): AttractionSummary => ({
 beforeEach(() => {
   MockServerHooks.cities = undefined;
   MockServerHooks.saved = [];
+  MockServerHooks.optimized = [];
+  MockServerHooks.subscription = jest.requireActual('@/testing/subscription').freeSubscription();
+  MockServerHooks.saveError = null;
   useRouteStore.getState().clear();
   [0, 1, 2].forEach((km) => useRouteStore.getState().add(place(`s${km}`, km)));
 });
@@ -104,5 +120,53 @@ describe('a start time makes the list a meetup (D-041)', () => {
     await userEvent.press(screen.getByTestId('save-trip'));
     expect(await screen.findByText('Choose a date for this time.')).toBeOnTheScreen();
     expect(MockServerHooks.saved).toEqual([]);
+  });
+});
+
+describe('the walking path follows the order shown (D-046)', () => {
+  test('in automatic order the server may reorder the stops for the shortest walk', async () => {
+    render(<RouteScreen />);
+    await userEvent.press(screen.getByTestId('optimize'));
+    expect(MockServerHooks.optimized).toEqual([expect.objectContaining({ keepOrder: false })]);
+  });
+
+  test('an order set by hand is kept: only the street path is asked for', async () => {
+    act(() => useRouteStore.getState().move('s2', -1));
+    render(<RouteScreen />);
+    await userEvent.press(screen.getByTestId('optimize'));
+    expect(MockServerHooks.optimized).toEqual([expect.objectContaining({ keepOrder: true })]);
+  });
+});
+
+describe('saving within the plan (D-047)', () => {
+  test('Free with 5 lists cannot save a sixth: the limit is explained, nothing is sent', async () => {
+    MockServerHooks.subscription = freeSubscription(5);
+    render(<RouteScreen />);
+    await userEvent.press(screen.getByTestId('save-trip'));
+    expect(screen.getByText("You've reached the Free plan limit of 5 lists.")).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Upgrade to Premium' })).toBeOnTheScreen();
+    expect(MockServerHooks.saved).toEqual([]);
+  });
+
+  test('Free cannot save a list of more than 5 places (e.g. kept from before)', async () => {
+    ['s3', 's4', 's5'].forEach((id, k) => useRouteStore.getState().add(place(id, k + 3)));
+    render(<RouteScreen />);
+    await userEvent.press(screen.getByTestId('save-trip'));
+    expect(screen.getByText('Free accounts can add up to 5 places per list.')).toBeOnTheScreen();
+    expect(MockServerHooks.saved).toEqual([]);
+  });
+
+  test('Premium saves beyond the Free limits', async () => {
+    MockServerHooks.subscription = premiumSubscription(9);
+    ['s3', 's4', 's5'].forEach((id, k) => useRouteStore.getState().add(place(id, k + 3)));
+    render(<RouteScreen />);
+    await userEvent.press(screen.getByTestId('save-trip'));
+    expect(MockServerHooks.saved).toHaveLength(1);
+  });
+
+  test('a limit enforced by the server is explained the same way', () => {
+    MockServerHooks.saveError = new PlanLimitError('lists', 'plan limit');
+    render(<RouteScreen />);
+    expect(screen.getByText("You've reached the Free plan limit of 5 lists.")).toBeOnTheScreen();
   });
 });

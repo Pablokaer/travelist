@@ -25,6 +25,8 @@ import { searchAttractions } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
 import { routeNotice } from '@/features/route/notice';
+import { useToggleStop } from '@/features/route/use-toggle-stop';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 import { useCityRatings } from '@/features/reviews/api';
 import { withMinRating } from '@/features/reviews/rating-filter';
 import { useRouteStore } from '@/features/route/store';
@@ -46,7 +48,9 @@ export default function CityScreen() {
   const { categories, toggleCategory, clearCategories, view, setView, minRating, setMinRating } =
     useExploreStore();
   const routeStops = useRouteStore((s) => s.stops);
-  const toggleStop = useRouteStore((s) => s.toggle);
+  // Within the plan's places per list (D-047).
+  const toggleStop = useToggleStop();
+  const [planLimited, setPlanLimited] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   // The place whose card is open on the map; one at a time (D-029).
@@ -91,7 +95,11 @@ export default function CityScreen() {
   const [south, west, north, east] = city.bbox;
   const openAttraction = (id: string) =>
     router.push({ pathname: '/attraction/[id]', params: { id } });
-  const toggleWithNotice = (item: AttractionSummary) => setNotice(routeNotice(toggleStop(item), t));
+  const toggleWithNotice = (item: AttractionSummary) => {
+    const outcome = toggleStop(item);
+    setPlanLimited(outcome === 'planLimit');
+    setNotice(routeNotice(outcome, t));
+  };
   const selectCity = (next: string) => {
     setQuery('');
     router.setParams({ slug: next });
@@ -212,6 +220,11 @@ export default function CityScreen() {
               { value: 'list', label: t('explore.listView'), icon: 'grid' },
             ]}
           />
+          {planLimited ? (
+            <View style={styles.planLimit}>
+              <PlanLimitNotice limit="items" compact />
+            </View>
+          ) : null}
           {routeStops.length > 0 ? (
             <View
               style={[
@@ -278,6 +291,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md - 4,
   },
+  planLimit: { width: '100%', maxWidth: 560 },
   tray: {
     width: '100%',
     maxWidth: 560,

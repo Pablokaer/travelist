@@ -2,6 +2,7 @@ export * from './geo.ts';
 export * from './meetup.ts';
 export * from './navigation.ts';
 export * from './passport.ts';
+export * from './plans.ts';
 export * from './power.ts';
 export * from './route-plan.ts';
 export * from './route.ts';

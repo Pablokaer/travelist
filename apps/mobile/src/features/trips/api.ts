@@ -3,7 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AttractionSummary, PhotoCover } from '@/features/destinations/api';
 import { walklistCoverFrom } from '@/features/trips/walklist-cover';
-import { check, supabase, unwrap } from '@/lib/supabase';
+import { supabase, unwrap } from '@/lib/supabase';
+import { subscriptionKeys, throwIfError } from '@/features/subscription/api';
 
 export type TripSummary = {
   id: string;
@@ -199,21 +200,22 @@ export type SaveTripInput = {
 
 /** Saves one trip through the `save_trip` RPC and returns its id. */
 async function saveTrip(input: SaveTripInput): Promise<string> {
-  return unwrap(
-    await supabase.rpc('save_trip', {
-      p_city_slug: input.citySlug,
-      p_name: input.name,
-      p_attraction_ids: input.stops.map((s) => s.id),
-      p_trip_date: input.tripDate ?? undefined,
-      p_route_geometry: input.route?.geometry ?? undefined,
-      p_distance_m: input.route ? Math.round(input.route.distanceM) : undefined,
-      p_walking_seconds: input.route ? Math.round(input.route.walkingSeconds) : undefined,
-      p_visit_minutes: input.stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0),
-      p_is_fallback: input.route?.isFallback ?? false,
-      p_provider: input.route?.provider ?? undefined,
-      p_starts_at: input.startsAt ?? undefined,
-    }),
-  );
+  const result = await supabase.rpc('save_trip', {
+    p_city_slug: input.citySlug,
+    p_name: input.name,
+    p_attraction_ids: input.stops.map((s) => s.id),
+    p_trip_date: input.tripDate ?? undefined,
+    p_route_geometry: input.route?.geometry ?? undefined,
+    p_distance_m: input.route ? Math.round(input.route.distanceM) : undefined,
+    p_walking_seconds: input.route ? Math.round(input.route.walkingSeconds) : undefined,
+    p_visit_minutes: input.stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0),
+    p_is_fallback: input.route?.isFallback ?? false,
+    p_provider: input.route?.provider ?? undefined,
+    p_starts_at: input.startsAt ?? undefined,
+  });
+  // A plan limit (D-047) becomes a PlanLimitError the screen can explain.
+  throwIfError(result);
+  return result.data!;
 }
 
 /**
@@ -228,16 +230,31 @@ export function useSaveTrips() {
       for (const input of inputs) ids.push(await saveTrip(input));
       return ids;
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: tripKeys.all }),
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: tripKeys.all }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.mine }),
+      ]),
   });
 }
 
+/**
+ * Deletes the caller's list through `delete_trip`: only on a plan that allows it (D-047), and
+ * only the caller's own list.
+ * @example del.mutate(trip.id)
+ */
 export function useDeleteTrip() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      check(await supabase.from('trips').delete().eq('id', id));
+      throwIfError(await supabase.rpc('delete_trip', { p_trip_id: id }));
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: tripKeys.all }),
+    // My Trips (exact key) and the plan usage only: re-reading the deleted list's own page would
+    // redirect it to "not available" (D-040) before the screen goes back.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: tripKeys.all, exact: true }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.mine }),
+      ]),
   });
 }

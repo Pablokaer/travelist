@@ -1,3 +1,4 @@
+import { canDeleteList } from '@wayfarer/shared';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -24,6 +25,8 @@ import { ModeratorOfficialToggle } from '@/features/trips/walklist-community';
 import { env } from '@/lib/env';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
+import { useMySubscription } from '@/features/subscription/api';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 
 const openStop = (id: string) => router.push({ pathname: '/attraction/[id]', params: { id } });
 
@@ -31,7 +34,10 @@ function DeleteTrip({ tripId }: { tripId: string }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const del = useDeleteTrip();
+  const plan = useMySubscription().data?.plan;
   const [confirming, setConfirming] = useState(false);
+  // Deleting is a plan feature (D-047); the database refuses it too.
+  if (plan && !canDeleteList(plan.rules, true)) return <PlanLimitNotice limit="delete" />;
   if (!confirming) {
     return (
       <View style={styles.actions}>

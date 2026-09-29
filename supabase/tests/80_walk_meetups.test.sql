@@ -23,6 +23,9 @@ values
   ('a4444444-4444-4444-4444-444444444444', 'ana.m@example.com', '{"display_name":"Ana"}', 'authenticated', 'authenticated'),
   ('b5555555-5555-5555-5555-555555555555', 'ben.m@example.com', '{"display_name":"Ben"}', 'authenticated', 'authenticated'),
   ('c6666666-6666-6666-6666-666666666666', 'cid.m@example.com', '{"display_name":"Cid"}', 'authenticated', 'authenticated');
+-- Premium (D-047): this file tests other rules, not the Free plan's limits.
+insert into public.subscriptions (user_id, plan_id, status)
+values ('a4444444-4444-4444-4444-444444444444', 'premium', 'active');
 
 -- Ana's lists: in two days, in one hour, an hour ago, a private one, one without a time.
 insert into public.trips (id, user_id, city_slug, name, visibility, starts_at)

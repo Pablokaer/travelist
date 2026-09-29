@@ -5,12 +5,18 @@ import { FunctionsHttpError } from '@supabase/supabase-js';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { supabase } from '@/lib/supabase';
 
-export async function optimizeRoute(
+/**
+ * The `route-optimize` request: the first stop is kept as the start; with `keepOrder` (an order
+ * set by hand) the server keeps every stop where it is and only walks the streets (D-046).
+ * @example routeRequestBody(route, { keepOrder: manualOrder })
+ */
+export function routeRequestBody(
   stops: AttractionSummary[],
-  keepFirst = true,
-): Promise<RouteResponse> {
-  const body: RouteRequest = {
-    keepFirst,
+  { keepOrder }: { keepOrder: boolean },
+): RouteRequest {
+  return {
+    keepFirst: true,
+    keepOrder,
     stops: stops.map((s) => ({
       id: s.id,
       lat: s.lat,
@@ -18,6 +24,13 @@ export async function optimizeRoute(
       visitMinutes: s.avgVisitMinutes,
     })),
   };
+}
+
+export async function optimizeRoute(
+  stops: AttractionSummary[],
+  options: { keepOrder: boolean },
+): Promise<RouteResponse> {
+  const body = routeRequestBody(stops, options);
   const { data, error } = await supabase.functions.invoke('route-optimize', { body });
   if (error) {
     if (error instanceof FunctionsHttpError) {
@@ -30,13 +43,15 @@ export async function optimizeRoute(
 }
 
 /**
- * Optimises every route of the selection independently (each keeps its first stop).
- * @example optimizeRoutes.mutate([routeA, routeB]) // → [responseA, responseB]
+ * Walking routes along the streets for every route of the selection (each keeps its first
+ * stop). In automatic order the server orders the stops for the shortest walk; with `keepOrder`
+ * (an order set by hand) it keeps them and computes only the path.
+ * @example optimizeRoutes.mutate({ routes: [routeA, routeB], keepOrder: false })
  */
 export function useOptimizeRoutes() {
   return useMutation({
-    mutationFn: (routes: AttractionSummary[][]) =>
-      Promise.all(routes.map((stops) => optimizeRoute(stops, true))),
+    mutationFn: ({ routes, keepOrder }: { routes: AttractionSummary[][]; keepOrder: boolean }) =>
+      Promise.all(routes.map((stops) => optimizeRoute(stops, { keepOrder }))),
   });
 }
 

@@ -11,6 +11,7 @@ class MockOwnTripServer {
   static trip: TripDetail | null;
   static moderator = false;
   static schedules: (string | null)[] = [];
+  static subscription: unknown = jest.requireActual('@/testing/subscription').freeSubscription();
 }
 
 jest.mock('expo-router', () => {
@@ -51,6 +52,10 @@ jest.mock('@/features/reviews/api', () => ({
   useRatingSummary: () => ({ data: { count: 1, average: 5 } }),
 }));
 jest.mock('@/features/profile/api', () => ({ useProfile: () => ({ data: undefined }) }));
+jest.mock('@/features/subscription/api', () => ({
+  ...jest.requireActual('@/features/subscription/api'),
+  useMySubscription: () => ({ data: MockOwnTripServer.subscription }),
+}));
 jest.mock('@/features/destinations/api', () => ({
   ...jest.requireActual('@/features/destinations/api'),
   useCities: () => ({
@@ -82,6 +87,7 @@ beforeEach(() => {
   MockOwnTripServer.trip = trip();
   MockOwnTripServer.moderator = false;
   MockOwnTripServer.schedules = [];
+  MockOwnTripServer.subscription = jest.requireActual('@/testing/subscription').freeSubscription();
 });
 
 test('the owner reads the reviews of their list but has no form to rate it', () => {
@@ -156,5 +162,21 @@ describe('group chat for the organiser (D-044)', () => {
     MockOwnTripServer.trip = trip({ visibility: 'private' });
     render(<TripScreen />);
     expect(screen.queryByRole('button', { name: 'Open group chat' })).toBeNull();
+  });
+});
+
+describe('deleting a list is a Premium feature (D-047)', () => {
+  test('Free: no delete, but why and the way to Premium', () => {
+    render(<TripScreen />);
+    expect(screen.queryByRole('button', { name: 'Delete trip' })).toBeNull();
+    expect(screen.getByText('Deleting lists is a Premium feature.')).toBeOnTheScreen();
+  });
+
+  test('Premium: the owner deletes the list', () => {
+    MockOwnTripServer.subscription = jest
+      .requireActual('@/testing/subscription')
+      .premiumSubscription();
+    render(<TripScreen />);
+    expect(screen.getByRole('button', { name: 'Delete trip' })).toBeOnTheScreen();
   });
 });

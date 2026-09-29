@@ -1,10 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { type RouteResponse, routeResponseSchema } from '@wayfarer/shared';
 
-import { cacheKey, type CacheStore, createCached, noCache } from '../_shared/cache.ts';
-import { type FetchJson, type FetchJsonOptions, HttpError } from '../_shared/http.ts';
-import { createHandler, FALLBACK_TTL, normalizeRouteInput, type RouteDeps } from './handler.ts';
+import { cacheKey, createCached, noCache } from '../_shared/cache.ts';
+import { HttpError } from '../_shared/http.ts';
+import { createHandler, FALLBACK_TTL, normalizeRouteInput } from './handler.ts';
 import { createOrsRouting, FALLBACK_ATTRIBUTION, ORS_ATTRIBUTION } from './routing.ts';
+import { fakeOrsFetch, memoryStore, ok, post } from './test-fakes.ts';
 
 // Lisbon: Belém tower, Jerónimos, Praça do Comércio, Castelo de São Jorge.
 const STOPS = [
@@ -58,51 +59,6 @@ const VROOM_OK = {
     ],
   }],
 };
-
-type Call = { url: string; options?: FetchJsonOptions };
-
-function fakeOrsFetch(responses: { optimization?: unknown; error?: Error }) {
-  const calls: Call[] = [];
-  const fetchJson: FetchJson = <T>(url: string, options?: FetchJsonOptions) => {
-    calls.push({ url, options });
-    if (responses.error) return Promise.reject(responses.error);
-    if (url.endsWith('/optimization')) return Promise.resolve(responses.optimization as T);
-    return Promise.reject(new Error(`unexpected ${url}`));
-  };
-  return { fetchJson, calls };
-}
-
-function memoryStore() {
-  const rows = new Map<string, { value: unknown; expiresAt: Date }>();
-  const store: CacheStore = {
-    get: (k, now) => {
-      const r = rows.get(k);
-      return Promise.resolve(r && r.expiresAt > now ? r.value : undefined);
-    },
-    set: (k, value, expiresAt) => {
-      rows.set(k, { value, expiresAt });
-      return Promise.resolve();
-    },
-    purgeExpired: () => Promise.resolve(),
-  };
-  return { store, rows };
-}
-
-async function post(deps: RouteDeps, body: unknown): Promise<Response> {
-  return await createHandler(deps)(
-    new Request('http://localhost/route-optimize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    }),
-  );
-}
-
-async function ok(deps: RouteDeps, body: unknown): Promise<RouteResponse> {
-  const res = await post(deps, body);
-  assertEquals(res.status, 200, await res.clone().text());
-  return routeResponseSchema.parse(await res.json());
-}
 
 Deno.test('route: ORS order, legs and geometry from a single VROOM call', async () => {
   const { fetchJson, calls } = fakeOrsFetch({ optimization: VROOM_OK });

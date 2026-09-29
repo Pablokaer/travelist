@@ -14,6 +14,8 @@ import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { localizedName, useAttraction } from '@/features/destinations/api';
 import { routeNotice } from '@/features/route/notice';
+import { useToggleStop } from '@/features/route/use-toggle-stop';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 import { useRatingSummary } from '@/features/reviews/api';
 import { RatingSummaryLine } from '@/features/reviews/components';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
@@ -29,7 +31,9 @@ export default function AttractionScreen() {
   const attraction = useAttraction(id);
   const rating = useRatingSummary({ kind: 'attraction', id });
   const inRoute = useRouteStore((s) => s.stops.some((x) => x.id === id));
-  const toggle = useRouteStore((s) => s.toggle);
+  // Within the plan's places per list (D-047).
+  const toggle = useToggleStop();
+  const [planLimited, setPlanLimited] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (attraction.isPending) return <LoadingState />;
@@ -41,7 +45,11 @@ export default function AttractionScreen() {
   const article = preferredArticle(lang, a.wikipediaEn, a.wikipediaPt);
   const articleUrl = article ? wikipediaUrl(article) : null;
 
-  const toggleRoute = () => setNotice(routeNotice(toggle(a), t));
+  const toggleRoute = () => {
+    const outcome = toggle(a);
+    setPlanLimited(outcome === 'planLimit');
+    setNotice(routeNotice(outcome, t));
+  };
 
   const open = (url: string) => void WebBrowser.openBrowserAsync(url);
   const fee = a.fee
@@ -80,6 +88,7 @@ export default function AttractionScreen() {
         </>
       }>
       <Stack.Screen options={{ title: name }} />
+      {planLimited ? <PlanLimitNotice limit="items" /> : null}
       {a.imageUrl ? (
         <View style={styles.hero}>
           <Image

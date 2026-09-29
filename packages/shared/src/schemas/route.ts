@@ -19,6 +19,11 @@ export const routeRequestSchema = z.object({
     .refine((s) => new Set(s.map((x) => x.id)).size === s.length, { message: 'duplicate stop' }),
   /** Keep the first stop as the starting point (default) instead of letting the optimiser pick. */
   keepFirst: z.boolean().default(true),
+  /**
+   * Walk the stops in the given order (an order set by hand, D-046): only the street path and
+   * the legs are computed, nothing is reordered.
+   */
+  keepOrder: z.boolean().default(false),
 });
 export type RouteRequest = z.infer<typeof routeRequestSchema>;
 

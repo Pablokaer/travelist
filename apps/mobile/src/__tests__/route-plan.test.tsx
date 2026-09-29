@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 
 import type { AttractionSummary } from '@/features/destinations/api';
-import { SplitPanel } from '@/features/route/route-plan';
+import { RouteStopList, SplitPanel } from '@/features/route/route-plan';
 import { useRouteStore } from '@/features/route/store';
 import '@/lib/i18n';
 
@@ -153,5 +153,36 @@ describe('SplitPanel', () => {
     await userEvent.press(screen.getByTestId('suggest-split'));
     expect(onSuggest).toHaveBeenCalledWith(3);
     expect(screen.queryByTestId('merge-routes')).toBeNull();
+  });
+});
+
+describe('walk between stops along the streets (D-046)', () => {
+  const noop = () => undefined;
+  const list = (
+    legs?: { fromId: string; toId: string; distanceM: number; durationS: number }[],
+  ) => (
+    <RouteStopList
+      route={[placeAt('a', 0), placeAt('b', 1)]}
+      routeIndex={0}
+      routeCount={1}
+      splittable={false}
+      units="metric"
+      legs={legs}
+      onMove={noop}
+      onMoveTo={noop}
+      onRemove={noop}
+      onSplitAt={noop}
+    />
+  );
+
+  test('before the route is computed, the walk is a straight-line estimate', () => {
+    render(list());
+    expect(screen.getByText(/^≈ .* on foot$/)).toBeOnTheScreen();
+  });
+
+  test('once computed, each leg shows the street distance and time, not an estimate', () => {
+    render(list([{ fromId: 'a', toId: 'b', distanceM: 1500, durationS: 1080 }]));
+    expect(screen.getByText('1.5 km · 18 min on foot')).toBeOnTheScreen();
+    expect(screen.queryByText(/^≈/)).toBeNull();
   });
 });

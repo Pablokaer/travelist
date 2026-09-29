@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   addLisbonPlaces,
   byTestIdOn,
+  makePremium,
   openLisbonAttractions,
   roleOn,
   signUpAndOnboard,
@@ -52,6 +53,8 @@ test('orders picks automatically, splits them into two routes and saves both', a
   test.setTimeout(150_000);
   const byTestId = byTestIdOn(page);
   await signUpAndOnboard(page);
+  // Six places in a list need Premium (the Free plan allows 5 per list, D-047).
+  await makePremium(page);
   await addLisbonPlaces(page, 6);
 
   await byTestId('open-route').click();
@@ -233,6 +236,8 @@ test('a route holds up to 20 places: the 21st is refused with a notice; 20 are s
   test.setTimeout(150_000);
   const byTestId = byTestIdOn(page);
   await signUpAndOnboard(page);
+  // Twenty places in a list need Premium (the Free plan allows 5 per list, D-047).
+  await makePremium(page);
   await openLisbonAttractions(page);
   await page
     .getByRole('radio', { name: 'List' })

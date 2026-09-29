@@ -13,6 +13,7 @@ import { cityName, useCities, type City } from '@/features/destinations/api';
 import { BrowseHeader } from '@/features/destinations/browse-header';
 import { CityCard } from '@/features/destinations/city-card';
 import { searchCities } from '@/features/destinations/search';
+import { UpgradeButton } from '@/features/subscription/upgrade-button';
 import { layout, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -47,6 +48,7 @@ export default function HomeScreen() {
       <BrowseHeader
         container={{ maxWidth: layout.page + gutter * 2, paddingHorizontal: gutter }}
         gutter={gutter}
+        action={<UpgradeButton />}
         search={
           <SearchField
             value={query}

@@ -1,0 +1,26 @@
+import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components/button';
+import { useMySubscription } from '@/features/subscription/api';
+
+/**
+ * "Upgrade" in the top bar (D-047): opens the plans. Shown on the default (free) plan only —
+ * a paid plan has nothing to upgrade to yet.
+ * @example <UpgradeButton />
+ */
+export function UpgradeButton() {
+  const { t } = useTranslation();
+  const subscription = useMySubscription();
+  if (!subscription.data || subscription.data.plan.priceCents > 0) return null;
+  return (
+    <Button
+      compact
+      variant="secondary"
+      icon="sparkles"
+      label={t('plans.upgrade')}
+      onPress={() => router.push('/plans')}
+      testID="upgrade"
+    />
+  );
+}

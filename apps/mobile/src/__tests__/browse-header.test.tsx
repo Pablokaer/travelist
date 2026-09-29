@@ -7,6 +7,13 @@ import { CityHeader } from '@/features/destinations/city-header';
 import '@/lib/i18n';
 import { fakeCity } from '@/testing/fixtures';
 
+jest.mock('@/features/subscription/api', () => ({
+  ...jest.requireActual('@/features/subscription/api'),
+  useMySubscription: () => ({
+    data: jest.requireActual('@/testing/subscription').freeSubscription(),
+  }),
+}));
+
 const GUTTER = 32;
 const container = { paddingHorizontal: GUTTER };
 const amsterdam = fakeCity();
@@ -61,6 +68,11 @@ describe('CityHeader', () => {
     await userEvent.press(screen.getByTestId('open-checklist'));
     expect(onOpenChecklist).toHaveBeenCalled();
     expect(screen.getByRole('checkbox', { name: 'All' })).toBeChecked();
+  });
+
+  test('offers "Upgrade" in the top bar to Free users (D-047)', () => {
+    renderCityHeader();
+    expect(screen.getByRole('button', { name: 'Upgrade' })).toBeOnTheScreen();
   });
 
   test('shows the rating tabs after the category tabs', () => {

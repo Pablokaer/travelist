@@ -31,6 +31,9 @@ insert into auth.users (id, email, raw_user_meta_data, aud, role)
 values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.com', '{"display_name":"Alice","language":"pt"}', 'authenticated', 'authenticated'),
   ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{}', 'authenticated', 'authenticated');
+-- Premium (D-047): this file tests other rules, not the Free plan's limits.
+insert into public.subscriptions (user_id, plan_id, status)
+values ('11111111-1111-1111-1111-111111111111', 'premium', 'active');
 
 select is((select display_name from public.profiles where id = '11111111-1111-1111-1111-111111111111'), 'Alice',
   'profile is created from auth metadata');
