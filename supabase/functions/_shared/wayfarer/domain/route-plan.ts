@@ -1,6 +1,10 @@
 // Route planning on top of optimizeOrder: keep the selection in walking order as stops are
 // added, and split a long route into several balanced ones (D-022, D-023).
-import { ROUTE_MIN_STOPS, WALKING_SPEED_M_PER_S } from '../constants/index.ts';
+import {
+  ROUTE_MAX_SPLIT_PARTS,
+  ROUTE_MIN_STOPS,
+  WALKING_SPEED_M_PER_S,
+} from '../constants/index.ts';
 import { haversineMeters } from './geo.ts';
 import { optimizeOrder, optimizeOrderAnyStart, pathLength, type RoutePoint } from './route.ts';
 
@@ -96,14 +100,42 @@ function orderGroup<T extends RoutePoint>(group: readonly T[], index: number): T
   return index === 0 ? orderFromStart(group) : orderFromBestStart(group);
 }
 
-/** Every way to cut `length` items into `parts` contiguous groups of ≥ `min` (group starts). */
+/**
+ * Work caps that keep "Suggest a split" interactive for long routes (D-030): how many
+ * contiguous cuts are scored, and how many neighbouring splits the hill climb may evaluate.
+ * Both are counts, not time limits, so the result stays deterministic.
+ */
+const CUT_BUDGET = 20_000;
+const NEIGHBOUR_BUDGET = 1_500;
+
+/** Number of ways to cut `length` items into `parts` groups of ≥ `min` (a binomial). */
+function cutCount(length: number, parts: number, min: number): number {
+  const free = length - min * parts;
+  let count = 1;
+  for (let k = 1; k < parts; k++) count = (count * (free + k)) / k;
+  return count;
+}
+
+/**
+ * How far each cut may stray from an even split: unlimited while every way of cutting fits in
+ * CUT_BUDGET, otherwise the widest window whose combinations do.
+ */
+function cutWindow(length: number, parts: number, min: number): number {
+  if (cutCount(length, parts, min) <= CUT_BUDGET) return Infinity;
+  return Math.max(0, Math.floor((Math.pow(CUT_BUDGET, 1 / (parts - 1)) - 1) / 2));
+}
+
+/** Ways to cut `length` items into `parts` contiguous groups of ≥ `min` (group starts). */
 function contiguousCuts(length: number, parts: number, min: number): number[][] {
   if (parts === 1) return [[]];
+  const window = cutWindow(length, parts, min);
   const all: number[][] = [];
   const walk = (from: number, left: number, cuts: number[]) => {
     if (left === 0) return void all.push(cuts);
-    for (let cut = from + min; cut <= length - min * left; cut++)
-      walk(cut, left - 1, [...cuts, cut]);
+    const even = Math.round((length * cuts.length + length) / parts);
+    const lo = Math.max(from + min, even - window);
+    const hi = Math.min(length - min * left, even + window);
+    for (let cut = lo; cut <= hi; cut++) walk(cut, left - 1, [...cuts, cut]);
   };
   walk(0, parts - 1, []);
   return all;
@@ -171,15 +203,15 @@ function neighbours<T extends SplitPoint>(groups: T[][], min: number): T[][][] {
 function improveSplit<T extends SplitPoint>(groups: T[][], min: number): T[][] {
   let current = groups;
   let cost = splitCost(current);
-  // Each step lowers the score by > 0.01, so this terminates; the cap is a guard.
-  for (let step = 0; step < 200; step++) {
-    const best = neighbours(current, min).reduce<{ groups: T[][]; cost: number } | null>(
-      (acc, candidate) => {
-        const c = splitCost(candidate);
-        return c < (acc?.cost ?? cost - 0.01) ? { groups: candidate, cost: c } : acc;
-      },
-      null,
-    );
+  let evaluated = 0;
+  // Each step lowers the score by > 0.01, so this terminates; the caps bound long routes.
+  for (let step = 0; step < 200 && evaluated < NEIGHBOUR_BUDGET; step++) {
+    const candidates = neighbours(current, min);
+    evaluated += candidates.length;
+    const best = candidates.reduce<{ groups: T[][]; cost: number } | null>((acc, candidate) => {
+      const c = splitCost(candidate);
+      return c < (acc?.cost ?? cost - 0.01) ? { groups: candidate, cost: c } : acc;
+    }, null);
     if (!best) break;
     [current, cost] = [best.groups, best.cost];
   }
@@ -191,7 +223,7 @@ function improveSplit<T extends SplitPoint>(groups: T[][], min: number): T[][] {
  * short walks (nearby places stay together) and routes of similar length in time — visits plus
  * walking — so each can fill a day or a part of the trip. Starts from the best contiguous cuts of
  * the walking order, then moves and swaps stops between routes while `splitCost` drops. The
- * first route keeps the original start. Deterministic; fine for ≤ 12 stops.
+ * first route keeps the original start. Deterministic; well under a second for 20 stops.
  * @example splitRoute(stops, 2) // [[start, …], […]]
  */
 export function splitRoute<T extends SplitPoint>(
@@ -208,7 +240,7 @@ export function splitRoute<T extends SplitPoint>(
   return improveSplit(bestContiguousSplit(path, parts, min), min);
 }
 
-/** Largest number of routes `stopCount` stops can be split into. */
+/** Largest number of routes `stopCount` stops can be split into (at most ROUTE_MAX_SPLIT_PARTS). */
 export function maxRouteParts(stopCount: number, min: number = ROUTE_MIN_STOPS): number {
-  return Math.floor(stopCount / min);
+  return Math.min(Math.floor(stopCount / min), ROUTE_MAX_SPLIT_PARTS);
 }

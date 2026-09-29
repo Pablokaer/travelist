@@ -15,6 +15,8 @@ type Props<T> = {
   /** Above the first row (e.g. "269 places"). */
   header: ReactElement;
   empty: ReactElement;
+  /** After the last row (e.g. "Load more"). */
+  footer?: ReactElement | null;
   /** Content width of the page container (without the gutter), shared with the header. */
   maxWidth: number;
   gutter: number;
@@ -51,6 +53,8 @@ export function CardGrid<T>(props: Props<T>) {
         <View style={itemWidth ? { width: itemWidth } : styles.flex}>{props.renderCard(item)}</View>
       )}
       ListEmptyComponent={props.empty}
+      ListFooterComponent={props.footer}
+      ListFooterComponentStyle={styles.footer}
     />
   );
 }
@@ -65,5 +69,6 @@ const styles = StyleSheet.create({
   // Bottom room for floating controls (Map/List switch, route tray).
   content: { width: '100%', alignSelf: 'center', paddingTop: spacing.lg, paddingBottom: 160 },
   header: { marginBottom: spacing.md },
+  footer: { marginTop: spacing.lg, alignItems: 'center' },
   rowGap: { height: spacing.xl },
 });

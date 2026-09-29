@@ -45,7 +45,7 @@ jest.mock('@/features/reviews/api', () => {
   const idle = { isPending: false, error: null, mutate: jest.fn() };
   return {
     ...jest.requireActual('@/features/reviews/api'),
-    useAttractionReviews: () => ({ data: [], isPending: false }),
+    useReviews: () => ({ data: [], isPending: false }),
     useRatingSummary: () => ({ data: { count: 128, average: 4.56 } }),
     useSaveReview: () => idle,
     useDeleteReview: () => idle,

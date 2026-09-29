@@ -1,8 +1,9 @@
 // Web implementation (maplibre-gl). Native lives in map-view.native.tsx.
 import 'maplibre-gl/dist/maplibre-gl.css';
+import './map-view.css';
 
 import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import {
@@ -13,6 +14,18 @@ import {
   toRouteFeature,
   type MapViewProps,
 } from './map-view.types';
+import { WebPhotoMarker, WebPopup } from './web-annotations';
+
+type Loaded = { lib: typeof import('maplibre-gl'); map: MapLibreMap };
+
+/** Press on the map itself, not on a marker, the popup or a circle point. */
+function isEmptySpot(m: MapLibreMap, e: { point: { x: number; y: number }; originalEvent: Event }) {
+  const target = e.originalEvent.target as HTMLElement | null;
+  if (target?.closest?.('.maplibregl-marker, .maplibregl-popup')) return false;
+  return (
+    m.queryRenderedFeatures([e.point.x, e.point.y], { layers: ['points-circle'] }).length === 0
+  );
+}
 
 export function MapView({
   styleUrl,
@@ -20,6 +33,11 @@ export function MapView({
   points,
   routes,
   onPointPress,
+  markers = 'circle',
+  selectedId,
+  popup,
+  onMapPress,
+  overlayInsets,
   style,
   testID,
   accessibilityLabel,
@@ -27,10 +45,14 @@ export function MapView({
   const container = useRef<View>(null);
   const map = useRef<MapLibreMap | null>(null);
   const loaded = useRef(false);
-  const latest = useRef({ points, routes, onPointPress });
+  // Photo markers are map annotations, so the dot layer stays empty.
+  const dots = useMemo(() => (markers === 'photo' ? [] : points), [markers, points]);
+  const latest = useRef({ dots, routes, onPointPress, onMapPress });
   useEffect(() => {
-    latest.current = { points, routes, onPointPress };
-  }, [points, routes, onPointPress]);
+    latest.current = { dots, routes, onPointPress, onMapPress };
+  }, [dots, routes, onPointPress, onMapPress]);
+  // Set once the style has loaded; the photo markers and the popup render from then on.
+  const [ready, setReady] = useState<Loaded | null>(null);
 
   // Create the map once (client-side only; never during static rendering).
   useEffect(() => {
@@ -62,7 +84,7 @@ export function MapView({
         });
         m.addSource('points', {
           type: 'geojson',
-          data: toFeatureCollection(latest.current.points),
+          data: toFeatureCollection(latest.current.dots),
         });
         m.addLayer({
           id: 'points-circle',
@@ -83,13 +105,18 @@ export function MapView({
         });
         m.on('mouseenter', 'points-circle', () => (m.getCanvas().style.cursor = 'pointer'));
         m.on('mouseleave', 'points-circle', () => (m.getCanvas().style.cursor = ''));
+        m.on('click', (e) => {
+          if (isEmptySpot(m, e)) latest.current.onMapPress?.();
+        });
         loaded.current = true;
+        setReady({ lib: maplibregl, map: m });
       });
       map.current = created;
     });
     return () => {
       cancelled = true;
       loaded.current = false;
+      setReady(null);
       instance?.remove();
       map.current = null;
     };
@@ -99,9 +126,9 @@ export function MapView({
   useEffect(() => {
     if (!loaded.current) return;
     (map.current?.getSource('points') as GeoJSONSource | undefined)?.setData(
-      toFeatureCollection(points),
+      toFeatureCollection(dots),
     );
-  }, [points]);
+  }, [dots]);
 
   useEffect(() => {
     if (!loaded.current) return;
@@ -114,12 +141,33 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- compare by value
   }, [boundsKey]);
 
+  const selected = markers === 'photo' ? points.find((p) => p.id === selectedId) : undefined;
   return (
     <View
       ref={container}
       testID={testID}
       accessibilityLabel={accessibilityLabel}
-      style={[{ flex: 1, minHeight: 240, overflow: 'hidden' }, style]}
-    />
+      style={[{ flex: 1, minHeight: 240, overflow: 'hidden' }, style]}>
+      {ready && markers === 'photo'
+        ? points.map((p) => (
+            <WebPhotoMarker
+              key={p.id}
+              lib={ready.lib}
+              map={ready.map}
+              point={p}
+              onPress={(id) => latest.current.onPointPress?.(id)}
+            />
+          ))
+        : null}
+      {ready && selected && popup ? (
+        <WebPopup
+          lib={ready.lib}
+          map={ready.map}
+          lngLat={[selected.lng, selected.lat]}
+          insets={overlayInsets}>
+          {popup}
+        </WebPopup>
+      ) : null}
+    </View>
   );
 }

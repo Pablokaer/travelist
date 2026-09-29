@@ -18,6 +18,7 @@ import { useRatingSummary } from '@/features/reviews/api';
 import { RatingSummaryLine } from '@/features/reviews/components';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useRouteStore } from '@/features/route/store';
+import { preferredArticle, wikipediaUrl } from '@/lib/wikipedia';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -26,7 +27,7 @@ export default function AttractionScreen() {
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage ?? 'en';
   const attraction = useAttraction(id);
-  const rating = useRatingSummary(id);
+  const rating = useRatingSummary({ kind: 'attraction', id });
   const inRoute = useRouteStore((s) => s.stops.some((x) => x.id === id));
   const toggle = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
@@ -37,17 +38,8 @@ export default function AttractionScreen() {
   const name = localizedName(a, lang);
   const description =
     lang === 'pt' ? (a.descriptionPt ?? a.descriptionEn) : (a.descriptionEn ?? a.descriptionPt);
-  const wiki =
-    lang === 'pt' && a.wikipediaPt
-      ? { host: 'pt', title: a.wikipediaPt }
-      : a.wikipediaEn
-        ? { host: 'en', title: a.wikipediaEn }
-        : a.wikipediaPt
-          ? { host: 'pt', title: a.wikipediaPt }
-          : null;
-  const wikipediaUrl = wiki
-    ? `https://${wiki.host}.wikipedia.org/wiki/${encodeURIComponent(wiki.title.replace(/ /g, '_'))}`
-    : null;
+  const article = preferredArticle(lang, a.wikipediaEn, a.wikipediaPt);
+  const articleUrl = article ? wikipediaUrl(article) : null;
 
   const toggleRoute = () => setNotice(routeNotice(toggle(a), t));
 
@@ -138,9 +130,9 @@ export default function AttractionScreen() {
         </RowGroup>
       </Section>
 
-      <ReviewsSection attractionId={a.id} />
+      <ReviewsSection target={{ kind: 'attraction', id: a.id }} />
 
-      {a.website || wikipediaUrl || a.imagePageUrl ? (
+      {a.website || articleUrl || a.imagePageUrl ? (
         <Section title={t('attraction.links')}>
           <RowGroup>
             {a.website ? (
@@ -152,13 +144,13 @@ export default function AttractionScreen() {
                 onPress={() => open(a.website!)}
               />
             ) : null}
-            {wikipediaUrl ? (
+            {articleUrl ? (
               <ListRow
                 icon="info"
                 role="link"
                 external
                 label={t('attraction.wikipedia')}
-                onPress={() => open(wikipediaUrl)}
+                onPress={() => open(articleUrl)}
               />
             ) : null}
             {a.imagePageUrl ? (

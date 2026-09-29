@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 
 import SharedTripScreen from '@/app/shared';
-import type { SharedTripView } from '@/features/trips/sharing-api';
+import type { SharedTripDetail, SharedTripView } from '@/features/trips/sharing-api';
 import '@/lib/i18n';
 
 /** What `shared_trip` answers for each password the visitor tries (null = none yet). */
@@ -9,11 +9,19 @@ class MockSharedTripServer {
   static answers = new Map<string | null, SharedTripView>();
   static asked: (string | null)[] = [];
   static pushed: unknown[] = [];
+  static signedIn = false;
+  static moderator = false;
+  static officialSet: boolean[] = [];
+  static saves: { id: string; saved: boolean }[] = [];
 
   static reset() {
     MockSharedTripServer.answers = new Map();
     MockSharedTripServer.asked = [];
     MockSharedTripServer.pushed = [];
+    MockSharedTripServer.signedIn = false;
+    MockSharedTripServer.moderator = false;
+    MockSharedTripServer.officialSet = [];
+    MockSharedTripServer.saves = [];
   }
 }
 
@@ -29,10 +37,35 @@ jest.mock('@/features/trips/sharing-api', () => ({
     return { isPending: false, isError: false, data: MockSharedTripServer.answers.get(password) };
   },
 }));
-jest.mock('@/features/auth/auth-provider', () => ({ useAuth: () => ({ session: null }) }));
+jest.mock('@/features/auth/auth-provider', () => ({
+  useAuth: () => ({ session: MockSharedTripServer.signedIn ? { user: { id: 'u1' } } : null }),
+}));
+jest.mock('@/features/reviews/api', () => {
+  const idle = { isPending: false, error: null, mutate: jest.fn() };
+  return {
+    ...jest.requireActual('@/features/reviews/api'),
+    useReviews: () => ({ data: [], isPending: false }),
+    useRatingSummary: () => ({ data: { count: 2, average: 4.5 } }),
+    useSaveReview: () => idle,
+    useDeleteReview: () => idle,
+  };
+});
+jest.mock('@/features/trips/community-api', () => ({
+  ...jest.requireActual('@/features/trips/community-api'),
+  useIsModerator: () => ({ data: MockSharedTripServer.moderator }),
+  useSetTripOfficial: () => ({
+    isPending: false,
+    error: null,
+    mutate: (official: boolean) => MockSharedTripServer.officialSet.push(official),
+  }),
+  useToggleSavedWalklist: () => ({
+    isPending: false,
+    mutate: (input: { id: string; saved: boolean }) => MockSharedTripServer.saves.push(input),
+  }),
+}));
 jest.mock('@/features/profile/api', () => ({ useProfile: () => ({ data: undefined }) }));
 
-const trip = (isOwner: boolean): SharedTripView => ({
+const trip = (isOwner: boolean, over: Partial<SharedTripDetail> = {}): SharedTripView => ({
   status: 'ok',
   trip: {
     id: 't1',
@@ -44,11 +77,15 @@ const trip = (isOwner: boolean): SharedTripView => ({
     visitMinutes: 20,
     createdAt: '2026-09-29T10:00:00Z',
     stopCount: 1,
-    visibility: 'password',
+    visibility: 'public',
     geometry: null,
     isFallback: false,
     provider: null,
     isOwner,
+    isOfficial: false,
+    authorName: 'Olga',
+    rating: { count: 0, average: null },
+    isSaved: false,
     stops: [
       {
         id: 'a1',
@@ -64,6 +101,7 @@ const trip = (isOwner: boolean): SharedTripView => ({
         isUnesco: true,
       },
     ],
+    ...over,
   },
 });
 
@@ -109,4 +147,79 @@ test('the owner sees their list as others do, with a way back to editing it', as
   expect(screen.getByText('This is your list, as others see it.')).toBeOnTheScreen();
   await userEvent.press(screen.getByRole('button', { name: 'Edit list' }));
   expect(MockSharedTripServer.pushed).toEqual([{ pathname: '/trip/[id]', params: { id: 't1' } }]);
+});
+
+describe('community features (D-035)', () => {
+  test('the list shows its author and rating, signed in or not', () => {
+    MockSharedTripServer.answers.set(null, trip(false, { rating: { count: 2, average: 4.5 } }));
+    render(<SharedTripScreen />);
+    expect(screen.getByText('by Olga')).toBeOnTheScreen();
+    expect(screen.getAllByTestId('rating-summary')[0]).toHaveTextContent('4.5 ★ · 2 reviews');
+    // Reviews and saving need an account.
+    expect(screen.queryByTestId('review-form')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Save Belém by the river' })).toBeNull();
+  });
+
+  test('an official list is marked as such', () => {
+    MockSharedTripServer.answers.set(null, trip(false, { isOfficial: true }));
+    render(<SharedTripScreen />);
+    expect(screen.getByText('Official')).toBeOnTheScreen();
+    expect(screen.getByText('by Travelist')).toBeOnTheScreen();
+  });
+
+  test('a signed-in visitor saves the list and rates it', async () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.answers.set(null, trip(false));
+    render(<SharedTripScreen />);
+    await userEvent.press(screen.getByRole('button', { name: 'Save Belém by the river' }));
+    expect(MockSharedTripServer.saves).toEqual([{ id: 't1', saved: true }]);
+    expect(screen.getByText('Rate this walk list')).toBeOnTheScreen();
+  });
+
+  test('the owner sees the reviews of their list but cannot rate or save it', () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.answers.set(null, trip(true));
+    render(<SharedTripScreen />);
+    expect(screen.getByText('Travellers who open your list can rate it here.')).toBeOnTheScreen();
+    expect(screen.queryByTestId('review-form')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Save Belém by the river' })).toBeNull();
+  });
+
+  test('a moderator marks a public list official, or removes the badge', async () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.moderator = true;
+    MockSharedTripServer.answers.set(null, trip(false));
+    const { rerender } = render(<SharedTripScreen />);
+    await userEvent.press(screen.getByRole('button', { name: 'Mark as official' }));
+    expect(MockSharedTripServer.officialSet).toEqual([true]);
+
+    MockSharedTripServer.answers.set(null, trip(false, { isOfficial: true }));
+    rerender(<SharedTripScreen />);
+    await userEvent.press(screen.getByRole('button', { name: 'Remove official badge' }));
+    expect(MockSharedTripServer.officialSet).toEqual([true, false]);
+  });
+
+  test('moderators cannot make a password list official; others see no moderation', () => {
+    MockSharedTripServer.signedIn = true;
+    MockSharedTripServer.moderator = true;
+    MockSharedTripServer.answers.set(null, trip(false, { visibility: 'password' }));
+    const { rerender } = render(<SharedTripScreen />);
+    expect(screen.getByText('Only public lists can be official.')).toBeOnTheScreen();
+
+    MockSharedTripServer.moderator = false;
+    MockSharedTripServer.answers.set(null, trip(false));
+    rerender(<SharedTripScreen />);
+    expect(screen.queryByText('Moderation')).toBeNull();
+  });
+});
+
+test('a visitor only views a shared list: no editing, visibility, sharing or delete controls', () => {
+  MockSharedTripServer.signedIn = true;
+  MockSharedTripServer.answers.set(null, trip(false));
+  render(<SharedTripScreen />);
+  expect(screen.getByText('Belém by the river')).toBeOnTheScreen();
+  for (const name of ['Edit list', 'Save visibility', 'Share list', 'Delete trip'])
+    expect(screen.queryByRole('button', { name })).toBeNull();
+  expect(screen.queryByRole('radio', { name: 'Private' })).toBeNull();
+  expect(screen.queryAllByTestId(/^drag-stop-/)).toHaveLength(0);
 });

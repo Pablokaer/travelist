@@ -24,58 +24,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      attraction_reviews: {
-        Row: {
-          attraction_id: string;
-          comment: string | null;
-          created_at: string;
-          id: string;
-          rating: number;
-          updated_at: string;
-          user_id: string;
-        };
-        Insert: {
-          attraction_id: string;
-          comment?: string | null;
-          created_at?: string;
-          id?: string;
-          rating: number;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Update: {
-          attraction_id?: string;
-          comment?: string | null;
-          created_at?: string;
-          id?: string;
-          rating?: number;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
-            columns: ['attraction_id'];
-            isOneToOne: false;
-            referencedRelation: 'attraction_details';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
-            columns: ['attraction_id'];
-            isOneToOne: false;
-            referencedRelation: 'attraction_rating_summary';
-            referencedColumns: ['attraction_id'];
-          },
-          {
-            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
-            columns: ['attraction_id'];
-            isOneToOne: false;
-            referencedRelation: 'attractions';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
       attractions: {
         Row: {
           avg_visit_minutes: number;
@@ -181,9 +129,13 @@ export type Database = {
           name_en: string;
           name_pt: string;
           slug: string;
+          summary_en: string | null;
+          summary_pt: string | null;
           timezone: string | null;
           updated_at: string;
           wikidata_id: string;
+          wikipedia_en: string | null;
+          wikipedia_pt: string | null;
         };
         Insert: {
           bbox: number[];
@@ -193,9 +145,13 @@ export type Database = {
           name_en: string;
           name_pt: string;
           slug: string;
+          summary_en?: string | null;
+          summary_pt?: string | null;
           timezone?: string | null;
           updated_at?: string;
           wikidata_id: string;
+          wikipedia_en?: string | null;
+          wikipedia_pt?: string | null;
         };
         Update: {
           bbox?: number[];
@@ -205,9 +161,13 @@ export type Database = {
           name_en?: string;
           name_pt?: string;
           slug?: string;
+          summary_en?: string | null;
+          summary_pt?: string | null;
           timezone?: string | null;
           updated_at?: string;
           wikidata_id?: string;
+          wikipedia_en?: string | null;
+          wikipedia_pt?: string | null;
         };
         Relationships: [
           {
@@ -282,6 +242,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      moderators: {
+        Row: {
+          created_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profile_nationalities: {
         Row: {
           country_code: string;
@@ -317,6 +292,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_path: string | null;
           created_at: string;
           display_name: string | null;
           home_country: string | null;
@@ -329,6 +305,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          avatar_path?: string | null;
           created_at?: string;
           display_name?: string | null;
           home_country?: string | null;
@@ -341,6 +318,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          avatar_path?: string | null;
           created_at?: string;
           display_name?: string | null;
           home_country?: string | null;
@@ -359,6 +337,137 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'countries';
             referencedColumns: ['code'];
+          },
+        ];
+      };
+      reviews: {
+        Row: {
+          attraction_id: string | null;
+          city_slug: string | null;
+          comment: string | null;
+          created_at: string;
+          id: string;
+          rating: number;
+          trip_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          attraction_id?: string | null;
+          city_slug?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          rating: number;
+          trip_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Update: {
+          attraction_id?: string | null;
+          city_slug?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          rating?: number;
+          trip_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_details';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_rating_summary';
+            referencedColumns: ['attraction_id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attractions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reviews_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['slug'];
+          },
+          {
+            foreignKeyName: 'reviews_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'city_list';
+            referencedColumns: ['slug'];
+          },
+          {
+            foreignKeyName: 'reviews_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      saved_trips: {
+        Row: {
+          created_at: string;
+          trip_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          trip_id: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          trip_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'saved_trips_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      trip_passwords: {
+        Row: {
+          created_at: string;
+          password_hash: string;
+          trip_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          password_hash: string;
+          trip_id: string;
+        };
+        Update: {
+          created_at?: string;
+          password_hash?: string;
+          trip_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trip_passwords_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: true;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -416,15 +525,17 @@ export type Database = {
           distance_m: number | null;
           id: string;
           is_fallback: boolean;
+          is_official: boolean;
           name: string;
           provider: string | null;
           route_geometry: Json | null;
           trip_date: string | null;
           updated_at: string;
           user_id: string;
+          visibility: string;
           visit_minutes: number | null;
           walking_seconds: number | null;
-          visibility: string;
+          walklist_cover: Json | null;
         };
         Insert: {
           city_slug: string;
@@ -432,15 +543,16 @@ export type Database = {
           distance_m?: number | null;
           id?: string;
           is_fallback?: boolean;
+          is_official?: boolean;
           name: string;
           provider?: string | null;
           route_geometry?: Json | null;
           trip_date?: string | null;
           updated_at?: string;
           user_id?: string;
+          visibility?: string;
           visit_minutes?: number | null;
           walking_seconds?: number | null;
-          visibility?: string;
         };
         Update: {
           city_slug?: string;
@@ -448,15 +560,16 @@ export type Database = {
           distance_m?: number | null;
           id?: string;
           is_fallback?: boolean;
+          is_official?: boolean;
           name?: string;
           provider?: string | null;
           route_geometry?: Json | null;
           trip_date?: string | null;
           updated_at?: string;
           user_id?: string;
+          visibility?: string;
           visit_minutes?: number | null;
           walking_seconds?: number | null;
-          visibility?: string;
         };
         Relationships: [
           {
@@ -652,6 +765,60 @@ export type Database = {
           },
         ];
       };
+      rating_summary: {
+        Row: {
+          attraction_id: string | null;
+          city_slug: string | null;
+          rating_avg: number | null;
+          rating_counts: number[] | null;
+          review_count: number | null;
+          trip_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_details';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attraction_rating_summary';
+            referencedColumns: ['attraction_id'];
+          },
+          {
+            foreignKeyName: 'attraction_reviews_attraction_id_fkey';
+            columns: ['attraction_id'];
+            isOneToOne: false;
+            referencedRelation: 'attractions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reviews_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'cities';
+            referencedColumns: ['slug'];
+          },
+          {
+            foreignKeyName: 'reviews_city_slug_fkey';
+            columns: ['city_slug'];
+            isOneToOne: false;
+            referencedRelation: 'city_list';
+            referencedColumns: ['slug'];
+          },
+          {
+            foreignKeyName: 'reviews_trip_id_fkey';
+            columns: ['trip_id'];
+            isOneToOne: false;
+            referencedRelation: 'trips';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Functions: {
       attractions_in_view: {
@@ -678,9 +845,17 @@ export type Database = {
         }[];
       };
       delete_account: { Args: Record<PropertyKey, never>; Returns: undefined };
-      list_attraction_reviews: {
-        Args: { p_attraction_id: string; p_limit?: number; p_offset?: number };
+      is_moderator: { Args: Record<PropertyKey, never>; Returns: boolean };
+      list_reviews: {
+        Args: {
+          p_attraction_id?: string;
+          p_city_slug?: string;
+          p_limit?: number;
+          p_offset?: number;
+          p_trip_id?: string;
+        };
         Returns: {
+          author_avatar_path: string;
           author_name: string;
           comment: string;
           created_at: string;
@@ -690,8 +865,43 @@ export type Database = {
           updated_at: string;
         }[];
       };
+      list_walklists: {
+        Args: {
+          p_city_slug?: string;
+          p_limit?: number;
+          p_official?: boolean;
+          p_offset?: number;
+          p_saved?: boolean;
+          p_search?: string;
+          p_sort?: string;
+        };
+        Returns: {
+          author_name: string;
+          city_slug: string;
+          cover: Json;
+          created_at: string;
+          distance_m: number;
+          id: string;
+          is_official: boolean;
+          is_own: boolean;
+          is_saved: boolean;
+          name: string;
+          rating_avg: number;
+          review_count: number;
+          stop_count: number;
+          visibility: string;
+          visit_minutes: number;
+          walking_seconds: number;
+        }[];
+      };
       save_review: {
-        Args: { p_attraction_id: string; p_comment?: string; p_rating: number };
+        Args: {
+          p_attraction_id?: string;
+          p_city_slug?: string;
+          p_comment?: string;
+          p_rating: number;
+          p_trip_id?: string;
+        };
         Returns: string;
       };
       save_trip: {
@@ -710,11 +920,18 @@ export type Database = {
         Returns: string;
       };
       set_nationalities: { Args: { codes: string[] }; Returns: undefined };
+      set_trip_official: { Args: { p_official: boolean; p_trip_id: string }; Returns: undefined };
       set_trip_visibility: {
         Args: { p_password?: string; p_trip_id: string; p_visibility: string };
         Returns: undefined;
       };
       shared_trip: { Args: { p_password?: string; p_trip_id: string }; Returns: Json };
+      trip_open_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
+      trip_visible_to_caller: { Args: { p_trip_id: string }; Returns: boolean };
+      walklist_cover: {
+        Args: { p_trip: Database['public']['Tables']['trips']['Row'] };
+        Returns: Json;
+      };
     };
     Enums: {
       attraction_category:

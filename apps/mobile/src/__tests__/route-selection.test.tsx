@@ -1,9 +1,8 @@
-import { ROUTE_MAX_STOPS } from '@wayfarer/shared';
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { t as translate } from 'i18next';
 
 import type { AttractionSummary } from '@/features/destinations/api';
-import { AttractionCard } from '@/features/destinations/components';
+import { AttractionCard } from '@/features/destinations/attraction-card';
 import { routeNotice } from '@/features/route/notice';
 import { useRouteStore } from '@/features/route/store';
 import '@/lib/i18n';
@@ -46,10 +45,10 @@ describe('route toggle', () => {
     expect(store().stops.map((s) => s.id)).toEqual(['p']);
   });
 
-  test('a full route is left unchanged', () => {
-    for (let i = 0; i < ROUTE_MAX_STOPS; i++) store().toggle(fakeAttraction(`s${i}`));
+  test('up to 20 places are added; a full route is left unchanged', () => {
+    for (let i = 0; i < 20; i++) expect(store().toggle(fakeAttraction(`s${i}`))).toBe('added');
     expect(store().toggle(fakeAttraction('extra'))).toBe('full');
-    expect(store().stops).toHaveLength(ROUTE_MAX_STOPS);
+    expect(store().stops).toHaveLength(20);
   });
 });
 
@@ -57,7 +56,7 @@ describe('routeNotice', () => {
   const t = translate;
 
   test('explains a full route and a new city; stays quiet otherwise', () => {
-    expect(routeNotice('full', t)).toBe(`Your route already has ${ROUTE_MAX_STOPS} stops.`);
+    expect(routeNotice('full', t)).toBe('Your route already has 20 stops.');
     expect(routeNotice('startedNewCity', t)).toBe('Started a new route in this city.');
     expect(routeNotice('added', t)).toBeNull();
     expect(routeNotice('removed', t)).toBeNull();

@@ -16,6 +16,7 @@ import {
   NationalityFields,
   PassportFields,
 } from '@/features/profile/profile-fields';
+import { ProfilePhotoEditor } from '@/features/profile/profile-photo-editor';
 import { spacing } from '@/theme/colors';
 
 function EditProfileForm({ profile }: { profile: Profile }) {
@@ -46,6 +47,11 @@ function EditProfileForm({ profile }: { profile: Profile }) {
           style={styles.save}
         />
       }>
+      <Section title={t('profile.photo.title')}>
+        <Card style={styles.fields}>
+          <ProfilePhotoEditor profile={profile} />
+        </Card>
+      </Section>
       <Section title={t('onboarding.step1Title')}>
         <Card style={styles.fields}>
           <NameAndPreferencesFields control={control} />

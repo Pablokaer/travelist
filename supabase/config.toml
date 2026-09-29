@@ -248,11 +248,11 @@ otp_expiry = 3600
 
 # Bilingual (EN/PT) templates that include both the link and the 6-digit code.
 [auth.email.template.magic_link]
-subject = "Your Wayfarer sign-in link · O seu link de acesso ao Wayfarer"
+subject = "Your Travelist sign-in link · O seu link de acesso ao Travelist"
 content_path = "./supabase/templates/magic_link.html"
 
 [auth.email.template.confirmation]
-subject = "Confirm your Wayfarer account · Confirme a sua conta Wayfarer"
+subject = "Confirm your Travelist account · Confirme a sua conta Travelist"
 content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize email template

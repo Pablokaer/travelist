@@ -10,6 +10,8 @@ const ICONS = {
   add: { ios: 'plus', android: 'add', web: 'add' },
   arrowDown: { ios: 'arrow.down', android: 'arrow_downward', web: 'arrow_downward' },
   arrowUp: { ios: 'arrow.up', android: 'arrow_upward', web: 'arrow_upward' },
+  bookmark: { ios: 'bookmark', android: 'bookmark_add', web: 'bookmark_add' },
+  bookmarked: { ios: 'bookmark.fill', android: 'bookmark_added', web: 'bookmark_added' },
   calendar: { ios: 'calendar', android: 'calendar_today', web: 'calendar_today' },
   check: { ios: 'checkmark', android: 'check', web: 'check' },
   checklist: { ios: 'checklist', android: 'checklist', web: 'checklist' },
@@ -59,6 +61,7 @@ const ICONS = {
   sparkles: { ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' },
   ticket: { ios: 'ticket', android: 'confirmation_number', web: 'confirmation_number' },
   trash: { ios: 'trash', android: 'delete', web: 'delete' },
+  verified: { ios: 'checkmark.seal.fill', android: 'verified', web: 'verified' },
   walk: { ios: 'figure.walk', android: 'directions_walk', web: 'directions_walk' },
   // Attraction categories
   museum: { ios: 'building.columns', android: 'museum', web: 'museum' },

@@ -3,6 +3,7 @@
 python -m wayfarer_pipeline validate-config
 python -m wayfarer_pipeline countries          # Wikidata → data/countries.json → 10_countries.sql
 python -m wayfarer_pipeline cities             # cities.yaml → 20_cities.sql
+python -m wayfarer_pipeline city-summaries     # Wikipedia leads → data/city_summaries.json → 20
 python -m wayfarer_pipeline visa               # passport-index → data/visa.csv → 30_visa.sql
 python -m wayfarer_pipeline ingest --city lisbon | --all   # → data/attractions/*.json → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
@@ -16,7 +17,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import countries, coverage, seed, visa
+from . import city_summaries, countries, coverage, seed, visa
 from .attractions import pipeline
 from .config import DEFAULT_CITIES_FILE, CitiesConfig, load_cities
 from .http import HttpClient
@@ -60,6 +61,15 @@ def _cmd_cities(args: argparse.Namespace) -> int:
         return 1
     print(f"wrote {seed.write_cities(config)} ({len(config.cities)} cities)")
     _write_coverage(config)
+    return 0
+
+
+def _cmd_city_summaries(args: argparse.Namespace) -> int:
+    config = load_cities(args.config)
+    summaries = city_summaries.build(_client(args), config)
+    city_summaries.save(summaries)
+    print(city_summaries.summary_line(summaries))
+    print(f"wrote {seed.write_cities(config)}")
     return 0
 
 
@@ -149,6 +159,9 @@ def build_parser() -> argparse.ArgumentParser:
         func=_cmd_countries
     )
     sub.add_parser("cities", help="cities.yaml → 20_cities.sql").set_defaults(func=_cmd_cities)
+    sub.add_parser(
+        "city-summaries", help="fetch Wikipedia city leads → data/city_summaries.json"
+    ).set_defaults(func=_cmd_city_summaries)
     sub.add_parser("visa", help="fetch visa rules → 30_visa.sql").set_defaults(func=_cmd_visa)
 
     ingest = sub.add_parser("ingest", help="ingest attractions for one or all cities")

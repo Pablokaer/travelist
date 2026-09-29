@@ -20,6 +20,8 @@ export type Profile = {
   passportExpiry: string | null;
   onboardedAt: string | null;
   nationalities: string[];
+  /** Profile photo in the avatars bucket (D-039); null shows the initials. */
+  avatarPath: string | null;
 };
 
 export const profileKeys = {
@@ -48,7 +50,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     await supabase
       .from('profiles')
       .select(
-        'id, display_name, home_country, language, units, theme, passport_expiry, onboarded_at, profile_nationalities(country_code)',
+        'id, display_name, home_country, language, units, theme, passport_expiry, onboarded_at, avatar_path, profile_nationalities(country_code)',
       )
       .eq('id', userId)
       .single(),
@@ -63,6 +65,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     passportExpiry: row.passport_expiry,
     onboardedAt: row.onboarded_at,
     nationalities: (row.profile_nationalities ?? []).map((n) => n.country_code).sort(),
+    avatarPath: row.avatar_path,
   };
 }
 

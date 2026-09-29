@@ -7,7 +7,7 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 ## D-001 — Working name and identifiers
 
 - **Context:** The brief used a `{{APP_NAME}}` placeholder.
-- **Decision:** Working name **Wayfarer**. Package scope `@wayfarer/*`, Expo slug `wayfarer`, URL scheme `wayfarer`, bundle id / Android package `com.finperiti.wayfarer` (placeholder until the store listings are created).
+- **Decision:** Working name **Wayfarer**. Package scope `@wayfarer/*`, Expo slug `wayfarer`, URL scheme `wayfarer`, bundle id / Android package `com.travelist.app` (placeholder until the store listings are created; renamed 2026-09-29 so no company name appears in the project).
 - **Alternatives:** none; renaming touches `app.json`, package names and this file only.
 
 ## D-002 — Expo SDK 57 with the default template as a base
@@ -201,6 +201,28 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **City cards:** the city page reads the ratings of all its places in one request — `attraction_rating_summary` filtered by `city_slug` and `review_count > 0` (the filter reaches the attractions' city index) — instead of adding columns to the public, cached `attractions_in_view` or one request per card. The card shows "3.5 ★" as a caption beside the name, and the rating joins the card's spoken label.
 - **Trade-offs:** reviews are visible to signed-in users only (every screen but About needs sign-in). The page shows the 50 newest; no "load more", reporting or moderation yet. Aggregates computed per read would need a cached column or materialized view at much larger volumes.
 
+## D-029 — Photo markers and a card popup on the city map
+
+- **Context:** the city map drew places as category-coloured dots and a tap opened the attraction page straight away, so the map gave no preview of a place and adding it to the route meant switching to the List.
+- **Decision:**
+  - **Native map annotations, not a GL layer:** `maplibre-gl`'s `Marker` (web) and MapLibre React Native's `Marker` (iOS/Android) hold React content — the web renders it through portals into the marker elements — so a marker is our `PhotoMarker` built on the existing `Thumbnail` (same photo and placeholder as the cards). A symbol layer with runtime images would scale further but needs each photo decoded into a circular sprite and a second rendering path per platform; a city has at most a few hundred places.
+  - **Small images:** markers load the Commons 120 px thumbnail (`thumbnailUrl` rewrites the stored 960 px one to that standard width), ~5–10 KB each; all ~290 Lisbon thumbnails loaded with HTTP 200 in the E2E probe.
+  - **Popup = the List card:** `AttractionCard` gained `compact` (narrower, own surface, rating on its own line) and is rendered in `maplibre-gl`'s `Popup` (automatic anchor keeps it inside the map; `closeOnClick` off, the page decides) or a native `Marker` anchored above the point. Its **+** is the same `RouteCheckbox`, a sibling of the pressable card so its press never opens the place, wired to the page's existing `toggleWithNotice`; the card's press is the existing `openAttraction`. No route logic or navigation changed.
+  - **Selection lives in the city page** (`selectedId`); the map reports marker presses (`onPointPress`) and presses on empty spots (`onMapPress`: a click whose target is not a marker or popup and that hits no dot). A marker click stops propagating so it never reaches the map as an "empty" press.
+  - **Floating UI:** the "N places" pill and the Map/List switch + route tray cover parts of the map, which maplibre cannot know; the page passes them as `overlayInsets` (the bottom one measured with `onLayout`) and the map pans an opening popup out of them (`popupPanY`).
+  - **Opt-in:** `markers="photo"`; the route and trip maps keep the numbered dots.
+- **Trade-offs:** no clustering (none existed): at city zoom dense areas overlap; the selected marker is drawn on top and zooming separates the rest. The native version (and its popup placement near the screen edges) is untested on this machine.
+
+## D-030 — Up to 20 stops per route
+
+- **Context:** a route (tray, `route-optimize`, `save_trip`, `trip_stops`) held at most 12 stops (`ROUTE_MAX_STOPS`). The owner first asked to remove the limit, then settled on 20. The old number also protected the exact ordering (Held-Karp, O(2ⁿ·n²): ~1 ms at 12 stops, ~4 s at 20) and bounded "Suggest a split".
+- **Decision:**
+  - **Limit 20** (`ROUTE_MAX_STOPS`), counted over the whole tray as before: the store refuses a 21st stop ("Your route already has 20 stops."), `routeRequestSchema` has `.max(20)`, `save_trip` needs 2–20 stops and `trip_stops.position` is 0–19 (migration `20261001000300`).
+  - **Ordering:** exact up to `EXACT_ORDER_MAX_STOPS` (12, unchanged results); for 13–20, nearest neighbour + 2-opt — from the fixed start, or with a free start from three candidates (the first stop and the two ends of the longest stretch). Deterministic, ~1 ms.
+  - **Split:** still at most 6 routes (`ROUTE_MAX_SPLIT_PARTS`, what 12 stops allowed). Two work caps bound the search: when there are more than 20 000 ways to cut the walking order, each cut is searched only near an even split; the hill climb evaluates at most 1 500 neighbouring splits. Counts, not timers, so results stay deterministic. Measured while there was no limit: ≤ 90 ms at 20 stops, ~1 s at 60, ~2 s at 100 — so raising the limit later is mostly a matter of changing the constant, the schema and `save_trip`.
+  - **Unchanged:** the Google Maps link still carries origin + 9 waypoints + destination (trips offer per-leg links), and ORS failures fall back to the labelled straight-line estimate.
+- **Trade-offs:** 13–20-stop routes get a near-shortest order, not a guaranteed shortest one.
+
 ## D-031 — Walk list visibility: private, public or password
 
 - **Context:** a saved trip (walk list) was visible only to its owner. The owner asked for three states: **public** (anyone with the link), **private** (owner only) and **password** (anyone with the link who knows the password the owner gives them), a share button, and the ability to change the state later.
@@ -214,3 +236,82 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - **Visitors** see the list read-only (map, totals, stops, Google / Apple Maps links) through the same `TripView` as the owner. Signed out, stops are not tappable (attraction pages need an account) and **Plan your own walks** leads to sign-up. The typed password is kept only in the screen's state and sent with each request; nothing is stored on the device.
 - **Alternatives:** per-person sharing (invite by email) — more than asked, and needs accounts for visitors; a random share token separate from the trip id — would allow revoking a link without going private, at the cost of another column and flow; hashing in an Edge Function — no benefit over `pgcrypto`, one more hop.
 - **Trade-offs:** no limit on password attempts (bcrypt slows each one; a rate limit needs an Edge Function or a failed-attempts table); revoking a link means going private; the native share sheet is untested on this machine.
+
+## D-032 — Filter city pages by minimum rating
+
+- **Context:** with reviews (D-028) and card ratings in place, users asked to see only places rated "3+, 4+ or 5+" stars, keeping the current filter row.
+- **Decision:**
+  - **Three radio tabs in the category row** (★ 3+, ★ 4+, ★ 5+), after a divider, drawn like the category tabs (`FilterTab`). A minimum ("at least N") rather than exact bands, so one choice is enough; pressing the active tab clears it instead of adding an "Any" tab.
+  - **Filtered on the device** with `withMinRating`, over the city's averages that `useCityRatings` already loads for the cards: no new query, and it applies to the map, the grid and the count at once. Search and categories apply first.
+  - **Places without reviews are hidden** while a minimum is set: they have no average to compare, and showing them would defeat "only well-rated places".
+  - Kept in the explore store beside the categories, so it survives switching cities.
+- **Alternatives:** filtering in `attractions_in_view` (a join with the rating view) — a second source of truth for the averages and a refetch per change; a slider or 1–5 options — "1+" and "2+" filter almost nothing.
+- **Trade-offs:** "5+" means an average of exactly 5.0, so places with many reviews rarely qualify; with few reviews in a city, 3+ can leave the page nearly empty (the "No places match these filters." state explains it).
+
+## D-033 — City page hub at `/short/[slug]`; attractions stay at `/city/[slug]`
+
+- **Context:** a city card on the Home opened the attractions (Map / List) straight away. The owner asked for a page per city — photo, rating, About, walk lists, Before you go, reviews — with the attractions one button away, without rebuilding the attractions page or breaking its URL.
+- **Decision:**
+  - **`/short/[slug]`** (the owner's choice) is the hub; **`/city/[slug]`** keeps the unchanged attractions page, so old links still work. Both live in the Explore stack (tab bar, back to the Home). The hub uses the stack header (city name + back), like the attraction page.
+  - **Composition, not new features:** the hub places existing pieces — the city's `city_list` cover and credit, `RatingSummaryLine`, `ReviewsSection`, the checklist sections (extracted into `ChecklistSections` + `useCityChecklist`, now shared with `/checklist/[city]`), and the walk list card shared with My Trips.
+  - **Before you go inline** assumes a trip starting today; the dates live on the checklist page (**Choose your dates**), so the hub stays one screen and the Edge Function contract is unchanged.
+  - **Per-section states:** each section loads, fails (retry) or is empty on its own; nothing hides the page.
+- **Alternatives:** hub at `/city/[slug]` and attractions at `/city/[slug]/attractions` — cleaner URLs, but it would change what every existing `/city/…` link shows.
+- **Trade-offs:** two URL families for one city; the hub makes ~6 small requests (city about, rating, two walk list previews, reviews, checklist).
+
+## D-034 — One `reviews` table for attractions, cities and walk lists
+
+- **Context:** cities and walk lists needed the same reviews as attractions (1–5 stars, optional comment, one per user, author-only edit/delete, public to signed-in users).
+- **Decision:** rename `attraction_reviews` to `reviews` and add nullable `city_slug` and `trip_id` next to `attraction_id`, with a `num_nonnulls(...) = 1` check and a unique (target, user) constraint per column. Every target keeps a real, cascading foreign key. `save_review` and `list_reviews` take the target as one of three parameters; the `rating_summary` view adds reviews per star (`rating_counts`) for the distribution bars. Trips are reviewable only when shared and not the reviewer's own (`trip_open_to_caller` in the insert/update policies). The app's review hooks and `ReviewsSection` take a `ReviewTarget`.
+- **Alternatives:** a polymorphic `(target_type, target_id text)` pair — one column but no foreign keys or cascades; a table per target — three copies of the same rules, RPCs and UI wiring.
+- **Trade-offs:** one more column per future target type; `list_attraction_reviews` and the old `save_review(uuid, int, text)` signature are dropped (the app is updated in the same change).
+
+## D-035 — Community and official walk lists are public trips; saved lists are references
+
+- **Context:** the city page shows the best public walk lists of travellers and official lists curated by the platform; users save other people's lists and rate them. The app already had trips with `private` / `public` / `password` (D-031) and no roles.
+- **Decision:**
+  - **One entity:** community lists are `trips` with `visibility = 'public'`; official lists are public trips with `is_official`, set only by **moderators** (`moderators` table managed in SQL, `is_moderator()`, `set_trip_official`). A trigger rejects `is_official` from non-moderators and clears it when a list stops being public, so owners can always make their list private. Official cards say "by Travelist".
+  - **Listing:** `list_walklists` (security definer; trips stay owner-only) returns card rows — author, stops, times, average, count, saved/own flags — in one query, filtered by city, official flag, name (ILIKE with the text escaped) or the caller's saved lists, sorted `top` / `lowest` / `most_reviewed` / `newest`, paged by limit/offset. Previews fetch 7 rows to know if there are more without counting.
+  - **Saving** is a reference in `saved_trips` (the owner's choice), shown under My Trips → Saved and opened read-only through `/shared?id=…`; lists with a password can be saved (by someone who has the link) but are never listed on city pages.
+  - **Rating** happens on the shared list page with the shared `ReviewsSection` (D-034).
+- **Alternatives:** copying a list into the saver's trips (no new table, but no link to the original's rating or edits); a role claim in the JWT (needs an auth hook; a table is enough and testable in pgTAP); keyset pagination (offset is enough at this scale).
+- **Trade-offs:** no admin screen for moderators; no count of lists; offset paging can repeat or skip a row when lists change between pages.
+
+## D-036 — City "About" text from the Wikipedia lead
+
+- **Context:** the About section needs a short BIO per city, from data, not hardcoded; cities had none.
+- **Decision:** the pipeline's `city-summaries` command takes each city's en/pt Wikipedia titles from its Wikidata sitelinks and stores the plain-text `extract` of the Wikipedia REST summary in `cities.summary_en/pt` (with `wikipedia_en/pt`), through the committed `data/city_summaries.json` and `20_cities.sql` like all reference data. The app shows the app-language text (else the other one) with "From Wikipedia · CC BY-SA 4.0" and a link to that same article.
+- **Alternatives:** Wikidata descriptions (CC0, but one line — "capital of the Netherlands"); hand-written text in `cities.yaml` (control, but ~160 texts to write and maintain).
+- **Trade-offs:** CC BY-SA requires the attribution and link on screen; Portuguese articles mix European and Brazilian spelling; texts change only when the command is re-run.
+
+## D-037 — Demo community data is local-only SQL, one file per city
+
+- **Context:** the city page feed (city rating and comments, place reviews, community and official walk lists) needs realistic multi-user, multi-language data to test, city by city.
+- **Decision:** hand-written SQL in `supabase/demo/`: shared `accounts.sql` (six friends plus a moderator editorial account, fixed ids, one known password), then `<city>.sql` and `<city>.check.sql` per city. `pnpm db:demo <city>` (`scripts/seed-demo.mjs`) pipes them into the local `supabase_db_<project_id>` container's `psql`. Rows are inserted as `postgres` with explicit past dates, so feeds have realistic ordering, and the transaction acts as the moderator so the official-list guard still runs. Places are found by Wikidata id, list ids come from `md5(key)` so share links survive re-runs, and the route numbers use the app's own offline fallback model. Each city file first deletes the demo accounts' content in that city, so re-runs are idempotent.
+- **Alternatives:** files in `supabase/seed/` (rejected: `db push --include-seed` would put fake accounts in production, and that folder is pipeline-generated); calling the RPCs over HTTP as each user (rejected: every row would be dated "now" and it needs the API up); `supabase db query -f` (rejected: it refuses multi-statement files).
+- **Trade-offs:** Docker access to the local container is required; `db:reset` removes the demo data; RLS is bypassed on insert, so the check file (`list_walklists`, `list_reviews`, `rating_summary`, no self-reviews) guards consistency.
+
+## D-038 — Walk list cover: the starting point's photo, chosen in the database
+
+- **Context:** walk list cards had no image, only the city flag, so a grid of lists looked all alike. Each list should be recognisable at a glance.
+- **Decision:** the card shows the photo of stop 0 or, when that place has no photo, of the next stop that has one, with its Commons credit. One SQL function, `walklist_cover(trip)` (security invoker, returns `{url, author, license}` or null), is the only rule: `list_walklists` returns it as `cover`, and My Trips reads it as a PostgREST computed column (`trips?select=…,walklist_cover`). The app parses it with `walklistCoverFrom` and reuses the city card's `PhotoCredit`.
+- **Alternatives:** picking the photo in the app from the embedded stops (rejected: the same rule twice, in SQL and TypeScript, and more data per card); a stored `trips.cover_*` column (rejected: goes stale when stops change or a city is re-ingested); strictly stop 0 with a placeholder otherwise (rejected: a blank card whenever the start has no photo).
+- **Trade-offs:** one extra indexed lookup per listed trip; a list whose first stop has no photo shows a later stop's photo, not literally its starting point.
+
+## D-039 — Profile photos in a public Storage bucket, resized on the device
+
+- **Context:** users want a photo on their profile. Its main value is being seen next to their reviews by other travellers.
+- **Decision:** Supabase Storage bucket `avatars`, **public read**, created by a migration with a 2 MiB limit and JPEG / PNG / WebP only. RLS on `storage.objects` lets each user write only under `<user id>/`, and `profiles.avatar_path` must point inside that folder (DB check). The app picks with `expo-image-picker`, cuts the centre square and resizes to 512 px JPEG with `expo-image-manipulator`, behind `lib/photo-picker.ts`. Each upload gets a new file name (`avatar-<ms>.jpg`) and the previous file is deleted, so no cache shows a stale photo. `list_reviews` returns the author's path, and the app builds the public URL without a request.
+- **Alternatives:** a private bucket with signed URLs (rejected: one extra request per review author, and the URLs expire in caches); storing the image in `profiles` as base64 (rejected: bloats every profile read); third-party avatars such as Gravatar or OAuth pictures (rejected: not every user has one, and it leaks the email hash); server-side resizing (Image Transformation needs the Pro plan).
+- **Trade-offs:** a photo is visible to anyone who has its URL. Files do not cascade with the account, so the app deletes them before `delete_account`, and deletions made outside the app leave orphans. Two new native modules need a new development build.
+
+## D-040 — Access to a walk list does not depend on knowing its URL
+
+- **Context:** the owner set the rule: public lists made by users can be viewed by anyone, even someone who guesses the URL, but only the owner edits them; a guessed URL of a private list must give an error — only the owner views and edits private lists.
+- **Decision:**
+  - **Editing** stays owner-only in the database whatever the visibility (RLS on `trips` / `trip_stops`, `set_trip_visibility`); proven for public and password lists, visitors who saved a list and signed-out users (`40_trip_visibility.test.sql`).
+  - **Viewing** goes through `shared_trip` only: public → the list, password → the prompt, private or missing → `not_found` ("Walk list not available"; the same answer, so a guess never reveals that a private list exists).
+  - **The owner's editing page** (`/trip/[id]`) reads `trips` with `maybeSingle`: no row means the list is not the caller's, and the page redirects to `/shared?id=…` instead of an error — so a guessed editing URL of a public list opens it read-only and one of a private list says it is not available.
+  - **Reviews of a private list** were still readable by anyone who guessed its id (table, `rating_summary`, `list_reviews`). They are now visible only to the owner (`trip_visible_to_caller` in the select policy and in `list_reviews`).
+- **Alternatives:** a 403-style "you are not the owner" message on `/trip/[id]` — it would tell a guesser that the id exists.
+- **Trade-offs:** password lists keep their D-031 behaviour (link + password to view); their reviews stay readable by signed-in users with the id.

@@ -3,6 +3,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
+import { removeAllProfilePhotos } from '@/features/profile/avatar-api';
 import { supabase } from '@/lib/supabase';
 
 export type OAuthProvider = 'google' | 'apple';
@@ -119,6 +120,9 @@ export async function signOut() {
 }
 
 export async function deleteAccount() {
+  // Storage files do not cascade with the account rows: remove the profile photos first (D-039).
+  const { data } = await supabase.auth.getSession();
+  if (data.session) await removeAllProfilePhotos(data.session.user.id);
   const { error } = await supabase.rpc('delete_account');
   fail(error);
   await supabase.auth.signOut({ scope: 'local' });

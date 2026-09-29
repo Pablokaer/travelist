@@ -3,11 +3,15 @@ import { render, screen, userEvent } from '@testing-library/react-native';
 import { formatRating } from '@/lib/format';
 import {
   reviewFromRow,
+  reviewKeys,
   summaryFromRow,
+  targetParams,
   type RatingSummary,
   type Review,
+  type ReviewTarget,
 } from '@/features/reviews/api';
 import { RatingSummaryLine, ReviewCard } from '@/features/reviews/components';
+import { RatingDistribution } from '@/features/reviews/rating-distribution';
 import { ReviewForm } from '@/features/reviews/review-form';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { StarRating } from '@/features/reviews/star-rating';
@@ -33,7 +37,7 @@ jest.mock('@/features/reviews/api', () => {
   const idle = { isPending: false, error: null };
   return {
     ...actual,
-    useAttractionReviews: () => ({ data: MockReviewsBackend.reviews, isPending: false }),
+    useReviews: () => ({ data: MockReviewsBackend.reviews, isPending: false }),
     useRatingSummary: () => ({ data: MockReviewsBackend.summary }),
     useSaveReview: () => ({
       ...idle,
@@ -51,10 +55,31 @@ const review = (over: Partial<Review> = {}): Review => ({
   updatedAt: '2026-09-29T10:00:00Z',
   authorName: 'Carla',
   isOwn: false,
+  authorAvatarUrl: null,
   ...over,
 });
 
+const placeTarget: ReviewTarget = { kind: 'attraction', id: 'a1' };
+const cityTarget: ReviewTarget = { kind: 'city', id: 'lisbon' };
+
 beforeEach(() => MockReviewsBackend.reset());
+
+describe('review targets (D-034)', () => {
+  test('each target is sent to the RPCs as its own parameter', () => {
+    expect(targetParams(placeTarget)).toEqual({ p_attraction_id: 'a1' });
+    expect(targetParams(cityTarget)).toEqual({ p_city_slug: 'lisbon' });
+    expect(targetParams({ kind: 'trip', id: 't1' })).toEqual({ p_trip_id: 't1' });
+  });
+
+  test('a city and an attraction with the same id never share cached reviews', () => {
+    const city = { kind: 'city', id: 'x' } as const;
+    const place = { kind: 'attraction', id: 'x' } as const;
+    expect(reviewKeys.list(city)).not.toEqual(reviewKeys.list(place));
+    expect(reviewKeys.summary(city)).not.toEqual(reviewKeys.summary(place));
+    // The city page cards' ratings are cached apart from the city's own reviews.
+    expect(reviewKeys.cards('x')).not.toEqual(reviewKeys.list(city));
+  });
+});
 
 describe('mapping server rows', () => {
   test('a review row keeps rating, comment, dates, author and ownership', () => {
@@ -66,6 +91,7 @@ describe('mapping server rows', () => {
       updated_at: '2026-09-30T10:00:00Z',
       author_name: null,
       is_own: true,
+      author_avatar_path: null,
     };
     expect(reviewFromRow(row)).toEqual({
       id: 'r1',
@@ -75,6 +101,7 @@ describe('mapping server rows', () => {
       updatedAt: '2026-09-30T10:00:00Z',
       authorName: null,
       isOwn: true,
+      authorAvatarUrl: null,
     });
   });
 
@@ -84,6 +111,12 @@ describe('mapping server rows', () => {
       count: 128,
       average: 4.56,
     });
+  });
+
+  test('the count per star comes along when the summary has it', () => {
+    expect(
+      summaryFromRow({ review_count: 3, rating_avg: 4, rating_counts: [0, 0, 1, 0, 2] }),
+    ).toEqual({ count: 3, average: 4, distribution: [0, 0, 1, 0, 2] });
   });
 });
 
@@ -103,6 +136,22 @@ describe('RatingSummaryLine', () => {
   test('formats the average in the app language', () => {
     expect(formatRating(4.56, 'pt')).toBe('4,6');
     expect(formatRating(4, 'en')).toBe('4.0');
+  });
+});
+
+describe('RatingDistribution', () => {
+  test('one bar per star, 5 first, each with its count', () => {
+    render(<RatingDistribution distribution={[1, 0, 0, 2, 7]} />);
+    const rows = screen.getAllByTestId(/^rating-bar-/);
+    expect(rows.map((r) => r.props.testID)).toEqual([
+      'rating-bar-5',
+      'rating-bar-4',
+      'rating-bar-3',
+      'rating-bar-2',
+      'rating-bar-1',
+    ]);
+    expect(screen.getByLabelText('5 stars: 7 reviews')).toBeOnTheScreen();
+    expect(screen.getByLabelText('1 star: 1 review')).toBeOnTheScreen();
   });
 });
 
@@ -193,14 +242,14 @@ describe('ReviewsSection', () => {
   test('lists every review of the attraction with the summary', () => {
     MockReviewsBackend.reviews = [review(), review({ id: 'r2', authorName: 'Dan', rating: 5 })];
     MockReviewsBackend.summary = { count: 2, average: 4.5 };
-    render(<ReviewsSection attractionId="a1" />);
+    render(<ReviewsSection target={placeTarget} />);
     expect(screen.getByTestId('review-r1')).toBeTruthy();
     expect(screen.getByTestId('review-r2')).toBeTruthy();
     expect(screen.getAllByTestId('rating-summary')[0]).toHaveTextContent('4.5 ★ · 2 reviews');
   });
 
   test('with no review of mine, the form publishes a new one', async () => {
-    render(<ReviewsSection attractionId="a1" />);
+    render(<ReviewsSection target={placeTarget} />);
     expect(screen.getByText('Publish review')).toBeTruthy();
     await userEvent.press(screen.getByLabelText('5 stars'));
     await userEvent.press(screen.getByTestId('save-review'));
@@ -209,7 +258,7 @@ describe('ReviewsSection', () => {
 
   test('with a review of mine, the form edits it and offers to delete it', async () => {
     MockReviewsBackend.reviews = [review({ isOwn: true, rating: 2, comment: 'Crowded' })];
-    render(<ReviewsSection attractionId="a1" />);
+    render(<ReviewsSection target={placeTarget} />);
     expect(screen.getByDisplayValue('Crowded')).toBeTruthy();
     expect(screen.getByLabelText('2 stars')).toBeChecked();
     await userEvent.press(screen.getByTestId('delete-review'));
@@ -217,9 +266,24 @@ describe('ReviewsSection', () => {
     expect(MockReviewsBackend.deleted).toBe(1);
   });
 
+  test('a city is rated with its own title, and its distribution is shown', () => {
+    MockReviewsBackend.summary = { count: 2, average: 4, distribution: [0, 0, 1, 0, 1] };
+    render(<ReviewsSection target={cityTarget} />);
+    expect(screen.getByText('Rate this city')).toBeOnTheScreen();
+    expect(screen.getByTestId('rating-bar-5')).toBeOnTheScreen();
+  });
+
+  test('without the right to review (own walk list), only the reviews are shown', () => {
+    MockReviewsBackend.reviews = [review()];
+    render(<ReviewsSection target={{ kind: 'trip', id: 't1' }} canReview={false} />);
+    expect(screen.queryByTestId('review-form')).toBeNull();
+    expect(screen.getByText('Travellers who open your list can rate it here.')).toBeOnTheScreen();
+    expect(screen.getByTestId('review-r1')).toBeOnTheScreen();
+  });
+
   test("other people's reviews offer no edit or delete controls", () => {
     MockReviewsBackend.reviews = [review({ isOwn: false })];
-    render(<ReviewsSection attractionId="a1" />);
+    render(<ReviewsSection target={placeTarget} />);
     expect(screen.queryByTestId('delete-review')).toBeNull();
     expect(screen.getByText('Publish review')).toBeTruthy();
   });

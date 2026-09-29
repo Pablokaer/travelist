@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { Card } from '@/components/card';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { useProfile } from '@/features/profile/api';
+import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useDeleteTrip, useTrip, type TripDetail } from '@/features/trips/api';
 import {
   createLinkSharer,
@@ -18,6 +19,7 @@ import {
 import { useSetTripVisibility } from '@/features/trips/sharing-api';
 import { TripView } from '@/features/trips/trip-view';
 import { VisibilityEditor } from '@/features/trips/visibility-editor';
+import { ModeratorOfficialToggle } from '@/features/trips/walklist-community';
 import { env } from '@/lib/env';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -88,9 +90,15 @@ export default function TripScreen() {
 
   if (trip.isPending) return <LoadingState />;
   if (trip.isError) return <ErrorState onRetry={() => trip.refetch()} />;
+  // Not the caller's list: only its owner edits it. The read-only view shows it if it is
+  // public, asks for its password, or says a private one is not available (D-040).
+  if (trip.data === null) return <Redirect href={{ pathname: '/shared', params: { id } }} />;
   return (
     <TripView trip={trip.data} units={profile.data?.units ?? 'metric'} onOpenStop={openStop}>
       <TripSharing trip={trip.data} />
+      {/* Travellers rate shared lists (D-035); the owner reads what they said. */}
+      <ReviewsSection target={{ kind: 'trip', id: trip.data.id }} canReview={false} />
+      <ModeratorOfficialToggle trip={trip.data} />
       <DeleteTrip tripId={trip.data.id} />
     </TripView>
   );

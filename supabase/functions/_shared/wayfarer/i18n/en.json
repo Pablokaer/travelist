@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Wayfarer",
+    "appName": "Travelist",
     "locale": "en-GB",
     "loading": "Loading…",
     "retry": "Try again",
@@ -70,6 +70,9 @@
     "placesCount_other": "{{count}} places",
     "filters": "Filter by category",
     "allCategories": "All",
+    "ratingFilter": "Filter by rating",
+    "minRating_one": "{{count}} star or more",
+    "minRating_other": "{{count}} stars or more",
     "viewMode": "View as",
     "mapView": "Map",
     "listView": "List",
@@ -89,7 +92,7 @@
     "citiesCount_other": "{{count}} destinations",
     "openCity": "{{city}}, {{country}}, {{places}}",
     "photoCredit": "Photo © {{author}} · {{license}}",
-    "goHome": "Wayfarer — all destinations",
+    "goHome": "Travelist — all destinations",
     "cityNotFound": "City not found",
     "cityNotFoundBody": "This destination isn't available. Pick one of the cities we cover.",
     "backHome": "See all destinations"
@@ -149,7 +152,15 @@
     "deleteConfirm": "Delete your review of this place?",
     "deleteYes": "Delete review",
     "saved": "Thanks! Your review is published.",
-    "error": "We couldn't load the reviews. Check your connection and try again."
+    "error": "We couldn't load the reviews. Check your connection and try again.",
+    "writeTitle_city": "Rate this city",
+    "writeTitle_trip": "Rate this walk list",
+    "deleteConfirm_city": "Delete your review of this city?",
+    "deleteConfirm_trip": "Delete your review of this walk list?",
+    "noneBody_trip": "Walked it? Be the first to rate this list.",
+    "ownTrip": "Travellers who open your list can rate it here.",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews"
   },
   "checklist": {
     "title": "Before you go",
@@ -356,7 +367,12 @@
     "delete": "Delete trip",
     "deleteConfirm": "Delete this trip? This can't be undone.",
     "deleteYes": "Yes, delete trip",
-    "subtitle": "Your saved walking routes, ready for the day."
+    "subtitle": "Your saved walking routes, ready for the day.",
+    "tabsLabel": "Show",
+    "mineTab": "My lists",
+    "savedTab": "Saved",
+    "savedEmptyTitle": "No saved walk lists",
+    "savedEmpty": "Save other travellers' public lists from a city page to find them here."
   },
   "sharing": {
     "visibilityTitle": "Who can see this list",
@@ -393,6 +409,16 @@
   "profile": {
     "title": "Profile",
     "edit": "Edit profile",
+    "photo": {
+      "title": "Profile photo",
+      "hint": "Shown on your profile and next to your reviews. Anyone can see it.",
+      "add": "Add photo",
+      "change": "Change photo",
+      "remove": "Remove photo",
+      "saving": "Saving photo…",
+      "permissionDenied": "Allow access to your photos in Settings to add a profile photo.",
+      "failed": "Couldn't save your photo. Please try again."
+    },
     "displayName": "Name",
     "language": "Language",
     "languageName": {
@@ -427,13 +453,14 @@
   },
   "about": {
     "title": "About",
-    "body": "Wayfarer helps you prepare for a trip and explore a city on foot.",
+    "body": "Travelist helps you prepare for a trip and explore a city on foot.",
     "dataSources": "Data sources",
     "sources": {
       "osm": "Map data © OpenStreetMap contributors (ODbL)",
       "wikidata": "Attraction data from Wikidata (CC0)",
       "commons": "Images from Wikimedia Commons (licence shown per image)",
       "pageviews": "Popularity from Wikipedia pageviews (Wikimedia)",
+      "wikipediaText": "City descriptions from Wikipedia (CC BY-SA 4.0, linked on each city page)",
       "openfreemap": "Map tiles by OpenFreeMap © OpenMapTiles",
       "ors": "Walking routes © openrouteservice.org by HeiGIT",
       "openMeteo": "Weather data by Open-Meteo.com (CC BY 4.0)",
@@ -465,5 +492,51 @@
   },
   "menu": {
     "open": "Open menu"
+  },
+  "cityHub": {
+    "exploreAttractions": "Explore attractions",
+    "about": "About {{city}}",
+    "aboutSource": "From Wikipedia · CC BY-SA 4.0",
+    "readMore": "Read more on Wikipedia",
+    "noAbout": "No description available yet.",
+    "beforeYouGoIntro": "For a trip starting today, with the passports in your profile.",
+    "changeDates": "Choose your dates"
+  },
+  "walklists": {
+    "communityTitle": "Top community walk lists",
+    "officialTitle": "Official walk lists",
+    "officialSubtitle": "Curated by the Travelist team.",
+    "viewAll": "View all walk lists",
+    "viewAllOfficial": "View all official lists",
+    "communityEmpty": "No public walk lists yet",
+    "communityEmptyBody": "Plan a route in {{city}}, save it and make it public to share it here.",
+    "officialEmpty": "No official walk lists yet",
+    "officialEmptyBody": "The Travelist team hasn't published one for {{city}} yet.",
+    "error": "We couldn't load the walk lists. Try again.",
+    "pageTitle": "Community walk lists in {{city}}",
+    "officialPageTitle": "Official walk lists in {{city}}",
+    "search": "Search walk lists",
+    "sortLabel": "Sort by",
+    "sort": {
+      "top": "Highest rated",
+      "lowest": "Lowest rated",
+      "most_reviewed": "Most reviewed",
+      "newest": "Newest"
+    },
+    "noMatch": "No walk lists match your search.",
+    "loadMore": "Load more",
+    "view": "View",
+    "save": "Save",
+    "saved": "Saved",
+    "saveLabel": "Save {{name}}",
+    "unsaveLabel": "Remove {{name}} from saved",
+    "official": "Official",
+    "byAuthor": "by {{name}}",
+    "byPlatform": "by Travelist",
+    "anonymousAuthor": "a traveller",
+    "moderatorTitle": "Moderation",
+    "markOfficial": "Mark as official",
+    "unmarkOfficial": "Remove official badge",
+    "officialNeedsPublic": "Only public lists can be official."
   }
 }

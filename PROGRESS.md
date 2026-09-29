@@ -30,7 +30,7 @@ Milestones from the MVP brief. Each milestone ends with lint, typecheck and all 
 - **Database:** reference tables (countries, cities, attractions with PostGIS, visa rules, api_cache) and user tables (profiles, nationalities, trips, trip stops) with RLS; RPCs `attractions_in_view`, `set_nationalities`, `save_trip`, `delete_account`; profile created on sign-up; pgTAP: 24 tests.
 - **Data:** 250 countries (plugs, voltage, currency, calling code, emergency numbers, languages), 80 cities in 32 countries (12 at launch + 68 added 2026-09-28; list in [docs/CITIES.md](./docs/CITIES.md)), 39,402 visa rules, 14,222 attractions (≤ 300 per city) with images, licences, opening hours and popularity. Committed as SQL seeds (D-011).
 - **Edge Functions:** `checklist` (visa, passport validity, power, Open-Meteo weather, FX, Canada advisories, practical info, each degrading independently, cached) and `route-optimize` (ORS + fallback). Both require a signed-in user (D-015). Deno: 40 tests.
-- **App:** email/password, magic link + 6-digit code, Google/Apple (PKCE; native Apple on iOS), protected routes, 3-step onboarding, profile edit, language/units, account deletion; Explore with MapLibre map (web + native), city switcher, category filters, accessible list view, attraction detail with image credit; checklist screen; route tray (≤ 12 stops), optimisation, totals, save trip; My Trips list/detail/delete with Google/Apple Maps walking links. Jest: 12 tests. Playwright: smoke + full journey (sign-up → onboarding → checklist → route → saved trip) on desktop and mobile viewports.
+- **App:** email/password, magic link + 6-digit code, Google/Apple (PKCE; native Apple on iOS), protected routes, 3-step onboarding, profile edit, language/units, account deletion; Explore with MapLibre map (web + native), city switcher, category filters, accessible list view, attraction detail with image credit; checklist screen; route tray (≤ 12 stops at the time; 20 since D-030), optimisation, totals, save trip; My Trips list/detail/delete with Google/Apple Maps walking links. Jest: 12 tests. Playwright: smoke + full journey (sign-up → onboarding → checklist → route → saved trip) on desktop and mobile viewports.
 - **Verified locally (macOS, 2026-09-28):** `pnpm check`, `pnpm db:test`, `supabase db lint`, Deno lint/fmt/test, pytest (76) + ruff, `pnpm build:web`, `E2E_BACKEND=1 pnpm e2e` 6/6, map rendering on web (screenshots), live checklist for Lisbon with real providers.
 
 ## 2026-09-28 — 20 more cities
@@ -57,16 +57,46 @@ Design system (tokens, Inter, shared components with hover/focus/press/loading s
 
 1–5 star ratings with optional comments on every attraction, average + count next to the name, one review per user (edit / delete own only). Postgres table with RLS, `save_review` / `list_attraction_reviews` RPCs and `attraction_rating_summary` view; 24 pgTAP tests, unit/component tests and an E2E journey (publish → edit → delete) on web.
 
+## 2026-09-29 — Photo markers on the city map (D-029)
+
+Places on the city map are round photo markers; a first tap opens the compact List card over the map (+ adds to the route, tapping the card opens the place). Unit/component tests plus an E2E journey on desktop and phone widths.
+
+## 2026-09-29 — Up to 20 stops per route (D-030)
+
+Routes hold 2–20 stops (was 12): tray, `route-optimize` schema, `save_trip` and `trip_stops` (migration). Exact order up to 12 stops, nearest neighbour + 2-opt for 13–20; the split keeps ≤ 6 routes with work caps. Tests at every layer and an E2E that fills a route to 20, sees the 21st refused and saves the trip.
+
 ## 2026-09-29 — Walk list visibility and sharing (D-031)
 
 Saved trips are private (default), public or password-protected; the owner switches between them and shares the link (`/shared?id=…`), which opens read-only for anyone allowed, signed in or not. pgTAP: 28 tests (RLS, hashes unreadable, owner-only changes, anon access); unit/component tests; an E2E that goes private → public (link copied and opened signed out) → password (wrong, then right) → private, on desktop and phone widths.
+
+## 2026-09-29 — Rating filter on city pages (D-032)
+
+★ 3+ / 4+ / 5+ tabs after the category tabs keep only places whose average rating reaches the minimum (grid, map, count); unrated places are hidden while one is active. Unit/component tests; verified with `pnpm check`, not yet on a device.
+
+## 2026-09-29 — City page hub, community walk lists, city reviews (D-033 – D-036)
+
+Home cards open the city page `/short/{slug}` (hero, Wikipedia About, community and official walk lists, Before you go, reviews); **Explore attractions** leads to the unchanged `/city/{slug}`. Reviews generalised to cities and walk lists (`reviews` table); public lists are listed, searched, sorted and saved (`list_walklists`, `saved_trips`); moderators mark lists official. pgTAP: 43 new tests (129 in all); pipeline: 6 new tests; app: unit/component/router tests (215 in all); E2E: `city-page.spec.ts` (city review, a public list found, saved and rated by a second traveller) on desktop and phone widths.
+
+## 2026-09-29 — Demo community data (D-037)
+
+`pnpm db:demo <city>` loads local test data for the city page feed: six friends writing in EN/ES/FR plus a "Wayfarer Team" moderator. Done: **Amsterdam**, with 6 city reviews, 35 reviews of 10 places, 9 community and 4 official walk lists, 42 list ratings and 12 saves, checked by `amsterdam.check.sql`. Next: the other cities, one `supabase/demo/<city>.sql` + `.check.sql` each.
+
+## 2026-09-29 — Walk list cover photo (D-038)
+
+Walk list cards (My Trips, city page, View all) show the starting point's photo with its credit, through `walklist_cover(trip)`, which `list_walklists` returns and My Trips reads as a computed column. pgTAP: 6 new tests (135 in all); app: 6 new tests (221 in all). Checked in the web app with the Amsterdam demo data.
+
+## 2026-09-29 — Profile photo (D-039)
+
+Users add, change and remove a profile photo on Edit profile. It is cropped to a square, resized to 512 px and uploaded to the public `avatars` bucket (per-user folder policies), and shown on the Profile screen and next to their reviews. pgTAP: 9 new tests (144 in all); app: 10 new tests (231 in all). Verified on web: upload, change (old file deleted), remove, and the photo on another user's view of the reviews. Next: check the native picker on iOS/Android; the author photo on walk list cards.
 
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
 - Route stop drag and drop (D-027) is verified on web only; check it on iOS/Android with a development build (gesture vs page scroll).
+- Map: clustering for dense areas; check photo markers and the card popup on iOS/Android (D-029).
 - Walk list sharing: limit password attempts; revoke a link without going private; check the native share sheet on iOS/Android (D-031).
-- Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028).
+- Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028); city and walk list reviews share the same gap (D-034).
+- Walk lists: an admin screen for moderators (today: SQL), a count of lists on the city page, and a check of the city page on iOS/Android (D-033, D-035).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
 - Native date pickers (D-019) and a map-beside-list layout for Explore on wide screens (D-007) are post-MVP polish; route and trip detail already use it (D-020).
@@ -75,7 +105,7 @@ Saved trips are private (default), public or password-protected; the owner switc
 ## Known issues / open questions
 
 - **Without `ORS_API_KEY`** routes are straight-line estimates (clearly labelled in the UI).
-- **Bundle id** `com.finperiti.wayfarer` is a placeholder (D-001).
+- **Bundle id** `com.travelist.app` is a placeholder (D-001).
 - Portuguese attraction names exist for ~15–55% of places outside Portugal/Rome; the English name is shown as fallback.
 - Opening hours come from OSM and cover ~15–30% of places.
 - Expo Go cannot load MapLibre; a development build is required.

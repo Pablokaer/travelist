@@ -113,7 +113,7 @@ function ReviewAuthor({ review }: { review: Review }) {
   const date = formatDate(review.createdAt, t('common.locale'));
   return (
     <View style={styles.author}>
-      <Avatar name={name} size={40} />
+      <Avatar name={name} uri={review.authorAvatarUrl} size={40} />
       <View style={styles.flex}>
         <Text variant="subtitle" numberOfLines={1}>
           {name}

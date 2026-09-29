@@ -163,6 +163,11 @@ describe('sharedTripDetail', () => {
       visibility: 'password' as const,
       created_at: '2026-09-29T10:00:00+00:00',
       is_owner: false,
+      is_official: true,
+      author_name: 'Olga',
+      review_count: 3,
+      rating_avg: 4.33,
+      is_saved: true,
       stop_ids: ['a1'],
     };
     expect(sharedTripDetail(trip, [stop])).toEqual({
@@ -181,6 +186,10 @@ describe('sharedTripDetail', () => {
       provider: 'fallback',
       stops: [stop],
       isOwner: false,
+      isOfficial: true,
+      authorName: 'Olga',
+      rating: { count: 3, average: 4.33 },
+      isSaved: true,
     });
   });
 });

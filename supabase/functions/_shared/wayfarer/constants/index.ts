@@ -37,7 +37,10 @@ export const DEFAULT_VISIT_MINUTES: Record<AttractionCategory, number> = {
 };
 
 export const ROUTE_MIN_STOPS = 2;
-export const ROUTE_MAX_STOPS = 12;
+/** Stops per route (the whole tray, before any split); raised from 12 (D-030). */
+export const ROUTE_MAX_STOPS = 20;
+/** "Suggest a split" offers at most this many routes (what 12 stops allowed). */
+export const ROUTE_MAX_SPLIT_PARTS = 6;
 /** A route with at least this many stops can be split into several routes. */
 export const ROUTE_SPLIT_MIN_STOPS = 5;
 
@@ -75,6 +78,17 @@ export const DEFAULT_TRIP_VISIBILITY: TripVisibility = 'private';
 /** Trip password length, in characters; bcrypt reads at most 72 bytes (`set_trip_visibility`). */
 export const TRIP_PASSWORD_MIN = 4;
 export const TRIP_PASSWORD_MAX = 72;
+
+/**
+ * Orders of the public walk list listing (D-035), as `list_walklists(p_sort)` accepts them:
+ * best average first, lowest first, most reviews first, newest first.
+ */
+export const WALKLIST_SORTS = ['top', 'lowest', 'most_reviewed', 'newest'] as const;
+export type WalklistSort = (typeof WALKLIST_SORTS)[number];
+/** Lists per page on "View all walk lists" (`list_walklists` returns at most 50). */
+export const WALKLIST_PAGE_SIZE = 20;
+/** Lists in each preview section of the city page (community, official). */
+export const WALKLIST_PREVIEW_COUNT = 6;
 
 /** EU member states (ISO alpha-2). */
 export const EU_COUNTRIES = [

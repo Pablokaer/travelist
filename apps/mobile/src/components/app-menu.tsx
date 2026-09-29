@@ -12,7 +12,7 @@ import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
 /**
- * The Wayfarer logo: accent tile with the map glyph, optionally followed by the wordmark.
+ * The Travelist logo: accent tile with the map glyph, optionally followed by the wordmark.
  * @example <BrandMark size={40} withName />
  */
 export function BrandMark({ size = 32, withName }: { size?: number; withName?: boolean }) {

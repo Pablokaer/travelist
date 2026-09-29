@@ -1,5 +1,7 @@
 # Wayfarer
 
+> Shown to users as **Travelist** (logo, app name, About page, sign-in emails). _Wayfarer_ remains the project's code name: repository, packages (`@wayfarer/*`), deep-link scheme (`wayfarer://`) and bundle id.
+
 Cross-platform travel companion (iOS · Android · Web) built with Expo + Supabase.
 
 - **Before you go:** a checklist personalised to your passports (visa, passport validity, power, weather, money, safety, practical info).
@@ -65,8 +67,9 @@ Finishing sets `onboarded_at`, which unlocks the main app.
 
 **Profile tab** (`(tabs)/profile.tsx`):
 
-- Shows name, email, nationalities, home country and passport expiry.
-- **Edit profile** (`edit-profile.tsx`) — the same fields as onboarding on one screen.
+- Shows the profile photo (or the initials), name, email, nationalities, home country and passport expiry.
+- **Edit profile** (`edit-profile.tsx`) — **Profile photo** first, then the same fields as onboarding on one screen.
+- **Profile photo** (D-039, `features/profile/profile-photo-editor.tsx`) — **Add photo** / **Change photo** opens the photo library: the native crop on iOS/Android, a file dialog on web. The app keeps the centre square, resizes it to 512 × 512 and uploads it as JPEG. **Remove photo** goes back to the initials. Changes apply at once, not with Save, and the old file is deleted. The photo is shown on the profile and next to the user's reviews, and anyone can see it (the note under the buttons says so). If photo library access is denied, the app says to allow it in Settings. **Delete account** also deletes the user's photos.
 - **Language**, **Units** and **Theme** (Light / Dark) switches — applied instantly and saved to the profile.
 - Links to **About**, **Sign out** and **Delete account** (with confirmation).
 
@@ -74,26 +77,43 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 
 ### 3. Explore: Home and city pages
 
-The **Explore** tab is a stack (`(tabs)/(explore)/`, D-026): the **Home** (`/`) lists the destinations; a city card opens the **city page** (`/city/[slug]`) with its attractions. After sign-in (and onboarding) the app opens on the Home.
+The **Explore** tab is a stack (`(tabs)/(explore)/`, D-026): the **Home** (`/`) lists the destinations; a city card opens the **city page** (`/short/[slug]`, D-033) — the hub of the city — and its **Explore attractions** button opens the **attractions page** (`/city/[slug]`, Map / List). After sign-in (and onboarding) the app opens on the Home.
 
 **Home** (`(tabs)/(explore)/index.tsx`)
 
-- **Header** — the Wayfarer logo and a **Search cities** field, in one row (the search centred, max 640 px); on phones the logo mark sits next to the search. No category tabs: they belong to city pages.
+- **Header** — the Travelist logo and a **Search cities** field, in one row (the search centred, max 640 px); on phones the logo mark sits next to the search. No category tabs: they belong to city pages.
 - **"Where to next?"** and the number of destinations shown, then a responsive grid of **city cards** (same grid as the attractions: as many ≥ 240 px columns as fit).
-- **City card** (`features/destinations/city-card.tsx`) — cover photo, city name, flag + country and number of places; the whole card opens the city. The cover is the photo of the city's most popular attraction that has one, shown with its **author + licence** (Commons credit). Only active cities with data are listed (`city_list`), A–Z in the UI language.
+- **City card** (`features/destinations/city-card.tsx`) — cover photo, city name, flag + country and number of places; the whole card opens the city page (`/short/[slug]`). The cover is the photo of the city's most popular attraction that has one, shown with its **author + licence** (Commons credit). Only active cities with data are listed (`city_list`), A–Z in the UI language.
 - **Search cities** — filters the grid as you type: city names in English and Portuguese, then countries ("ital" → Italian cities), accents ignored (`searchCities`). "No cities match your search." when nothing does.
 
-**City page** (`(tabs)/(explore)/city/[slug].tsx`) — the city comes from the URL, so any city page can be linked directly; an unknown slug shows "City not found" with **See all destinations**.
+**City page** (`(tabs)/(explore)/short/[slug]/index.tsx`, D-033) — the starting point for everything about a city, opened from its card on the Home. The city comes from the URL; an unknown slug shows "City not found" with **See all destinations**. The stack header has the city name and back. Top to bottom:
+
+- **Hero** (`features/destinations/city-hero.tsx`) — the city's cover photo with its credit, the name, flag + country, the city's average rating ("4.8 ★ · 1,240 reviews", or "No reviews yet") and **Explore attractions**, which opens the attractions page below (`/city/[slug]`).
+- **About {city}** — the lead of the city's Wikipedia article in the app language (the other language when there is none), with "From Wikipedia · CC BY-SA 4.0" and **Read more on Wikipedia** (D-036). Data from `cities.summary_*`, filled by the pipeline; "No description available yet." without one.
+- **Top community walk lists** — up to 6 public lists of the city made by travellers, best average first (unrated last), as cards: city, name, "by {author}", average rating, stops, distance, walking time, and **View** / **Save** (D-035). **View all walk lists** opens the full list. "No public walk lists yet" (with how to share one) when there are none.
+- **Official walk lists** — "Curated by the Travelist team.": up to 6 public lists a moderator marked official, with an **Official** badge and "by Travelist" instead of the author; **View all official lists** when there are more. "No official walk lists yet" otherwise.
+- **Before you go** — the same sections as the checklist page (visa, passport, weather, power, money, safety, practical), for a trip starting today with the passports in the profile; **Choose your dates** opens the checklist page (`/checklist/[city]`). Without a passport in the profile: "Add your nationality…" with **Edit profile**.
+- **Reviews** — the city's average, how many reviews gave each number of stars (bars, 5 to 1), **Rate this city** (same form as attractions: 1–5 stars, optional comment; one review per user and city, editable and deletable by its author) and every review with author, stars, date and comment (D-034).
+- Each section has its own loading, empty and error (retry) state; an empty or failing section never hides the rest of the page.
+
+**Community walk lists** (`short/[slug]/walklists.tsx`, D-035) — "Community walk lists in {city}" (or "Official walk lists in {city}" with `?kind=official`): **Search walk lists** (by name, accents and case as typed, 300 ms after the last key), sort **Highest rated** (default) / **Lowest rated** / **Most reviewed** / **Newest**, cards with **View** / **Save**, 20 at a time with **Load more**. "No walk lists match your search." when the search finds nothing. While a new search or sort loads, the current cards stay on screen.
+
+**Attractions page** (`(tabs)/(explore)/city/[slug].tsx`) — the Map / List of a city's places, opened from **Explore attractions** on the city page (its URL is unchanged, so old links still open it). The city comes from the URL, so any attractions page can be linked directly; an unknown slug shows "City not found" with **See all destinations**.
 
 - **Back to the Home:** the **logo** in the header (a link on every browse page), the **Explore** tab (pressing it on a city page returns to the Home; from another tab it returns to where you left), or the back button / browser back.
-- **Header** (`features/destinations/browse-header.tsx` + `city-header.tsx`, D-024) — the Wayfarer logo, the city pill + search group and the checklist button. When the page is wide enough (desktop windows from about 1110 px) they share one row, with the city + search group centred (max 640 px); narrower tablets/desktops show logo + checklist on top and the group below; phones show the logo mark, city pill and checklist icon in one row and the search below. The category tabs follow. Header and grid share one container (max 1440 px + gutter).
+- **Header** (`features/destinations/browse-header.tsx` + `city-header.tsx`, D-024) — the Travelist logo, the city pill + search group and the checklist button. When the page is wide enough (desktop windows from about 1110 px) they share one row, with the city + search group centred (max 640 px); narrower tablets/desktops show logo + checklist on top and the group below; phones show the logo mark, city pill and checklist icon in one row and the search below. The category tabs follow. Header and grid share one container (max 1440 px + gutter).
 
 - **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count; picking a city switches the page (and its URL) to it.
 - **Search** — a search bar beside the city pill (below it on phones) ("Search places in {city}"). While typing, up to 8 **autocomplete** suggestions from the city's attractions appear (accents ignored, English and Portuguese names; names starting with the text first, then a word starting with it, then any match, most popular first). Picking a suggestion adds the place to the route or removes it, like the card checkbox, and it stays in the list with its stop number; the arrow opens the attraction. On web, ↑/↓ move through suggestions, Enter picks, Escape closes. The grid and the map show every match; clearing the search or changing city shows everything again.
 - **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories. Centred when they fit; otherwise the row scrolls horizontally, edge to edge.
+- **Rating filter** (D-032) — after the category tabs, past a thin divider, three gold-star tabs **3+**, **4+** and **5+** (`features/reviews/rating-filter-tabs.tsx`): only places whose average rating is at least that many stars stay in the grid, on the map and in the count; places without reviews are hidden while a rating tab is active. One at a time (a radio group, "4 stars or more" to screen readers); pressing the active tab again shows every place. It combines with the categories and the search, and, like the categories, it is kept while switching cities. Filtering happens on the device, on the city's averages already loaded for the cards.
 - **Map / List switch** — floating pill at the bottom of the screen.
-  - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
-  - **List** — responsive grid of image cards, sorted by popularity: as many columns of ≥ 240 px cards as the grid's width fits (1 on phones, 2 on tablets, 3–5 on desktop; `gridColumns`, `theme/grid.ts`), with photo, UNESCO badge, name, category and visit time. A place with reviews shows its average beside the name, quietly, as "3.5 ★" (one decimal; nothing without reviews); screen readers hear "Rated 3.5 out of 5 from 2 reviews". The averages of the whole city come in one request (`attraction_rating_summary` filtered by city, D-028). A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
+  - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Every place is a small **round photo marker** (36 px, white ring; the 120 px Commons thumbnail of its photo, or the photo placeholder when it has none); places in the route show their stop number (D-029).
+    - **First tap** on a marker selects it (larger, accent ring, above the others) and opens the **compact attraction card** over the map, attached to the marker: photo, name, category · visit time, rating ("5.0 ★", when reviewed) and the **+** checkbox. It is the List card (`AttractionCard compact`), not a separate design.
+    - **+** adds the place to the route (or removes it) exactly like the List checkbox — same notices, and it then shows the stop number; it never opens the place. **Tapping the card** opens the attraction, as in the List.
+    - One place is selected at a time: another marker moves the card to it; a tap on an empty spot, or a search/filter that hides the place, closes it.
+    - The card opens on the side of the marker with room (maplibre's automatic anchor), above every marker, and the map pans when it would sit under the "N places" pill or the Map/List switch and route tray. The map stays usable (pan, zoom) while it is open.
+  - **List** — responsive grid of image cards, sorted by popularity: as many columns of ≥ 240 px cards as the grid's width fits (1 on phones, 2 on tablets, 3–5 on desktop; `gridColumns`, `theme/grid.ts`), with photo, UNESCO badge, name, category and visit time. A place with reviews shows its average beside the name, quietly, as "3.5 ★" (one decimal; nothing without reviews); screen readers hear "Rated 3.5 out of 5 from 2 reviews". The averages of the whole city come in one request (`attraction_rating_summary` filtered by city, D-028). A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 20 stops, one city per route), and their notices appear in the route tray.
 - **Places count** — "N places" for the current filters (announced to screen readers).
 - **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route", the latest route notice (route full / new route started in this city) and a **Build route** button.
 - **Checklist** button (**Before you go**; icon-only on phones) — opens the pre-trip checklist for the current city.
@@ -109,7 +129,7 @@ Data comes from the `attractions_in_view` RPC (bbox + categories, most popular f
 - Localised name and description (PT falls back to EN and vice versa), category and a **UNESCO** badge when applicable.
 - **Average rating** under the name: "4.6 ★ · 128 reviews" (average of every review, one decimal; "No reviews yet" when there are none).
 - **Add to route / Remove from route**:
-  - max 12 stops — shows "route is full" beyond that;
+  - max 20 stops (D-030; it was 12) — shows "route is full" beyond that;
   - a route belongs to one city — adding a place from another city **starts a new route** (with a notice).
 - **Good to know:** average visit time (minutes, per category default or per place) and entry fee (yes / no / free text) as tiles; opening hours (OSM, when available) on their own row.
 - **Reviews** (D-028):
@@ -143,16 +163,16 @@ A disclaimer at the bottom reminds the user to confirm requirements with officia
 
 `route.tsx`, opened from the route tray on Explore.
 
-- **Automatic order:** places can be picked in any order. The first pick is the starting point; every new pick is slotted into the walk and the route is re-ordered for the shortest total walk (exact shortest path on straight-line distance, `orderFromStart` in `packages/shared/src/domain/route-plan.ts`, D-025) — not simply sorted by distance from the start. A notice says the order is automatic (D-022).
+- **Automatic order:** places can be picked in any order. The first pick is the starting point; every new pick is slotted into the walk and the route is re-ordered for the shortest total walk (exact shortest path on straight-line distance for up to 12 stops, nearest neighbour + 2-opt for 13–20; `orderFromStart` in `packages/shared/src/domain/route-plan.ts`, D-025, D-030) — not simply sorted by distance from the start. A notice says the order is automatic (D-022).
 - Map of the selected stops, numbered per route and coloured per route, and, after optimising, each route's walking line. On desktop the map sits beside the stop list.
 - Stop list in walking order with the estimated walk between consecutive stops (straight line × 1.3) and **drag grip / move up / move down / remove** controls.
   - **Drag and drop:** press the grip (⋮⋮) and drag the stop to its new place within the route; the other stops slide to make room and the page doesn't scroll while dragging (web: mouse or touch; iOS/Android: touch). A stop can't be dragged into another route of a split — use **Split here** / **Join into one route** for that (D-027).
   - Moving a stop (buttons or drag) switches to **manual order**: the notice changes and new picks are inserted where they add the least walking, without re-sorting. **Reorder automatically** goes back to the shortest walk.
 - **Split into several routes** (from 5 stops, `ROUTE_SPLIT_MIN_STOPS`): each route keeps ≥ 2 stops and is independent.
   - **Split here** between two stops cuts the route at that point.
-  - **Suggest a split** into 2–6 routes (as many as 2-stop routes allow) makes **balanced** routes, each meant for a day or a part of the trip (D-023): it weighs short walks (nearby places stay together) against routes of similar length in time — visits plus walking. It starts from the best cuts of the walking order, then moves and swaps stops between routes while that improves the score `walking minutes + 0.5 × Σ |route time − average route time|` (`splitRoute`, `splitCost`). Neighbourhoods far apart are never merged just to even out the count. The first route keeps the starting point; the others start where their walk is shortest.
+  - **Suggest a split** into 2–6 routes (as many as 2-stop routes allow, at most 6) makes **balanced** routes, each meant for a day or a part of the trip (D-023): it weighs short walks (nearby places stay together) against routes of similar length in time — visits plus walking. It starts from the best cuts of the walking order, then moves and swaps stops between routes while that improves the score `walking minutes + 0.5 × Σ |route time − average route time|` (`splitRoute`, `splitCost`). Neighbourhoods far apart are never merged just to even out the count. The first route keeps the starting point; the others start where their walk is shortest.
   - **Join into one route** merges them again. A new pick joins the route it is closest to; removing a stop that leaves a route with one stop folds it into the nearest route.
-- **Optimise** (every route needs 2–12 stops) calls the `route-optimize` Edge Function once per route, keeping each route's first stop as its start, and reorders each route. Only routes without a result for their current order are sent (a changed route of a split leaves the others' answers in place); when every route is already optimised, all are sent again and answered from the server cache.
+- **Optimise** (every route needs 2–20 stops) calls the `route-optimize` Edge Function once per route, keeping each route's first stop as its start, and reorders each route. Only routes without a result for their current order are sent (a changed route of a split leaves the others' answers in place); when every route is already optimised, all are sent again and answered from the server cache.
   - With `ORS_API_KEY`: one OpenRouteService optimisation (VROOM) request on the foot-walking network, which returns the order, each leg's street distance and time, and the walking line (D-025).
   - Without a key or on any ORS error: the exact shortest straight-line order with legs × 1.3 at 4.5 km/h. The UI flags this as an **estimate** (D-014).
   - A result only applies to the exact stops and order it was computed for; any change shows "–" again until you optimise.
@@ -164,7 +184,10 @@ The tray itself (`features/route/store.ts`, Zustand) is in-memory client state: 
 
 ### 7. My Trips
 
-- **List** (`(tabs)/trips.tsx`) — grid of trip cards, newest first: city (with flag) and date, name, number of stops, distance and walking time, and **Public** / **With password** for lists others can open (private lists have no badge). Pull to refresh. Empty state links back to Explore.
+- **List** (`(tabs)/trips.tsx`) — two tabs (D-035):
+  - **My lists** (default) — grid of trip cards, newest first: city (with flag) and date, name, number of stops, distance and walking time, and **Public** / **With password** for lists others can open (private lists have no badge). Pull to refresh. Empty state links back to Explore.
+  - **Saved** — other travellers' lists the user saved from a city page or a shared link, newest first, with author, rating and **Saved** (press to remove); a card opens the list read-only (`/shared?id=…`). A saved list that its owner makes private disappears from here. 20 at a time with **Load more**. Empty: "No saved walk lists".
+- **Card** (`features/trips/trip-card.tsx`) — the same card on My Trips, the city page and the walk list page. At the top is the photo of the list's **starting point**, or of the next stop with a photo when the start has none (photo placeholder if no stop has one), with its credit ("Photo © author · licence") over it (D-038). Other people's lists add "by {author}" (or **Official** · "by Travelist") and their average rating; actions (View, Save) sit below the card, outside its pressable area.
 - **Detail** (`trip/[id].tsx`) — map with numbered stops and the saved route line (beside the details on desktop), totals, stop list (tap to open the attraction).
 - **Navigate:**
   - **Open in Google Maps** — one walking route through all stops (Google allows up to 9 waypoints; longer routes are truncated, with a note).
@@ -173,11 +196,15 @@ The tray itself (`features/route/store.ts`, Zustand) is in-memory client state: 
   - **Private** (default) — only the owner can see it; the link shows "Walk list not available" to anyone else, the same as a missing list, so it never reveals that the list exists.
   - **Public** — anyone with the link can see it, signed in or not.
   - **With password** — anyone with the link can open it after typing the password the owner chose (4–72 characters). Saving again with the field blank keeps the current password; switching away from _With password_ forgets it, so protecting the list again needs a new one.
+  - **Guessed links** (D-040): a public list opens read-only for anyone who has or guesses its link, including the owner's editing address `/trip/[id]` (redirected to `/shared?id=…`); a private one answers "Walk list not available" to everyone but its owner — the same answer as a missing list — and its reviews and rating are hidden too.
+  - Whatever the visibility, **only the owner edits** the list (name, stops, order, visibility, delete); everyone who opens a shared link — or saved the list — can only view it (and rate or save it). Enforced by RLS on `trips` / `trip_stops` and tested in `supabase/tests/40_trip_visibility.test.sql`.
   - Pick one and **Save visibility**; the owner can change it at any time. The hint under the choice says who can see the list.
   - **Share list** (only when the saved visibility is Public or With password) — opens the share sheet on iOS/Android and in browsers that have one; otherwise the link is copied ("Link copied."). The link is `<EXPO_PUBLIC_WEB_URL>/shared?id=<trip id>` when the web address is configured, else the app's own link (web origin, or `wayfarer://shared?id=…`).
+- **Reviews** — the owner reads the reviews of their list (average, stars per level, comments) but cannot rate it: "Travellers who open your list can rate it here." (D-035).
+- **Moderation** (moderators only) — **Mark as official** / **Remove official badge** on a public list ("Only public lists can be official." otherwise).
 - **Delete trip** (with confirmation).
 
-**Shared link** (`shared.tsx`, `/shared?id=<trip id>`, open to everyone): a public list opens straight away; a protected one asks for the password ("This walk list is protected" → **Open list**; "Wrong password. Try again."); a private or missing one says "Walk list not available". An opened list shows the map, totals, stops and the Google / Apple Maps links, read-only. Signed-out visitors get **Plan your own walks** (sign-up) and stops are not tappable (attraction pages need an account); signed-in visitors can open the stops. The owner sees "This is your list, as others see it." with **Edit list**. The password is only kept on screen while the list is open, never stored on the device.
+**Shared link** (`shared.tsx`, `/shared?id=<trip id>`, open to everyone): a public list opens straight away; a protected one asks for the password ("This walk list is protected" → **Open list**; "Wrong password. Try again."); a private or missing one says "Walk list not available". An opened list shows the map, totals, stops and the Google / Apple Maps links, read-only. Signed-out visitors get **Plan your own walks** (sign-up) and stops are not tappable (attraction pages need an account); signed-in visitors can open the stops. The owner sees "This is your list, as others see it." with **Edit list**. The password is only kept on screen while the list is open, never stored on the device. Every opened list shows who made it ("by {author}", or **Official** · "by Travelist") and its average rating, signed in or not (D-035). Signed-in visitors also get **Save** / **Saved** (not on their own lists) and the list's **Reviews** with **Rate this walk list** (one review per user and list; nobody rates their own list; private lists cannot be rated); moderators get **Mark as official** on public lists. Community lists from the city page open here.
 
 Trips are saved with the `save_trip` RPC (trip + ordered stops in one transaction; every stop must belong to the trip's city).
 
@@ -192,7 +219,7 @@ Trips are saved with the `save_trip` RPC (trip + ordered stops in one transactio
 
 ### 9. About / data sources
 
-`about.tsx` (reachable from Profile and from the sign-in / sign-up footer) lists the data sources and licences — OpenStreetMap, Wikidata, Wikimedia Commons, Wikipedia pageviews, OpenFreeMap, openrouteservice, Open-Meteo, passport-index, Government of Canada, FX providers — and the app version. Details in [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md).
+`about.tsx` (reachable from Profile and from the sign-in / sign-up footer) lists the data sources and licences — OpenStreetMap, Wikidata, Wikimedia Commons, Wikipedia pageviews, Wikipedia (city descriptions), OpenFreeMap, openrouteservice, Open-Meteo, passport-index, Government of Canada, FX providers — and the app version. Details in [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md).
 
 ---
 
@@ -200,26 +227,28 @@ Trips are saved with the `save_trip` RPC (trip + ordered stops in one transactio
 
 Expo Router, files in `apps/mobile/src/app`.
 
-Every screen stacked above the tabs (attraction, checklist, route, trip, edit profile, about) has an **app menu** at the right of its header: the Wayfarer logo with a menu icon. It opens a menu with **Explore**, **My Trips**, **Profile** and **About**, so a page opened from a link (e.g. `/trip/…`) is never a dead end. It is shown only to signed-in, onboarded users.
+Every screen stacked above the tabs (attraction, checklist, route, trip, edit profile, about) has an **app menu** at the right of its header: the Travelist logo with a menu icon. It opens a menu with **Explore**, **My Trips**, **Profile** and **About**, so a page opened from a link (e.g. `/trip/…`) is never a dead end. It is shown only to signed-in, onboarded users.
 
-| Route               | File                               | Access                   | Purpose                                            |
-| ------------------- | ---------------------------------- | ------------------------ | -------------------------------------------------- |
-| `/sign-in`          | `(auth)/sign-in.tsx`               | signed out               | Email + password, links to magic link/OAuth        |
-| `/sign-up`          | `(auth)/sign-up.tsx`               | signed out               | Create account                                     |
-| `/magic-link`       | `(auth)/magic-link.tsx`            | signed out               | Magic link + 6-digit code                          |
-| `/auth/callback`    | `auth/callback.tsx`                | always                   | OAuth / magic link / confirmation landing          |
-| `/onboarding`       | `onboarding.tsx`                   | signed in, not onboarded | 3-step profile setup                               |
-| `/` (Explore tab)   | `(tabs)/(explore)/index.tsx`       | onboarded                | Home: searchable grid of destinations              |
-| `/city/[slug]`      | `(tabs)/(explore)/city/[slug].tsx` | onboarded                | City page: map/list, filters, search, tray         |
-| `/trips`            | `(tabs)/trips.tsx`                 | onboarded                | Saved trips                                        |
-| `/profile`          | `(tabs)/profile.tsx`               | onboarded                | Profile, documents, preferences, account           |
-| `/attraction/[id]`  | `attraction/[id].tsx`              | onboarded (modal)        | Attraction detail, add to route, reviews           |
-| `/checklist/[city]` | `checklist/[city].tsx`             | onboarded (modal)        | Pre-trip checklist                                 |
-| `/route`            | `route.tsx`                        | onboarded                | Route builder and save                             |
-| `/trip/[id]`        | `trip/[id].tsx`                    | onboarded                | Trip detail, navigation, visibility, share, delete |
-| `/shared?id=…`      | `shared.tsx`                       | always                   | A walk list opened by its link (D-031)             |
-| `/edit-profile`     | `edit-profile.tsx`                 | onboarded                | Edit profile                                       |
-| `/about`            | `about.tsx`                        | always                   | Data sources and version                           |
+| Route                     | File                                          | Access                   | Purpose                                                                                     |
+| ------------------------- | --------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| `/sign-in`                | `(auth)/sign-in.tsx`                          | signed out               | Email + password, links to magic link/OAuth                                                 |
+| `/sign-up`                | `(auth)/sign-up.tsx`                          | signed out               | Create account                                                                              |
+| `/magic-link`             | `(auth)/magic-link.tsx`                       | signed out               | Magic link + 6-digit code                                                                   |
+| `/auth/callback`          | `auth/callback.tsx`                           | always                   | OAuth / magic link / confirmation landing                                                   |
+| `/onboarding`             | `onboarding.tsx`                              | signed in, not onboarded | 3-step profile setup                                                                        |
+| `/` (Explore tab)         | `(tabs)/(explore)/index.tsx`                  | onboarded                | Home: searchable grid of destinations                                                       |
+| `/short/[slug]`           | `(tabs)/(explore)/short/[slug]/index.tsx`     | onboarded                | City page (hub): hero, About, walk lists, Before you go, reviews (D-033)                    |
+| `/short/[slug]/walklists` | `(tabs)/(explore)/short/[slug]/walklists.tsx` | onboarded                | A city's public walk lists: search, sort, load more; `?kind=official` for the official ones |
+| `/city/[slug]`            | `(tabs)/(explore)/city/[slug].tsx`            | onboarded                | Attractions page: map/list, filters, search, tray                                           |
+| `/trips`                  | `(tabs)/trips.tsx`                            | onboarded                | My lists and Saved lists (D-035)                                                            |
+| `/profile`                | `(tabs)/profile.tsx`                          | onboarded                | Profile, documents, preferences, account                                                    |
+| `/attraction/[id]`        | `attraction/[id].tsx`                         | onboarded (modal)        | Attraction detail, add to route, reviews                                                    |
+| `/checklist/[city]`       | `checklist/[city].tsx`                        | onboarded (modal)        | Pre-trip checklist                                                                          |
+| `/route`                  | `route.tsx`                                   | onboarded                | Route builder and save                                                                      |
+| `/trip/[id]`              | `trip/[id].tsx`                               | onboarded                | Trip detail, navigation, visibility, share, delete                                          |
+| `/shared?id=…`            | `shared.tsx`                                  | always                   | A walk list opened by its link (D-031)                                                      |
+| `/edit-profile`           | `edit-profile.tsx`                            | onboarded                | Edit profile                                                                                |
+| `/about`                  | `about.tsx`                                   | always                   | Data sources and version                                                                    |
 
 Deep link scheme: `wayfarer://` (e.g. `wayfarer://auth/callback`).
 
@@ -230,33 +259,44 @@ Deep link scheme: `wayfarer://` (e.g. `wayfarer://auth/callback`).
 | Function         | Method | Auth                   | Input → output                                                                                                                                                                        | Cache (`api_cache`)                                                                                               |
 | ---------------- | ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `checklist`      | POST   | signed-in user (D-015) | `checklistRequestSchema` (city, 1–5 nationalities, home country, arrival, departure, passport expiry, language) → `checklistResponseSchema` (7 sections, each `ok` or `unavailable`)  | weather forecast 3 h, climate 30 days, FX 24 h, advisories 24 h                                                   |
-| `route-optimize` | POST   | signed-in user (D-015) | `routeRequestSchema` (2–12 unique stops with lat/lng/visit minutes, `keepFirst`) → order, legs, GeoJSON line, distance, walking time, visit time, `isFallback`, provider, attribution | ORS results 30 days, keyed by the start + the set of other stops (any order); fallback 1 h (only when no ORS key) |
+| `route-optimize` | POST   | signed-in user (D-015) | `routeRequestSchema` (2–20 unique stops with lat/lng/visit minutes, `keepFirst`) → order, legs, GeoJSON line, distance, walking time, visit time, `isFallback`, provider, attribution | ORS results 30 days, keyed by the start + the set of other stops (any order); fallback 1 h (only when no ORS key) |
 | `health`         | GET    | none                   | → `{ ok, service, time }`                                                                                                                                                             | —                                                                                                                 |
 
 Request/response schemas live in `packages/shared/src/schemas` and are copied into `supabase/functions/_shared/wayfarer` by `pnpm sync:shared` (D-005).
 
 ### Database RPCs and views
 
-| Name                        | Kind     | Who          | What it does                                                                                                                                                                                                                                 |
-| --------------------------- | -------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `attractions_in_view`       | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                                                                                           |
-| `attraction_details`        | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                                                                                                |
-| `city_list`                 | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence)                                                                          |
-| `set_nationalities`         | function | authed       | Replaces the caller's nationalities                                                                                                                                                                                                          |
-| `set_trip_visibility`       | function | authed       | Owner only: sets a trip to `private`, `public` or `password` (with `p_password`, 4–72 characters, stored as a bcrypt hash; omitted → keeps the current one); errors `P0002` (not the caller's trip) and `22023` (bad visibility or password) |
-| `shared_trip`               | function | anon, authed | A trip by link: `{status}` = `ok` (+ `trip`: columns, `stop_ids` in order, `is_owner`), `not_found` (missing, or private and not the owner), `password_required` or `wrong_password`; the owner always gets `ok`; security definer           |
-| `save_trip`                 | function | authed       | Creates a trip + ordered stops (2–12, same city); returns the trip id                                                                                                                                                                        |
-| `delete_account`            | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                                                                                           |
-| `save_review`               | function | authed       | Creates the caller's review of an attraction (rating 1–5, optional comment, blank → none) or updates it if there is one; returns the review id                                                                                               |
-| `list_attraction_reviews`   | function | authed       | An attraction's reviews, newest first (limit 1–100, default 50, offset): rating, comment, dates, author display name, `is_own`; security definer only to read display names                                                                  |
-| `attraction_rating_summary` | view     | authed       | Per attraction: `review_count`, `rating_avg` (2 decimals, null without reviews) and `city_slug` (city pages filter on it)                                                                                                                    |
+| Name                        | Kind     | Who          | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `attractions_in_view`       | function | anon, authed | Attractions inside a bbox, optional category filter, most popular first (max 1000)                                                                                                                                                                                                                                                                                                                                                                     |
+| `attraction_details`        | view     | anon, authed | One attraction with lat/lng, image credits, links, hours, fee                                                                                                                                                                                                                                                                                                                                                                                          |
+| `city_list`                 | view     | anon, authed | Active cities with centre, bbox, time zone, attraction count, country names (EN/PT) and a cover photo (most popular photographed attraction, with author + licence)                                                                                                                                                                                                                                                                                    |
+| `set_nationalities`         | function | authed       | Replaces the caller's nationalities                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `set_trip_visibility`       | function | authed       | Owner only: sets a trip to `private`, `public` or `password` (with `p_password`, 4–72 characters, stored as a bcrypt hash; omitted → keeps the current one); errors `P0002` (not the caller's trip) and `22023` (bad visibility or password)                                                                                                                                                                                                           |
+| `shared_trip`               | function | anon, authed | A trip by link: `{status}` = `ok` (+ `trip`: columns, `stop_ids` in order, `is_owner`, `is_official`, `author_name`, `review_count`, `rating_avg`, `is_saved`), `not_found` (missing, or private and not the owner), `password_required` or `wrong_password`; the owner always gets `ok`; security definer                                                                                                                                             |
+| `save_trip`                 | function | authed       | Creates a trip + ordered stops (2–20, same city); returns the trip id                                                                                                                                                                                                                                                                                                                                                                                  |
+| `delete_account`            | function | authed       | Deletes the caller's auth user; owned rows cascade                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `save_review`               | function | authed       | Creates the caller's review of exactly one target — `p_attraction_id`, `p_city_slug` or `p_trip_id` — (rating 1–5, optional comment, blank → none) or updates it if there is one; returns the review id; `23514` with none or several targets; `42501` for a private or own trip (D-034)                                                                                                                                                               |
+| `list_reviews`              | function | authed       | The reviews of one target (same three parameters; `22023` unless exactly one), newest first (limit 1–100, default 50, offset): rating, comment, dates, author display name, `is_own`, `author_avatar_path` (profile photo, D-039); security definer only to read display names and photos                                                                                                                                                              |
+| `rating_summary`            | view     | authed       | Per reviewed target (`attraction_id`, `city_slug` or `trip_id`): `review_count`, `rating_avg` (2 decimals) and `rating_counts` (reviews per star, 1 → 5); no row = no reviews                                                                                                                                                                                                                                                                          |
+| `attraction_rating_summary` | view     | authed       | Per attraction: `review_count`, `rating_avg` (2 decimals, null without reviews) and `city_slug` (attractions pages filter on it for the card ratings)                                                                                                                                                                                                                                                                                                  |
+| `list_walklists`            | function | authed       | Walk list cards: public lists (optionally `p_city_slug`, `p_official`, `p_search` by name, taken literally), or with `p_saved` the caller's saved lists still shared; `p_sort` `top` / `lowest` / `most_reviewed` / `newest` (`22023` otherwise); `p_limit` 1–50, `p_offset`; each row has author name, official flag, stops, distance, times, rating, `is_saved`, `is_own` and `cover` (`walklist_cover`, D-038); one query, security definer (D-035) |
+| `walklist_cover`            | function | authed       | `walklist_cover(trip)` → `{url, author, license}` of the starting point's photo (stop 0, else the next stop with a photo) or null; also a PostgREST computed column on `trips` (`select=…,walklist_cover`), used by My Trips (D-038)                                                                                                                                                                                                                   |
+| `is_moderator`              | function | authed       | True when the caller is in `moderators`                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `set_trip_official`         | function | authed       | Moderators only (`42501` otherwise): marks a public trip official or removes the badge; `P0002` when the trip is missing or not public                                                                                                                                                                                                                                                                                                                 |
+| `trip_visible_to_caller`    | function | authed       | True when the caller owns the trip or it is not private; used by the `reviews` select policy and `list_reviews` (D-040)                                                                                                                                                                                                                                                                                                                                |
+| `trip_open_to_caller`       | function | authed       | True when a trip is shared (public or password) and not the caller's; used by the `reviews` and `saved_trips` insert policies                                                                                                                                                                                                                                                                                                                          |
 
 ### Tables
 
 - **Reference (read-only for clients, written by the pipeline seeds):** `countries`, `cities`, `attractions` (PostGIS `geography`), `visa_requirements`, `api_cache` (service role only).
-- **User data (RLS: owner only):** `profiles`, `profile_nationalities`, `trips` (with `visibility`: `private` default, `public`, `password`), `trip_stops`. Others open a trip only through `shared_trip`.
+- **Reference data additions:** `cities.summary_en`, `summary_pt`, `wikipedia_en`, `wikipedia_pt` — the city's Wikipedia lead and article titles (D-036), readable by everyone like the rest of `cities`.
+- **User data (RLS: owner only):** `profiles`, `profile_nationalities`, `trips` (with `visibility`: `private` default, `public`, `password`; and `is_official`, which only moderators set and which is cleared when a list stops being public), `trip_stops`. Others open a trip only through `shared_trip` and list public ones through `list_walklists`.
+- **Profile photos (D-039):** `profiles.avatar_path` (check: inside the owner's own folder, ≤ 200 characters) points at a file in the Storage bucket `avatars`. The bucket is public read (photos load by URL on review cards), limited to 2 MiB and JPEG / PNG / WebP, and created by the migration. `storage.objects` policies let each signed-in user select, insert, update and delete only under `<their user id>/`. Files are named `avatar-<ms>.jpg`, a new name per photo, so caches never show an old one.
+- **Saved lists:** `saved_trips` (user → trip, unique; both sides cascade). RLS: users read and delete their own rows and insert only for shared lists that are not theirs (D-035).
+- **Moderators:** `moderators` (user ids). RLS on, no policies, no grants: managed with SQL / the service role only, e.g. `insert into public.moderators (user_id) values ('<auth user id>');`.
 - **Trip passwords:** `trip_passwords` (trip → bcrypt hash; cascades with the trip). RLS on, no policies, no grants: no client role can read it, owners included; only `set_trip_visibility` / `shared_trip` use it. A trigger deletes the hash when a trip leaves `password`.
-- **Reviews:** `attraction_reviews` (user → review → attraction, unique per user and attraction; both sides cascade). RLS: every signed-in user reads all; only the author inserts, updates or deletes; no access for anon. Deleting a review is a plain `delete` filtered by id.
+- **Reviews:** `reviews` (was `attraction_reviews`; D-034) — user → review → exactly one of attraction, city or trip (`reviews_one_target` check; real foreign keys, all cascading), unique per user and target. RLS: every signed-in user reads all, except reviews of a private list (owner only, D-040); only the author inserts, updates or deletes; trips can be reviewed only when shared and not the reviewer's own; no access for anon. Deleting a review is a plain `delete` filtered by id.
 
 Migrations: `supabase/migrations`. RLS and RPC tests: `supabase/tests` (pgTAP).
 
@@ -266,7 +306,9 @@ Defined in `packages/shared/src/constants/index.ts` unless noted.
 
 | Rule                         | Value                                                                                                                              |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Stops per route / trip       | 2 – 12 (`ROUTE_MIN_STOPS`, `ROUTE_MAX_STOPS`; also enforced in `save_trip`)                                                        |
+| Stops per route / trip       | 2 – 20 (`ROUTE_MIN_STOPS`, `ROUTE_MAX_STOPS`; also enforced in `save_trip`; D-030)                                                 |
+| Exact walking order          | up to 12 stops (`EXACT_ORDER_MAX_STOPS`); longer routes use nearest neighbour + 2-opt                                              |
+| Suggested split              | 2 – 6 routes (`ROUTE_MAX_SPLIT_PARTS`), ≥ 2 stops each                                                                             |
 | Cities per route             | 1                                                                                                                                  |
 | Split routes                 | offered from 5 stops (`ROUTE_SPLIT_MIN_STOPS`); ≥ 2 stops per route, so at most 6 routes                                           |
 | Nationalities per profile    | 1 – 5 (`MAX_NATIONALITIES`)                                                                                                        |
@@ -279,10 +321,16 @@ Defined in `packages/shared/src/constants/index.ts` unless noted.
 | Google Maps multi-stop link  | origin + up to 9 waypoints + destination                                                                                           |
 | Dates                        | typed as `YYYY-MM-DD` (D-019)                                                                                                      |
 | Review rating                | whole number 1 – 5, required (`REVIEW_RATING_MIN`, `REVIEW_RATING_MAX`; DB check)                                                  |
+| Rating filter (city page)    | minimum average 3, 4 or 5 stars, or none (`RATING_FILTER_OPTIONS`); a place is kept when its average ≥ the minimum                 |
 | Review comment               | optional, ≤ 1000 characters (`REVIEW_COMMENT_MAX`; DB check); blank is saved as no comment                                         |
 | Walk list visibility         | `private` (default), `public`, `password` (`TRIP_VISIBILITIES`; DB check; D-031)                                                   |
 | Walk list password           | 4 – 72 characters, not trimmed (`TRIP_PASSWORD_MIN`, `TRIP_PASSWORD_MAX`; bcrypt reads 72 bytes; checked in `set_trip_visibility`) |
-| Reviews per user             | 1 per attraction (unique in the DB); saving again edits it                                                                         |
+| Profile photo                | one per user; stored as a 512 × 512 JPEG (quality 0.8, `PROFILE_PHOTO_SIZE`); bucket accepts ≤ 2 MiB JPEG / PNG / WebP             |
+| Reviews per user             | 1 per attraction, city and walk list (unique in the DB); saving again edits it; no review of one's own list                        |
+| Walk list previews           | 6 per section on the city page (`WALKLIST_PREVIEW_COUNT`); the 7th row fetched only tells whether there are more                   |
+| Walk list pages              | 20 per page (`WALKLIST_PAGE_SIZE`); `list_walklists` returns at most 50                                                            |
+| Walk list sorts              | `top`, `lowest`, `most_reviewed`, `newest` (`WALKLIST_SORTS`); unrated lists sort last by rating                                   |
+| Listed / saved walk lists    | listed: public only; saved: public or password, not one's own; official: public only (DB check)                                    |
 
 ## Covered cities
 
@@ -300,8 +348,12 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 - Sentry / PostHog are not wired yet (no-op facade).
 - Dark theme: sign-in and sign-up screens are always light (the choice lives on the profile), and the map keeps its light style.
 - Route stops are dragged only within their route (not between split routes), and there is no auto-scroll when dragging past the edge of the screen. Drag and drop is verified on web (mouse and touch emulation); iOS/Android untested on this machine (D-027).
+- Map photo markers (D-029): no clustering yet, so in dense areas at city zoom the photos overlap (zoom in to separate them); a city page loads one small thumbnail per place (~300 for Lisbon). Verified on web (desktop and phone widths); the iOS/Android version uses the library's native `Marker` and is untested on this machine.
+- Routes of 13–20 stops (D-030): the walking order is near-shortest (nearest neighbour + 2-opt) instead of exact; if OpenRouteService rejects a large optimisation request the route falls back to the labelled straight-line estimate; Google Maps opens at most origin + 9 waypoints + destination (use the per-leg links on the trip).
 - Walk list sharing (D-031): there is no limit on password attempts (bcrypt makes each one slow, but a short password can still be guessed by someone with the link); no list of people a list was shared with, and changing to private is the only way to revoke a link. Shared links use `/shared?id=…` because `/trip/[id]`-style dynamic pages need host rewrite rules on static hosts (`expo serve` returns 404 for them when opened directly). Sharing is verified on web (desktop and phone widths); the native share sheet is untested on this machine.
 - Reviews: the attraction page shows the 50 newest reviews (no "load more" yet; the RPC already pages), and there is no reporting or moderation of reviews. Reviews need a signed-in user, like the rest of the app (D-028).
+- City page and walk lists (D-033 – D-036): the Before you go section always assumes a trip starting today (other dates on the checklist page); the About text is the Wikipedia lead as fetched on 2026-09-29 (refresh with `city-summaries`), and Wikipedia's Portuguese articles are often in Brazilian or European Portuguese regardless of the app's European Portuguese; there is no count of walk lists (the full list pages with **Load more**); walk list reviews are not moderated, and the moderator list is managed in SQL (no admin screen); lists with a password never appear on city pages. Like `/city/[slug]`, `/short/[slug]` is a dynamic page: opened directly on a static host it needs a rewrite rule. Verified on web (desktop and phone widths); iOS/Android untested on this machine.
+- Profile photos (D-039): public to anyone with the URL (no private option); if the account is deleted outside the app (dashboard / SQL), its photo files stay in the bucket, because Storage files do not cascade with database rows. Walk list cards show the author's name, not their photo. Verified on web (file dialog); the native library picker and its crop UI are untested on this machine.
 - No native date pickers. Explore has no map-beside-list layout on desktop yet (route and trip detail do).
 - The redesign was verified on web (desktop and phone widths); iOS/Android rendering is untested on this machine. Several category icons on iOS are approximations (SF Symbols has no church, castle or palace glyph).
 
@@ -417,6 +469,7 @@ Wayfarer is a **pnpm + Turborepo monorepo** with four deployable parts:
 │   ├── config.toml                local stack configuration (ports, auth, seeds)
 │   ├── migrations/                ordered SQL: schema, PostGIS, RLS policies, views, RPCs
 │   ├── seed/                      generated reference data (00…40_*.sql) — never edit by hand
+│   ├── demo/                      local-only demo community per city (accounts, reviews, walk lists) — `pnpm db:demo <city>`
 │   ├── tests/                     pgTAP tests (RLS, RPCs, views)
 │   ├── templates/                 auth email templates (confirmation, magic link)
 │   └── functions/                 Deno Edge Functions
@@ -453,27 +506,27 @@ The tabs (`(tabs)/_layout.tsx`) are a bottom bar on phones and a 96 px side rail
 
 **Feature folders.** Anything that is not a route lives in `src/features/<feature>/`:
 
-| Feature        | Contents                                                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `auth`         | `AuthProvider` (session from Supabase Auth), sign-in/up/magic-link/OAuth calls, auth form parts                                 |
-| `profile`      | profile query + mutations (optimistic updates), country picker, profile fields                                                  |
-| `destinations` | cities, attractions in a bbox, attraction detail; Home cards, city header, search, Explore store                                |
-| `map`          | `MapView` with a web and a native implementation and a shared contract (see below)                                              |
-| `checklist`    | calls the `checklist` Edge Function; sections and plug icons                                                                    |
-| `route`        | route tray store, route plan and split, drag and drop of stops, `route-optimize` call                                           |
-| `trips`        | list, detail, save (`save_trip` RPC, one trip per split route), delete; visibility, share link and the shared-list view (D-031) |
-| `reviews`      | reviews list, star rating, review form, rating summaries (per attraction and per city)                                          |
+| Feature        | Contents                                                                                                                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth`         | `AuthProvider` (session from Supabase Auth), sign-in/up/magic-link/OAuth calls, auth form parts                                                                                                      |
+| `profile`      | profile query + mutations (optimistic updates), country picker, profile fields                                                                                                                       |
+| `destinations` | cities, attractions in a bbox, attraction detail; Home cards, city header, search, Explore store                                                                                                     |
+| `map`          | `MapView` with a web and a native implementation and a shared contract (see below)                                                                                                                   |
+| `checklist`    | calls the `checklist` Edge Function; sections and plug icons                                                                                                                                         |
+| `route`        | route tray store, route plan and split, drag and drop of stops, `route-optimize` call                                                                                                                |
+| `trips`        | list, detail, save (`save_trip` RPC, one trip per split route), delete; visibility, share link and the shared-list view (D-031); community lists, saved lists, official badge, the trip card (D-035) |
+| `reviews`      | reviews of any target (attraction, city, walk list): list, star rating, form, per-star distribution, rating summaries (D-034)                                                                        |
 
 Each feature's `api.ts` owns its query keys (e.g. `destinationKeys`, `tripKeys`, `reviewKeys`) and invalidates them after mutations. Cross-cutting code is in `src/lib/`: `env.ts` (zod-validated `EXPO_PUBLIC_*`), `supabase.ts` (the single client plus `unwrap` / `check` helpers that turn Supabase errors into thrown errors for TanStack Query), `secure-storage.ts`, `i18n.ts`, `query-client.ts`, `format.ts` (units, dates), `observability.ts`.
 
 **Data access.** Screens never call Supabase directly; they use the hooks in `features/*/api.ts`:
 
-- **Reads** go straight to PostgREST — views (`city_list`, `attraction_details`, `attraction_rating_summary`), RPCs (`attractions_in_view`, `list_attraction_reviews`) and owner-only tables. RLS decides what each user can see.
-- **Writes** that touch several rows use RPCs so they are atomic and validated in SQL (`save_trip`, `set_nationalities`, `save_review`, `set_trip_visibility`, `delete_account`).
-- **Reads across users** go through `security definer` RPCs that return only what may be shown (`list_attraction_reviews`, `shared_trip`), while the tables stay owner-only.
+- **Reads** go straight to PostgREST — views (`city_list`, `attraction_details`, `rating_summary`, `attraction_rating_summary`), RPCs (`attractions_in_view`, `list_reviews`, `list_walklists`) and owner-only tables. RLS decides what each user can see.
+- **Writes** that touch several rows use RPCs so they are atomic and validated in SQL (`save_trip`, `set_nationalities`, `save_review`, `set_trip_visibility`, `set_trip_official`, `delete_account`); saving a list is a plain insert into `saved_trips`, checked by RLS.
+- **Reads across users** go through `security definer` RPCs that return only what may be shown (`list_reviews`, `list_walklists`, `shared_trip`), while the tables stay owner-only.
 - **Anything with secrets, rate limits or third-party APIs** goes through an Edge Function via `supabase.functions.invoke` (`checklist`, `route-optimize`).
 
-**State.** Server data lives only in TanStack Query. Zustand holds UI state that must survive navigation: `features/route/store.ts` (the route tray — one city, 2–12 stops, split routes, manual order) and `features/destinations/store.ts` (category filters, map/list view). The tray is in memory only (not persisted).
+**State.** Server data lives only in TanStack Query. Zustand holds UI state that must survive navigation: `features/route/store.ts` (the route tray — one city, 2–20 stops, split routes, manual order) and `features/destinations/store.ts` (category filters, map/list view). The tray is in memory only (not persisted).
 
 **Maps.** `features/map/map-view.tsx` (web, `maplibre-gl`) and `map-view.native.tsx` (iOS/Android, MapLibre React Native) implement the same `MapViewProps` from `map-view.types.ts`; Metro picks the right file by extension. The contract covers bounds, points (dots or photo markers), route lines, selection and a popup; shared paint styles and helpers (GeoJSON conversion, popup panning) live in the `.types.ts` file so both platforms draw the same map. On web the maplibre worker is served from `public/maplibre` (D-018).
 
@@ -506,11 +559,15 @@ It ships as source with explicit `.ts` import extensions, so no build step is ne
 | Cache          | `api_cache`                                                | service role only (Edge Functions)                                                                                 |
 | User data      | `profiles`, `profile_nationalities`, `trips`, `trip_stops` | owner only (`auth.uid()`); rows cascade when the auth user is deleted; shared trips are read through `shared_trip` |
 | Trip passwords | `trip_passwords`                                           | no client access at all (bcrypt hashes; used by security definer RPCs)                                             |
-| Reviews        | `attraction_reviews`                                       | signed-in users read all; only the author writes                                                                   |
+| Reviews        | `reviews`                                                  | signed-in users read all; only the author writes; trips only when shared and not one's own                         |
+| Saved lists    | `saved_trips`                                              | owner only; insert only for shared lists of others                                                                 |
+| Moderators     | `moderators`                                               | no client access (SQL / service role); `is_moderator()` tells the caller                                           |
 
 A profile row is created by a trigger on `auth.users` insert. Attractions are `geography(Point, 4326)` with a GiST index; `attractions_in_view` returns the places inside the map's bbox, most popular first. See [Backend reference](#backend-reference) for every RPC and view.
 
 **Seeds.** Reference data is committed as SQL in `supabase/seed/` (`10_countries`, `20_cities`, `30_visa`, `40_attractions`), generated by the pipeline (D-011). `pnpm db:reset` (local) or `supabase db push --include-seed` (hosted) loads a complete database without running the pipeline.
+
+**Demo community (local only, D-037).** `supabase/demo/` holds hand-written test data for the community features, which is not reference data and is never pushed to a hosted project. `accounts.sql` creates six friends, Emma Clarke, Oliver Bennett, Lucía Fernández, Mateo Rojas, Camille Dubois and Julien Moreau (`<first name>@demo-wayfarer.example.com`), plus `team@demo-wayfarer.example.com` ("Wayfarer Team", a moderator). All of them sign in with the password `wayfarer-demo`. `<city>.sql` adds that city's content: city and place reviews in English, Spanish and French, public walk lists rated and saved by the friends, and the team's official lists. `<city>.check.sql` then asserts the city page has all of it. `pnpm db:demo <city>` runs the three files in the `supabase start` container and is idempotent: it replaces that city's demo content each time. `db:reset` wipes the demo data, so run it again afterwards. Available for: Amsterdam.
 
 **Edge Functions.** Each function has a thin `index.ts` that wires real dependencies (Supabase client, `fetch`, cache, env) into a `createHandler(deps)` in `handler.ts`; tests call the handler with fakes. A request goes through:
 
@@ -533,26 +590,29 @@ Providers sit behind small function types (`RoutingProvider`, the checklist prov
 
 `python -m wayfarer_pipeline <command>` (see [Data pipeline](#data-pipeline) for setup):
 
-| Command                          | Output                                                                                                     |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `validate-config`                | checks `cities.yaml`                                                                                       |
-| `countries`                      | fetches countries (Wikidata + `country_overrides.yaml` + tz zone.tab) → `10_countries.sql`                 |
-| `cities`                         | `cities.yaml` → `20_cities.sql`                                                                            |
-| `visa`                           | passport-index dataset → `30_visa.sql`                                                                     |
-| `ingest --city <slug>` / `--all` | attractions for one or all cities → `data/attractions/<slug>.json`, `40_attractions.sql`, `docs/CITIES.md` |
-| `report`                         | per-city quality report                                                                                    |
-| `seed`                           | regenerates all seed SQL offline from the committed data                                                   |
-| `cities-doc [--check]`           | writes (or checks, in CI) `docs/CITIES.md`                                                                 |
+| Command                          | Output                                                                                                                        |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `validate-config`                | checks `cities.yaml`                                                                                                          |
+| `countries`                      | fetches countries (Wikidata + `country_overrides.yaml` + tz zone.tab) → `10_countries.sql`                                    |
+| `cities`                         | `cities.yaml` (+ `data/city_summaries.json`) → `20_cities.sql`                                                                |
+| `city-summaries`                 | Wikipedia leads EN/PT of every city (Wikidata sitelinks → REST summary) → `data/city_summaries.json`, `20_cities.sql` (D-036) |
+| `visa`                           | passport-index dataset → `30_visa.sql`                                                                                        |
+| `ingest --city <slug>` / `--all` | attractions for one or all cities → `data/attractions/<slug>.json`, `40_attractions.sql`, `docs/CITIES.md`                    |
+| `report`                         | per-city quality report                                                                                                       |
+| `seed`                           | regenerates all seed SQL offline from the committed data                                                                      |
+| `cities-doc [--check]`           | writes (or checks, in CI) `docs/CITIES.md`                                                                                    |
 
 Attraction ingestion per city: **Wikidata SPARQL** in the city's bbox (+ ~200 m margin) and categories → labels EN/PT, coordinates, image, UNESCO, website → **Overpass** (OSM) for opening hours and fees → **Wikipedia pageviews** for a 0–100 popularity score → **deduplicate** (OSM link, or name similarity ≥ 0.85 within 75 m) → **Commons** for image author and licence → default visit time per category. At most 300 places per city. Attraction ids are UUIDv5 of the Wikidata entity, so re-ingesting keeps ids (and therefore trips and reviews) stable. HTTP responses are cached in `data-pipeline/.cache`; requests are rate-limited and identify themselves (`PIPELINE_CONTACT_EMAIL`). Sources and licences: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md).
 
 ### Main flows end to end
 
-- **Opening a city page:** `/city/[slug]` reads the city from `city_list` (cached), then `attractions_in_view` for its bbox and the selected categories, and `attraction_rating_summary` filtered by `city_slug` for the card ratings. The map draws the points; tapping one opens its card; **+** adds it to the Zustand route tray.
+- **Opening a city page:** `/short/[slug]` reads the city from `city_list` (cached), its About text from `cities`, its rating from `rating_summary`, two `list_walklists` previews (community, official; 7 rows each), `list_reviews` for the city and the `checklist` function for today — one request each, none per card.
+- **Opening the attractions page:** `/city/[slug]` reads the city from `city_list` (cached), then `attractions_in_view` for its bbox and the selected categories, and `attraction_rating_summary` filtered by `city_slug` for the card ratings. The map draws the points; tapping one opens its card; **+** adds it to the Zustand route tray.
 - **Building a route:** `/route` reads the tray, orders the stops locally with the shared domain logic, then calls `route-optimize` for each route; the function returns the order, legs, line geometry, distance and times (from cache, ORS, or the fallback). **Save** calls the `save_trip` RPC and invalidates the trips list.
 - **Pre-trip checklist:** `/checklist/[city]` sends the city, the profile's nationalities, home country, dates and passport expiry to `checklist`, which reads visa rules and country data from Postgres, fetches weather, FX and advisories in parallel (each cached) and returns seven sections.
 - **Sharing a walk list:** the owner saves the visibility with `set_trip_visibility` and shares `/shared?id=<id>`; the visitor's screen calls `shared_trip(id, password)` — signed in or not — and, for `ok`, loads the stops from `attraction_details` (readable by everyone). A typed password is sent again with each request and kept only in the screen's state.
-- **Reviews:** the attraction page lists reviews with `list_attraction_reviews` and the average from `attraction_rating_summary`; publishing calls `save_review` (insert or update), deleting is a plain `delete` allowed by RLS only for the author.
+- **Reviews:** attraction, city and walk list pages list reviews with `list_reviews` and the average and per-star counts from `rating_summary`, both for one target; publishing calls `save_review` (insert or update), deleting is a plain `delete` allowed by RLS only for the author.
+- **Community walk lists:** `list_walklists` reads public lists (or the caller's saved ones) with author, stops and rating in one query; **Save** inserts into `saved_trips` (RLS checks the list is shared and not the caller's); a moderator's **Mark as official** calls `set_trip_official`.
 
 ### Testing and CI
 
@@ -648,6 +708,7 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 | `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds                                             |
 | `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                                |
 | `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                       |
+| `pnpm db:demo <city>`                        | Load a city's demo community into the **local** DB and self-check it (today: `amsterdam`; D-037)           |
 | `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                                                           |
 | `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                      |
 | `pnpm docs:check`                            | Fail if code/data/config changed vs `origin/main` without a CHANGELOG entry; warn if README wasn't updated |

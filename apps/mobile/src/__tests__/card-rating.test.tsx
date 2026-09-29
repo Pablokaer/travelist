@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 
 import type { AttractionSummary } from '@/features/destinations/api';
-import { AttractionCard } from '@/features/destinations/components';
+import { AttractionCard } from '@/features/destinations/attraction-card';
 import { ratingsByAttraction } from '@/features/reviews/api';
 import '@/lib/i18n';
 

@@ -93,6 +93,8 @@ describe('splitRoute', () => {
   it('maxRouteParts allows two stops per route', () => {
     expect(maxRouteParts(5)).toBe(2);
     expect(maxRouteParts(12)).toBe(6);
+    // 20 stops would allow 10 two-stop routes; at most ROUTE_MAX_SPLIT_PARTS are offered.
+    expect(maxRouteParts(20)).toBe(6);
   });
 });
 
@@ -151,6 +153,31 @@ describe('balanced splits (D-023)', () => {
     ]);
     expect(even).toBe(0);
     expect(uneven).toBeGreaterThan(even);
+  });
+
+  it('splits the longest route (20 stops into 3) quickly', () => {
+    const many = Array.from({ length: 20 }, (_, i) =>
+      at(`s${i}`, (i % 5) * 0.7, Math.floor(i / 5) * 0.7),
+    );
+    const started = Date.now();
+    const routes = splitRoute(many, 3);
+    expect(Date.now() - started).toBeLessThan(3000);
+    expect(routes.flat()).toHaveLength(20);
+    expect(routes.every((r) => r.length >= 2)).toBe(true);
+    expect(routes[0]![0]).toBe(many[0]);
+  });
+
+  it('splits the longest route (20 stops) into the most routes (6) quickly', () => {
+    const many = Array.from({ length: 20 }, (_, i) =>
+      at(`s${i}`, (i % 5) * 0.4, Math.floor(i / 5) * 0.4),
+    );
+    const started = Date.now();
+    const routes = splitRoute(many, 6);
+    // Well under a second on an idle machine; the margin keeps it repeatable under load.
+    expect(Date.now() - started).toBeLessThan(3000);
+    expect(routes).toHaveLength(6);
+    expect(routes.flat()).toHaveLength(20);
+    expect(splitRoute(many, 6)).toEqual(routes); // deterministic
   });
 
   it('splits the largest route (12 stops into 6) quickly', () => {

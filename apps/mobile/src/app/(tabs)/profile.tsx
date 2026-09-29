@@ -13,6 +13,7 @@ import { Text } from '@/components/text';
 import { deleteAccount, signOut } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/auth-provider';
 import { FormError } from '@/features/auth/components';
+import { avatarUrl } from '@/features/profile/avatar-api';
 import {
   countryName,
   useCountries,
@@ -61,7 +62,7 @@ export default function ProfileScreen() {
 
       {p ? (
         <Card style={styles.identity}>
-          <Avatar name={displayName} />
+          <Avatar name={displayName} uri={avatarUrl(p.avatarPath)} />
           <View style={styles.identityText}>
             <Text variant="heading" numberOfLines={1}>
               {displayName}

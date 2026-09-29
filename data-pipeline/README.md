@@ -13,6 +13,7 @@ pip install -e ".[dev]"
 python -m wayfarer_pipeline validate-config        # check cities.yaml
 python -m wayfarer_pipeline countries              # Wikidata → data/countries.json → 10_countries.sql
 python -m wayfarer_pipeline cities                 # cities.yaml → 20_cities.sql
+python -m wayfarer_pipeline city-summaries         # Wikipedia leads (EN/PT) → data/city_summaries.json → 20_cities.sql
 python -m wayfarer_pipeline visa                   # passport-index → data/visa.csv → 30_visa.sql
 python -m wayfarer_pipeline ingest --city lisbon   # one city → data/attractions/lisbon.json
 python -m wayfarer_pipeline ingest --all           # every city (≈ 30–60 min cold, seconds cached)
@@ -55,5 +56,5 @@ re-ingesting one city keeps the others. Run `pnpm db:reset` from the repo root t
 ## Politeness
 
 Every request sends `User-Agent: wayfarer-pipeline/<version> (<PIPELINE_CONTACT_EMAIL>)`
-(env var, default `pablo@finperiti.com`). Wikidata SPARQL and Overpass run one request at a
+(env var: an email address or URL; default the repository URL `https://github.com/Pablokaer/travelist`). Wikidata SPARQL and Overpass run one request at a
 time; Wikimedia REST ≤ 10 req/s. 429/5xx are retried with backoff honouring `Retry-After`.

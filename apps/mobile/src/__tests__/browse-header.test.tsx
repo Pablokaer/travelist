@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { t } from 'i18next';
 import { Text } from 'react-native';
 
 import { BrowseHeader, inlineHeaderMinWidth } from '@/features/destinations/browse-header';
@@ -21,6 +22,8 @@ function renderCityHeader() {
       categories={[]}
       onToggleCategory={jest.fn()}
       onClearCategories={jest.fn()}
+      minRating={null}
+      onChangeMinRating={jest.fn()}
       onOpenChecklist={onOpenChecklist}
       container={container}
       gutter={GUTTER}
@@ -49,7 +52,7 @@ describe('CityHeader', () => {
     renderCityHeader();
     layoutHeader(inlineHeaderMinWidth(true));
     expect(screen.getByTestId('browse-header-inline')).toBeOnTheScreen();
-    expect(screen.getByText('Wayfarer')).toBeOnTheScreen();
+    expect(screen.getByText('Travelist')).toBeOnTheScreen();
     expect(screen.getByText('search field')).toBeOnTheScreen();
   });
 
@@ -58,6 +61,12 @@ describe('CityHeader', () => {
     await userEvent.press(screen.getByTestId('open-checklist'));
     expect(onOpenChecklist).toHaveBeenCalled();
     expect(screen.getByRole('checkbox', { name: 'All' })).toBeChecked();
+  });
+
+  test('shows the rating tabs after the category tabs', () => {
+    renderCityHeader();
+    expect(screen.getByLabelText('Filter by rating')).toBeOnTheScreen();
+    expect(screen.getByRole('radio', { name: '5 stars or more' })).toBeOnTheScreen();
   });
 });
 
@@ -72,6 +81,16 @@ describe('BrowseHeader', () => {
 
   test('the logo is a link to the Home', () => {
     render(<BrowseHeader search={<Text>cities</Text>} container={container} gutter={GUTTER} />);
-    expect(screen.getByRole('link', { name: 'Wayfarer — all destinations' })).toBeOnTheScreen();
+    expect(screen.getByRole('link', { name: 'Travelist — all destinations' })).toBeOnTheScreen();
+  });
+});
+
+describe('brand name', () => {
+  test('the app is called Travelist in both languages; the about text names it', () => {
+    for (const lng of ['en', 'pt'] as const) {
+      expect(t('common.appName', { lng })).toBe('Travelist');
+      expect(t('home.goHome', { lng })).toMatch(/^Travelist — /);
+      expect(t('about.body', { lng })).toMatch(/Travelist/);
+    }
   });
 });

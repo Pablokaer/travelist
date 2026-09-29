@@ -28,7 +28,10 @@ export function tripVisibilityFormSchema(hasPassword: boolean) {
 }
 export type TripVisibilityForm = z.infer<ReturnType<typeof tripVisibilityFormSchema>>;
 
-/** The `trip` of a `shared_trip` answer: the trip's columns, its stop ids in order, is_owner. */
+/**
+ * The `trip` of a `shared_trip` answer: the trip's columns, its stop ids in order, is_owner, and
+ * the author, official badge, rating and saved state (D-035).
+ */
 export const sharedTripSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -43,6 +46,13 @@ export const sharedTripSchema = z.object({
   visibility: tripVisibilitySchema,
   created_at: z.string(),
   is_owner: z.boolean(),
+  /** Marked official by a moderator (D-035). */
+  is_official: z.boolean(),
+  author_name: z.string().nullable(),
+  review_count: z.number().int(),
+  rating_avg: z.number().nullable(),
+  /** The signed-in caller saved it (always false signed out). */
+  is_saved: z.boolean(),
   stop_ids: z.array(z.string()),
 });
 export type SharedTrip = z.infer<typeof sharedTripSchema>;

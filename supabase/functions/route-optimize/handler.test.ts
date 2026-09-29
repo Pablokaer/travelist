@@ -235,8 +235,20 @@ Deno.test('route: invalid input → 400', async () => {
   assertEquals((await one.json()).error, 'bad_request');
   const dup = await post(deps, { stops: [STOPS[0], STOPS[0]] });
   assertEquals(dup.status, 400);
-  const tooMany = await post(deps, {
-    stops: Array.from({ length: 13 }, (_, i) => ({ ...STOPS[0], id: `s${i}` })),
+});
+
+Deno.test('route: up to 20 stops are routed; 21 are rejected', async () => {
+  const many = Array.from({ length: 20 }, (_, i) => ({
+    ...STOPS[0],
+    id: `s${i}`,
+    lng: STOPS[0].lng + i * 0.002,
+  }));
+  const r = await ok({ ors: null, cached: noCache }, { stops: many });
+  assertEquals(r.order.length, 20);
+  assertEquals(r.order[0], 's0');
+  assertEquals(r.legs.length, 19);
+  const tooMany = await post({ ors: null, cached: noCache }, {
+    stops: [...many, { ...STOPS[0], id: 's20', lng: STOPS[0].lng + 0.05 }],
   });
   assertEquals(tooMany.status, 400);
 });

@@ -1,7 +1,8 @@
 import type { LineString, RouteResponse, TripVisibility } from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { AttractionSummary } from '@/features/destinations/api';
+import type { AttractionSummary, PhotoCover } from '@/features/destinations/api';
+import { walklistCoverFrom } from '@/features/trips/walklist-cover';
 import { check, supabase, unwrap } from '@/lib/supabase';
 
 export type TripSummary = {
@@ -16,9 +17,14 @@ export type TripSummary = {
   createdAt: string;
   /** Who can open the trip by link (D-031). */
   visibility: TripVisibility;
+  /** Photo of the starting point, for the card (D-038). */
+  cover: PhotoCover | null;
 };
 
-export type TripDetail = TripSummary & {
+// The detail page shows the stops' own photos, so it has no cover.
+export type TripDetail = Omit<TripSummary, 'cover'> & {
+  /** Marked official by a moderator (D-035). */
+  isOfficial: boolean;
   geometry: LineString | null;
   isFallback: boolean;
   provider: string | null;
@@ -38,38 +44,66 @@ export function useTrips() {
         await supabase
           .from('trips')
           .select(
-            'id, name, city_slug, trip_date, distance_m, walking_seconds, visit_minutes, created_at, visibility, trip_stops(count)',
+            'id, name, city_slug, trip_date, distance_m, walking_seconds, visit_minutes, created_at, visibility, trip_stops(count), walklist_cover',
           )
           .order('created_at', { ascending: false }),
       );
-      return rows.map((r) => ({
-        id: r.id,
-        name: r.name,
-        citySlug: r.city_slug,
-        tripDate: r.trip_date,
-        distanceM: r.distance_m,
-        walkingSeconds: r.walking_seconds,
-        visitMinutes: r.visit_minutes,
-        createdAt: r.created_at,
-        visibility: r.visibility as TripVisibility,
-        stopCount: (r.trip_stops as unknown as { count: number }[])[0]?.count ?? 0,
-      }));
+      return rows.map(tripSummaryFromRow);
     },
   });
 }
 
+/** A My Trips row: the trip, its stop count and its cover (computed column, D-038). */
+type TripSummaryRow = {
+  id: string;
+  name: string;
+  city_slug: string;
+  trip_date: string | null;
+  distance_m: number | null;
+  walking_seconds: number | null;
+  visit_minutes: number | null;
+  created_at: string;
+  visibility: string;
+  trip_stops: unknown;
+  walklist_cover: unknown;
+};
+
+/**
+ * @example tripSummaryFromRow({ ...row, trip_stops: [{ count: 4 }] }).stopCount // 4
+ */
+export function tripSummaryFromRow(r: TripSummaryRow): TripSummary {
+  return {
+    id: r.id,
+    name: r.name,
+    citySlug: r.city_slug,
+    tripDate: r.trip_date,
+    distanceM: r.distance_m,
+    walkingSeconds: r.walking_seconds,
+    visitMinutes: r.visit_minutes,
+    createdAt: r.created_at,
+    visibility: r.visibility as TripVisibility,
+    stopCount: (r.trip_stops as { count: number }[])[0]?.count ?? 0,
+    cover: walklistCoverFrom(r.walklist_cover),
+  };
+}
+
+/**
+ * The caller's own trip, for its editing page; null when it is not theirs (or does not exist):
+ * `trips` is owner-only under RLS, whatever the visibility (D-040).
+ * @example const trip = useTrip(id); if (trip.data === null) showReadOnlyView();
+ */
 export function useTrip(id: string | undefined) {
   return useQuery({
     queryKey: tripKeys.detail(id ?? ''),
     enabled: !!id,
-    queryFn: async (): Promise<TripDetail> => {
-      const trip = unwrap(
-        await supabase
-          .from('trips')
-          .select('*, trip_stops(position, attraction_id)')
-          .eq('id', id!)
-          .single(),
-      );
+    queryFn: async (): Promise<TripDetail | null> => {
+      const { data: trip, error } = await supabase
+        .from('trips')
+        .select('*, trip_stops(position, attraction_id)')
+        .eq('id', id!)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!trip) return null;
       const stopRows = [...trip.trip_stops].sort((a, b) => a.position - b.position);
       const stops = await fetchTripStops(stopRows.map((s) => s.attraction_id));
       return tripDetailFromRow({ ...trip, visibility: trip.visibility as TripVisibility }, stops);
@@ -90,6 +124,7 @@ export type TripRow = {
   is_fallback: boolean;
   provider: string | null;
   visibility: TripVisibility;
+  is_official: boolean;
   created_at: string;
 };
 
@@ -108,6 +143,7 @@ export function tripDetailFromRow(trip: TripRow, stops: AttractionSummary[]): Tr
     createdAt: trip.created_at,
     stopCount: stops.length,
     visibility: trip.visibility,
+    isOfficial: trip.is_official,
     geometry: (trip.route_geometry as LineString | null) ?? null,
     isFallback: trip.is_fallback,
     provider: trip.provider,

@@ -17,8 +17,8 @@ import { layout, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
 /**
- * Home (`/`): the destinations Wayfarer covers, as a searchable grid of city cards. A card opens
- * the city page (`/city/[slug]`) with its attractions.
+ * Home (`/`): the destinations Travelist covers, as a searchable grid of city cards. A card opens
+ * the city page (`/short/[slug]`, D-033); its attractions are one tap further (`/city/[slug]`).
  */
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
@@ -39,7 +39,7 @@ export default function HomeScreen() {
       <EmptyState icon="globe" title={t('explore.noCities')} body={t('explore.noCitiesBody')} />
     );
 
-  const openCity = (slug: string) => router.push({ pathname: '/city/[slug]', params: { slug } });
+  const openCity = (slug: string) => router.push({ pathname: '/short/[slug]', params: { slug } });
   return (
     <SafeAreaView
       edges={['top', 'left', 'right']}

@@ -5,10 +5,17 @@ import { sharedTripResultSchema, type SharedTrip, type TripVisibilityForm } from
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AttractionSummary } from '@/features/destinations/api';
+import type { RatingSummary } from '@/features/reviews/api';
 import { fetchTripStops, tripDetailFromRow, tripKeys, type TripDetail } from '@/features/trips/api';
 import { check, supabase } from '@/lib/supabase';
 
-export type SharedTripDetail = TripDetail & { isOwner: boolean };
+export type SharedTripDetail = TripDetail & {
+  isOwner: boolean;
+  authorName: string | null;
+  rating: RatingSummary;
+  /** The signed-in visitor saved it (D-035). */
+  isSaved: boolean;
+};
 
 export type SharedTripView =
   | { status: 'ok'; trip: SharedTripDetail }
@@ -18,7 +25,13 @@ export type SharedTripView =
  * @example sharedTripDetail(result.trip, await fetchTripStops(result.trip.stop_ids)).isOwner
  */
 export function sharedTripDetail(trip: SharedTrip, stops: AttractionSummary[]): SharedTripDetail {
-  return { ...tripDetailFromRow(trip, stops), isOwner: trip.is_owner };
+  return {
+    ...tripDetailFromRow(trip, stops),
+    isOwner: trip.is_owner,
+    authorName: trip.author_name,
+    rating: { count: trip.review_count, average: trip.rating_avg },
+    isSaved: trip.is_saved,
+  };
 }
 
 async function fetchSharedTrip(id: string, password: string | null): Promise<SharedTripView> {
@@ -67,6 +80,8 @@ export function useSetTripVisibility(tripId: string) {
       Promise.all([
         queryClient.invalidateQueries({ queryKey: tripKeys.all }),
         queryClient.invalidateQueries({ queryKey: ['sharedTrip', tripId] }),
+        // A list made private leaves the city pages and other people's saved lists.
+        queryClient.invalidateQueries({ queryKey: ['walklists'] }),
       ]),
   });
 }

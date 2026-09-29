@@ -1,4 +1,4 @@
-// Writing, editing and deleting the signed-in user's review (D-028).
+// Writing, editing and deleting the signed-in user's review (D-028) of any target (D-034).
 import { zodResolver } from '@hookform/resolvers/zod';
 import { REVIEW_COMMENT_MAX, reviewFormSchema, type ReviewForm as Form } from '@wayfarer/shared';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import { Card } from '@/components/card';
 import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { FormError } from '@/features/auth/components';
+import type { ReviewTarget } from '@/features/reviews/api';
 import { StarRating } from '@/features/reviews/star-rating';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -23,6 +24,8 @@ type Props = {
   saving?: boolean;
   deleting?: boolean;
   error?: string | null;
+  /** What is reviewed, for the wording ("Rate this city"); default an attraction. */
+  kind?: ReviewTarget['kind'];
 };
 
 /** Inline "Delete your review?" confirmation, as for trips. */
@@ -30,16 +33,18 @@ function DeleteConfirm({
   onDelete,
   onCancel,
   deleting,
+  kind,
 }: {
   onDelete: () => void;
   onCancel: () => void;
   deleting?: boolean;
+  kind: ReviewTarget['kind'];
 }) {
   const { t } = useTranslation();
   const theme = useTheme();
   return (
     <Card style={{ borderColor: theme.danger }}>
-      <Text>{t('reviews.deleteConfirm')}</Text>
+      <Text>{t('reviews.deleteConfirm', { context: kind })}</Text>
       <View style={styles.actions}>
         <Button
           variant="danger"
@@ -57,7 +62,8 @@ function DeleteConfirm({
  * Star picker and optional comment; publishes a new review or updates the user's own.
  * @example <ReviewForm initial={null} onSave={save.mutate} onDelete={remove} />
  */
-export function ReviewForm({ initial, onSave, onDelete, saving, deleting, error }: Props) {
+export function ReviewForm(props: Props) {
+  const { initial, onSave, onDelete, saving, deleting, error, kind = 'attraction' } = props;
   const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
   const { control, handleSubmit } = useForm<Form>({
@@ -67,7 +73,7 @@ export function ReviewForm({ initial, onSave, onDelete, saving, deleting, error 
   return (
     <Card testID="review-form">
       <Text variant="subtitle">
-        {initial ? t('reviews.yourReviewTitle') : t('reviews.writeTitle')}
+        {initial ? t('reviews.yourReviewTitle') : t('reviews.writeTitle', { context: kind })}
       </Text>
       <Controller
         control={control}
@@ -121,6 +127,7 @@ export function ReviewForm({ initial, onSave, onDelete, saving, deleting, error 
           onDelete={onDelete}
           onCancel={() => setConfirming(false)}
           deleting={deleting}
+          kind={kind}
         />
       ) : null}
     </Card>

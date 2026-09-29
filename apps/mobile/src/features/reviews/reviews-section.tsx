@@ -1,5 +1,5 @@
-// The Reviews section of an attraction (D-028): summary, the user's own review form and every
-// published review, newest first.
+// The Reviews section of an attraction (D-028), a city or a walk list (D-034): summary, reviews
+// per star, the user's own review form and every published review, newest first.
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -8,22 +8,24 @@ import { Section } from '@/components/screen';
 import { LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import {
-  useAttractionReviews,
   useDeleteReview,
   useRatingSummary,
+  useReviews,
   useSaveReview,
   type Review,
+  type ReviewTarget,
 } from '@/features/reviews/api';
 import { RatingSummaryLine, ReviewCard } from '@/features/reviews/components';
+import { RatingDistribution } from '@/features/reviews/rating-distribution';
 import { ReviewForm } from '@/features/reviews/review-form';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
 /** The signed-in user's review form, wired to save and delete. */
-function OwnReview({ attractionId, own }: { attractionId: string; own: Review | undefined }) {
+function OwnReview({ target, own }: { target: ReviewTarget; own: Review | undefined }) {
   const { t } = useTranslation();
-  const save = useSaveReview(attractionId);
-  const remove = useDeleteReview(attractionId);
+  const save = useSaveReview(target);
+  const remove = useDeleteReview(target);
   const [saved, setSaved] = useState(false);
   const error = save.error ?? remove.error;
   return (
@@ -37,6 +39,7 @@ function OwnReview({ attractionId, own }: { attractionId: string; own: Review | 
         saving={save.isPending}
         deleting={remove.isPending}
         error={error ? t('errors.generic') : null}
+        kind={target.kind}
       />
       {saved && own ? (
         <Text variant="helper" secondary accessibilityLiveRegion="polite">
@@ -48,11 +51,11 @@ function OwnReview({ attractionId, own }: { attractionId: string; own: Review | 
 }
 
 /** Every review, separated by hairlines, or an invitation to write the first one. */
-function ReviewList({ reviews }: { reviews: Review[] }) {
+function ReviewList({ reviews, kind }: { reviews: Review[]; kind: ReviewTarget['kind'] }) {
   const { t } = useTranslation();
   const theme = useTheme();
   if (reviews.length === 0) {
-    return <Text secondary>{t('reviews.noneBody')}</Text>;
+    return <Text secondary>{t('reviews.noneBody', { context: kind })}</Text>;
   }
   return (
     <View>
@@ -68,21 +71,34 @@ function ReviewList({ reviews }: { reviews: Review[] }) {
 }
 
 /**
- * Reviews of one attraction: average and count, the user's review form, then the list.
- * @example <ReviewsSection attractionId={attraction.id} />
+ * Reviews of one target: average and count, reviews per star, the user's review form (unless
+ * `canReview` is false, e.g. on the owner's own walk list), then the list.
+ * @example <ReviewsSection target={{ kind: 'city', id: city.slug }} />
  */
-export function ReviewsSection({ attractionId }: { attractionId: string }) {
+export function ReviewsSection({
+  target,
+  canReview = true,
+}: {
+  target: ReviewTarget;
+  canReview?: boolean;
+}) {
   const { t } = useTranslation();
-  const reviews = useAttractionReviews(attractionId);
-  const summary = useRatingSummary(attractionId);
+  const reviews = useReviews(target);
+  const summary = useRatingSummary(target);
   const own = reviews.data?.find((r) => r.isOwn);
+  const distribution = summary.data?.count ? summary.data.distribution : undefined;
   return (
     <Section title={t('reviews.title')}>
       {summary.data ? <RatingSummaryLine summary={summary.data} variant="heading" /> : null}
-      <OwnReview attractionId={attractionId} own={own} />
+      {distribution ? <RatingDistribution distribution={distribution} /> : null}
+      {canReview ? (
+        <OwnReview target={target} own={own} />
+      ) : (
+        <Text secondary>{t('reviews.ownTrip')}</Text>
+      )}
       {reviews.isPending ? <LoadingState /> : null}
       {reviews.error ? <Text secondary>{t('reviews.error')}</Text> : null}
-      {reviews.data ? <ReviewList reviews={reviews.data} /> : null}
+      {reviews.data ? <ReviewList reviews={reviews.data} kind={target.kind} /> : null}
     </Section>
   );
 }

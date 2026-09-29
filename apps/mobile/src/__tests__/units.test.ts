@@ -94,12 +94,12 @@ describe('route tray', () => {
     expect(useRouteStore.getState().stops.map((x) => x.id)).toEqual(['a']);
   });
 
-  it('refuses stops from another city and more than 12 stops', () => {
+  it('refuses stops from another city and more than 20 stops', () => {
     const s = useRouteStore.getState();
     s.add(stop('a'));
     expect(useRouteStore.getState().add(stop('x', 'porto'))).toBe(false);
-    for (let i = 0; i < 11; i++) useRouteStore.getState().add(stop(`s${i}`));
-    expect(useRouteStore.getState().stops).toHaveLength(12);
+    for (let i = 0; i < 19; i++) useRouteStore.getState().add(stop(`s${i}`));
+    expect(useRouteStore.getState().stops).toHaveLength(20);
     expect(useRouteStore.getState().add(stop('overflow'))).toBe(false);
   });
 });

@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { addLisbonPlaces, byTestIdOn, roleOn, signUpAndOnboard } from './helpers';
+import {
+  addLisbonPlaces,
+  byTestIdOn,
+  openLisbonAttractions,
+  roleOn,
+  signUpAndOnboard,
+} from './helpers';
 
 /**
  * Full journey against a local Supabase stack with seeds loaded and functions served:
@@ -94,8 +100,7 @@ test('publishes, edits and deletes a review of an attraction', async ({ page }) 
   const byTestId = byTestIdOn(page);
   const role = roleOn(page);
   await signUpAndOnboard(page);
-  await byTestId('city-search').fill('Lisb');
-  await byTestId('city-card-lisbon').click();
+  await openLisbonAttractions(page);
   await page.getByRole('radio', { name: 'List' }).or(role('checkbox', 'List')).click();
   const list = byTestId('attraction-list');
   await list.getByRole('button').first().click();
@@ -130,4 +135,126 @@ test('publishes, edits and deletes a review of an attraction', async ({ page }) 
   await role('button', 'Delete review').click();
   await expect(cards.filter({ hasText: comment })).toHaveCount(0, { timeout: 15_000 });
   await expect(byTestId('save-review')).toHaveText('Publish review');
+});
+
+test('map: photo markers open a compact card; + adds to the route; the card opens the place', async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const byTestId = byTestIdOn(page);
+  await signUpAndOnboard(page);
+  await openLisbonAttractions(page);
+  await page
+    .getByRole('radio', { name: 'Map' })
+    .or(page.getByRole('checkbox', { name: 'Map' }))
+    .click();
+
+  // Every place is a round photo marker (the city has hundreds).
+  const markers = page.locator('.maplibregl-marker.wayfarer-marker');
+  await expect(markers.first()).toBeVisible({ timeout: 20_000 });
+  expect(await markers.count()).toBeGreaterThan(50);
+  await expect(markers.first().locator('img').first()).toHaveAttribute('src', /\/120px-/);
+
+  // Markers of dense areas overlap: use ones whose centre is not covered by another.
+  const uncovered = await page.evaluate(() =>
+    [...document.querySelectorAll('.wayfarer-marker')]
+      .map((el, i) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return el.contains(hit) && r.top > 120 ? i : -1;
+      })
+      .filter((i) => i >= 0),
+  );
+  expect(uncovered.length).toBeGreaterThan(1);
+
+  // First press: a card over the map, no navigation.
+  const first = markers.nth(uncovered[0]!);
+  const name = (await first.getAttribute('aria-label'))!;
+  await first.click();
+  const popup = page.locator('.maplibregl-popup');
+  await expect(popup).toHaveCount(1);
+  await expect(popup).toContainText(name);
+  await expect(page).toHaveURL(/\/city\/lisbon$/);
+  await expect(first).toHaveAttribute('aria-pressed', 'true');
+
+  // + adds it to the route and stays on the map.
+  await popup.getByTestId('route-checkbox').click();
+  await expect(page.getByText('1 stop in your route')).toBeVisible();
+  await expect(popup.getByTestId('route-checkbox')).toHaveAttribute('aria-checked', 'true');
+  await expect(page).toHaveURL(/\/city\/lisbon$/);
+
+  // The card is never hidden behind the Map/List switch or the route tray floating over the map.
+  const cardBox = async () => (await popup.getByTestId(/^attraction-card-/).boundingBox())!;
+  const controlsTop = async () =>
+    (await page
+      .getByRole('radio', { name: 'Map' })
+      .or(page.getByRole('checkbox', { name: 'Map' }))
+      .boundingBox())!.y;
+  await expect
+    .poll(async () => (await cardBox()).y + (await cardBox()).height <= (await controlsTop()), {
+      timeout: 5_000,
+    })
+    .toBe(true);
+
+  // Another marker: one card at a time.
+  const second = markers.nth(uncovered[uncovered.length - 1]!);
+  const other = (await second.getAttribute('aria-label'))!;
+  await second.click({ force: true });
+  await expect(popup).toHaveCount(1);
+  await expect(popup).toContainText(other);
+  await expect(first).toHaveAttribute('aria-pressed', 'false');
+
+  // An empty spot closes it.
+  const empty = await page.evaluate(() => {
+    const canvas = document.querySelector('.maplibregl-canvas')!.getBoundingClientRect();
+    for (let y = canvas.top + 60; y < canvas.bottom - 60; y += 23) {
+      for (let x = canvas.left + 20; x < canvas.right - 60; x += 23) {
+        if (document.elementFromPoint(x, y)?.classList.contains('maplibregl-canvas'))
+          return { x, y };
+      }
+    }
+    return null;
+  });
+  await page.mouse.click(empty!.x, empty!.y);
+  await expect(popup).toHaveCount(0);
+
+  // Pressing the card opens the attraction page.
+  await second.click({ force: true });
+  await popup
+    .getByRole('button', { name: new RegExp(other) })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/\/attraction\//);
+});
+
+test('a route holds up to 20 places: the 21st is refused with a notice; 20 are saved', async ({
+  page,
+}) => {
+  test.setTimeout(150_000);
+  const byTestId = byTestIdOn(page);
+  await signUpAndOnboard(page);
+  await openLisbonAttractions(page);
+  await page
+    .getByRole('radio', { name: 'List' })
+    .or(page.getByRole('checkbox', { name: 'List' }))
+    .click();
+  const boxes = byTestId('attraction-list').getByTestId('route-checkbox');
+  await expect(boxes.first()).toBeVisible({ timeout: 20_000 });
+  for (let i = 0; i < 20; i++) await boxes.nth(i).click();
+  await expect(page.getByText('20 stops in your route')).toBeVisible();
+  await expect(page.getByText(/already has/)).toHaveCount(0);
+  await boxes.nth(20).click();
+  await expect(page.getByText('Your route already has 20 stops.')).toBeVisible();
+  await expect(page.getByText('20 stops in your route')).toBeVisible();
+  await expect(boxes.nth(20)).toHaveAttribute('aria-checked', 'false');
+
+  await byTestId('open-route').click();
+  await expect(page.getByTestId(/^route-0-stop-\d+$/).filter({ visible: true })).toHaveCount(20);
+  await byTestId('trip-name').fill('E2E long walk');
+  await byTestId('save-trip').click();
+  await expect(page.getByText('E2E long walk').first()).toBeVisible({ timeout: 20_000 });
+  // My Trips counts the saved stops.
+  await page.goto('/trips');
+  await expect(page.getByText('E2E long walk').first()).toBeVisible();
+  await expect(page.getByText('20 stops').first()).toBeVisible();
 });

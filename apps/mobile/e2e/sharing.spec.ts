@@ -1,6 +1,13 @@
 import { expect, test, type Browser } from '@playwright/test';
 
-import { addLisbonPlaces, byTestIdOn, roleOn, signUpAndOnboard, type Page } from './helpers';
+import {
+  byTestIdOn,
+  chooseVisibility,
+  roleOn,
+  saveWalk,
+  signUpAndOnboard,
+  type Page,
+} from './helpers';
 
 /**
  * Walk list visibility (D-031) against the local Supabase stack: the owner switches a saved trip
@@ -8,26 +15,6 @@ import { addLisbonPlaces, byTestIdOn, roleOn, signUpAndOnboard, type Page } from
  *   pnpm db:start && pnpm functions:serve & pnpm build:web && E2E_BACKEND=1 pnpm e2e sharing
  */
 test.skip(!process.env.E2E_BACKEND, 'needs the local Supabase stack (set E2E_BACKEND=1)');
-
-/** Saves a two-stop Lisbon walk and returns its id (the owner stays on the trip page). */
-async function saveWalk(page: Page, name: string): Promise<string> {
-  const byTestId = byTestIdOn(page);
-  await addLisbonPlaces(page, 2);
-  await byTestId('open-route').click();
-  await byTestId('optimize').click();
-  await expect(byTestId('route-distance')).toContainText(/\d/, { timeout: 30_000 });
-  await byTestId('trip-name').fill(name);
-  await byTestId('save-trip').click();
-  await expect(page).toHaveURL(/\/trip\/[0-9a-f-]{36}$/);
-  return page.url().split('/').pop()!;
-}
-
-async function chooseVisibility(page: Page, label: string, password?: string) {
-  const role = roleOn(page);
-  await role('radio', label).click();
-  if (password) await byTestIdOn(page)('trip-password').fill(password);
-  await role('button', 'Save visibility').click();
-}
 
 /** A signed-out visitor in a browser of their own. */
 async function visitor(browser: Browser): Promise<Page> {

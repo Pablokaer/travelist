@@ -4,6 +4,7 @@ import time
 
 import pytest
 
+from wayfarer_pipeline import http
 from wayfarer_pipeline.http import HttpClient, HttpError
 
 
@@ -44,3 +45,15 @@ def test_deadline_bounds_a_trickling_response(tmp_path):
         client.request("GET", url, namespace="test")
     stop.set()
     assert time.monotonic() - started < 5
+
+
+def test_user_agent_names_the_project_repository_by_default(monkeypatch):
+    monkeypatch.delenv("PIPELINE_CONTACT_EMAIL", raising=False)
+    agent = http.user_agent()
+    assert agent.startswith("wayfarer-pipeline/")
+    assert agent.endswith("(https://github.com/Pablokaer/travelist)")
+
+
+def test_user_agent_uses_the_configured_contact(monkeypatch):
+    monkeypatch.setenv("PIPELINE_CONTACT_EMAIL", "data@example.org")
+    assert http.user_agent().endswith("(data@example.org)")

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Wayfarer",
+    "appName": "Travelist",
     "locale": "pt-PT",
     "loading": "A carregar…",
     "retry": "Tentar novamente",
@@ -70,6 +70,9 @@
     "placesCount_other": "{{count}} locais",
     "filters": "Filtrar por categoria",
     "allCategories": "Todas",
+    "ratingFilter": "Filtrar por avaliação",
+    "minRating_one": "{{count}} estrela ou mais",
+    "minRating_other": "{{count}} estrelas ou mais",
     "viewMode": "Ver como",
     "mapView": "Mapa",
     "listView": "Lista",
@@ -89,7 +92,7 @@
     "citiesCount_other": "{{count}} destinos",
     "openCity": "{{city}}, {{country}}, {{places}}",
     "photoCredit": "Foto © {{author}} · {{license}}",
-    "goHome": "Wayfarer — todos os destinos",
+    "goHome": "Travelist — todos os destinos",
     "cityNotFound": "Cidade não encontrada",
     "cityNotFoundBody": "Este destino não está disponível. Escolha uma das cidades que cobrimos.",
     "backHome": "Ver todos os destinos"
@@ -149,7 +152,15 @@
     "deleteConfirm": "Eliminar a sua avaliação deste lugar?",
     "deleteYes": "Eliminar avaliação",
     "saved": "Obrigado! A sua avaliação foi publicada.",
-    "error": "Não foi possível carregar as avaliações. Verifique a ligação e tente novamente."
+    "error": "Não foi possível carregar as avaliações. Verifique a ligação e tente novamente.",
+    "writeTitle_city": "Avalie esta cidade",
+    "writeTitle_trip": "Avalie esta lista",
+    "deleteConfirm_city": "Eliminar a sua avaliação desta cidade?",
+    "deleteConfirm_trip": "Eliminar a sua avaliação desta lista?",
+    "noneBody_trip": "Já fez este passeio? Seja o primeiro a avaliar esta lista.",
+    "ownTrip": "Os viajantes que abrirem a sua lista podem avaliá-la aqui.",
+    "reviewCount_one": "{{count}} avaliação",
+    "reviewCount_other": "{{count}} avaliações"
   },
   "checklist": {
     "title": "Antes de partir",
@@ -356,7 +367,12 @@
     "delete": "Apagar viagem",
     "deleteConfirm": "Apagar esta viagem? Esta ação não pode ser anulada.",
     "deleteYes": "Sim, apagar viagem",
-    "subtitle": "Os seus percursos a pé guardados, prontos para o dia."
+    "subtitle": "Os seus percursos a pé guardados, prontos para o dia.",
+    "tabsLabel": "Mostrar",
+    "mineTab": "As minhas listas",
+    "savedTab": "Guardadas",
+    "savedEmptyTitle": "Sem listas guardadas",
+    "savedEmpty": "Guarde listas públicas de outros viajantes na página de uma cidade para as encontrar aqui."
   },
   "sharing": {
     "visibilityTitle": "Quem pode ver esta lista",
@@ -393,6 +409,16 @@
   "profile": {
     "title": "Perfil",
     "edit": "Editar perfil",
+    "photo": {
+      "title": "Foto de perfil",
+      "hint": "Aparece no seu perfil e junto às suas avaliações. Qualquer pessoa pode vê-la.",
+      "add": "Adicionar foto",
+      "change": "Alterar foto",
+      "remove": "Remover foto",
+      "saving": "A guardar a foto…",
+      "permissionDenied": "Permita o acesso às suas fotos nas Definições para adicionar uma foto de perfil.",
+      "failed": "Não foi possível guardar a foto. Tente novamente."
+    },
     "displayName": "Nome",
     "language": "Idioma",
     "languageName": {
@@ -427,13 +453,14 @@
   },
   "about": {
     "title": "Sobre",
-    "body": "O Wayfarer ajuda-o a preparar uma viagem e a explorar uma cidade a pé.",
+    "body": "O Travelist ajuda-o a preparar uma viagem e a explorar uma cidade a pé.",
     "dataSources": "Fontes de dados",
     "sources": {
       "osm": "Dados do mapa © colaboradores do OpenStreetMap (ODbL)",
       "wikidata": "Dados das atrações do Wikidata (CC0)",
       "commons": "Imagens da Wikimedia Commons (licença indicada em cada imagem)",
       "pageviews": "Popularidade a partir das visualizações da Wikipédia (Wikimedia)",
+      "wikipediaText": "Descrições das cidades da Wikipédia (CC BY-SA 4.0, com link em cada página de cidade)",
       "openfreemap": "Mosaicos do mapa por OpenFreeMap © OpenMapTiles",
       "ors": "Percursos a pé © openrouteservice.org by HeiGIT",
       "openMeteo": "Dados meteorológicos por Open-Meteo.com (CC BY 4.0)",
@@ -465,5 +492,51 @@
   },
   "menu": {
     "open": "Abrir menu"
+  },
+  "cityHub": {
+    "exploreAttractions": "Explorar atrações",
+    "about": "Sobre {{city}}",
+    "aboutSource": "Da Wikipédia · CC BY-SA 4.0",
+    "readMore": "Ler mais na Wikipédia",
+    "noAbout": "Ainda sem descrição.",
+    "beforeYouGoIntro": "Para uma viagem que começa hoje, com os passaportes do seu perfil.",
+    "changeDates": "Escolher as datas"
+  },
+  "walklists": {
+    "communityTitle": "Melhores listas da comunidade",
+    "officialTitle": "Listas oficiais",
+    "officialSubtitle": "Escolhidas pela equipa Travelist.",
+    "viewAll": "Ver todas as listas",
+    "viewAllOfficial": "Ver todas as listas oficiais",
+    "communityEmpty": "Ainda sem listas públicas",
+    "communityEmptyBody": "Planeie um percurso em {{city}}, guarde-o e torne-o público para o partilhar aqui.",
+    "officialEmpty": "Ainda sem listas oficiais",
+    "officialEmptyBody": "A equipa Travelist ainda não publicou nenhuma para {{city}}.",
+    "error": "Não foi possível carregar as listas. Tente novamente.",
+    "pageTitle": "Listas da comunidade em {{city}}",
+    "officialPageTitle": "Listas oficiais em {{city}}",
+    "search": "Pesquisar listas",
+    "sortLabel": "Ordenar por",
+    "sort": {
+      "top": "Mais bem avaliadas",
+      "lowest": "Menos bem avaliadas",
+      "most_reviewed": "Mais avaliadas",
+      "newest": "Mais recentes"
+    },
+    "noMatch": "Nenhuma lista corresponde à pesquisa.",
+    "loadMore": "Carregar mais",
+    "view": "Ver",
+    "save": "Guardar",
+    "saved": "Guardada",
+    "saveLabel": "Guardar {{name}}",
+    "unsaveLabel": "Remover {{name}} das guardadas",
+    "official": "Oficial",
+    "byAuthor": "por {{name}}",
+    "byPlatform": "pela Travelist",
+    "anonymousAuthor": "um viajante",
+    "moderatorTitle": "Moderação",
+    "markOfficial": "Marcar como oficial",
+    "unmarkOfficial": "Retirar selo oficial",
+    "officialNeedsPublic": "Só listas públicas podem ser oficiais."
   }
 }

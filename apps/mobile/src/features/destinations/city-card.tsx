@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { cityName, countryOf, type City, type CityCover } from './api';
-import { Thumbnail } from './components';
+import { cityName, countryOf, type City } from './api';
+import { PhotoCredit } from './photo-credit';
+import { Thumbnail } from './thumbnail';
 
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
@@ -53,35 +54,10 @@ export function CityCard({ city, onPress }: { city: City; onPress: () => void })
   );
 }
 
-/** Author and licence of the cover: Commons images must be shown with their credit. */
-function PhotoCredit({ cover }: { cover: CityCover }) {
-  const { t } = useTranslation();
-  if (!cover.author && !cover.license) return null;
-  return (
-    <View style={styles.credit} pointerEvents="none">
-      <Text variant="helper" numberOfLines={1} style={styles.creditText}>
-        {t('home.photoCredit', { author: cover.author ?? '?', license: cover.license ?? '' })}
-      </Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   card: { flex: 1, gap: spacing.md - 4 },
   media: { borderRadius: radius.lg, overflow: 'hidden' },
   cover: { width: '100%', aspectRatio: 4 / 3 },
   coverHover: { opacity: 0.88 },
-  // Over the photo in both themes, so fixed light-on-dark colours rather than theme tokens.
-  credit: {
-    position: 'absolute',
-    left: spacing.sm,
-    bottom: spacing.sm,
-    maxWidth: '80%',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-  },
-  creditText: { color: '#FFFFFF', fontSize: 11, lineHeight: 14 },
   body: { gap: spacing.xxs },
 });

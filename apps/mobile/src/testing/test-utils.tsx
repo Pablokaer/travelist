@@ -4,9 +4,10 @@ import type { Session } from '@supabase/supabase-js';
 export function queryResult(data: unknown) {
   const builder: Record<string, unknown> = {};
   const chain = () => builder;
-  for (const m of ['select', 'eq', 'in', 'order', 'update', 'delete', 'insert'])
+  for (const m of ['select', 'eq', 'gt', 'in', 'order', 'update', 'delete', 'insert'])
     builder[m] = jest.fn(chain);
   builder.single = jest.fn(async () => ({ data, error: null }));
+  builder.maybeSingle = jest.fn(async () => ({ data, error: null }));
   builder.then = (resolve: (v: unknown) => unknown) =>
     Promise.resolve({ data, error: null }).then(resolve);
   return builder;

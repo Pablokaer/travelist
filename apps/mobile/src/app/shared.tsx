@@ -1,5 +1,6 @@
 // A walk list opened by its link, /shared?id=<trip id> (D-031), signed in or not: public lists open straight away,
-// protected ones ask for the password, private or missing ones are "not available".
+// protected ones ask for the password, private or missing ones are "not available". Community
+// lists open here from the city page: author, rating, Save and reviews (D-035).
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -12,9 +13,11 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { useAuth } from '@/features/auth/auth-provider';
 import { useProfile } from '@/features/profile/api';
+import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useSharedTrip, type SharedTripDetail } from '@/features/trips/sharing-api';
 import { TripPasswordPrompt } from '@/features/trips/trip-password-prompt';
 import { TripView } from '@/features/trips/trip-view';
+import { ModeratorOfficialToggle, WalklistByline } from '@/features/trips/walklist-community';
 import { spacing } from '@/theme/colors';
 
 const openStop = (id: string) => router.push({ pathname: '/attraction/[id]', params: { id } });
@@ -52,8 +55,21 @@ function OpenedTrip({ trip, signedIn }: { trip: SharedTripDetail; signedIn: bool
       units={profile.data?.units ?? 'metric'}
       // Attraction pages need an account, like the rest of the app.
       onOpenStop={signedIn ? openStop : undefined}
-      notice={trip.isOwner ? <OwnerNotice tripId={trip.id} /> : null}>
-      {signedIn ? null : <PlanYourOwn />}
+      notice={
+        <>
+          <WalklistByline trip={trip} canSave={signedIn} />
+          {trip.isOwner ? <OwnerNotice tripId={trip.id} /> : null}
+        </>
+      }>
+      {/* Reviews, like attraction reviews, need an account (D-028). */}
+      {signedIn ? (
+        <>
+          <ReviewsSection target={{ kind: 'trip', id: trip.id }} canReview={!trip.isOwner} />
+          <ModeratorOfficialToggle trip={trip} />
+        </>
+      ) : (
+        <PlanYourOwn />
+      )}
     </TripView>
   );
 }

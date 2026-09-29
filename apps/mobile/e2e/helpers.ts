@@ -36,13 +36,26 @@ export async function signUpAndOnboard(page: Page) {
   await role('button', 'Start exploring').click();
 }
 
+/** Opens Lisbon's city page from the Home (D-033). */
+export async function openLisbon(page: Page) {
+  const byTestId = byTestIdOn(page);
+  await byTestId('city-search').fill('Lisb');
+  await byTestId('city-card-lisbon').click();
+  await expect(page).toHaveURL(/\/short\/lisbon$/);
+}
+
+/** Opens Lisbon's attractions (Map / List) from the Home, through its city page. */
+export async function openLisbonAttractions(page: Page) {
+  await openLisbon(page);
+  await roleOn(page)('button', 'Explore attractions').click();
+  await expect(page).toHaveURL(/\/city\/lisbon$/);
+}
+
 /** Opens Lisbon from the Home in list view and adds the first `count` places to the route. */
 export async function addLisbonPlaces(page: Page, count: number) {
   const byTestId = byTestIdOn(page);
   const role = roleOn(page);
-  await byTestId('city-search').fill('Lisb');
-  await byTestId('city-card-lisbon').click();
-  await expect(page).toHaveURL(/\/city\/lisbon$/);
+  await openLisbonAttractions(page);
   await page.getByRole('radio', { name: 'List' }).or(role('checkbox', 'List')).click();
   const list = byTestId('attraction-list');
   await expect(list.getByRole('button').first()).toBeVisible({ timeout: 20_000 });
@@ -53,4 +66,25 @@ export async function addLisbonPlaces(page: Page, count: number) {
     await page.goBack();
   }
   await expect(page.getByText(`${count} stops in your route`)).toBeVisible();
+}
+
+/** Saves a two-stop Lisbon walk and returns its id (the owner stays on the trip page). */
+export async function saveWalk(page: Page, name: string): Promise<string> {
+  const byTestId = byTestIdOn(page);
+  await addLisbonPlaces(page, 2);
+  await byTestId('open-route').click();
+  await byTestId('optimize').click();
+  await expect(byTestId('route-distance')).toContainText(/\d/, { timeout: 30_000 });
+  await byTestId('trip-name').fill(name);
+  await byTestId('save-trip').click();
+  await expect(page).toHaveURL(/\/trip\/[0-9a-f-]{36}$/);
+  return page.url().split('/').pop()!;
+}
+
+/** Picks a visibility on the owner's trip page and saves it (D-031). */
+export async function chooseVisibility(page: Page, label: string, password?: string) {
+  const role = roleOn(page);
+  await role('radio', label).click();
+  if (password) await byTestIdOn(page)('trip-password').fill(password);
+  await role('button', 'Save visibility').click();
 }

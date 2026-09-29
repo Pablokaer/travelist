@@ -4,7 +4,7 @@
 -- Run with `supabase test db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(35);
 
 insert into public.countries (code, name_en, name_pt) values ('ZZ', 'Testland', 'Terra de Teste')
   on conflict do nothing;
@@ -83,6 +83,31 @@ select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select is(public.shared_trip((select id from trip_id)) -> 'trip' ->> 'name', 'Olga''s walk',
   'a signed-out visitor opens a public trip');
 
+-- Shared lists are read-only for everyone but the owner (visitors view, never edit). ---------
+-- RLS makes other people's update/delete match no row; inserts are refused outright.
+select throws_ok($$ update public.trips set name = 'Hacked' where id = (select id from trip_id) $$,
+  '42501', null, 'a signed-out visitor cannot rename a public list');
+select throws_ok($$ delete from public.trip_stops where trip_id = (select id from trip_id) $$,
+  '42501', null, 'a signed-out visitor cannot remove its stops');
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-7777-7777-7777-777777777777","role":"authenticated"}', true);
+insert into public.saved_trips (trip_id) values ((select id from trip_id));
+update public.trips set name = 'Pete''s now', distance_m = 1 where id = (select id from trip_id);
+update public.trip_stops set position = 5 where trip_id = (select id from trip_id);
+delete from public.trip_stops where trip_id = (select id from trip_id);
+delete from public.trips where id = (select id from trip_id);
+select throws_ok($$ insert into public.trip_stops (trip_id, position, attraction_id)
+                    values ((select id from trip_id), 2, '00000000-0000-0000-0000-0000000000d1') $$,
+  '42501', null, 'a visitor who saved the list cannot add stops to it');
+select throws_ok($$ select public.set_trip_visibility((select id from trip_id), 'private') $$,
+  'P0002', null, 'nor change who can see it');
+select is(public.shared_trip((select id from trip_id)) -> 'trip' ->> 'name', 'Olga''s walk',
+  'renaming, reordering, removing stops and deleting all left the public list as it was');
+select is(public.shared_trip((select id from trip_id)) -> 'trip' -> 'stop_ids',
+  '["00000000-0000-0000-0000-0000000000d2", "00000000-0000-0000-0000-0000000000d1"]'::jsonb,
+  'its stops are unchanged, in the owner''s order');
+
 -- Olga protects it with a password ------------------------------------------------------------
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"66666666-6666-6666-6666-666666666666","role":"authenticated"}', true);
@@ -105,6 +130,16 @@ select is(public.shared_trip((select id from trip_id), 'wrong'), '{"status":"wro
   'a wrong password is refused');
 select is(public.shared_trip((select id from trip_id), 'lisbon24') ->> 'status', 'ok',
   'the right password opens it');
+
+-- Knowing the password lets a visitor view the list, not edit it.
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"77777777-7777-7777-7777-777777777777","role":"authenticated"}', true);
+update public.trips set name = 'Hacked' where id = (select id from trip_id);
+delete from public.trips where id = (select id from trip_id);
+select is(public.shared_trip((select id from trip_id), 'lisbon24') -> 'trip' ->> 'name', 'Olga''s walk',
+  'a visitor with the password could neither rename nor delete the list');
+set local role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', true);
 select throws_ok($$ select * from public.trip_passwords $$,
   '42501', null, 'visitors cannot read password hashes');
 
