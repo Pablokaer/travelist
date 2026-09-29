@@ -18,7 +18,7 @@ export function MapView({
   styleUrl,
   bounds,
   points,
-  route,
+  routes,
   onPointPress,
   style,
   testID,
@@ -27,10 +27,10 @@ export function MapView({
   const container = useRef<View>(null);
   const map = useRef<MapLibreMap | null>(null);
   const loaded = useRef(false);
-  const latest = useRef({ points, route, onPointPress });
+  const latest = useRef({ points, routes, onPointPress });
   useEffect(() => {
-    latest.current = { points, route, onPointPress };
-  }, [points, route, onPointPress]);
+    latest.current = { points, routes, onPointPress };
+  }, [points, routes, onPointPress]);
 
   // Create the map once (client-side only; never during static rendering).
   useEffect(() => {
@@ -52,7 +52,7 @@ export function MapView({
       created.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
       created.on('load', () => {
         const m = created;
-        m.addSource('route', { type: 'geojson', data: toRouteFeature(latest.current.route) });
+        m.addSource('route', { type: 'geojson', data: toRouteFeature(latest.current.routes) });
         m.addLayer({
           id: 'route-line',
           type: 'line',
@@ -105,8 +105,8 @@ export function MapView({
 
   useEffect(() => {
     if (!loaded.current) return;
-    (map.current?.getSource('route') as GeoJSONSource | undefined)?.setData(toRouteFeature(route));
-  }, [route]);
+    (map.current?.getSource('route') as GeoJSONSource | undefined)?.setData(toRouteFeature(routes));
+  }, [routes]);
 
   const boundsKey = bounds.join(',');
   useEffect(() => {

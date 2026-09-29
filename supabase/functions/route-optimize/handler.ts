@@ -36,9 +36,20 @@ type Stored = RoutingResult & { provider: RouteResponse['provider'] };
 
 const round6 = (n: number) => Math.round(n * 1e6) / 1e6;
 
+const byId = (a: { id: string }, b: { id: string }) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+
+/**
+ * Canonical form of a request, used as the cache key and sent to the provider: coordinates
+ * rounded to ~0.1 m, and the stops that the optimiser may reorder sorted by id. The same set of
+ * places then hits the cache in any order — e.g. "Optimise" again after the app applied the
+ * optimised order, or after reordering by hand — and gets the same deterministic answer.
+ * @example normalizeRouteInput({ stops: [a, c, b], keepFirst: true }).stops // [a, b, c]
+ */
 export function normalizeRouteInput(input: RouteRequest) {
+  const stops = input.stops.map((s) => ({ id: s.id, lat: round6(s.lat), lng: round6(s.lng) }));
+  const [first, ...rest] = stops;
   return {
-    stops: input.stops.map((s) => ({ id: s.id, lat: round6(s.lat), lng: round6(s.lng) })),
+    stops: input.keepFirst ? [first!, ...rest.sort(byId)] : stops.sort(byId),
     keepFirst: input.keepFirst,
   };
 }

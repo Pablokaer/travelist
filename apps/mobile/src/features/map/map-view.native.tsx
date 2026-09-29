@@ -15,7 +15,7 @@ export function MapView({
   styleUrl,
   bounds,
   points,
-  route,
+  routes,
   onPointPress,
   style,
   testID,
@@ -23,7 +23,7 @@ export function MapView({
 }: MapViewProps) {
   const camera = useRef<CameraRef>(null);
   const pointsData = useMemo(() => toFeatureCollection(points), [points]);
-  const routeData = useMemo(() => toRouteFeature(route), [route]);
+  const routeData = useMemo(() => toRouteFeature(routes), [routes]);
   const boundsKey = bounds.join(',');
 
   useEffect(() => {

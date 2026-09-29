@@ -56,7 +56,7 @@ export default function TripScreen() {
         styleUrl={env.mapStyleUrl}
         bounds={boundsOf(data.stops, [-180, -85, 180, 85])}
         points={points}
-        route={data.geometry}
+        routes={data.geometry ? [{ geometry: data.geometry, color: theme.primary }] : []}
         onPointPress={(aid) => router.push({ pathname: '/attraction/[id]', params: { id: aid } })}
       />
     </View>

@@ -298,7 +298,7 @@
     "splitHere": "Dividir aqui",
     "splitHereLabel": "Dividir o percurso antes de {{name}}",
     "splitTitle": "Dividir em vários percursos",
-    "splitBody": "Demasiado para um só passeio? Divida as paragens em percursos por proximidade; cada um é otimizado à parte.",
+    "splitBody": "Demasiado para um só passeio? Divida as paragens em percursos equilibrados — cada um com tempo semelhante (visitas + caminhada) e as caminhadas mais curtas — um por dia ou por parte da viagem. Cada percurso é otimizado à parte.",
     "splitParts": "Número de percursos",
     "suggestSplit": "Sugerir divisão",
     "merge": "Juntar num só percurso",

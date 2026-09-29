@@ -52,8 +52,11 @@ export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;
 /** Minimum touch target (iOS HIG 44pt / Material 48dp). */
 export const MIN_TOUCH = 44;
 
-/** Content widths: reading column, forms and the wide grid layouts. */
-export const layout = { form: 440, content: 760, wide: 1200 } as const;
+/**
+ * Content widths: reading column, forms, the wide grid layouts and the full browse page
+ * (Explore), whose header and card grid share one container.
+ */
+export const layout = { form: 440, content: 760, wide: 1200, page: 1440 } as const;
 
 /** Soft elevation. Dark mode relies on surfaces and borders more than on shadows. */
 export const shadows: Record<ColorScheme, { card: string; raised: string; floating: string }> = {

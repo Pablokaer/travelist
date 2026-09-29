@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, IconButton } from '@/components/button';
+import { Button } from '@/components/button';
 import { useGutter } from '@/components/screen';
 import { Segmented } from '@/components/segmented';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
@@ -16,7 +16,8 @@ import {
   type City,
 } from '@/features/destinations/api';
 import { AttractionSearch } from '@/features/destinations/attraction-search';
-import { AttractionCard, CategoryFilters, CitySwitcher } from '@/features/destinations/components';
+import { AttractionCard } from '@/features/destinations/components';
+import { ExploreHeader } from '@/features/destinations/explore-header';
 import { searchAttractions } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
@@ -24,9 +25,12 @@ import { routeNotice } from '@/features/route/notice';
 import { useRouteStore } from '@/features/route/store';
 import { env } from '@/lib/env';
 import { categoryColors, layout, radius, spacing } from '@/theme/colors';
-import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
+import { gridColumns, gridItemWidth } from '@/theme/grid';
+import { useShadows, useTheme } from '@/theme/use-theme';
 
 const GRID_GAP = spacing.lg;
+/** Cards stay at least this wide; the column count follows the space the grid really has. */
+const CARD_MIN_WIDTH = 240;
 
 const cityLabel = (city: City, lang: string) => (lang === 'pt' ? city.namePt : city.nameEn);
 
@@ -35,7 +39,6 @@ export default function ExploreScreen() {
   const theme = useTheme();
   const shadows = useShadows();
   const gutter = useGutter();
-  const { isTablet, columns } = useBreakpoint();
   const [listWidth, setListWidth] = useState(0);
   const cities = useCities();
   const { citySlug, setCity, categories, toggleCategory, clearCategories, view, setView } =
@@ -93,11 +96,11 @@ export default function ExploreScreen() {
   const openChecklist = () =>
     router.push({ pathname: '/checklist/[city]', params: { city: city.slug } });
 
-  const inner = { maxWidth: layout.wide + gutter * 2, paddingHorizontal: gutter };
-  const itemWidth = listWidth
-    ? (Math.min(listWidth, layout.wide + gutter * 2) - gutter * 2 - GRID_GAP * (columns - 1)) /
-      columns
-    : undefined;
+  // One container for the header and the grid, so both start and end on the same lines.
+  const inner = { maxWidth: layout.page + gutter * 2, paddingHorizontal: gutter };
+  const gridWidth = Math.min(listWidth, layout.page + gutter * 2) - gutter * 2;
+  const columns = gridColumns(gridWidth, CARD_MIN_WIDTH, GRID_GAP);
+  const itemWidth = listWidth ? gridItemWidth(gridWidth, columns, GRID_GAP) : undefined;
   const count = attractions.isPending
     ? t('common.loading')
     : t('explore.placesCount', { count: visible.length });
@@ -106,35 +109,11 @@ export default function ExploreScreen() {
     <SafeAreaView
       edges={['top', 'left', 'right']}
       style={[styles.safe, { backgroundColor: theme.background }]}>
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: theme.surface, borderColor: theme.border, boxShadow: shadows.card },
-        ]}>
-        <View style={[styles.inner, inner, styles.headerRow]}>
-          <View style={styles.search}>
-            <CitySwitcher cities={cities.data} current={city} onSelect={selectCity} />
-          </View>
-          {isTablet ? (
-            <Button
-              compact
-              variant="secondary"
-              icon="checklist"
-              label={t('checklist.open')}
-              onPress={openChecklist}
-              testID="open-checklist"
-            />
-          ) : (
-            <IconButton
-              icon="checklist"
-              variant="outlined"
-              accessibilityLabel={t('checklist.open')}
-              onPress={openChecklist}
-              testID="open-checklist"
-            />
-          )}
-        </View>
-        <View style={[styles.inner, inner, styles.searchRow]}>
+      <ExploreHeader
+        cities={cities.data}
+        city={city}
+        onSelectCity={selectCity}
+        search={
           <AttractionSearch
             items={attractions.data ?? []}
             cityName={cityLabel(city, lang)}
@@ -144,15 +123,14 @@ export default function ExploreScreen() {
             onToggle={toggleWithNotice}
             onOpen={(item) => openAttraction(item.id)}
           />
-        </View>
-        <View style={[styles.inner, inner]}>
-          <CategoryFilters
-            selected={categories}
-            onToggle={toggleCategory}
-            onClear={clearCategories}
-          />
-        </View>
-      </View>
+        }
+        categories={categories}
+        onToggleCategory={toggleCategory}
+        onClearCategories={clearCategories}
+        onOpenChecklist={openChecklist}
+        container={inner}
+        gutter={gutter}
+      />
 
       <View style={styles.body} onLayout={(e) => setListWidth(e.nativeEvent.layout.width)}>
         {attractions.isError ? (
@@ -186,6 +164,8 @@ export default function ExploreScreen() {
             numColumns={columns}
             columnWrapperStyle={columns > 1 ? { gap: GRID_GAP } : undefined}
             contentContainerStyle={[styles.inner, inner, styles.grid]}
+            ItemSeparatorComponent={RowGap}
+            ListHeaderComponentStyle={styles.listHeader}
             ListHeaderComponent={
               <Text variant="heading" accessibilityLiveRegion="polite">
                 {count}
@@ -259,21 +239,20 @@ export default function ExploreScreen() {
   );
 }
 
+/** Vertical space between card rows (FlatList puts it between rows, not after the header). */
+function RowGap() {
+  return <View style={styles.rowGap} />;
+}
+
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
   inner: { width: '100%', alignSelf: 'center' },
-  header: {
-    paddingTop: spacing.md - 4,
-    gap: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    zIndex: 1,
-  },
-  searchRow: { zIndex: 10 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md - 4 },
-  search: { flex: 1, maxWidth: 560, flexDirection: 'row' },
   body: { flex: 1 },
-  grid: { paddingTop: spacing.lg, paddingBottom: 160, gap: spacing.xl - 4 },
+  // Bottom room for the floating Map/List switch and route tray.
+  grid: { paddingTop: spacing.lg, paddingBottom: 160 },
+  listHeader: { marginBottom: spacing.md },
+  rowGap: { height: spacing.xl },
   mapCount: {
     position: 'absolute',
     top: spacing.md,

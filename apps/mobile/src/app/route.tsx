@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ROUTE_MAX_STOPS,
   ROUTE_MIN_STOPS,
+  ROUTE_SPLIT_MIN_STOPS,
   saveTripFormSchema,
   type RouteResponse,
   type SaveTripForm,
@@ -12,7 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Button, IconButton } from '@/components/button';
+import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { PageHeader, Screen, Section } from '@/components/screen';
 import { EmptyState } from '@/components/states';
@@ -20,30 +21,53 @@ import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { FormError } from '@/features/auth/components';
 import { useCities } from '@/features/destinations/api';
-import { AttractionRow } from '@/features/destinations/components';
 import { MapView } from '@/features/map/map-view';
-import { boundsOf } from '@/features/map/map-view.types';
+import { boundsOf, type MapPoint, type RouteLine } from '@/features/map/map-view.types';
 import { useProfile } from '@/features/profile/api';
-import { useOptimizeRoute } from '@/features/route/api';
+import { routesToOptimize, useOptimizeRoutes } from '@/features/route/api';
 import { RouteTotals } from '@/features/route/components';
+import { useRouteColor } from '@/features/route/route-colors';
+import { RouteOrderNotice, RouteStopList, SplitPanel } from '@/features/route/route-plan';
 import { useRouteStore } from '@/features/route/store';
-import { useSaveTrip } from '@/features/trips/api';
+import type { AttractionSummary } from '@/features/destinations/api';
+import { useSaveTrips } from '@/features/trips/api';
 import { env } from '@/lib/env';
 import { radius, spacing } from '@/theme/colors';
-import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
+import { useBreakpoint, useShadows } from '@/theme/use-theme';
+
+/** Identifies a route by its stops in order, so a result only applies to the exact route. */
+const routeKey = (route: readonly AttractionSummary[]) => route.map((s) => s.id).join(',');
+
+/** Numbered map points, coloured per route. */
+function routePoints(
+  routes: AttractionSummary[][],
+  colorOf: (index: number) => string,
+): MapPoint[] {
+  return routes.flatMap((route, r) =>
+    route.map((s, i) => ({
+      id: s.id,
+      lat: s.lat,
+      lng: s.lng,
+      color: colorOf(r),
+      selected: true,
+      order: i + 1,
+    })),
+  );
+}
 
 export default function RouteScreen() {
   const { t, i18n } = useTranslation();
-  const { stops, citySlug, remove, move, setOrder, clear } = useRouteStore();
+  const store = useRouteStore();
+  const { stops, routes, citySlug, manualOrder } = store;
   const cities = useCities();
   const profile = useProfile();
   const city = cities.data?.find((c) => c.slug === citySlug);
-  const optimize = useOptimizeRoute();
-  const save = useSaveTrip();
-  const [result, setResult] = useState<RouteResponse | null>(null);
-  const theme = useTheme();
+  const optimize = useOptimizeRoutes();
+  const save = useSaveTrips();
+  const [results, setResults] = useState<Record<string, RouteResponse>>({});
   const shadows = useShadows();
   const { isDesktop } = useBreakpoint();
+  const units = profile.data?.units ?? 'metric';
 
   const cityName = city ? (i18n.resolvedLanguage === 'pt' ? city.namePt : city.nameEn) : '';
   const { control, handleSubmit } = useForm<SaveTripForm>({
@@ -51,19 +75,17 @@ export default function RouteScreen() {
     defaultValues: { name: t('route.defaultName', { city: cityName }), tripDate: null },
   });
 
-  const points = useMemo(
+  const colorOf = useRouteColor();
+  const points = useMemo(() => routePoints(routes, colorOf), [routes, colorOf]);
+  const routeResults = routes.map((route) => results[routeKey(route)] ?? null);
+  const lines = useMemo(
     () =>
-      stops.map((s, i) => ({
-        id: s.id,
-        lat: s.lat,
-        lng: s.lng,
-        color: theme.primary,
-        selected: true,
-        order: i + 1,
-      })),
-    [stops, theme.primary],
+      routes.flatMap((route, r): RouteLine[] => {
+        const geometry = results[routeKey(route)]?.geometry;
+        return geometry ? [{ geometry, color: colorOf(r) }] : [];
+      }),
+    [routes, results, colorOf],
   );
-  const visitMinutes = stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0);
 
   if (stops.length === 0) {
     return (
@@ -76,25 +98,43 @@ export default function RouteScreen() {
     );
   }
 
-  const invalidate = () => setResult(null);
-  const runOptimize = () =>
+  const optimized = routeResults.every((r) => r != null);
+  const tooShort = routes.some((r) => r.length < ROUTE_MIN_STOPS);
+  const runOptimize = () => {
+    const targets = routesToOptimize(routeResults);
     optimize.mutate(
-      { stops, keepFirst: true },
+      targets.map((i) => routes[i]!),
       {
-        onSuccess: (r) => {
-          setOrder(r.order);
-          setResult(r);
+        onSuccess: (responses) => {
+          // Untouched routes keep their answer; optimised ones take the server's order.
+          const next: Record<string, RouteResponse> = {};
+          routes.forEach((route, i) => {
+            if (routeResults[i] && !targets.includes(i)) next[routeKey(route)] = routeResults[i]!;
+          });
+          responses.forEach((r, k) => {
+            store.setRouteOrder(targets[k]!, r.order);
+            next[r.order.join(',')] = r;
+          });
+          setResults(next);
         },
       },
     );
+  };
 
   const onSave = handleSubmit((form) =>
     save.mutate(
-      { ...form, citySlug: citySlug!, stops, route: result },
+      routes.map((route, i) => ({
+        ...form,
+        name: routes.length > 1 ? t('route.splitName', { name: form.name, n: i + 1 }) : form.name,
+        citySlug: citySlug!,
+        stops: route,
+        route: routeResults[i] ?? null,
+      })),
       {
-        onSuccess: (id) => {
-          clear();
-          router.replace({ pathname: '/trip/[id]', params: { id } });
+        onSuccess: (ids) => {
+          store.clear();
+          if (ids.length === 1) router.replace({ pathname: '/trip/[id]', params: { id: ids[0]! } });
+          else router.replace('/trips');
         },
       },
     ),
@@ -112,7 +152,7 @@ export default function RouteScreen() {
         styleUrl={env.mapStyleUrl}
         bounds={boundsOf(stops, fallbackBounds)}
         points={points}
-        route={result?.geometry}
+        routes={lines}
       />
     </View>
   );
@@ -120,65 +160,55 @@ export default function RouteScreen() {
   const details = (
     <View style={styles.column}>
       <Section title={t('route.stopsTitle')}>
-        {stops.map((s, i) => (
-          <AttractionRow
-            key={s.id}
-            item={s}
-            index={i}
-            trailing={
-              <View style={styles.rowActions}>
-                <IconButton
-                  icon="arrowUp"
-                  accessibilityLabel={t('route.moveUp')}
-                  disabled={i === 0}
-                  onPress={() => {
-                    move(s.id, -1);
-                    invalidate();
-                  }}
-                />
-                <IconButton
-                  icon="arrowDown"
-                  accessibilityLabel={t('route.moveDown')}
-                  disabled={i === stops.length - 1}
-                  onPress={() => {
-                    move(s.id, 1);
-                    invalidate();
-                  }}
-                />
-                <IconButton
-                  icon="close"
-                  accessibilityLabel={t('route.removeNamed', { name: s.nameEn })}
-                  onPress={() => {
-                    remove(s.id);
-                    invalidate();
-                  }}
-                />
-              </View>
-            }
-          />
+        <RouteOrderNotice manual={manualOrder} onAuto={store.autoOrder} />
+        {routes.map((route, r) => (
+          <View key={routeKey(route)} style={styles.route}>
+            <RouteStopList
+              route={route}
+              routeIndex={r}
+              routeCount={routes.length}
+              splittable={stops.length >= ROUTE_SPLIT_MIN_STOPS}
+              units={units}
+              onMove={store.move}
+              onRemove={store.remove}
+              onSplitAt={(position) => store.splitAt(r, position)}
+            />
+            <RouteTotals
+              distanceM={routeResults[r]?.distanceM ?? null}
+              walkingSeconds={routeResults[r]?.walkingSeconds ?? null}
+              visitMinutes={route.reduce((sum, s) => sum + s.avgVisitMinutes, 0)}
+              units={units}
+              isFallback={routeResults[r]?.isFallback}
+              attribution={routeResults[r]?.attribution}
+            />
+          </View>
         ))}
       </Section>
 
-      <RouteTotals
-        distanceM={result?.distanceM ?? null}
-        walkingSeconds={result?.walkingSeconds ?? null}
-        visitMinutes={visitMinutes}
-        units={profile.data?.units ?? 'metric'}
-        isFallback={result?.isFallback}
-        attribution={result?.attribution}
+      <SplitPanel
+        stopCount={stops.length}
+        routeCount={routes.length}
+        onSuggest={store.suggestSplit}
+        onMerge={store.merge}
       />
 
       <View style={styles.optimize}>
         <Button
           icon="sparkles"
-          variant={result ? 'secondary' : 'primary'}
-          label={result ? t('route.reoptimize') : t('route.optimize')}
+          variant={optimized ? 'secondary' : 'primary'}
+          label={
+            optimized
+              ? t('route.reoptimize')
+              : routes.length > 1
+                ? t('route.optimizeMany', { count: routes.length })
+                : t('route.optimize')
+          }
           onPress={runOptimize}
           loading={optimize.isPending}
-          disabled={stops.length < ROUTE_MIN_STOPS}
+          disabled={tooShort}
           testID="optimize"
         />
-        {stops.length < ROUTE_MIN_STOPS ? (
+        {tooShort ? (
           <Text variant="helper" secondary>
             {t('route.needMore', { min: ROUTE_MIN_STOPS })}
           </Text>
@@ -218,13 +248,20 @@ export default function RouteScreen() {
             />
           )}
         />
+        {routes.length > 1 ? (
+          <Text variant="helper" secondary>
+            {t('route.saveSplitHint')}
+          </Text>
+        ) : null}
         <FormError message={save.error ? save.error.message : null} />
         <Button
-          variant={result ? 'primary' : 'secondary'}
-          label={t('route.save')}
+          variant={optimized ? 'primary' : 'secondary'}
+          label={
+            routes.length > 1 ? t('route.saveMany', { count: routes.length }) : t('route.save')
+          }
           onPress={onSave}
           loading={save.isPending}
-          disabled={stops.length < ROUTE_MIN_STOPS || optimize.isPending}
+          disabled={tooShort || optimize.isPending}
           testID="save-trip"
         />
         <Button
@@ -232,7 +269,7 @@ export default function RouteScreen() {
           icon="trash"
           label={t('route.clear')}
           onPress={() => {
-            clear();
+            store.clear();
             router.back();
           }}
         />
@@ -267,6 +304,6 @@ const styles = StyleSheet.create({
   mapDesktop: { height: 560 },
   split: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xl },
   column: { flex: 1, gap: spacing.lg },
-  rowActions: { flexDirection: 'row' },
+  route: { gap: spacing.md },
   optimize: { gap: spacing.sm },
 });

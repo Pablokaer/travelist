@@ -4,8 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, type IconName } from '@/components/icon';
+import { spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
 import { useBreakpoint, useTheme } from '@/theme/use-theme';
+
+/**
+ * Desktop side rail: fits the English labels. "As minhas viagens" (PT) is ellipsised at this
+ * width as it was at the previous 104 px.
+ */
+const RAIL_WIDTH = 96;
 
 function TabIcon({ name, color }: { name: IconName; color: string }) {
   return <Icon name={name} color={color} size={24} />;
@@ -33,7 +40,12 @@ export default function TabsLayout() {
           backgroundColor: theme.surface,
           borderColor: theme.border,
           ...(isDesktop
-            ? { borderRightWidth: StyleSheet.hairlineWidth, paddingTop: 24, width: 104 }
+            ? // Top padding matches the page header's, so the first item lines up with the logo row.
+              {
+                borderRightWidth: StyleSheet.hairlineWidth,
+                paddingTop: spacing.md,
+                width: RAIL_WIDTH,
+              }
             : {
                 // Each item adds 5px padding around a 28px icon box; the default 49pt bar
                 // leaves Inter's 16px labels about 9px and clips them.

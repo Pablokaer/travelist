@@ -1,14 +1,16 @@
-// Routing providers for route-optimize: OpenRouteService (VROOM optimisation + walking
-// directions) and the offline straight-line fallback from @wayfarer/shared.
+// Routing providers for route-optimize: OpenRouteService (VROOM optimisation on the walking
+// network, with its geometry) and the offline straight-line fallback from @wayfarer/shared.
 import {
   estimateLegs,
   type LineString,
   optimizeOrder,
+  optimizeOrderAnyStart,
   type RouteLeg,
   type RoutePoint,
 } from '@wayfarer/shared';
 
 import type { FetchJson } from '../_shared/http.ts';
+import { decodePolyline } from './polyline.ts';
 
 export type RoutingResult = { order: string[]; legs: RouteLeg[]; geometry: LineString };
 
@@ -28,110 +30,116 @@ export const ORS_ATTRIBUTION =
 export const FALLBACK_ATTRIBUTION = 'Estimated straight-line route';
 
 const lngLat = (p: RoutePoint): [number, number] => [p.lng, p.lat];
-const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
 // ---------------------------------------------------------------------------
 // Fallback
 // ---------------------------------------------------------------------------
 
-function fallbackFrom(stops: readonly RoutePoint[]): RoutingResult & { distance: number } {
-  const ordered = optimizeOrder(stops);
-  const legs = estimateLegs(ordered);
+/** Straight-line legs and geometry for stops already in walking order. */
+function straightLineRoute(ordered: readonly RoutePoint[]): RoutingResult {
   return {
     order: ordered.map((p) => p.id),
-    legs,
+    legs: estimateLegs(ordered),
     geometry: { type: 'LineString', coordinates: ordered.map(lngLat) },
-    distance: sum(legs.map((l) => l.distanceM)),
   };
 }
 
-/** Best start for an open path (tries every stop as the start; deterministic). */
+/** Shortest straight-line open path from whichever stop makes it shortest (exact). */
 export function bestStartFallback(stops: readonly RoutePoint[]): RoutingResult {
-  let best: (RoutingResult & { distance: number }) | undefined;
-  stops.forEach((start, i) => {
-    const candidate = fallbackFrom([start, ...stops.filter((_, j) => j !== i)]);
-    if (!best || candidate.distance < best.distance - 1e-6) best = candidate;
-  });
-  const { order, legs, geometry } = best!;
-  return { order, legs, geometry };
+  return straightLineRoute(optimizeOrderAnyStart(stops));
 }
 
-export const fallbackRouting: RoutingProvider = (stops, fixedStart) => {
-  if (fixedStart) {
-    const { order, legs, geometry } = fallbackFrom(stops);
-    return Promise.resolve({ order, legs, geometry });
-  }
-  return Promise.resolve(bestStartFallback(stops));
-};
+export const fallbackRouting: RoutingProvider = (stops, fixedStart) =>
+  Promise.resolve(fixedStart ? straightLineRoute(optimizeOrder(stops)) : bestStartFallback(stops));
 
 // ---------------------------------------------------------------------------
 // OpenRouteService
 // ---------------------------------------------------------------------------
 
-type VroomStep = { type: string; id?: number; job?: number };
+/** Step of a VROOM route; `distance` (m) and `duration` (s) are cumulative from the start. */
+type VroomStep = { type: string; id?: number; job?: number; distance?: number; duration?: number };
 type VroomResponse = {
   code: number;
   error?: string;
-  routes?: { vehicle: number; steps: VroomStep[] }[];
+  /** `geometry` is an encoded polyline, present when the request sets `options.g`. */
+  routes?: { vehicle: number; steps: VroomStep[]; geometry?: string }[];
   unassigned?: { id: number }[];
 };
-type OrsDirections = {
-  features?: {
-    geometry?: { type: string; coordinates: number[][] };
-    properties?: { segments?: { distance: number; duration: number }[] };
-  }[];
-};
 
-/** Pure: stop order from a VROOM solution (start stop first, then jobs by step order). */
-export function orderFromVroom(
+/** Pure: the job steps of a VROOM solution as stops, after checking every stop is visited once. */
+function visitedJobs(
+  jobs: readonly RoutePoint[],
+  res: VroomResponse,
+): { stop: RoutePoint; step: VroomStep }[] {
+  if (res.code !== 0) throw new Error(`ORS optimization error ${res.code}: ${res.error ?? ''}`);
+  if (res.unassigned?.length) {
+    throw new Error(`ORS optimization left jobs unassigned: ${res.unassigned.map((u) => u.id)}`);
+  }
+  const visited = (res.routes?.[0]?.steps ?? []).filter((s) => s.type === 'job').map((step) => {
+    const idx = step.id ?? step.job;
+    const stop = idx === undefined ? undefined : jobs[idx];
+    if (!stop) {
+      throw new Error(
+        `ORS optimization returned unknown job ${idx}, expected 0–${jobs.length - 1}`,
+      );
+    }
+    return { stop, step };
+  });
+  if (visited.length !== jobs.length || new Set(visited.map((v) => v.stop)).size !== jobs.length) {
+    throw new Error(
+      `ORS optimization visited ${visited.length} jobs, expected each of ${jobs.length} once`,
+    );
+  }
+  return visited;
+}
+
+/** Pure: per-leg distance and duration from the cumulative totals VROOM puts on each step. */
+function legsFromSteps(ordered: readonly RoutePoint[], steps: readonly VroomStep[]): RouteLeg[] {
+  return steps.map((step, i) => {
+    const before = steps[i - 1];
+    const distanceM = (step.distance ?? NaN) - (before?.distance ?? 0);
+    const durationS = (step.duration ?? NaN) - (before?.duration ?? 0);
+    if (!(distanceM >= 0 && durationS >= 0)) {
+      throw new Error(
+        `ORS optimization step ${i} has no cumulative distance/duration: ${JSON.stringify(step)}`,
+      );
+    }
+    return {
+      fromId: ordered[i]!.id,
+      toId: ordered[i + 1]!.id,
+      distanceM: Math.round(distanceM),
+      durationS: Math.round(durationS),
+    };
+  });
+}
+
+/**
+ * Pure: order, walking legs and street geometry from one VROOM solution requested with
+ * `options.g` — no separate directions call is needed (the totals match ORS directions).
+ * @example routeFromVroom(start, jobs, await orsOptimization(...)).order // ['start', …]
+ */
+export function routeFromVroom(
   start: RoutePoint,
   jobs: readonly RoutePoint[],
   res: VroomResponse,
-): RoutePoint[] {
-  if (res.code !== 0) throw new Error(`ORS optimization error ${res.code}: ${res.error ?? ''}`);
-  if (res.unassigned?.length) throw new Error('ORS optimization left stops unassigned');
-  const steps = res.routes?.[0]?.steps ?? [];
-  const visited = steps
-    .filter((s) => s.type === 'job')
-    .map((s) => {
-      const idx = s.id ?? s.job;
-      const stop = idx === undefined ? undefined : jobs[idx];
-      if (!stop) throw new Error(`ORS optimization returned unknown job ${idx}`);
-      return stop;
-    });
-  if (visited.length !== jobs.length || new Set(visited).size !== jobs.length) {
-    throw new Error('ORS optimization did not visit every stop exactly once');
-  }
-  return [start, ...visited];
-}
-
-/** Pure: legs + geometry from an ORS GeoJSON directions response for `ordered` stops. */
-export function routeFromDirections(
-  ordered: readonly RoutePoint[],
-  res: OrsDirections,
 ): RoutingResult {
-  const feature = res.features?.[0];
-  const segments = feature?.properties?.segments ?? [];
-  if (segments.length !== ordered.length - 1) {
-    throw new Error(`ORS directions returned ${segments.length} segments`);
-  }
-  const coords = feature?.geometry?.type === 'LineString' ? feature.geometry.coordinates : [];
-  if (coords.length < 2) throw new Error('ORS directions returned no LineString geometry');
+  const visited = visitedJobs(jobs, res);
+  const ordered = [start, ...visited.map((v) => v.stop)];
+  const encoded = res.routes?.[0]?.geometry;
+  const coordinates = encoded ? decodePolyline(encoded) : [];
+  if (coordinates.length < 2) throw new Error('ORS optimization returned no route geometry');
   return {
     order: ordered.map((p) => p.id),
-    legs: segments.map((s, i) => ({
-      fromId: ordered[i]!.id,
-      toId: ordered[i + 1]!.id,
-      distanceM: Math.round(s.distance),
-      durationS: Math.round(s.duration),
-    })),
-    geometry: {
-      type: 'LineString',
-      coordinates: coords.map((c) => [c[0]!, c[1]!] as [number, number]),
-    },
+    legs: legsFromSteps(ordered, visited.map((v) => v.step)),
+    geometry: { type: 'LineString', coordinates },
   };
 }
 
+/**
+ * OpenRouteService routing: one `/optimization` call (VROOM on the foot-walking network) that
+ * returns the order, the per-leg totals and the geometry.
+ * @example const route = await createOrsRouting({ apiKey, fetchJson })(stops, true);
+ */
 export function createOrsRouting(deps: {
   apiKey: string;
   fetchJson: FetchJson;
@@ -145,8 +153,8 @@ export function createOrsRouting(deps: {
   };
 
   return async (stops, fixedStart) => {
-    // VROOM needs a vehicle start or end; for a free start, pick it with the local heuristic
-    // and let ORS order the rest on the real street network.
+    // VROOM needs a vehicle start or end; for a free start, pick it with the exact
+    // straight-line solution and let ORS order the rest on the real street network.
     const startId = fixedStart ? stops[0]!.id : bestStartFallback(stops).order[0]!;
     const start = stops.find((s) => s.id === startId)!;
     const jobs = stops.filter((s) => s !== start);
@@ -158,24 +166,10 @@ export function createOrsRouting(deps: {
         // Ordering only minimises walking, so visits have no service time.
         jobs: jobs.map((s, i) => ({ id: i, location: lngLat(s), service: 0 })),
         vehicles: [{ id: 0, profile: 'foot-walking', start: lngLat(start) }],
+        // Geometry plus cumulative distance/duration per step (saves a directions call).
+        options: { g: true },
       },
     });
-    const ordered = orderFromVroom(start, jobs, optimization);
-
-    const directions = await deps.fetchJson<OrsDirections>(
-      `${base}/v2/directions/foot-walking/geojson`,
-      {
-        ...opts,
-        // The GeoJSON endpoint answers 406 unless GeoJSON is an accepted type.
-        headers: { ...opts.headers, Accept: 'application/json, application/geo+json' },
-        method: 'POST',
-        body: {
-          coordinates: ordered.map(lngLat),
-          // Snap stops to the nearest walkable way however far it is (parks, squares).
-          radiuses: ordered.map(() => -1),
-        },
-      },
-    );
-    return routeFromDirections(ordered, directions);
+    return routeFromVroom(start, jobs, optimization);
   };
 }

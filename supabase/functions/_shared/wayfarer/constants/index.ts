@@ -38,6 +38,8 @@ export const DEFAULT_VISIT_MINUTES: Record<AttractionCategory, number> = {
 
 export const ROUTE_MIN_STOPS = 2;
 export const ROUTE_MAX_STOPS = 12;
+/** A route with at least this many stops can be split into several routes. */
+export const ROUTE_SPLIT_MIN_STOPS = 5;
 
 export const VISA_REQUIREMENTS = [
   'freedom_of_movement',

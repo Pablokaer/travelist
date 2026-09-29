@@ -14,12 +14,15 @@ export type MapPoint = {
   order?: number;
 };
 
+/** One walking route drawn on the map; split routes each get their own colour. */
+export type RouteLine = { geometry: LineString; color: string };
+
 export type MapViewProps = {
   styleUrl: string;
   /** Initial / target viewport: [west, south, east, north]. */
   bounds: [number, number, number, number];
   points: MapPoint[];
-  route?: LineString | null;
+  routes?: RouteLine[];
   onPointPress?: (id: string) => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -43,10 +46,14 @@ export function toFeatureCollection(points: MapPoint[]): GeoJSON.FeatureCollecti
   };
 }
 
-export function toRouteFeature(route: LineString | null | undefined): GeoJSON.FeatureCollection {
+export function toRouteFeature(routes: RouteLine[] | undefined): GeoJSON.FeatureCollection {
   return {
     type: 'FeatureCollection',
-    features: route ? [{ type: 'Feature', geometry: route, properties: {} }] : [],
+    features: (routes ?? []).map((r) => ({
+      type: 'Feature',
+      geometry: r.geometry,
+      properties: { color: r.color },
+    })),
   };
 }
 
@@ -82,7 +89,7 @@ export const labelLayout = {
 } as const;
 
 export const routePaint = {
-  'line-color': palette.light.primary,
+  'line-color': ['coalesce', ['get', 'color'], palette.light.primary],
   'line-width': 4,
   'line-opacity': 0.85,
 } as const;

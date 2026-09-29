@@ -75,12 +75,14 @@ Nationalities are saved with the `set_nationalities` RPC (replaces the whole set
 
 The **Explore** tab (`(tabs)/index.tsx`) is the home screen.
 
+- **Header** (`features/destinations/explore-header.tsx`, D-024) — the Wayfarer logo, the city pill + search group and the checklist button. When the page is wide enough (desktop windows from about 1110 px) they share one row, with the city + search group centred (max 640 px); narrower tablets/desktops show logo + checklist on top and the group below; phones show the logo mark, city pill and checklist icon in one row and the search below. The category tabs follow. Header and grid share one container (max 1440 px + gutter).
+
 - **City switcher** — search-style pill (flag + city name) that opens a searchable city picker ([docs/CITIES.md](./docs/CITIES.md)) with each city's flag and place count. Defaults to the city of the current route tray, else the first city.
-- **Search** — a search bar under the city pill ("Search places in {city}"). While typing, up to 8 **autocomplete** suggestions from the city's attractions appear (accents ignored, English and Portuguese names; names starting with the text first, then a word starting with it, then any match, most popular first). Picking a suggestion adds the place to the route or removes it, like the card checkbox, and it stays in the list with its stop number; the arrow opens the attraction. On web, ↑/↓ move through suggestions, Enter picks, Escape closes. The grid and the map show every match; clearing the search or changing city shows everything again.
-- **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories.
+- **Search** — a search bar beside the city pill (below it on phones) ("Search places in {city}"). While typing, up to 8 **autocomplete** suggestions from the city's attractions appear (accents ignored, English and Portuguese names; names starting with the text first, then a word starting with it, then any match, most popular first). Picking a suggestion adds the place to the route or removes it, like the card checkbox, and it stays in the list with its stop number; the arrow opens the attraction. On web, ↑/↓ move through suggestions, Enter picks, Escape closes. The grid and the map show every match; clearing the search or changing city shows everything again.
+- **Category filters** — multi-select icon tabs (underlined when active): museum, monument, church, castle, viewpoint, landmark, park, palace, other; **All** resets. No selection = all categories. Centred when they fit; otherwise the row scrolls horizontally, edge to edge.
 - **Map / List switch** — floating pill at the bottom of the screen.
   - **Map** — MapLibre (`maplibre-gl` on web, MapLibre React Native on iOS/Android), fitted to the city's bounding box. Points are coloured by category; points already in the route tray are highlighted with their stop number. Tap a point to open the attraction.
-  - **List** — responsive grid of image cards (1 column on phones, up to 4 on desktop), sorted by popularity: photo, UNESCO badge, name, category and visit time. A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
+  - **List** — responsive grid of image cards, sorted by popularity: as many columns of ≥ 240 px cards as the grid's width fits (1 on phones, 2 on tablets, 3–5 on desktop; `gridColumns`, `theme/grid.ts`), with photo, UNESCO badge, name, category and visit time. A round **checkbox** on each photo adds the place to the route (or removes it) without opening it; when checked it shows the stop number. The same route rules apply as in the attraction detail (max 12 stops, one city per route), and their notices appear in the route tray.
 - **Places count** — "N places" for the current filters (announced to screen readers).
 - **Route tray** — when at least one stop is selected, a floating card shows "N stops in your route", the latest route notice (route full / new route started in this city) and a **Build route** button.
 - **Checklist** button (**Before you go**; icon-only on phones) — opens the pre-trip checklist for the current city.
@@ -125,13 +127,20 @@ A disclaimer at the bottom reminds the user to confirm requirements with officia
 
 `route.tsx`, opened from the route tray on Explore.
 
-- Map of the selected stops (numbered) and, after optimising, the walking line. On desktop the map sits beside the stop list.
-- Stop list with **move up / move down / remove** controls. Any manual change clears the previous optimisation result.
-- **Optimise** (needs 2–12 stops) calls the `route-optimize` Edge Function, keeping the first stop as the start, and reorders the list.
-  - With `ORS_API_KEY`: OpenRouteService optimisation (VROOM) + foot-walking directions — real street distances and geometry.
-  - Without a key or on any ORS error: nearest-neighbour + 2-opt order with straight-line legs × 1.3 at 4.5 km/h. The UI flags this as an **estimate** (D-014).
-- **Totals:** tiles for walking distance (km or mi), walking time, visit time and total time, plus attribution.
-- **Save as trip:** name (default "Walk in {city}", max 80 characters) and optional date. Saving works with or without an optimisation result; the trip opens right after saving and the tray is cleared.
+- **Automatic order:** places can be picked in any order. The first pick is the starting point; every new pick is slotted into the walk and the route is re-ordered for the shortest total walk (exact shortest path on straight-line distance, `orderFromStart` in `packages/shared/src/domain/route-plan.ts`, D-025) — not simply sorted by distance from the start. A notice says the order is automatic (D-022).
+- Map of the selected stops, numbered per route and coloured per route, and, after optimising, each route's walking line. On desktop the map sits beside the stop list.
+- Stop list in walking order with the estimated walk between consecutive stops (straight line × 1.3) and **move up / move down / remove** controls.
+  - Moving a stop switches to **manual order**: the notice changes and new picks are inserted where they add the least walking, without re-sorting. **Reorder automatically** goes back to the shortest walk.
+- **Split into several routes** (from 5 stops, `ROUTE_SPLIT_MIN_STOPS`): each route keeps ≥ 2 stops and is independent.
+  - **Split here** between two stops cuts the route at that point.
+  - **Suggest a split** into 2–6 routes (as many as 2-stop routes allow) makes **balanced** routes, each meant for a day or a part of the trip (D-023): it weighs short walks (nearby places stay together) against routes of similar length in time — visits plus walking. It starts from the best cuts of the walking order, then moves and swaps stops between routes while that improves the score `walking minutes + 0.5 × Σ |route time − average route time|` (`splitRoute`, `splitCost`). Neighbourhoods far apart are never merged just to even out the count. The first route keeps the starting point; the others start where their walk is shortest.
+  - **Join into one route** merges them again. A new pick joins the route it is closest to; removing a stop that leaves a route with one stop folds it into the nearest route.
+- **Optimise** (every route needs 2–12 stops) calls the `route-optimize` Edge Function once per route, keeping each route's first stop as its start, and reorders each route. Only routes without a result for their current order are sent (a changed route of a split leaves the others' answers in place); when every route is already optimised, all are sent again and answered from the server cache.
+  - With `ORS_API_KEY`: one OpenRouteService optimisation (VROOM) request on the foot-walking network, which returns the order, each leg's street distance and time, and the walking line (D-025).
+  - Without a key or on any ORS error: the exact shortest straight-line order with legs × 1.3 at 4.5 km/h. The UI flags this as an **estimate** (D-014).
+  - A result only applies to the exact stops and order it was computed for; any change shows "–" again until you optimise.
+- **Totals** per route: tiles for walking distance (km or mi), walking time, visit time and total time, plus attribution.
+- **Save as trip:** name (default "Walk in {city}", max 80 characters) and optional date. Saving works with or without an optimisation result and clears the tray. One route → one trip, opened right after saving. Split routes → **one trip per route**, named "{name} · Route {n}", then My Trips opens.
 - **Clear route** empties the tray.
 
 The tray itself (`features/route/store.ts`, Zustand) is in-memory client state: it is lost when the app is closed.
@@ -191,11 +200,11 @@ Deep link scheme: `wayfarer://` (e.g. `wayfarer://auth/callback`).
 
 ### Edge Functions (`supabase/functions`)
 
-| Function         | Method | Auth                   | Input → output                                                                                                                                                                        | Cache (`api_cache`)                                             |
-| ---------------- | ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `checklist`      | POST   | signed-in user (D-015) | `checklistRequestSchema` (city, 1–5 nationalities, home country, arrival, departure, passport expiry, language) → `checklistResponseSchema` (7 sections, each `ok` or `unavailable`)  | weather forecast 3 h, climate 30 days, FX 24 h, advisories 24 h |
-| `route-optimize` | POST   | signed-in user (D-015) | `routeRequestSchema` (2–12 unique stops with lat/lng/visit minutes, `keepFirst`) → order, legs, GeoJSON line, distance, walking time, visit time, `isFallback`, provider, attribution | ORS results 30 days; fallback 1 h (only when no ORS key)        |
-| `health`         | GET    | none                   | → `{ ok, service, time }`                                                                                                                                                             | —                                                               |
+| Function         | Method | Auth                   | Input → output                                                                                                                                                                        | Cache (`api_cache`)                                                                                               |
+| ---------------- | ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `checklist`      | POST   | signed-in user (D-015) | `checklistRequestSchema` (city, 1–5 nationalities, home country, arrival, departure, passport expiry, language) → `checklistResponseSchema` (7 sections, each `ok` or `unavailable`)  | weather forecast 3 h, climate 30 days, FX 24 h, advisories 24 h                                                   |
+| `route-optimize` | POST   | signed-in user (D-015) | `routeRequestSchema` (2–12 unique stops with lat/lng/visit minutes, `keepFirst`) → order, legs, GeoJSON line, distance, walking time, visit time, `isFallback`, provider, attribution | ORS results 30 days, keyed by the start + the set of other stops (any order); fallback 1 h (only when no ORS key) |
+| `health`         | GET    | none                   | → `{ ok, service, time }`                                                                                                                                                             | —                                                                                                                 |
 
 Request/response schemas live in `packages/shared/src/schemas` and are copied into `supabase/functions/_shared/wayfarer` by `pnpm sync:shared` (D-005).
 
@@ -225,6 +234,7 @@ Defined in `packages/shared/src/constants/index.ts` unless noted.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Stops per route / trip       | 2 – 12 (`ROUTE_MIN_STOPS`, `ROUTE_MAX_STOPS`; also enforced in `save_trip`)                           |
 | Cities per route             | 1                                                                                                     |
+| Split routes                 | offered from 5 stops (`ROUTE_SPLIT_MIN_STOPS`); ≥ 2 stops per route, so at most 6 routes              |
 | Nationalities per profile    | 1 – 5 (`MAX_NATIONALITIES`)                                                                           |
 | Display name / trip name     | 1 – 80 characters                                                                                     |
 | Password                     | ≥ 8 characters                                                                                        |
@@ -301,7 +311,7 @@ pnpm dev                      # Expo dev server → w (web), i (iOS), a (Android
 - Seeds in `supabase/seed/` contain all reference data (countries, all cities, visa rules, attractions), so `pnpm db:reset` restores a complete database without re-running the pipeline.
 - Sign-up emails (confirmation, magic link + 6-digit code) are caught by Mailpit at http://127.0.0.1:54324. Local sign-up doesn't require confirmation.
 - Supabase Studio: http://127.0.0.1:54323.
-- Without `ORS_API_KEY` the route optimiser uses a built-in nearest-neighbour + 2-opt fallback with straight-line estimates (flagged in the UI). With a free key from openrouteservice.org you get real walking directions.
+- Without `ORS_API_KEY` the route optimiser uses a built-in exact shortest-path fallback with straight-line estimates (flagged in the UI). With a free key from openrouteservice.org you get real walking directions.
 - The map uses MapLibre. It works on web in any browser; on iOS/Android it needs a **development build** (not Expo Go): `pnpm --filter @wayfarer/mobile exec expo run:ios` (or `run:android`), or build in the cloud with EAS (`npx eas-cli build --profile development`).
 
 The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>` works without a global install.

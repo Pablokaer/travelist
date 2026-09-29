@@ -127,3 +127,42 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **Decision:** the theme is a **profile preference** (`profiles.theme`, `light` | `dark`, default `light`), picked in Profile → Preferences next to language and units. The system dark-mode setting is not followed. `ColorSchemeContext` (set in the root layout from the profile) drives `useTheme()`, `useShadows()`, the navigation theme and the status bar; on iOS/Android `Appearance.setColorScheme` makes keyboards and system dialogs match. The change is applied optimistically to the cached profile, so the app switches at once and rolls back if the save fails.
 - **Why the profile, not device storage:** it follows the user across devices like language and units, and needs no new storage dependency.
 - **Trade-offs:** signed-out screens (sign-in, sign-up, magic link) are always light because there is no profile yet; the map style stays light in dark mode.
+
+## D-022 — Routes are ordered as you pick, and can be split by proximity
+
+- **Context:** the route kept the order in which places were picked until the user pressed Optimise, and a long selection (up to 12 stops) could only become one walk.
+- **Decision:**
+  - **Order on pick, on the device.** The first pick is the start; each new pick is slotted in and the route re-ordered with the same nearest-neighbour + 2-opt used by the offline fallback (`orderFromStart`, `packages/shared/src/domain/route-plan.ts`), on straight-line distance. Instant and offline; **Optimise** still asks `route-optimize` (ORS) for street distances, per route.
+  - **Manual order wins once used.** Moving a stop switches to manual order: new picks go where they add the least walking (cheapest insertion) without re-sorting; "Reorder automatically" returns to the computed order.
+  - **Split** from 5 stops (`ROUTE_SPLIT_MIN_STOPS`), ≥ 2 stops per route. "Split here" cuts at a chosen point; the suggestion (`splitRoute`) cuts the optimised walk where it drops the longest legs (best over every contiguous cut), then moves single stops between routes while that shortens the total. The first route keeps the start; the others start where their walk is shortest. Deterministic, ~1 ms for 12 stops.
+  - **Saved as separate trips** ("{name} · Route {n}") through the existing `save_trip` RPC: no schema change.
+  - **Route colours:** one per route (accent, then the status hues plus purple and teal), per colour scheme, in `features/route/route-colors.ts`.
+- **Trade-offs:** reordering uses up/down buttons, not drag and drop (no gesture/animation dependency). The on-device order is straight-line based, so ORS may re-order a route slightly when optimising. Split routes are not linked to each other once saved.
+
+## D-023 — Balanced route splits
+
+- **Context:** D-022's "Suggest a split" minimised total walking only, so it could leave one route with most of the places (e.g. 3 + 9). Users split a selection to spread it over days or parts of a trip, so each route should be a similar amount of time out, while walks stay short.
+- **Decision:** `splitRoute` minimises `splitCost = walking minutes + SPLIT_BALANCE_WEIGHT × Σ |route time − average route time|`, where a route's time is its visits (`avgVisitMinutes`, 30 min when unknown) plus straight-line walking at 4.5 km/h, and `SPLIT_BALANCE_WEIGHT = 0.5`. Search: the best contiguous cuts of the walking order (exhaustive, memoised), then hill-climbing over single-stop moves and pairwise swaps between routes. The first route keeps the user's start; every route keeps ≥ 2 stops. Deterministic, under 10 ms for 12 stops.
+- **Why time, not just the number of places:** a 3-hour museum and a 15-minute viewpoint are not the same load; balancing time spreads long visits across routes (tested: two 3-hour museums end up in different routes), and with similar visits it also evens out the number of places.
+- **Trade-offs:** the weight is a judgement call: at 0.5, evening out an hour of imbalance is worth 30 extra minutes of walking, so far-apart neighbourhoods (10 km) still stay separate. Straight-line walking underestimates real streets; the split is recomputed on demand, not after every pick.
+
+## D-024 — Explore layout: one page container, compact header, width-driven grid
+
+- **Context:** the Explore header stacked three full-width rows (city + checklist, search, category tabs, ~205 px on desktop) with no logo; the search stretched to 1200 px, the tabs were left-aligned with nothing to anchor them, and the card grid picked its columns from the window width, ignoring the 104 px desktop rail (3 wide columns at 1180 px, ~300 px of empty margin at 1920 px).
+- **Decision:**
+  - **One container** (`layout.page`, 1440 px + gutter) for the header rows and the card grid, so the logo, the "N places" title and the first card share a left edge and the action and the last card share a right edge.
+  - **Header composition** (`features/destinations/explore-header.tsx`), chosen from the container's measured width, not the window: `[logo] [city pill + search] [Before you go]` in one row when the content is ≥ `INLINE_HEADER_MIN_WIDTH` (two 168 px side slots + gaps + a 580 px search group); otherwise logo + action on top and the city + search group below; on phones the logo mark, city pill and icon action share a row with the search below. The city + search group is centred and capped at 640 px.
+  - **Category tabs** form one centred group when they fit and scroll edge to edge (starting at the gutter) when they don't.
+  - **Grid columns** follow the grid's own width: as many ≥ 240 px cards as fit (`gridColumns`, `theme/grid.ts`), 24 px column gap, 32 px row gap — 1 column on phones, 2 on tablets, 3–5 on desktop.
+- **Trade-offs:** the single-row decision needs one layout pass, so a desktop first frame can show the stacked header. Only Explore uses the 1440 px container; the other grid screens keep `layout.wide`.
+
+## D-025 — Exact route ordering and a single ORS call
+
+- **Context:** on-device ordering (D-022), split routes (D-023) and the offline fallback (D-014) used nearest neighbour + 2-opt. Measured on 300 random routes in central Amsterdam, it missed the shortest walk on 13% of 6-stop, 29% of 9-stop and 46% of 12-stop routes, by 4.7% on average and up to 21%. `route-optimize` made two ORS requests per route (VROOM optimisation, then foot-walking directions for legs and geometry). Its cache key used the stops in request order, so "Optimise" again after the app applied the optimised order missed the cache, and the route screen re-sent every route of a split when one changed.
+- **Decision:**
+  - **Exact ordering** (`optimizeOrder`, `optimizeOrderAnyStart` in `packages/shared/src/domain/route.ts`): Held-Karp dynamic programming over subsets on the straight-line distance matrix, O(2ⁿ·n²): at most 0.4 ms (fixed start) / 0.9 ms (any start) for 12 stops, and `splitRoute` at 12 stops in under 1 ms. A free start is one pass instead of one optimisation per candidate start. Ties are broken deterministically; with a free start, a path and its reverse tie, and the one starting from the earlier-listed stop wins.
+  - **One ORS request:** `/optimization` with `options.g` returns the route geometry (encoded polyline, decoded in `route-optimize/polyline.ts`) and cumulative distance/duration per step, from which the legs are derived. Checked live on 12 Amsterdam stops: 6758 m / 4864 s against 6756.6 m / 4864.5 s from the directions call; the directions request is dropped.
+  - **Canonical requests:** `normalizeRouteInput` keeps the start (when `keepFirst`) and sorts the other stops by id, for the cache key and the provider call, so the same set of places hits the cache in any order and gets the same answer.
+  - **Client:** `routesToOptimize` sends only the routes without a result for their current order.
+- **Kept:** VROOM for the street-network order. On the measured Amsterdam set it matched the exact optimum on the ORS walking-time matrix, so replacing it with a matrix call + local exact search would add a request without improving the result.
+- **Trade-offs:** Held-Karp is exponential; fine up to `ROUTE_MAX_STOPS` (12), not beyond ~16. Without the directions call, stops are snapped with VROOM's default radius instead of `radiuses: -1`; a stop VROOM cannot snap already failed the optimisation before, so no route that worked is lost. Cached ORS entries written under the old key shape are simply not reused.

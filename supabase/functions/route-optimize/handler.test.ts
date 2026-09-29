@@ -14,54 +14,59 @@ const STOPS = [
   { id: 'comercio', lat: 38.7075, lng: -9.1364, visitMinutes: 20 },
 ];
 
-/** Recorded-shape VROOM response: jobs are STOPS[1..] by index (castelo=0, jeronimos=1, comercio=2). */
+/**
+ * Recorded-shape VROOM response (requested with `options.g`). Jobs are the non-start stops
+ * sorted by id, as `normalizeRouteInput` sends them (castelo=0, comercio=1, jeronimos=2); step
+ * distance/duration are cumulative; geometry is the encoded polyline of the four stops.
+ */
 const VROOM_OK = {
   code: 0,
-  summary: { cost: 900, routes: 1, unassigned: 0 },
+  summary: { cost: 6578, routes: 1, unassigned: 0 },
   unassigned: [],
   routes: [{
     vehicle: 0,
-    cost: 900,
+    cost: 6578,
+    distance: 9136.2,
+    duration: 6578,
+    geometry: 'o}ckF~~fw@kf@ox@_{@_wL_g@cQ',
     steps: [
-      { type: 'start', location: [-9.216, 38.6916] },
-      { type: 'job', id: 1, job: 1, location: [-9.2068, 38.6979] },
-      { type: 'job', id: 2, job: 2, location: [-9.1364, 38.7075] },
-      { type: 'job', id: 0, job: 0, location: [-9.1335, 38.7139] },
+      { type: 'start', location: [-9.216, 38.6916], distance: 0, duration: 0 },
+      {
+        type: 'job',
+        id: 2,
+        job: 2,
+        location: [-9.2068, 38.6979],
+        distance: 1012.4,
+        duration: 728.9,
+      },
+      {
+        type: 'job',
+        id: 1,
+        job: 1,
+        location: [-9.1364, 38.7075],
+        distance: 8133,
+        duration: 5855.7,
+      },
+      {
+        type: 'job',
+        id: 0,
+        job: 0,
+        location: [-9.1335, 38.7139],
+        distance: 9136.2,
+        duration: 6578,
+      },
     ],
-  }],
-};
-
-const DIRECTIONS_OK = {
-  type: 'FeatureCollection',
-  features: [{
-    type: 'Feature',
-    properties: {
-      segments: [
-        { distance: 1012.4, duration: 728.9, steps: [] },
-        { distance: 7120.6, duration: 5126.8, steps: [] },
-        { distance: 1003.2, duration: 722.3, steps: [] },
-      ],
-      summary: { distance: 9136.2, duration: 6578 },
-      way_points: [0, 10, 50, 60],
-    },
-    geometry: {
-      type: 'LineString',
-      coordinates: [[-9.216, 38.6916], [-9.2068, 38.6979], [-9.1364, 38.7075], [-9.1335, 38.7139]],
-    },
   }],
 };
 
 type Call = { url: string; options?: FetchJsonOptions };
 
-function fakeOrsFetch(responses: { optimization?: unknown; directions?: unknown; error?: Error }) {
+function fakeOrsFetch(responses: { optimization?: unknown; error?: Error }) {
   const calls: Call[] = [];
   const fetchJson: FetchJson = <T>(url: string, options?: FetchJsonOptions) => {
     calls.push({ url, options });
     if (responses.error) return Promise.reject(responses.error);
     if (url.endsWith('/optimization')) return Promise.resolve(responses.optimization as T);
-    if (url.includes('/v2/directions/foot-walking/geojson')) {
-      return Promise.resolve(responses.directions as T);
-    }
     return Promise.reject(new Error(`unexpected ${url}`));
   };
   return { fetchJson, calls };
@@ -99,11 +104,8 @@ async function ok(deps: RouteDeps, body: unknown): Promise<RouteResponse> {
   return routeResponseSchema.parse(await res.json());
 }
 
-Deno.test('route: ORS ordering from VROOM steps, legs and geometry from directions', async () => {
-  const { fetchJson, calls } = fakeOrsFetch({
-    optimization: VROOM_OK,
-    directions: DIRECTIONS_OK,
-  });
+Deno.test('route: ORS order, legs and geometry from a single VROOM call', async () => {
+  const { fetchJson, calls } = fakeOrsFetch({ optimization: VROOM_OK });
   const ors = createOrsRouting({ apiKey: 'test-key', fetchJson });
   const r = await ok({ ors, cached: noCache }, { stops: STOPS });
 
@@ -113,7 +115,12 @@ Deno.test('route: ORS ordering from VROOM steps, legs and geometry from directio
     { fromId: 'jeronimos', toId: 'comercio', distanceM: 7121, durationS: 5127 },
     { fromId: 'comercio', toId: 'castelo', distanceM: 1003, durationS: 722 },
   ]);
-  assertEquals(r.geometry.coordinates.length, 4);
+  assertEquals(r.geometry.coordinates, [
+    [-9.216, 38.6916],
+    [-9.2068, 38.6979],
+    [-9.1364, 38.7075],
+    [-9.1335, 38.7139],
+  ]);
   assertEquals(r.distanceM, 1012 + 7121 + 1003);
   assertEquals(r.walkingSeconds, 729 + 5127 + 722);
   assertEquals(r.visitMinutes, 200);
@@ -121,24 +128,22 @@ Deno.test('route: ORS ordering from VROOM steps, legs and geometry from directio
   assertEquals(r.provider, 'openrouteservice');
   assertEquals(r.attribution, ORS_ATTRIBUTION);
 
-  // Request shapes
-  const [opt, dir] = calls;
+  // Request shape: one optimization call asking for geometry, no directions call.
+  assertEquals(calls.length, 1);
+  const [opt] = calls;
   assertEquals(opt!.options?.headers?.Authorization, 'test-key');
-  // ORS answers 406 to the GeoJSON endpoint unless GeoJSON is accepted.
-  assertEquals(dir!.options?.headers?.Authorization, 'test-key');
-  assertEquals(dir!.options?.headers?.Accept?.includes('application/geo+json'), true);
   const optBody = opt!.options?.body as {
     jobs: { id: number; location: number[]; service: number }[];
     vehicles: { profile: string; start: number[]; end?: number[] }[];
+    options: { g: boolean };
   };
+  assertEquals(optBody.options.g, true);
   assertEquals(optBody.vehicles[0]!.profile, 'foot-walking');
   assertEquals(optBody.vehicles[0]!.start, [-9.216, 38.6916]);
   assertEquals(optBody.vehicles[0]!.end, undefined);
   assertEquals(optBody.jobs.map((j) => j.id), [0, 1, 2]);
   assertEquals(optBody.jobs[0]!.location, [-9.1335, 38.7139]);
   assertEquals(optBody.jobs.every((j) => j.service === 0), true);
-  const dirBody = dir!.options?.body as { coordinates: number[][] };
-  assertEquals(dirBody.coordinates[1], [-9.2068, 38.6979]);
 });
 
 Deno.test('route: no ORS key → fallback (cached 1 h)', async () => {
@@ -171,28 +176,39 @@ Deno.test('route: ORS error → fallback, not cached', async () => {
 });
 
 Deno.test('route: malformed ORS response (unassigned job) → fallback', async () => {
-  const { fetchJson } = fakeOrsFetch({
-    optimization: { ...VROOM_OK, unassigned: [{ id: 2 }] },
-    directions: DIRECTIONS_OK,
-  });
+  const { fetchJson } = fakeOrsFetch({ optimization: { ...VROOM_OK, unassigned: [{ id: 2 }] } });
   const ors = createOrsRouting({ apiKey: 'k', fetchJson });
   const r = await ok({ ors, cached: noCache }, { stops: STOPS });
   assertEquals(r.provider, 'fallback');
 });
 
+Deno.test('route: VROOM answer without geometry or step totals → fallback', async () => {
+  const [route] = VROOM_OK.routes;
+  const noGeometry = { ...VROOM_OK, routes: [{ ...route!, geometry: undefined }] };
+  const noTotals = {
+    ...VROOM_OK,
+    routes: [{ ...route!, steps: route!.steps.map(({ distance: _d, ...step }) => step) }],
+  };
+  for (const optimization of [noGeometry, noTotals]) {
+    const ors = createOrsRouting({
+      apiKey: 'k',
+      fetchJson: fakeOrsFetch({ optimization }).fetchJson,
+    });
+    const r = await ok({ ors, cached: noCache }, { stops: STOPS });
+    assertEquals(r.provider, 'fallback');
+  }
+});
+
 Deno.test('route: ORS results are cached for 30 days by normalized input', async () => {
   const { store, rows } = memoryStore();
-  const { fetchJson, calls } = fakeOrsFetch({
-    optimization: VROOM_OK,
-    directions: DIRECTIONS_OK,
-  });
+  const { fetchJson, calls } = fakeOrsFetch({ optimization: VROOM_OK });
   const deps = { ors: createOrsRouting({ apiKey: 'k', fetchJson }), cached: createCached(store) };
   await ok(deps, { stops: STOPS });
   // Same stops with sub-micro-degree noise hit the cache.
   const noisy = STOPS.map((s) => ({ ...s, lat: s.lat + 1e-9 }));
   const again = await ok(deps, { stops: noisy });
   assertEquals(again.provider, 'openrouteservice');
-  assertEquals(calls.length, 2);
+  assertEquals(calls.length, 1);
   const key = await cacheKey('route:ors', normalizeRouteInput({ stops: STOPS, keepFirst: true }));
   assert(rows.has(key));
 });
@@ -232,4 +248,34 @@ Deno.test('route: OPTIONS preflight and method not allowed', async () => {
   assertEquals(pre.headers.get('Access-Control-Allow-Origin'), '*');
   const get = await handler(new Request('http://localhost/route-optimize'));
   assertEquals(get.status, 405);
+});
+
+Deno.test('route: the same places in another order (same start) hit the cache', async () => {
+  const { store } = memoryStore();
+  const { fetchJson, calls } = fakeOrsFetch({ optimization: VROOM_OK });
+  const deps = { ors: createOrsRouting({ apiKey: 'k', fetchJson }), cached: createCached(store) };
+  const first = await ok(deps, { stops: STOPS });
+  // E.g. "Optimise" again after the app applied the optimised order.
+  const reordered = first.order.map((id) => STOPS.find((s) => s.id === id)!);
+  const again = await ok(deps, { stops: reordered });
+  assertEquals(calls.length, 1);
+  assertEquals(again.order, first.order);
+});
+
+Deno.test('route: normalizeRouteInput keeps the start and sorts the other stops by id', () => {
+  const [belem, castelo, jeronimos, comercio] = STOPS;
+  const input = { stops: [jeronimos!, castelo!, belem!, comercio!] };
+  const ids = (n: { stops: { id: string }[] }) => n.stops.map((s) => s.id);
+  assertEquals(ids(normalizeRouteInput({ ...input, keepFirst: true })), [
+    'jeronimos',
+    'belem',
+    'castelo',
+    'comercio',
+  ]);
+  assertEquals(ids(normalizeRouteInput({ ...input, keepFirst: false })), [
+    'belem',
+    'castelo',
+    'comercio',
+    'jeronimos',
+  ]);
 });

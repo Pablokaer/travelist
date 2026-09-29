@@ -13,6 +13,9 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- Route optimisation (D-025): on-device ordering, split routes and the offline fallback now find the exact shortest walk (Held-Karp) instead of nearest neighbour + 2-opt, which walked up to 21% further on 46% of random 12-stop routes (about 2% on average); `route-optimize` makes one OpenRouteService request per route instead of two (the optimisation returns the geometry and leg totals); the ORS cache matches the same places in any order, so optimising again after the app applied the order is a cache hit; the route screen only re-sends routes that changed.
+- Explore layout (D-024): the header shows the Wayfarer logo and fits logo, city + search and **Before you go** in one row on wide screens (about 70 px shorter on desktop); the search is a centred group capped at 640 px instead of spanning the page; category tabs are a centred group that scrolls edge to edge on phones; header and card grid share one container (1440 px), and the grid picks its columns from its own width (3–5 on desktop instead of the window-based 1–4). The desktop rail is narrower (96 px) and lines up with the header.
+- Route builder: "Suggest a split" makes balanced routes — similar time each (visits + walking) with the shortest walks — instead of minimising walking only (D-023).
 - Theme: the app is light by default and no longer follows the system dark-mode setting (D-021).
 - UI redesign across every screen (D-020): neutral palette with one coral accent for primary actions and selection, Inter typeface with an 8-step type scale, soft shadows and generous radii, light and dark themes.
 - Explore: search-style city pill with a searchable city picker (flags), icon category tabs, responsive image-card grid (1–4 columns), floating Map/List switch and route tray; cards show the stop number when a place is in the route.
@@ -40,6 +43,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 - Header app menu: the logo with a menu icon on every stacked screen (attraction, checklist, route, trip, edit profile, about) opens Explore, My Trips, Profile and About — no more dead ends on pages opened from a link.
 - Explore search: a search bar with autocomplete over the city's attractions (accent-insensitive, EN/PT names); picking a suggestion adds the place to the route, the grid and map show every match.
 - Profile → Preferences: **Theme** (Light / Dark), saved on the profile (`profiles.theme`, new migration) and applied at once across the app (D-021).
+- Route builder: picks are ordered automatically for the shortest walk from the first pick; manual reordering (with "Reorder automatically" to undo), estimated walk between stops, and splitting a route of 5+ stops into independent routes — "Split here" or a proximity-based suggestion — each optimised and saved as its own trip (D-022).
 - Checklist → Power: each destination plug type is shown with an illustration of the plug face.
 - Explore list: a checkbox on each attraction card adds it to (or removes it from) the route without opening the attraction; checked cards show their stop number, and route notices (full route, new city) appear in the route tray.
 - City coverage register [docs/CITIES.md](./docs/CITIES.md), generated from `cities.yaml` and the ingested data (`python -m wayfarer_pipeline cities-doc`; `ingest`, `seed` and `cities` rewrite it). CI fails when it is stale.
@@ -49,6 +53,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 - README rewritten as the functional reference of the app: every feature, screen/route, Edge Function, RPC, table, limit and known limitation, plus a "Maintaining this README" checklist.
 - `CLAUDE.md` with the documentation rules for coding agents.
+- `CLAUDE.md`: code style, comments, tests, dependencies, structure, formatting and logging rules.
 - This changelog, back-filled from the git history.
 
 ## 2026-09-28

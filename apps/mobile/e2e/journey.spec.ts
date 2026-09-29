@@ -7,11 +7,16 @@ import { expect, test } from '@playwright/test';
 test.skip(!process.env.E2E_BACKEND, 'needs the local Supabase stack (set E2E_BACKEND=1)');
 test.describe.configure({ mode: 'serial' });
 
-test('sign up, onboard, explore, check, build and save a walk', async ({ page }) => {
-  test.setTimeout(120_000);
-  const byTestId = (id: string) => page.getByTestId(id).filter({ visible: true });
-  const role = (r: Parameters<typeof page.getByRole>[0], name: string | RegExp) =>
-    page.getByRole(r, { name }).filter({ visible: true });
+type Page = import('@playwright/test').Page;
+
+const byTestIdOn = (page: Page) => (id: string) => page.getByTestId(id).filter({ visible: true });
+const roleOn = (page: Page) => (r: Parameters<Page['getByRole']>[0], name: string | RegExp) =>
+  page.getByRole(r, { name }).filter({ visible: true });
+
+/** Signs up a fresh user with a Brazilian passport and lands on Explore. */
+async function signUpAndOnboard(page: Page) {
+  const byTestId = byTestIdOn(page);
+  const role = roleOn(page);
   const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
 
   await page.goto('/sign-up');
@@ -20,7 +25,6 @@ test('sign up, onboard, explore, check, build and save a walk', async ({ page })
   await byTestId('password').fill('correct-horse-battery');
   await role('button', 'Create account').click();
 
-  // Onboarding
   await expect(page.getByText('Step 1 of 3')).toBeVisible();
   await role('button', 'Next').click();
   await expect(page.getByText('Step 2 of 3')).toBeVisible();
@@ -34,22 +38,32 @@ test('sign up, onboard, explore, check, build and save a walk', async ({ page })
   await role('button', 'Next').click();
   await byTestId('passportExpiry').fill('2030-01-31');
   await role('button', 'Start exploring').click();
+}
 
-  // Explore: switch to Lisbon, list view
+/** Switches Explore to Lisbon in list view and adds the first `count` places to the route. */
+async function addLisbonPlaces(page: Page, count: number) {
+  const byTestId = byTestIdOn(page);
+  const role = roleOn(page);
   await byTestId('city-switcher').click();
   await role('radio', 'Lisbon').click();
   await page.getByRole('radio', { name: 'List' }).or(role('checkbox', 'List')).click();
   const list = byTestId('attraction-list');
   await expect(list.getByRole('button').first()).toBeVisible({ timeout: 20_000 });
-
-  // Add the first two places to the route
-  for (const i of [0, 1]) {
+  for (let i = 0; i < count; i++) {
     await list.getByRole('button').nth(i).click();
     await byTestId('toggle-route').click();
     await expect(byTestId('toggle-route')).toHaveText('Remove from route');
     await page.goBack();
   }
-  await expect(page.getByText('2 stops in your route')).toBeVisible();
+  await expect(page.getByText(`${count} stops in your route`)).toBeVisible();
+}
+
+test('sign up, onboard, explore, check, build and save a walk', async ({ page }) => {
+  test.setTimeout(120_000);
+  const byTestId = byTestIdOn(page);
+  const role = roleOn(page);
+  await signUpAndOnboard(page);
+  await addLisbonPlaces(page, 2);
 
   // Checklist
   await byTestId('open-checklist').click();
@@ -75,4 +89,28 @@ test('sign up, onboard, explore, check, build and save a walk', async ({ page })
   // My Trips
   await page.goto('/trips');
   await expect(page.getByText('E2E walk')).toBeVisible();
+});
+
+test('orders picks automatically, splits them into two routes and saves both', async ({ page }) => {
+  test.setTimeout(150_000);
+  const byTestId = byTestIdOn(page);
+  await signUpAndOnboard(page);
+  await addLisbonPlaces(page, 6);
+
+  await byTestId('open-route').click();
+  await expect(byTestId('route-order-notice')).toContainText('shortest walk');
+  await byTestId('suggest-split').click();
+  await expect(byTestId('route-heading-0')).toContainText('Route 1');
+  await expect(byTestId('route-heading-1')).toContainText('Route 2');
+
+  await byTestId('optimize').click();
+  await expect(byTestId('route-distance').first()).toContainText(/\d+(\.\d+)? (km|m|mi)\b/, {
+    timeout: 30_000,
+  });
+  await expect(byTestId('route-distance').nth(1)).toContainText(/\d+(\.\d+)? (km|m|mi)\b/);
+  await byTestId('trip-name').fill('E2E split');
+  await byTestId('save-trip').click();
+
+  await expect(page.getByText('E2E split · Route 1')).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText('E2E split · Route 2')).toBeVisible();
 });

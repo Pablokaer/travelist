@@ -113,31 +113,45 @@ export function useTrip(id: string | undefined) {
   });
 }
 
-export function useSaveTrip() {
+export type SaveTripInput = {
+  name: string;
+  tripDate: string | null;
+  citySlug: string;
+  stops: AttractionSummary[];
+  route: RouteResponse | null;
+};
+
+/** Saves one trip through the `save_trip` RPC and returns its id. */
+async function saveTrip(input: SaveTripInput): Promise<string> {
+  return unwrap(
+    await supabase.rpc('save_trip', {
+      p_city_slug: input.citySlug,
+      p_name: input.name,
+      p_attraction_ids: input.stops.map((s) => s.id),
+      p_trip_date: input.tripDate ?? undefined,
+      p_route_geometry: input.route?.geometry ?? undefined,
+      p_distance_m: input.route ? Math.round(input.route.distanceM) : undefined,
+      p_walking_seconds: input.route ? Math.round(input.route.walkingSeconds) : undefined,
+      p_visit_minutes: input.stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0),
+      p_is_fallback: input.route?.isFallback ?? false,
+      p_provider: input.route?.provider ?? undefined,
+    }),
+  );
+}
+
+/**
+ * Saves each route of a split selection as its own trip, in order; returns the new ids.
+ * @example saveTrips.mutate([{ name: 'Lisbon · Route 1', … }, { name: 'Lisbon · Route 2', … }])
+ */
+export function useSaveTrips() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (input: {
-      name: string;
-      tripDate: string | null;
-      citySlug: string;
-      stops: AttractionSummary[];
-      route: RouteResponse | null;
-    }) =>
-      unwrap(
-        await supabase.rpc('save_trip', {
-          p_city_slug: input.citySlug,
-          p_name: input.name,
-          p_attraction_ids: input.stops.map((s) => s.id),
-          p_trip_date: input.tripDate ?? undefined,
-          p_route_geometry: input.route?.geometry ?? undefined,
-          p_distance_m: input.route ? Math.round(input.route.distanceM) : undefined,
-          p_walking_seconds: input.route ? Math.round(input.route.walkingSeconds) : undefined,
-          p_visit_minutes: input.stops.reduce((sum, s) => sum + s.avgVisitMinutes, 0),
-          p_is_fallback: input.route?.isFallback ?? false,
-          p_provider: input.route?.provider ?? undefined,
-        }),
-      ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: tripKeys.all }),
+    mutationFn: async (inputs: SaveTripInput[]) => {
+      const ids: string[] = [];
+      for (const input of inputs) ids.push(await saveTrip(input));
+      return ids;
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: tripKeys.all }),
   });
 }
 

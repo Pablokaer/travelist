@@ -139,22 +139,28 @@ export function CitySwitcher({
   );
 }
 
-/** Icon + label category tabs; the active ones are underlined in the text colour. */
+/**
+ * Icon + label category tabs; the active ones are underlined in the text colour. The tabs form
+ * one centred group when they fit; otherwise they scroll edge to edge, starting at `inset`.
+ */
 export function CategoryFilters({
   selected,
   onToggle,
   onClear,
+  inset = 0,
 }: {
   selected: AttractionCategory[];
   onToggle: (c: AttractionCategory) => void;
   onClear: () => void;
+  /** Horizontal padding of the scrolling row (the page gutter). */
+  inset?: number;
 }) {
   const { t } = useTranslation();
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.filters}
+      contentContainerStyle={[styles.filters, { paddingHorizontal: inset }]}
       accessibilityLabel={t('explore.filters')}>
       <CategoryTab
         label={t('explore.allCategories')}
@@ -199,7 +205,7 @@ function CategoryTab({
         const color = selected || hovered ? theme.text : theme.textSecondary;
         return (
           <>
-            <Icon name={icon} size={22} color={color} />
+            <Icon name={icon} size={20} color={color} />
             <Text variant="helper" style={{ color, fontWeight: selected ? '600' : '500' }}>
               {label}
             </Text>
@@ -365,11 +371,14 @@ export function AttractionRow({
   onPress,
   trailing,
   index,
+  badgeColor,
 }: {
   item: AttractionSummary;
   onPress?: () => void;
   trailing?: React.ReactNode;
   index?: number;
+  /** Colour of the position badge; split routes each have their own (default: accent). */
+  badgeColor?: string;
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -398,7 +407,7 @@ export function AttractionRow({
           <View
             style={[
               styles.rowBadge,
-              { backgroundColor: theme.primary, borderColor: theme.surface },
+              { backgroundColor: badgeColor ?? theme.primary, borderColor: theme.surface },
             ]}>
             <Text variant="helper" style={{ color: theme.onPrimary, fontWeight: '700' }}>
               {index + 1}
@@ -433,14 +442,14 @@ const styles = StyleSheet.create({
     gap: spacing.md - 4,
     paddingLeft: spacing.sm,
     paddingRight: spacing.md,
-    minHeight: MIN_TOUCH + 12,
+    minHeight: MIN_TOUCH + 4,
     borderRadius: radius.pill,
     borderWidth: StyleSheet.hairlineWidth,
   },
   pillIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -471,9 +480,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   flagText: { fontSize: 22, lineHeight: 28 },
-  filters: { gap: spacing.lg, paddingHorizontal: spacing.xs },
-  tab: { alignItems: 'center', gap: spacing.xs, paddingTop: spacing.xs, minWidth: 56 },
-  tabBar: { height: 2, alignSelf: 'stretch', borderRadius: 1, marginTop: spacing.xs },
+  // flexGrow + center: a centred group when the tabs fit, a start-aligned scroll when not.
+  filters: { flexGrow: 1, justifyContent: 'center', gap: spacing.md },
+  tab: { alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.xs, minWidth: 56 },
+  // The underline sits on the header's bottom border.
+  tabBar: { height: 2, alignSelf: 'stretch', borderRadius: 1, marginTop: spacing.sm },
   dot: { width: 8, height: 8, borderRadius: 4 },
   card: { flex: 1, gap: spacing.md - 4 },
   media: { borderRadius: radius.lg, overflow: 'hidden' },
@@ -498,7 +509,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardBody: { gap: spacing.xxs, paddingHorizontal: spacing.xxs },
+  cardBody: { gap: spacing.xxs },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm - 2 },
   row: {
     flexDirection: 'row',

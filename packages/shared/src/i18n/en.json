@@ -298,7 +298,7 @@
     "splitHere": "Split here",
     "splitHereLabel": "Split the route before {{name}}",
     "splitTitle": "Split into several routes",
-    "splitBody": "Too much for one walk? Split the stops into routes by proximity; each one is optimised on its own.",
+    "splitBody": "Too much for one walk? Split the stops into balanced routes — each about the same time (visits + walking) with the shortest walks — for one day or part of the trip each. Every route is optimised on its own.",
     "splitParts": "Number of routes",
     "suggestSplit": "Suggest a split",
     "merge": "Join into one route",
