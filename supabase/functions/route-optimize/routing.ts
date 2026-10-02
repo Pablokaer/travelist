@@ -1,5 +1,6 @@
-// Routing providers for route-optimize: OpenRouteService (VROOM optimisation on the walking
-// network, with its geometry) and the offline straight-line fallback from @wayfarer/shared.
+// Routing providers for route-optimize: OpenRouteService — VROOM optimisation on the walking
+// network, and the foot-walking directions that follow the streets for an order already known
+// (D-046) — and the offline straight-line fallback from @wayfarer/shared.
 import {
   estimateLegs,
   type LineString,
@@ -23,7 +24,15 @@ export type RoutingProvider = (
   fixedStart: boolean,
 ) => Promise<RoutingResult>;
 
+/** The street path and legs of stops already in walking order. */
+export type PathProvider = (ordered: readonly RoutePoint[]) => Promise<RoutingResult>;
+
+/** Both OpenRouteService services: ordering on the network, and the path for a given order. */
+export type OrsRouting = { optimize: RoutingProvider; directions: PathProvider };
+
 export const ORS_BASE_URL = 'https://api.openrouteservice.org';
+/** ORS foot-walking directions, answered as GeoJSON (geometry + one segment per leg). */
+export const ORS_DIRECTIONS_PATH = '/v2/directions/foot-walking/geojson';
 export const ORS_TIMEOUT_MS = 8000;
 export const ORS_ATTRIBUTION =
   '© openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors';
@@ -36,7 +45,7 @@ const lngLat = (p: RoutePoint): [number, number] => [p.lng, p.lat];
 // ---------------------------------------------------------------------------
 
 /** Straight-line legs and geometry for stops already in walking order. */
-function straightLineRoute(ordered: readonly RoutePoint[]): RoutingResult {
+export function straightLineRoute(ordered: readonly RoutePoint[]): RoutingResult {
   return {
     order: ordered.map((p) => p.id),
     legs: estimateLegs(ordered),
@@ -135,24 +144,67 @@ export function routeFromVroom(
   };
 }
 
+/** The part of an ORS directions GeoJSON answer we read. */
+type DirectionsResponse = {
+  features?: {
+    geometry?: { coordinates?: number[][] };
+    properties?: { segments?: { distance?: number; duration?: number }[] };
+  }[];
+};
+
 /**
- * OpenRouteService routing: one `/optimization` call (VROOM on the foot-walking network) that
- * returns the order, the per-leg totals and the geometry.
- * @example const route = await createOrsRouting({ apiKey, fetchJson })(stops, true);
+ * Pure: the street path and per-leg totals of an ORS directions answer for `ordered` stops.
+ * Throws when the answer has no route or not one segment per leg.
+ * @example parseDirections([a, b, c], answer).legs.length // 2
+ */
+export function parseDirections(
+  ordered: readonly RoutePoint[],
+  res: DirectionsResponse,
+): RoutingResult {
+  const feature = res.features?.[0];
+  const coordinates = (feature?.geometry?.coordinates ?? []).map(
+    (c) => [c[0]!, c[1]!] as [number, number],
+  );
+  if (coordinates.length < 2) throw new Error('ORS directions returned no route');
+  const segments = feature?.properties?.segments ?? [];
+  if (segments.length !== ordered.length - 1) {
+    throw new Error(
+      `ORS directions returned ${segments.length} segments for ${ordered.length} stops, expected ${
+        ordered.length - 1
+      }`,
+    );
+  }
+  return {
+    order: ordered.map((p) => p.id),
+    legs: segments.map((seg, i) => ({
+      fromId: ordered[i]!.id,
+      toId: ordered[i + 1]!.id,
+      distanceM: Math.round(seg.distance ?? 0),
+      durationS: Math.round(seg.duration ?? 0),
+    })),
+    geometry: { type: 'LineString', coordinates },
+  };
+}
+
+/**
+ * OpenRouteService routing: `optimize` makes one `/optimization` call (VROOM on the foot-walking
+ * network) that returns the order, the per-leg totals and the geometry; `directions` follows
+ * the streets for an order already known (D-046). They have separate quotas.
+ * @example const route = await createOrsRouting({ apiKey, fetchJson }).optimize(stops, true);
  */
 export function createOrsRouting(deps: {
   apiKey: string;
   fetchJson: FetchJson;
   baseUrl?: string;
   timeoutMs?: number;
-}): RoutingProvider {
+}): OrsRouting {
   const base = deps.baseUrl ?? ORS_BASE_URL;
   const opts = {
     headers: { Authorization: deps.apiKey },
     timeoutMs: deps.timeoutMs ?? ORS_TIMEOUT_MS,
   };
 
-  return async (stops, fixedStart) => {
+  const optimize: RoutingProvider = async (stops, fixedStart) => {
     // VROOM needs a vehicle start or end; for a free start, pick it with the exact
     // straight-line solution and let ORS order the rest on the real street network.
     const startId = fixedStart ? stops[0]!.id : bestStartFallback(stops).order[0]!;
@@ -172,4 +224,24 @@ export function createOrsRouting(deps: {
     });
     return routeFromVroom(start, jobs, optimization);
   };
+
+  const directions: PathProvider = async (ordered) => {
+    const res = await deps.fetchJson<DirectionsResponse>(`${base}${ORS_DIRECTIONS_PATH}`, {
+      ...opts,
+      // The GeoJSON endpoint answers 406 unless GeoJSON is acceptable.
+      headers: { ...opts.headers, Accept: 'application/geo+json, application/json' },
+      method: 'POST',
+      // radiuses −1: each stop snaps to the nearest walkable point, however far (a stop in the
+      // middle of a bridge or a park would otherwise fail the whole route with error 2010).
+      body: {
+        coordinates: ordered.map(lngLat),
+        radiuses: ordered.map(() => -1),
+        // The per-leg segments (distance, duration) only come with the instructions.
+        instructions: true,
+      },
+    });
+    return parseDirections(ordered, res);
+  };
+
+  return { optimize, directions };
 }

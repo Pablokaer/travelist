@@ -13,6 +13,7 @@ import { Text } from '@/components/text';
 import { deleteAccount, signOut } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/auth-provider';
 import { FormError } from '@/features/auth/components';
+import { avatarUrl } from '@/features/profile/avatar-api';
 import {
   countryName,
   useCountries,
@@ -22,6 +23,7 @@ import {
 import { formatDate } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 import { useBreakpoint, useTheme } from '@/theme/use-theme';
+import { SubscriptionSection } from '@/features/subscription/subscription-section';
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -61,13 +63,13 @@ export default function ProfileScreen() {
 
       {p ? (
         <Card style={styles.identity}>
-          <Avatar name={displayName} />
+          <Avatar name={displayName} uri={avatarUrl(p.avatarPath)} />
           <View style={styles.identityText}>
             <Text variant="heading" numberOfLines={1}>
               {displayName}
             </Text>
-            <Text variant="caption" secondary numberOfLines={1}>
-              {session?.user.email}
+            <Text variant="caption" secondary numberOfLines={1} testID="profile-login">
+              {p.nickname ? `@${p.nickname} · ${session?.user.email}` : session?.user.email}
             </Text>
           </View>
           <Button
@@ -159,6 +161,8 @@ export default function ProfileScreen() {
           </View>
         </Section>
       </View>
+
+      <SubscriptionSection />
 
       <Section title={t('profile.account')}>
         <RowGroup>

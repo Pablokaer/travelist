@@ -18,10 +18,11 @@ export type City = {
   countryNameEn: string;
   countryNamePt: string;
   /** Photo of the city's most popular attraction that has one, with its required credit. */
-  cover: CityCover | null;
+  cover: PhotoCover | null;
 };
 
-export type CityCover = { url: string; author: string | null; license: string | null };
+/** A Commons photo with its credit (shown wherever the photo is: city and walk list cards). */
+export type PhotoCover = { url: string; author: string | null; license: string | null };
 
 export type AttractionSummary = {
   id: string;
@@ -81,7 +82,7 @@ export function countryOf(city: City, language: string): string {
 
 type CityRow = Database['public']['Views']['city_list']['Row'];
 
-function coverFrom(row: CityRow): CityCover | null {
+function coverFrom(row: CityRow): PhotoCover | null {
   if (!row.cover_image_url) return null;
   return {
     url: row.cover_image_url,

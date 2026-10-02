@@ -6,6 +6,10 @@ import {
   saveTripFormSchema,
   type RouteResponse,
   type SaveTripForm,
+  meetupStart,
+  canAddItemToList,
+  canCreateList,
+  type PlanLimit,
 } from '@wayfarer/shared';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -31,9 +35,12 @@ import { RouteOrderNotice, RouteStopList, SplitPanel } from '@/features/route/ro
 import { useRouteStore } from '@/features/route/store';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { useSaveTrips } from '@/features/trips/api';
+import { FALLBACK_TIME_ZONE } from '@/features/trips/meetup-time';
 import { env } from '@/lib/env';
 import { radius, spacing } from '@/theme/colors';
 import { useBreakpoint, useShadows } from '@/theme/use-theme';
+import { PlanLimitError, useMySubscription, type Subscription } from '@/features/subscription/api';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 
 /** Identifies a route by its stops in order, so a result only applies to the exact route. */
 const routeKey = (route: readonly AttractionSummary[]) => route.map((s) => s.id).join(',');
@@ -55,6 +62,17 @@ function routePoints(
   );
 }
 
+/**
+ * The plan limit that saving these routes would break — one new list per route, each within the
+ * plan's places per list — or null.
+ */
+function planBlockFor(subscription: Subscription, routes: readonly unknown[][]): PlanLimit | null {
+  const rules = subscription.plan.rules;
+  if (!canCreateList(rules, subscription.listCount + routes.length - 1)) return 'lists';
+  if (routes.some((r) => !canAddItemToList(rules, r.length - 1))) return 'items';
+  return null;
+}
+
 export default function RouteScreen() {
   const { t, i18n } = useTranslation();
   const store = useRouteStore();
@@ -64,6 +82,8 @@ export default function RouteScreen() {
   const city = cities.data?.find((c) => c.slug === citySlug);
   const optimize = useOptimizeRoutes();
   const save = useSaveTrips();
+  const subscription = useMySubscription().data;
+  const [planBlock, setPlanBlock] = useState<PlanLimit | null>(null);
   const [results, setResults] = useState<Record<string, RouteResponse>>({});
   // The page stops scrolling while a stop is dragged, so the gesture moves the stop.
   const [dragging, setDragging] = useState(false);
@@ -72,9 +92,13 @@ export default function RouteScreen() {
   const units = profile.data?.units ?? 'metric';
 
   const cityName = city ? (i18n.resolvedLanguage === 'pt' ? city.namePt : city.nameEn) : '';
-  const { control, handleSubmit } = useForm<SaveTripForm>({
+  const { control, handleSubmit, setError } = useForm<SaveTripForm>({
     resolver: zodResolver(saveTripFormSchema),
-    defaultValues: { name: t('route.defaultName', { city: cityName }), tripDate: null },
+    defaultValues: {
+      name: t('route.defaultName', { city: cityName }),
+      tripDate: null,
+      startTime: null,
+    },
   });
 
   const colorOf = useRouteColor();
@@ -105,7 +129,8 @@ export default function RouteScreen() {
   const runOptimize = () => {
     const targets = routesToOptimize(routeResults);
     optimize.mutate(
-      targets.map((i) => routes[i]!),
+      // An order set by hand is kept; the server only walks it along the streets (D-046).
+      { routes: targets.map((i) => routes[i]!), keepOrder: manualOrder },
       {
         onSuccess: (responses) => {
           // Untouched routes keep their answer; optimised ones take the server's order.
@@ -123,11 +148,19 @@ export default function RouteScreen() {
     );
   };
 
-  const onSave = handleSubmit((form) =>
+  const onSave = handleSubmit((form) => {
+    // The plan's limits (D-047), checked before sending; the database checks them again.
+    const blocked = subscription ? planBlockFor(subscription, routes) : null;
+    setPlanBlock(blocked);
+    if (blocked) return;
+    // The time is the city's wall-clock time (D-041); it must still be to come.
+    const start = meetupStart(form, city?.timezone ?? FALLBACK_TIME_ZONE, new Date());
+    if ('error' in start) return setError('startTime', { message: start.error });
     save.mutate(
       routes.map((route, i) => ({
-        ...form,
         name: routes.length > 1 ? t('route.splitName', { name: form.name, n: i + 1 }) : form.name,
+        tripDate: form.tripDate,
+        startsAt: start.startsAt,
         citySlug: citySlug!,
         stops: route,
         route: routeResults[i] ?? null,
@@ -139,8 +172,8 @@ export default function RouteScreen() {
           else router.replace('/trips');
         },
       },
-    ),
-  );
+    );
+  });
 
   const fallbackBounds: [number, number, number, number] = city
     ? [city.bbox[1], city.bbox[0], city.bbox[3], city.bbox[2]]
@@ -173,6 +206,8 @@ export default function RouteScreen() {
               routeCount={routes.length}
               splittable={stops.length >= ROUTE_SPLIT_MIN_STOPS}
               units={units}
+              // Street legs only for a real route (not the straight-line estimate).
+              legs={routeResults[r]?.isFallback ? null : routeResults[r]?.legs}
               onMove={store.move}
               onMoveTo={store.moveTo}
               onDragActive={setDragging}
@@ -251,6 +286,24 @@ export default function RouteScreen() {
               onChangeText={(v) => field.onChange(v.trim() === '' ? null : v.trim())}
               error={fieldState.error?.message}
               maxLength={10}
+              testID="trip-date"
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="startTime"
+          render={({ field, fieldState }) => (
+            <TextField
+              icon="clock"
+              label={t('route.startTime')}
+              placeholder={`HH:MM · ${t('checklist.optional')}`}
+              hint={t('route.startTimeHint')}
+              value={field.value ?? ''}
+              onChangeText={(v) => field.onChange(v.trim() === '' ? null : v.trim())}
+              error={fieldState.error?.message}
+              maxLength={5}
+              testID="trip-time"
             />
           )}
         />
@@ -259,7 +312,11 @@ export default function RouteScreen() {
             {t('route.saveSplitHint')}
           </Text>
         ) : null}
-        <FormError message={save.error ? save.error.message : null} />
+        {planBlock || save.error instanceof PlanLimitError ? (
+          <PlanLimitNotice limit={planBlock ?? (save.error as PlanLimitError).limit} />
+        ) : (
+          <FormError message={save.error ? save.error.message : null} />
+        )}
         <Button
           variant={optimized ? 'primary' : 'secondary'}
           label={

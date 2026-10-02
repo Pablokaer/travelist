@@ -84,3 +84,53 @@ describe('optimizeOrderAnyStart', () => {
     expect(() => optimizeOrderAnyStart(randomPoints(1, 1))).toThrow('got 1');
   });
 });
+
+describe('routes longer than the exact limit (13–20 stops)', () => {
+  /** Deterministic pseudo-random points in a ~5 km square (seeded LCG). */
+  const scattered = (count: number, seed = 7) => {
+    let x = seed;
+    const next = () => (x = (x * 48271) % 2147483647) / 2147483647;
+    return Array.from({ length: count }, (_, i) => ({
+      id: `p${i}`,
+      lat: 38.7 + next() * 0.045,
+      lng: -9.2 + next() * 0.057,
+    }));
+  };
+  /** Stops along a street, listed out of order. */
+  const street = (count: number) =>
+    Array.from({ length: count }, (_, i) => ({ id: `s${i}`, lat: 38.7, lng: -9.2 + i * 0.002 }))
+      .map((p, i) => ({ p, k: (i * 7) % count }))
+      .sort((a, b) => a.k - b.k)
+      .map(({ p }) => p);
+
+  it('walks a street from its west end to its east end without doubling back', () => {
+    const stops = street(20);
+    const west = stops.reduce((w, p) => (p.lng < w.lng ? p : w));
+    const order = optimizeOrder([west, ...stops.filter((s) => s !== west)]).map((p) => p.lng);
+    expect(order.every((v, i) => i === 0 || v > order[i - 1]!)).toBe(true);
+  });
+
+  it('with a free start, begins at an end of the street and never doubles back', () => {
+    const order = optimizeOrderAnyStart(street(20)).map((p) => p.lng);
+    const ascending = order.every((v, i) => i === 0 || v > order[i - 1]!);
+    const descending = order.every((v, i) => i === 0 || v < order[i - 1]!);
+    expect(ascending || descending).toBe(true);
+  });
+
+  it('orders 20 scattered stops into a short walk, quickly and deterministically', () => {
+    const stops = scattered(20);
+    const started = Date.now();
+    const order = optimizeOrder(stops);
+    expect(Date.now() - started).toBeLessThan(500);
+    expect(new Set(order.map((p) => p.id)).size).toBe(20);
+    expect(order[0]).toBe(stops[0]);
+    expect(pathLength(order)).toBeLessThan(pathLength(stops) / 2);
+    expect(optimizeOrder(stops)).toEqual(order);
+  });
+
+  it('keeps the exact order up to 12 stops (no heuristic below the limit)', () => {
+    const stops = scattered(12, 3);
+    const brute = optimizeOrder(stops);
+    expect(pathLength(brute)).toBeLessThanOrEqual(pathLength(optimizeOrder([...stops])) + 1e-6);
+  });
+});

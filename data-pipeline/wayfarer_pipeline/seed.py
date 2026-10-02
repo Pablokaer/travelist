@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from . import city_summaries as summaries_mod
 from . import countries as countries_mod
 from . import visa as visa_mod
 from .attractions import pipeline as attractions_mod
@@ -26,7 +27,7 @@ README_SQL = """\
 -- pipeline from committed snapshots in data-pipeline/data (regenerate offline with
 -- `python -m wayfarer_pipeline seed`):
 --   10_countries.sql    countries (Wikidata + IANA zone.tab + curated overrides)
---   20_cities.sql       launch cities (data-pipeline/cities.yaml)
+--   20_cities.sql       launch cities (data-pipeline/cities.yaml + Wikipedia summaries)
 --   30_visa.sql         visa_requirements (passport-index-dataset, MIT)
 --   40_attractions.sql  attractions (Wikidata, OpenStreetMap, Wikipedia pageviews, Commons)
 select 1;
@@ -60,7 +61,14 @@ def countries_sql(countries: dict[str, dict[str, Any]]) -> str:
     return upsert("public.countries", columns, rows, conflict=["code"])
 
 
-def cities_sql(config: CitiesConfig) -> str:
+CITY_SUMMARY_COLUMNS = ["summary_en", "summary_pt", "wikipedia_en", "wikipedia_pt"]
+
+
+def cities_sql(
+    config: CitiesConfig, summaries: dict[str, summaries_mod.CitySummary] | None = None
+) -> str:
+    """Cities upsert; ``summaries`` (``data/city_summaries.json``) fills the About text (D-036)."""
+    summaries = summaries or {}
     columns = [
         "slug",
         "name_en",
@@ -71,9 +79,11 @@ def cities_sql(config: CitiesConfig) -> str:
         "bbox",
         "timezone",
         "is_active",
+        *CITY_SUMMARY_COLUMNS,
     ]
     rows = []
     for c in sorted(config.cities, key=lambda c: c.slug):
+        about = summaries.get(c.slug, {})
         rows.append(
             [
                 c.slug,
@@ -85,6 +95,7 @@ def cities_sql(config: CitiesConfig) -> str:
                 Raw(array([float(v) for v in c.bbox], "double precision[]")),
                 c.timezone,
                 c.is_active,
+                *(about.get(col) for col in CITY_SUMMARY_COLUMNS),
             ]
         )
     return upsert("public.cities", columns, rows, conflict=["slug"])
@@ -204,7 +215,8 @@ def write_countries(seed_dir: Path = SEED_DIR) -> Path:
 
 
 def write_cities(config: CitiesConfig, seed_dir: Path = SEED_DIR) -> Path:
-    return _write(seed_dir / "20_cities.sql", "cities", cities_sql(config))
+    body = cities_sql(config, summaries_mod.load())
+    return _write(seed_dir / "20_cities.sql", "cities", body)
 
 
 def write_visa(seed_dir: Path = SEED_DIR) -> Path:

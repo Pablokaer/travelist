@@ -12,18 +12,23 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import {
   cityName,
+  localizedName,
   useAttractions,
   useCities,
   type AttractionSummary,
 } from '@/features/destinations/api';
 import { AttractionSearch } from '@/features/destinations/attraction-search';
-import { AttractionCard } from '@/features/destinations/components';
+import { AttractionCard } from '@/features/destinations/attraction-card';
 import { CityHeader } from '@/features/destinations/city-header';
+import { CityNotFound } from '@/features/destinations/city-not-found';
 import { searchAttractions } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
 import { routeNotice } from '@/features/route/notice';
+import { useToggleStop } from '@/features/route/use-toggle-stop';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 import { useCityRatings } from '@/features/reviews/api';
+import { withMinRating } from '@/features/reviews/rating-filter';
 import { useRouteStore } from '@/features/route/store';
 import { env } from '@/lib/env';
 import { categoryColors, layout, radius, spacing } from '@/theme/colors';
@@ -40,26 +45,34 @@ export default function CityScreen() {
   const gutter = useGutter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const cities = useCities();
-  const { categories, toggleCategory, clearCategories, view, setView } = useExploreStore();
+  const { categories, toggleCategory, clearCategories, view, setView, minRating, setMinRating } =
+    useExploreStore();
   const routeStops = useRouteStore((s) => s.stops);
-  const toggleStop = useRouteStore((s) => s.toggle);
+  // Within the plan's places per list (D-047).
+  const toggleStop = useToggleStop();
+  const [planLimited, setPlanLimited] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  // The place whose card is open on the map; one at a time (D-029).
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Height of the Map/List switch + route tray floating over the map's bottom edge.
+  const [floatingHeight, setFloatingHeight] = useState(0);
 
   const city = cities.data?.find((c) => c.slug === slug);
 
   const attractions = useAttractions(city, categories);
   const ratings = useCityRatings(city?.slug);
   const lang = i18n.resolvedLanguage ?? 'en';
-  // The grid and the map show every match of the search; the dropdown only the best few.
-  const visible = useMemo(
-    () =>
-      query.trim()
-        ? searchAttractions(attractions.data ?? [], query, lang)
-        : (attractions.data ?? []),
-    [attractions.data, query, lang],
-  );
+  // The grid and the map show every match of the search and the rating tabs; the dropdown
+  // only the best few matches.
+  const visible = useMemo(() => {
+    const all = attractions.data ?? [];
+    const matches = query.trim() ? searchAttractions(all, query, lang) : all;
+    return withMinRating(matches, ratings.data, minRating);
+  }, [attractions.data, query, lang, ratings.data, minRating]);
   const stopOrder = useMemo(() => new Map(routeStops.map((s, i) => [s.id, i + 1])), [routeStops]);
+  // A filter or search that hides the selected place also closes its card.
+  const selected = visible.find((a) => a.id === selectedId) ?? null;
   const points = useMemo(
     () =>
       visible.map((a) => ({
@@ -67,30 +80,26 @@ export default function CityScreen() {
         lat: a.lat,
         lng: a.lng,
         color: categoryColors[a.category] ?? categoryColors.other!,
-        selected: stopOrder.has(a.id),
+        selected: a.id === selected?.id,
         order: stopOrder.get(a.id),
+        imageUrl: a.imageUrl,
+        name: localizedName(a, lang),
       })),
-    [visible, stopOrder],
+    [visible, stopOrder, selected?.id, lang],
   );
 
   if (cities.isPending) return <LoadingState />;
   if (cities.isError) return <ErrorState onRetry={() => cities.refetch()} />;
-  if (!city)
-    return (
-      <EmptyState
-        icon="globe"
-        title={t('home.cityNotFound')}
-        body={t('home.cityNotFoundBody')}
-        action={
-          <Button icon="globe" label={t('home.backHome')} onPress={() => router.navigate('/')} />
-        }
-      />
-    );
+  if (!city) return <CityNotFound />;
 
   const [south, west, north, east] = city.bbox;
   const openAttraction = (id: string) =>
     router.push({ pathname: '/attraction/[id]', params: { id } });
-  const toggleWithNotice = (item: AttractionSummary) => setNotice(routeNotice(toggleStop(item), t));
+  const toggleWithNotice = (item: AttractionSummary) => {
+    const outcome = toggleStop(item);
+    setPlanLimited(outcome === 'planLimit');
+    setNotice(routeNotice(outcome, t));
+  };
   const selectCity = (next: string) => {
     setQuery('');
     router.setParams({ slug: next });
@@ -126,6 +135,8 @@ export default function CityScreen() {
         categories={categories}
         onToggleCategory={toggleCategory}
         onClearCategories={clearCategories}
+        minRating={minRating}
+        onChangeMinRating={setMinRating}
         onOpenChecklist={openChecklist}
         container={inner}
         gutter={gutter}
@@ -142,7 +153,23 @@ export default function CityScreen() {
               styleUrl={env.mapStyleUrl}
               bounds={[west, south, east, north]}
               points={points}
-              onPointPress={openAttraction}
+              markers="photo"
+              selectedId={selected?.id ?? null}
+              onPointPress={setSelectedId}
+              onMapPress={() => setSelectedId(null)}
+              overlayInsets={{ top: MAP_COUNT_BAND, bottom: floatingHeight + spacing.md }}
+              popup={
+                selected ? (
+                  <AttractionCard
+                    compact
+                    item={selected}
+                    order={stopOrder.get(selected.id)}
+                    onPress={() => openAttraction(selected.id)}
+                    onToggleRoute={() => toggleWithNotice(selected)}
+                    rating={ratings.data?.get(selected.id)}
+                  />
+                ) : null
+              }
             />
             <View
               style={[styles.mapCount, { backgroundColor: theme.surface, boxShadow: shadows.card }]}
@@ -179,7 +206,10 @@ export default function CityScreen() {
           />
         )}
 
-        <View style={styles.floating} pointerEvents="box-none">
+        <View
+          style={styles.floating}
+          pointerEvents="box-none"
+          onLayout={(e) => setFloatingHeight(e.nativeEvent.layout.height)}>
           <Segmented
             floating
             accessibilityLabel={t('explore.viewMode')}
@@ -190,6 +220,11 @@ export default function CityScreen() {
               { value: 'list', label: t('explore.listView'), icon: 'grid' },
             ]}
           />
+          {planLimited ? (
+            <View style={styles.planLimit}>
+              <PlanLimitNotice limit="items" compact />
+            </View>
+          ) : null}
           {routeStops.length > 0 ? (
             <View
               style={[
@@ -233,6 +268,9 @@ export default function CityScreen() {
   );
 }
 
+/** The "N places" pill over the top of the map (its offset + height). */
+const MAP_COUNT_BAND = spacing.md + 40;
+
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   flex: { flex: 1 },
@@ -253,6 +291,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md - 4,
   },
+  planLimit: { width: '100%', maxWidth: 560 },
   tray: {
     width: '100%',
     maxWidth: 560,

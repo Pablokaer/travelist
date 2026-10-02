@@ -1,6 +1,6 @@
-import { isoDateSchema, type Language } from '@wayfarer/shared';
+import { isoDateSchema } from '@wayfarer/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -10,18 +10,9 @@ import { PageHeader, Screen } from '@/components/screen';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
-import { useChecklist } from '@/features/checklist/api';
-import {
-  MoneySection,
-  PassportSection,
-  PowerSection,
-  PracticalSection,
-  SafetySection,
-  VisaSection,
-  WeatherSection,
-} from '@/features/checklist/sections';
+import { ChecklistSections } from '@/features/checklist/checklist-sections';
+import { useCityChecklist, type TripDates } from '@/features/checklist/use-city-checklist';
 import { useCities } from '@/features/destinations/api';
-import { useProfile } from '@/features/profile/api';
 import { todayIso } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 import { useBreakpoint } from '@/theme/use-theme';
@@ -32,13 +23,12 @@ export default function ChecklistScreen() {
   const { city: citySlug } = useLocalSearchParams<{ city: string }>();
   const { t, i18n } = useTranslation();
   const { isTablet, isDesktop } = useBreakpoint();
-  const profile = useProfile();
   const cities = useCities();
   const city = cities.data?.find((c) => c.slug === citySlug);
 
   const [arrivalInput, setArrivalInput] = useState(todayIso());
   const [departureInput, setDepartureInput] = useState('');
-  const [dates, setDates] = useState<{ arrival: string; departure: string | null }>({
+  const [dates, setDates] = useState<TripDates>({
     arrival: todayIso(),
     departure: null,
   });
@@ -48,27 +38,11 @@ export default function ChecklistScreen() {
       ? 'validation.date'
       : undefined;
 
-  const p = profile.data;
-  const request = useMemo(
-    () =>
-      p && citySlug && p.nationalities.length
-        ? {
-            city: citySlug,
-            nationalities: p.nationalities,
-            homeCountry: p.homeCountry,
-            passportExpiry: p.passportExpiry,
-            arrival: dates.arrival,
-            departure: dates.departure,
-            language: (i18n.resolvedLanguage ?? 'en') as Language,
-          }
-        : null,
-    [p, citySlug, dates, i18n.resolvedLanguage],
-  );
-  const checklist = useChecklist(request);
+  const { profile, checklist, needsNationality } = useCityChecklist(citySlug, dates);
   const cityName = city ? (i18n.resolvedLanguage === 'pt' ? city.namePt : city.nameEn) : '';
 
   if (profile.isPending) return <LoadingState />;
-  if (p && p.nationalities.length === 0) {
+  if (needsNationality) {
     return (
       <EmptyState
         icon="passport"
@@ -77,18 +51,6 @@ export default function ChecklistScreen() {
       />
     );
   }
-
-  const sections = checklist.data
-    ? [
-        <VisaSection key="visa" data={checklist.data.visa} />,
-        <PassportSection key="passport" data={checklist.data.passport} />,
-        <WeatherSection key="weather" data={checklist.data.weather} units={p?.units ?? 'metric'} />,
-        <PowerSection key="power" data={checklist.data.power} />,
-        <MoneySection key="money" data={checklist.data.money} />,
-        <SafetySection key="safety" data={checklist.data.safety} />,
-        <PracticalSection key="practical" data={checklist.data.practical} />,
-      ]
-    : [];
 
   return (
     <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
@@ -136,18 +98,7 @@ export default function ChecklistScreen() {
         <ErrorState message={t('checklist.error')} onRetry={() => checklist.refetch()} />
       ) : (
         <>
-          {isTablet ? (
-            // Two balanced columns on wider screens.
-            <View style={styles.columns}>
-              {[0, 1].map((col) => (
-                <View key={col} style={styles.column}>
-                  {sections.filter((_, i) => i % 2 === col)}
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.column}>{sections}</View>
-          )}
+          <ChecklistSections data={checklist.data} units={profile.data?.units ?? 'metric'} />
           <Text variant="helper" secondary>
             {t('checklist.disclaimer')}
           </Text>
@@ -161,6 +112,4 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   dates: { gap: spacing.md },
   datesWide: { flexDirection: 'row', alignItems: 'flex-end' },
-  columns: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  column: { flex: 1, gap: spacing.md },
 });

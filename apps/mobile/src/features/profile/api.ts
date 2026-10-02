@@ -1,6 +1,8 @@
 import type { Language, ProfileForm, Theme, Units } from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
 
+import { nicknameAvailable } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/auth-provider';
 import { check, supabase, unwrap } from '@/lib/supabase';
 
@@ -13,6 +15,8 @@ export type Country = {
 export type Profile = {
   id: string;
   displayName: string | null;
+  /** Sign-in handle shown in walk chats (D-048); null until chosen. */
+  nickname: string | null;
   homeCountry: string | null;
   language: Language;
   units: Units;
@@ -20,6 +24,8 @@ export type Profile = {
   passportExpiry: string | null;
   onboardedAt: string | null;
   nationalities: string[];
+  /** Profile photo in the avatars bucket (D-039); null shows the initials. */
+  avatarPath: string | null;
 };
 
 export const profileKeys = {
@@ -48,7 +54,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     await supabase
       .from('profiles')
       .select(
-        'id, display_name, home_country, language, units, theme, passport_expiry, onboarded_at, profile_nationalities(country_code)',
+        'id, display_name, nickname, home_country, language, units, theme, passport_expiry, onboarded_at, avatar_path, profile_nationalities(country_code)',
       )
       .eq('id', userId)
       .single(),
@@ -56,6 +62,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
   return {
     id: row.id,
     displayName: row.display_name,
+    nickname: row.nickname,
     homeCountry: row.home_country,
     language: row.language as Language,
     units: row.units as Units,
@@ -63,6 +70,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     passportExpiry: row.passport_expiry,
     onboardedAt: row.onboarded_at,
     nationalities: (row.profile_nationalities ?? []).map((n) => n.country_code).sort(),
+    avatarPath: row.avatar_path,
   };
 }
 
@@ -76,17 +84,37 @@ export function useProfile() {
   });
 }
 
+/** Someone else has the nickname (D-048). */
+export class NicknameTakenError extends Error {
+  constructor(nickname: string) {
+    super(`nickname ${nickname} is taken (expected a free one)`);
+    this.name = 'NicknameTakenError';
+  }
+}
+
+/**
+ * The message under a profile form when saving failed.
+ * @example profileSaveError(save.error, t) // 'This nickname is taken. Try another.'
+ */
+export function profileSaveError(error: Error | null, t: TFunction): string | null {
+  if (!error) return null;
+  return error instanceof NicknameTakenError ? t('validation.nicknameTaken') : error.message;
+}
+
 export function useSaveProfile() {
   const { session } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (form: ProfileForm) => {
       const userId = session!.user.id;
+      // Your own nickname counts as available, so an unchanged one passes.
+      if (!(await nicknameAvailable(form.nickname))) throw new NicknameTakenError(form.nickname);
       check(
         await supabase
           .from('profiles')
           .update({
             display_name: form.displayName,
+            nickname: form.nickname,
             home_country: form.homeCountry,
             language: form.language,
             units: form.units,

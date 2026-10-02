@@ -10,12 +10,13 @@ import { Card } from '@/components/card';
 import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { FormError } from '@/features/auth/components';
-import { useProfile, useSaveProfile, type Profile } from '@/features/profile/api';
+import { profileSaveError, useProfile, useSaveProfile, type Profile } from '@/features/profile/api';
 import {
   NameAndPreferencesFields,
   NationalityFields,
   PassportFields,
 } from '@/features/profile/profile-fields';
+import { ProfilePhotoEditor } from '@/features/profile/profile-photo-editor';
 import { spacing } from '@/theme/colors';
 
 function EditProfileForm({ profile }: { profile: Profile }) {
@@ -25,6 +26,7 @@ function EditProfileForm({ profile }: { profile: Profile }) {
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       displayName: profile.displayName ?? '',
+      nickname: profile.nickname ?? '',
       language: profile.language,
       units: profile.units,
       homeCountry: profile.homeCountry ?? '',
@@ -46,6 +48,11 @@ function EditProfileForm({ profile }: { profile: Profile }) {
           style={styles.save}
         />
       }>
+      <Section title={t('profile.photo.title')}>
+        <Card style={styles.fields}>
+          <ProfilePhotoEditor profile={profile} />
+        </Card>
+      </Section>
       <Section title={t('onboarding.step1Title')}>
         <Card style={styles.fields}>
           <NameAndPreferencesFields control={control} />
@@ -61,7 +68,7 @@ function EditProfileForm({ profile }: { profile: Profile }) {
           <PassportFields control={control} />
         </Card>
       </Section>
-      <FormError message={save.error ? save.error.message : null} />
+      <FormError message={profileSaveError(save.error, t)} />
     </Screen>
   );
 }

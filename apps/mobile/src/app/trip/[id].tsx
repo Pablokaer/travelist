@@ -1,149 +1,117 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { canDeleteList } from '@wayfarer/shared';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
-import { PageHeader, Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
-import { AttractionRow } from '@/features/destinations/components';
-import { MapView } from '@/features/map/map-view';
-import { boundsOf } from '@/features/map/map-view.types';
 import { useProfile } from '@/features/profile/api';
-import { NavigationLinks, RouteTotals } from '@/features/route/components';
-import { useDeleteTrip, useTrip } from '@/features/trips/api';
+import { ReviewsSection } from '@/features/reviews/reviews-section';
+import { useDeleteTrip, useTrip, type TripDetail } from '@/features/trips/api';
+import {
+  createLinkSharer,
+  platformShareDeps,
+  tripShareUrl,
+  type ShareOutcome,
+} from '@/features/trips/share-link';
+import { useSetTripVisibility } from '@/features/trips/sharing-api';
+import { ScheduleEditor } from '@/features/trips/schedule-editor';
+import { TripView } from '@/features/trips/trip-view';
+import { VisibilityEditor } from '@/features/trips/visibility-editor';
+import { ModeratorOfficialToggle } from '@/features/trips/walklist-community';
 import { env } from '@/lib/env';
-import { formatDate } from '@/lib/format';
-import { radius, spacing } from '@/theme/colors';
-import { useBreakpoint, useShadows, useTheme } from '@/theme/use-theme';
+import { spacing } from '@/theme/colors';
+import { useTheme } from '@/theme/use-theme';
+import { useMySubscription } from '@/features/subscription/api';
+import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
+
+const openStop = (id: string) => router.push({ pathname: '/attraction/[id]', params: { id } });
+
+function DeleteTrip({ tripId }: { tripId: string }) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const del = useDeleteTrip();
+  const plan = useMySubscription().data?.plan;
+  const [confirming, setConfirming] = useState(false);
+  // Deleting is a plan feature (D-047); the database refuses it too.
+  if (plan && !canDeleteList(plan.rules, true)) return <PlanLimitNotice limit="delete" />;
+  if (!confirming) {
+    return (
+      <View style={styles.actions}>
+        <Button
+          variant="ghost"
+          icon="trash"
+          label={t('trips.delete')}
+          onPress={() => setConfirming(true)}
+        />
+      </View>
+    );
+  }
+  return (
+    <Card style={{ borderColor: theme.danger }}>
+      <Text>{t('trips.deleteConfirm')}</Text>
+      <View style={styles.actions}>
+        <Button
+          variant="danger"
+          label={t('trips.deleteYes')}
+          loading={del.isPending}
+          onPress={() => del.mutate(tripId, { onSuccess: () => router.back() })}
+        />
+        <Button variant="ghost" label={t('common.cancel')} onPress={() => setConfirming(false)} />
+      </View>
+    </Card>
+  );
+}
+
+/** Visibility form + share button for the owner (D-031). */
+function TripSharing({ trip }: { trip: TripDetail }) {
+  const setVisibility = useSetTripVisibility(trip.id);
+  const [shareNotice, setShareNotice] = useState<ShareOutcome | 'failed' | null>(null);
+  const share = async () => {
+    const url = tripShareUrl(trip.id, env.webUrl);
+    try {
+      setShareNotice(await createLinkSharer(platformShareDeps()).share(url, trip.name));
+    } catch {
+      setShareNotice('failed');
+    }
+  };
+  return (
+    <VisibilityEditor
+      visibility={trip.visibility}
+      onSave={(form) => setVisibility.mutate(form)}
+      onShare={() => void share()}
+      saving={setVisibility.isPending}
+      error={setVisibility.error?.message ?? null}
+      shareNotice={shareNotice}
+    />
+  );
+}
 
 export default function TripScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { t, i18n } = useTranslation();
   const trip = useTrip(id);
   const profile = useProfile();
-  const del = useDeleteTrip();
-  const [confirming, setConfirming] = useState(false);
-  const lang = i18n.resolvedLanguage ?? 'en';
-  const theme = useTheme();
-  const shadows = useShadows();
-  const { isDesktop } = useBreakpoint();
-
-  const points = useMemo(
-    () =>
-      (trip.data?.stops ?? []).map((s, i) => ({
-        id: s.id,
-        lat: s.lat,
-        lng: s.lng,
-        color: theme.primary,
-        selected: true,
-        order: i + 1,
-      })),
-    [trip.data, theme.primary],
-  );
 
   if (trip.isPending) return <LoadingState />;
   if (trip.isError) return <ErrorState onRetry={() => trip.refetch()} />;
-  const data = trip.data;
-
-  const map = (
-    <View style={[styles.map, isDesktop && styles.mapDesktop, { boxShadow: shadows.card }]}>
-      <MapView
-        testID="trip-map"
-        accessibilityLabel={t('route.mapLabel')}
-        styleUrl={env.mapStyleUrl}
-        bounds={boundsOf(data.stops, [-180, -85, 180, 85])}
-        points={points}
-        routes={data.geometry ? [{ geometry: data.geometry, color: theme.primary }] : []}
-        onPointPress={(aid) => router.push({ pathname: '/attraction/[id]', params: { id: aid } })}
-      />
-    </View>
-  );
-
-  const details = (
-    <View style={styles.column}>
-      <RouteTotals
-        distanceM={data.distanceM}
-        walkingSeconds={data.walkingSeconds}
-        visitMinutes={data.visitMinutes ?? 0}
-        units={profile.data?.units ?? 'metric'}
-        isFallback={data.isFallback}
-        attribution={
-          data.provider === 'openrouteservice'
-            ? '© openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors'
-            : null
-        }
-      />
-      <Section title={t('route.stopsTitle')}>
-        {data.stops.map((s, i) => (
-          <AttractionRow
-            key={s.id}
-            item={s}
-            index={i}
-            onPress={() => router.push({ pathname: '/attraction/[id]', params: { id: s.id } })}
-          />
-        ))}
-      </Section>
-      <NavigationLinks stops={data.stops} />
-      {confirming ? (
-        <Card style={{ borderColor: theme.danger }}>
-          <Text>{t('trips.deleteConfirm')}</Text>
-          <View style={styles.actions}>
-            <Button
-              variant="danger"
-              label={t('trips.deleteYes')}
-              loading={del.isPending}
-              onPress={() => del.mutate(data.id, { onSuccess: () => router.back() })}
-            />
-            <Button
-              variant="ghost"
-              label={t('common.cancel')}
-              onPress={() => setConfirming(false)}
-            />
-          </View>
-        </Card>
-      ) : (
-        <View style={styles.actions}>
-          <Button
-            variant="ghost"
-            icon="trash"
-            label={t('trips.delete')}
-            onPress={() => setConfirming(true)}
-          />
-        </View>
-      )}
-    </View>
-  );
-
+  // Not the caller's list: only its owner edits it. The read-only view shows it if it is
+  // public, asks for its password, or says a private one is not available (D-040).
+  if (trip.data === null) return <Redirect href={{ pathname: '/shared', params: { id } }} />;
   return (
-    <Screen edges={['left', 'right']} width={isDesktop ? 'wide' : 'content'}>
-      <Stack.Screen options={{ title: data.name }} />
-      <PageHeader
-        size="title"
-        title={data.name}
-        subtitle={data.tripDate ? formatDate(data.tripDate, lang, { dateStyle: 'full' }) : null}
-      />
-      {isDesktop ? (
-        <View style={styles.split}>
-          <View style={styles.column}>{map}</View>
-          {details}
-        </View>
-      ) : (
-        <>
-          {map}
-          {details}
-        </>
-      )}
-    </Screen>
+    <TripView trip={trip.data} units={profile.data?.units ?? 'metric'} onOpenStop={openStop}>
+      <TripSharing trip={trip.data} />
+      <ScheduleEditor trip={trip.data} />
+      {/* Travellers rate shared lists (D-035); the owner reads what they said. */}
+      <ReviewsSection target={{ kind: 'trip', id: trip.data.id }} canReview={false} />
+      <ModeratorOfficialToggle trip={trip.data} />
+      <DeleteTrip tripId={trip.data.id} />
+    </TripView>
   );
 }
 
 const styles = StyleSheet.create({
-  map: { height: 300, borderRadius: radius.xl, overflow: 'hidden' },
-  mapDesktop: { height: 560 },
-  split: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.xl },
-  column: { flex: 1, gap: spacing.lg },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

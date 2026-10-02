@@ -48,6 +48,24 @@ describe('env', () => {
   });
 });
 
+describe('env: public web address for shared links (D-031)', () => {
+  const base = {
+    supabaseUrl: undefined,
+    supabaseAnonKey: undefined,
+    mapStyleUrl: undefined,
+    sentryDsn: undefined,
+    posthogKey: undefined,
+    posthogHost: undefined,
+  };
+  it('is optional and must be a URL when set', () => {
+    expect(parseEnv({ ...base, webUrl: '' }).webUrl).toBeUndefined();
+    expect(parseEnv({ ...base, webUrl: 'https://wayfarer.app' }).webUrl).toBe(
+      'https://wayfarer.app',
+    );
+    expect(() => parseEnv({ ...base, webUrl: 'wayfarer app' })).toThrow(/EXPO_PUBLIC/);
+  });
+});
+
 describe('format', () => {
   it('formats units', () => {
     expect(formatTemperature(20, 'metric')).toBe('20°C');
@@ -76,12 +94,12 @@ describe('route tray', () => {
     expect(useRouteStore.getState().stops.map((x) => x.id)).toEqual(['a']);
   });
 
-  it('refuses stops from another city and more than 12 stops', () => {
+  it('refuses stops from another city and more than 20 stops', () => {
     const s = useRouteStore.getState();
     s.add(stop('a'));
     expect(useRouteStore.getState().add(stop('x', 'porto'))).toBe(false);
-    for (let i = 0; i < 11; i++) useRouteStore.getState().add(stop(`s${i}`));
-    expect(useRouteStore.getState().stops).toHaveLength(12);
+    for (let i = 0; i < 19; i++) useRouteStore.getState().add(stop(`s${i}`));
+    expect(useRouteStore.getState().stops).toHaveLength(20);
     expect(useRouteStore.getState().add(stop('overflow'))).toBe(false);
   });
 });

@@ -1,6 +1,6 @@
 // Small JSON-over-HTTP helper for third-party providers.
 
-export const USER_AGENT = 'wayfarer/0.1 (+https://github.com/finperiti/wayfarer)';
+export const USER_AGENT = 'wayfarer/0.1 (+https://github.com/Pablokaer/travelist)';
 export const DEFAULT_TIMEOUT_MS = 8000;
 
 export class HttpError extends Error {

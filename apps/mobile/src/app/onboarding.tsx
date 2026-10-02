@@ -15,7 +15,7 @@ import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
 import { Text } from '@/components/text';
 import { FormError } from '@/features/auth/components';
-import { useProfile, useSaveProfile } from '@/features/profile/api';
+import { profileSaveError, useProfile, useSaveProfile } from '@/features/profile/api';
 import {
   NameAndPreferencesFields,
   NationalityFields,
@@ -25,7 +25,7 @@ import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
 const STEP_FIELDS = [
-  ['displayName', 'language', 'units'],
+  ['displayName', 'nickname', 'language', 'units'],
   ['nationalities', 'homeCountry'],
   ['passportExpiry'],
 ] as const satisfies readonly (readonly (keyof ProfileForm)[])[];
@@ -41,6 +41,7 @@ export default function OnboardingScreen() {
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       displayName: profile.data?.displayName ?? '',
+      nickname: profile.data?.nickname ?? '',
       language: (i18n.resolvedLanguage as Language) ?? DEFAULT_LANGUAGE,
       units: profile.data?.units ?? 'metric',
       homeCountry: profile.data?.homeCountry ?? '',
@@ -81,7 +82,7 @@ export default function OnboardingScreen() {
         {step === 1 ? <NationalityFields control={control} /> : null}
         {step === 2 ? <PassportFields control={control} /> : null}
       </Card>
-      <FormError message={save.error ? save.error.message : null} />
+      <FormError message={profileSaveError(save.error, t)} />
       <View style={styles.actions}>
         {step > 0 ? (
           <Button

@@ -1,20 +1,17 @@
 import { ATTRACTION_CATEGORIES, type AttractionCategory } from '@wayfarer/shared';
-import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { FlatList, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { localizedName, type AttractionSummary, type City } from './api';
+import { Thumbnail } from './thumbnail';
 
-import { Badge } from '@/components/card';
 import { Icon, categoryIcon } from '@/components/icon';
 import { Sheet } from '@/components/sheet';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
-import type { RatingSummary } from '@/features/reviews/api';
-import { CardRating, ratingLabel } from '@/features/reviews/components';
 import { flagEmoji } from '@/lib/format';
-import { palette, categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
+import { categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
@@ -144,18 +141,21 @@ export function CitySwitcher({
 /**
  * Icon + label category tabs; the active ones are underlined in the text colour. The tabs form
  * one centred group when they fit; otherwise they scroll edge to edge, starting at `inset`.
+ * `trailing` (the rating tabs) scrolls in the same row, after the categories.
  */
 export function CategoryFilters({
   selected,
   onToggle,
   onClear,
   inset = 0,
+  trailing,
 }: {
   selected: AttractionCategory[];
   onToggle: (c: AttractionCategory) => void;
   onClear: () => void;
   /** Horizontal padding of the scrolling row (the page gutter). */
   inset?: number;
+  trailing?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -164,33 +164,44 @@ export function CategoryFilters({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={[styles.filters, { paddingHorizontal: inset }]}
       accessibilityLabel={t('explore.filters')}>
-      <CategoryTab
+      <FilterTab
         label={t('explore.allCategories')}
-        icon="grid"
+        icon={(color) => <Icon name="grid" size={20} color={color} />}
         selected={selected.length === 0}
         onPress={onClear}
       />
       {ATTRACTION_CATEGORIES.map((c) => (
-        <CategoryTab
+        <FilterTab
           key={c}
           label={t(`category.${c}`)}
-          icon={categoryIcon(c)}
+          icon={(color) => <Icon name={categoryIcon(c)} size={20} color={color} />}
           selected={selected.includes(c)}
           onPress={() => onToggle(c)}
         />
       ))}
+      {trailing}
     </ScrollView>
   );
 }
 
-function CategoryTab({
+/**
+ * One tab of the city page filter row: an icon over a label, underlined in the text colour
+ * while active. Categories are checkboxes; the rating tabs are radios.
+ * @example <FilterTab label="Parks" icon={(c) => <Icon name="tree" color={c} />} selected onPress={…} />
+ */
+export function FilterTab({
   label,
+  accessibilityLabel = label,
+  role = 'checkbox',
   icon,
   selected,
   onPress,
 }: {
   label: string;
-  icon: ReturnType<typeof categoryIcon>;
+  accessibilityLabel?: string;
+  role?: 'checkbox' | 'radio';
+  /** Draws the icon in the tab's current text colour. */
+  icon: (color: string) => ReactNode;
   selected: boolean;
   onPress: () => void;
 }) {
@@ -198,8 +209,8 @@ function CategoryTab({
   return (
     <Tappable
       onPress={onPress}
-      accessibilityRole="checkbox"
-      accessibilityLabel={label}
+      accessibilityRole={role}
+      accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: selected }}
       pressScale={0.94}
       style={styles.tab}>
@@ -207,7 +218,7 @@ function CategoryTab({
         const color = selected || hovered ? theme.text : theme.textSecondary;
         return (
           <>
-            <Icon name={icon} size={20} color={color} />
+            {icon(color)}
             <Text variant="helper" style={{ color, fontWeight: selected ? '600' : '500' }}>
               {label}
             </Text>
@@ -235,145 +246,6 @@ export function CategoryDot({ category }: { category: string }) {
     <View
       style={[styles.dot, { backgroundColor: categoryColors[category] ?? categoryColors.other }]}
     />
-  );
-}
-
-/** Photo, or a neutral placeholder with a photo glyph when there is none. */
-export function Thumbnail({ uri, style }: { uri: string | null; style: object }) {
-  const theme = useTheme();
-  return uri ? (
-    <Image source={uri} style={style} contentFit="cover" accessible={false} transition={200} />
-  ) : (
-    <View style={[style, styles.placeholder, { backgroundColor: theme.surfaceMuted }]}>
-      <Icon name="photo" size={28} color={theme.textSecondary} />
-    </View>
-  );
-}
-
-/** Image-led card for browsing attractions in a grid. */
-export function AttractionCard({
-  item,
-  onPress,
-  order,
-  onToggleRoute,
-  rating,
-}: {
-  item: AttractionSummary;
-  onPress?: () => void;
-  /** Position in the current route, when the place is in it. */
-  order?: number;
-  /** Shows a checkbox that adds/removes the place without opening it. */
-  onToggleRoute?: () => void;
-  /** Average rating shown beside the name; omitted for places without reviews (D-028). */
-  rating?: RatingSummary;
-}) {
-  const { t, i18n } = useTranslation();
-  const name = localizedName(item, i18n.resolvedLanguage ?? 'en');
-  const spokenRating = ratingLabel(rating, t('common.locale'), t)?.spoken;
-  return (
-    <View>
-      <Tappable
-        onPress={onPress}
-        disabled={!onPress}
-        pressScale={0.98}
-        accessibilityRole="button"
-        accessibilityLabel={[name, t(`category.${item.category}`), spokenRating]
-          .filter(Boolean)
-          .join(', ')}
-        style={styles.card}>
-        {({ hovered }) => (
-          <>
-            <View style={styles.media}>
-              <Thumbnail uri={item.imageUrl} style={[styles.cover, hovered && styles.coverHover]} />
-              <View style={styles.overlayRow} pointerEvents="none">
-                {item.isUnesco ? <Badge label="UNESCO" tone="overlay" /> : <View />}
-              </View>
-            </View>
-            <View style={styles.cardBody}>
-              <View style={styles.cardTitle}>
-                <Text variant="subtitle" numberOfLines={1} style={styles.flex}>
-                  {name}
-                </Text>
-                <CardRating summary={rating} />
-              </View>
-              <View style={styles.meta}>
-                <CategoryDot category={item.category} />
-                <Text variant="caption" secondary numberOfLines={1} style={styles.flex}>
-                  {t(`category.${item.category}`)} ·{' '}
-                  {t('attraction.visitMinutes', { minutes: item.avgVisitMinutes })}
-                </Text>
-              </View>
-            </View>
-          </>
-        )}
-      </Tappable>
-      {/* A sibling of the card, not a child, so its press never opens the attraction. */}
-      <View style={styles.selectSlot} pointerEvents="box-none">
-        {onToggleRoute ? (
-          <RouteCheckbox name={name} order={order} onPress={onToggleRoute} />
-        ) : order != null ? (
-          <OrderBadge order={order} />
-        ) : null}
-      </View>
-    </View>
-  );
-}
-
-function OrderBadge({ order }: { order: number }) {
-  const theme = useTheme();
-  return (
-    <View style={[styles.checkbox, { backgroundColor: theme.primary, borderColor: theme.primary }]}>
-      <Text variant="label" style={{ color: theme.onPrimary, fontWeight: '700' }}>
-        {order}
-      </Text>
-    </View>
-  );
-}
-
-/** Round checkbox over the photo; when checked it shows the stop number. */
-function RouteCheckbox({
-  name,
-  order,
-  onPress,
-}: {
-  name: string;
-  order?: number;
-  onPress: () => void;
-}) {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const shadows = useShadows();
-  const checked = order != null;
-  return (
-    <Tappable
-      accessibilityRole="checkbox"
-      accessibilityLabel={t('route.includeNamed', { name })}
-      accessibilityState={{ checked }}
-      onPress={onPress}
-      hitSlop={8}
-      pressScale={0.88}
-      testID="route-checkbox"
-      style={({ hovered }) => [
-        styles.checkbox,
-        {
-          backgroundColor: checked
-            ? theme.primary
-            : hovered
-              ? palette.light.surface
-              : 'rgba(255,255,255,0.85)',
-          borderColor: checked ? theme.primary : palette.light.surface,
-          boxShadow: shadows.floating,
-        },
-      ]}>
-      {checked ? (
-        <Text variant="label" style={{ color: theme.onPrimary, fontWeight: '700' }}>
-          {order}
-        </Text>
-      ) : (
-        // Sits on a light pill over the photo in both themes, so use the light-theme text colour.
-        <Icon name="add" size={18} color={palette.light.text} />
-      )}
-    </Tappable>
   );
 }
 
@@ -498,31 +370,6 @@ const styles = StyleSheet.create({
   // The underline sits on the header's bottom border.
   tabBar: { height: 2, alignSelf: 'stretch', borderRadius: 1, marginTop: spacing.sm },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  card: { flex: 1, gap: spacing.md - 4 },
-  media: { borderRadius: radius.lg, overflow: 'hidden' },
-  cover: { width: '100%', aspectRatio: 4 / 3 },
-  coverHover: { opacity: 0.88 },
-  placeholder: { alignItems: 'center', justifyContent: 'center' },
-  overlayRow: {
-    position: 'absolute',
-    top: spacing.md - 4,
-    left: spacing.md - 4,
-    right: spacing.md - 4,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  selectSlot: { position: 'absolute', top: spacing.md - 4, right: spacing.md - 4 },
-  checkbox: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardBody: { gap: spacing.xxs },
-  cardTitle: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
   meta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm - 2 },
   row: {
     flexDirection: 'row',

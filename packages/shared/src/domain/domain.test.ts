@@ -128,11 +128,13 @@ describe('route fallback', () => {
     ]);
   });
 
-  it('rejects too few or too many stops', () => {
+  it('orders 2 to 20 stops and rejects fewer or more', () => {
+    const line = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({ id: `${i}`, lat: 0, lng: i / 100 }));
     expect(() => optimizeOrder(pts.slice(0, 1))).toThrow(RangeError);
-    expect(() =>
-      optimizeOrder(Array.from({ length: 13 }, (_, i) => ({ id: `${i}`, lat: 0, lng: i / 100 }))),
-    ).toThrow(RangeError);
+    expect(optimizeOrder(line(13))).toHaveLength(13);
+    expect(optimizeOrder(line(20))).toHaveLength(20);
+    expect(() => optimizeOrder(line(21))).toThrow(/between 2 and 20 stops, got 21/);
   });
 
   it('estimates legs with a detour factor', () => {

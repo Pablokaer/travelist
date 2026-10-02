@@ -41,11 +41,17 @@ jest.mock('@/features/destinations/api', () => ({
   ...jest.requireActual('@/features/destinations/api'),
   useAttraction: () => ({ isPending: false, isError: false, data: MockAttractionServer.detail }),
 }));
+jest.mock('@/features/subscription/api', () => ({
+  ...jest.requireActual('@/features/subscription/api'),
+  useMySubscription: () => ({
+    data: jest.requireActual('@/testing/subscription').freeSubscription(),
+  }),
+}));
 jest.mock('@/features/reviews/api', () => {
   const idle = { isPending: false, error: null, mutate: jest.fn() };
   return {
     ...jest.requireActual('@/features/reviews/api'),
-    useAttractionReviews: () => ({ data: [], isPending: false }),
+    useReviews: () => ({ data: [], isPending: false }),
     useRatingSummary: () => ({ data: { count: 128, average: 4.56 } }),
     useSaveReview: () => idle,
     useDeleteReview: () => idle,

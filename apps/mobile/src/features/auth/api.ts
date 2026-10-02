@@ -3,6 +3,7 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 
+import { removeAllProfilePhotos } from '@/features/profile/avatar-api';
 import { supabase } from '@/lib/supabase';
 
 export type OAuthProvider = 'google' | 'apple';
@@ -21,11 +22,67 @@ export async function signInWithPassword(email: string, password: string) {
   fail(error);
 }
 
+/** Supabase Auth's answer to a wrong email or password; a wrong nickname gets the same one. */
+const INVALID_LOGIN = 'Invalid login credentials';
+
+/** Too many failed sign-ins with this nickname (D-048: 10 in 15 minutes). */
+export class NicknameLockedError extends Error {
+  constructor(nickname: string) {
+    super(
+      `too many failed sign-ins for nickname ${nickname}, expected fewer than 10 in 15 minutes`,
+    );
+    this.name = 'NicknameLockedError';
+  }
+}
+
+/**
+ * Nicknames never contain "@" (D-048), so an "@" means the user typed an email.
+ * @example isEmailLogin('nina_walks') // false
+ */
+export function isEmailLogin(login: string): boolean {
+  return login.includes('@');
+}
+
+/** The account email for a nickname, given its password; null when either is wrong. */
+async function emailForNickname(nickname: string, password: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc('login_email_for_nickname', {
+    p_nickname: nickname.trim().toLowerCase(),
+    p_password: password,
+  });
+  if (error?.code === 'P0429') throw new NicknameLockedError(nickname);
+  fail(error);
+  return data;
+}
+
+/**
+ * Signs in with an email or a nickname (D-048) and the password. The session always comes from
+ * Supabase Auth's password sign-in; a nickname is first turned into its account's email.
+ * @example await signInWithLogin('nina_walks', password)
+ */
+export async function signInWithLogin(login: string, password: string) {
+  const trimmed = login.trim();
+  if (isEmailLogin(trimmed)) return signInWithPassword(trimmed, password);
+  const email = await emailForNickname(trimmed, password);
+  if (!email) throw new Error(INVALID_LOGIN);
+  return signInWithPassword(email, password);
+}
+
+/**
+ * Whether a nickname is valid and free (checked before sign-up, and when it changes).
+ * @example await nicknameAvailable('nina_walks') // false once taken
+ */
+export async function nicknameAvailable(nickname: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('nickname_available', { p_nickname: nickname });
+  fail(error);
+  return data === true;
+}
+
 /** Returns true when the user must confirm the email before signing in. */
 export async function signUp(input: {
   email: string;
   password: string;
   displayName: string;
+  nickname: string;
   language: string;
 }) {
   const { data, error } = await supabase.auth.signUp({
@@ -33,7 +90,7 @@ export async function signUp(input: {
     password: input.password,
     options: {
       emailRedirectTo: authRedirectUrl(),
-      data: { display_name: input.displayName, language: input.language },
+      data: { display_name: input.displayName, nickname: input.nickname, language: input.language },
     },
   });
   fail(error);
@@ -119,6 +176,9 @@ export async function signOut() {
 }
 
 export async function deleteAccount() {
+  // Storage files do not cascade with the account rows: remove the profile photos first (D-039).
+  const { data } = await supabase.auth.getSession();
+  if (data.session) await removeAllProfilePhotos(data.session.user.id);
   const { error } = await supabase.rpc('delete_account');
   fail(error);
   await supabase.auth.signOut({ scope: 'local' });

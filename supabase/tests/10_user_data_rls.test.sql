@@ -1,7 +1,7 @@
 -- RLS for user-owned tables and the account RPCs. Run with `supabase test db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(20);
+select plan(22);
 
 -- Minimal reference rows (rolled back at the end).
 insert into public.countries (code, name_en, name_pt) values ('ZZ', 'Testland', 'Terra de Teste'), ('ZY', 'Otherland', 'Outra Terra')
@@ -16,11 +16,24 @@ values
   ('00000000-0000-0000-0000-00000000000b', 'testville', 'Q999999993', 'B', 'park',
    extensions.st_setsrid(extensions.st_makepoint(0.8, 0.8), 4326)::extensions.geography, 30);
 
+-- 21 places in a city of their own: a 13-stop walk (over the former 12) and one over 20.
+insert into public.cities (slug, name_en, name_pt, country_code, wikidata_id, center, bbox)
+values ('longville', 'Longville', 'Longelândia', 'ZZ', 'Q999999994',
+        extensions.st_setsrid(extensions.st_makepoint(10.5, 10.5), 4326)::extensions.geography, array[10, 10, 11, 11]);
+insert into public.attractions (id, city_slug, wikidata_id, name_en, category, location, avg_visit_minutes)
+select ('00000000-0000-0000-0000-0000000001' || lpad(i::text, 2, '0'))::uuid, 'longville',
+       'Q99999980' || lpad(i::text, 2, '0'), 'Stop ' || i, 'park',
+       extensions.st_setsrid(extensions.st_makepoint(10.1 + i / 100.0, 10.5), 4326)::extensions.geography, 20
+  from generate_series(1, 21) as i;
+
 -- Two users; the trigger creates their profiles.
 insert into auth.users (id, email, raw_user_meta_data, aud, role)
 values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.com', '{"display_name":"Alice","language":"pt"}', 'authenticated', 'authenticated'),
   ('22222222-2222-2222-2222-222222222222', 'bob@example.com', '{}', 'authenticated', 'authenticated');
+-- Premium (D-047): this file tests other rules, not the Free plan's limits.
+insert into public.subscriptions (user_id, plan_id, status)
+values ('11111111-1111-1111-1111-111111111111', 'premium', 'active');
 
 select is((select display_name from public.profiles where id = '11111111-1111-1111-1111-111111111111'), 'Alice',
   'profile is created from auth metadata');
@@ -46,6 +59,16 @@ select lives_ok($$ select public.save_trip('testville', 'Morning walk',
                     array['00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b']::uuid[],
                     '2026-10-01', null, 1200, 900, 90) $$, 'Alice saves a trip');
 select is((select count(*)::int from public.trip_stops), 2, 'stops are saved in order');
+-- A trip holds up to 20 stops: 13 are saved, 21 are refused.
+select lives_ok($$ select public.save_trip('longville', 'Long walk',
+                    array(select ('00000000-0000-0000-0000-0000000001' || lpad(i::text, 2, '0'))::uuid
+                            from generate_series(1, 13) as i)) $$,
+  'a trip can have more than 12 stops');
+select throws_ok($$ select public.save_trip('longville', 'Too long',
+                    array(select ('00000000-0000-0000-0000-0000000001' || lpad(i::text, 2, '0'))::uuid
+                            from generate_series(1, 21) as i)) $$,
+  '22023', null, 'a trip cannot have more than 20 stops');
+delete from public.trips where name = 'Long walk';
 select is((select attraction_id from public.trip_stops where position = 0),
   '00000000-0000-0000-0000-00000000000a'::uuid, 'first stop keeps position 0');
 

@@ -15,6 +15,7 @@ const SOURCES = [
   'wikidata',
   'commons',
   'pageviews',
+  'wikipediaText',
   'openfreemap',
   'ors',
   'openMeteo',

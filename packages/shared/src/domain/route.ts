@@ -11,6 +11,12 @@ export function pathLength(order: readonly RoutePoint[]): number {
   return total;
 }
 
+/**
+ * Up to this many stops the order is exact (Held-Karp, O(2ⁿ·n²): ~1 ms at 12, ~4 s at 20);
+ * longer routes, up to ROUTE_MAX_STOPS, use nearest neighbour + 2-opt (D-030).
+ */
+export const EXACT_ORDER_MAX_STOPS = 12;
+
 function assertStopCount(points: readonly RoutePoint[]): void {
   if (points.length < ROUTE_MIN_STOPS || points.length > ROUTE_MAX_STOPS) {
     throw new RangeError(
@@ -78,14 +84,93 @@ function shortestOpenPath(d: readonly number[][], start: number | null): number[
   return start === null && order[order.length - 1]! < order[0]! ? order.reverse() : order;
 }
 
+/** Greedy path from `start`: always walk to the nearest stop not yet visited. */
+function nearestNeighbourPath(d: readonly number[][], start: number): number[] {
+  const order = [start];
+  const left = new Set(d.map((_, i) => i).filter((i) => i !== start));
+  while (left.size > 0) {
+    const here = order[order.length - 1]!;
+    let next = -1;
+    for (const i of left) if (next < 0 || d[here]![i]! < d[here]![next]! - 1e-9) next = i;
+    order.push(next);
+    left.delete(next);
+  }
+  return order;
+}
+
+/** Length change of reversing `order[i..j]` in an open path (no edge before 0 or after n-1). */
+function reversalGain(d: readonly number[][], order: readonly number[], i: number, j: number) {
+  const [a, b, c, e] = [order[i - 1], order[i]!, order[j]!, order[j + 1]];
+  const before = (a === undefined ? 0 : d[a]![b]!) + (e === undefined ? 0 : d[c]![e]!);
+  const after = (a === undefined ? 0 : d[a]![c]!) + (e === undefined ? 0 : d[b]![e]!);
+  return before - after;
+}
+
+/** 2-opt: reverses stretches of the path while that shortens it; `from` 1 keeps the start. */
+function twoOpt(d: readonly number[][], path: number[], from: number): number[] {
+  const order = [...path];
+  for (let improved = true; improved;) {
+    improved = false;
+    for (let i = from; i < order.length - 1; i++) {
+      for (let j = i + 1; j < order.length; j++) {
+        if (reversalGain(d, order, i, j) <= 1e-9) continue;
+        order.splice(i, j - i + 1, ...order.slice(i, j + 1).reverse());
+        improved = true;
+      }
+    }
+  }
+  return order;
+}
+
+/** Sum of the path's legs in the distance matrix. */
+function matrixLength(d: readonly number[][], order: readonly number[]): number {
+  return order.slice(1).reduce((sum, stop, k) => sum + d[order[k]!]![stop]!, 0);
+}
+
+/** The stop farthest from `from` (lowest index on ties). */
+function farthestFrom(d: readonly number[][], from: number): number {
+  return d[from]!.reduce((best, dist, i) => (dist > d[from]![best]! + 1e-9 ? i : best), from);
+}
+
+/**
+ * Where a free-start path may begin: the first stop and the two ends of the selection's
+ * longest stretch (a shortest open path usually starts at an extreme). Trying every stop
+ * instead costs O(n) times more for little gain.
+ */
+function candidateStarts(d: readonly number[][]): number[] {
+  const end = farthestFrom(d, 0);
+  return [...new Set([0, end, farthestFrom(d, end)])];
+}
+
+/**
+ * Near-shortest open path for routes longer than EXACT_ORDER_MAX_STOPS: nearest neighbour then
+ * 2-opt, from the fixed start or (free start) from a few candidate starts, keeping the shortest.
+ */
+function approximateOpenPath(d: readonly number[][], start: number | null): number[] {
+  const starts = start === null ? candidateStarts(d) : [start];
+  let best: number[] = [];
+  for (const s of starts) {
+    const path = twoOpt(d, nearestNeighbourPath(d, s), start === null ? 0 : 1);
+    if (best.length === 0 || matrixLength(d, path) < matrixLength(d, best) - 1e-9) best = path;
+  }
+  return start === null && best[best.length - 1]! < best[0]! ? best.reverse() : best;
+}
+
+/** Exact up to EXACT_ORDER_MAX_STOPS, approximate beyond. */
+function openPath(d: readonly number[][], start: number | null): number[] {
+  return d.length <= EXACT_ORDER_MAX_STOPS
+    ? shortestOpenPath(d, start)
+    : approximateOpenPath(d, start);
+}
+
 /**
  * Orders stops into the shortest open walking path (straight-line distance) that starts at the
- * first stop. Exact and deterministic for 2–12 stops.
+ * first stop. Exact for up to EXACT_ORDER_MAX_STOPS stops, near-shortest beyond; deterministic.
  * @example optimizeOrder([hotel, castle, museum]) // [hotel, museum, castle]
  */
 export function optimizeOrder<T extends RoutePoint>(points: readonly T[]): T[] {
   assertStopCount(points);
-  return shortestOpenPath(distanceMatrix(points), 0).map((i) => points[i]!);
+  return openPath(distanceMatrix(points), 0).map((i) => points[i]!);
 }
 
 /**
@@ -95,7 +180,7 @@ export function optimizeOrder<T extends RoutePoint>(points: readonly T[]): T[] {
  */
 export function optimizeOrderAnyStart<T extends RoutePoint>(points: readonly T[]): T[] {
   assertStopCount(points);
-  return shortestOpenPath(distanceMatrix(points), null).map((i) => points[i]!);
+  return openPath(distanceMatrix(points), null).map((i) => points[i]!);
 }
 
 export type RouteLeg = { fromId: string; toId: string; distanceM: number; durationS: number };

@@ -5,6 +5,7 @@ import {
   ROUTE_MIN_STOPS,
   ROUTE_SPLIT_MIN_STOPS,
   type Units,
+  type RouteLeg,
 } from '@wayfarer/shared';
 import { useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
@@ -18,7 +19,7 @@ import { Text } from '@/components/text';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { localizedName } from '@/features/destinations/api';
 import { AttractionRow } from '@/features/destinations/components';
-import { formatDistance } from '@/lib/format';
+import { formatDistance, formatDuration } from '@/lib/format';
 import { useRouteColor } from '@/features/route/route-colors';
 import { DragHandle, useStopDrag, type DragGesture } from '@/features/route/stop-drag';
 import { spacing } from '@/theme/colors';
@@ -45,28 +46,40 @@ function RouteHeading({ routeIndex, stopCount }: { routeIndex: number; stopCount
   );
 }
 
-/** Estimated walk to the next stop, with a "Split here" action when the cut is allowed. */
+/**
+ * The walk to the next stop — along the streets once the route is computed (D-046), else a
+ * straight-line estimate — with a "Split here" action when the cut is allowed.
+ */
 function LegConnector({
   from,
   to,
   units,
+  street,
   onSplit,
 }: {
   from: Stop;
   to: Stop;
   units: Units;
+  /** The computed walking leg, when the route is known for this order. */
+  street?: RouteLeg;
   onSplit?: () => void;
 }) {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const lang = i18n.resolvedLanguage ?? 'en';
   const [leg] = estimateLegs([from, to]);
+  const label = street
+    ? t('route.legWalk', {
+        distance: formatDistance(street.distanceM, units, lang),
+        duration: formatDuration(street.durationS),
+      })
+    : t('route.legEstimate', { distance: formatDistance(leg!.distanceM, units, lang) });
   return (
     <View style={styles.connector}>
       <View style={[styles.rail, { backgroundColor: theme.borderStrong }]} />
       <Icon name="walk" size={14} color={theme.textSecondary} />
       <Text variant="helper" secondary style={styles.flex}>
-        {t('route.legEstimate', { distance: formatDistance(leg!.distanceM, units, lang) })}
+        {label}
       </Text>
       {onSplit ? (
         <Button
@@ -136,6 +149,7 @@ export function RouteStopList({
   routeCount,
   splittable,
   units,
+  legs,
   onMove,
   onMoveTo,
   onRemove,
@@ -148,6 +162,8 @@ export function RouteStopList({
   /** Whether "Split here" is offered (enough stops in the whole selection). */
   splittable: boolean;
   units: Units;
+  /** Walking legs along the streets for this exact order (a computed, non-estimated route). */
+  legs?: readonly RouteLeg[] | null;
   onMove: (id: string, direction: -1 | 1) => void;
   onMoveTo: (id: string, to: number) => void;
   onRemove: (id: string) => void;
@@ -180,6 +196,7 @@ export function RouteStopList({
               from={route[i - 1]!}
               to={stop}
               units={units}
+              street={legs?.find((l) => l.fromId === route[i - 1]!.id && l.toId === stop.id)}
               onSplit={splittable && canSplitBefore(route, i) ? () => onSplitAt(i) : undefined}
             />
           ) : null}

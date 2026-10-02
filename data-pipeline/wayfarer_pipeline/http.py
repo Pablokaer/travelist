@@ -23,7 +23,8 @@ import requests
 from . import __version__
 from .paths import CACHE_DIR
 
-DEFAULT_CONTACT = "pablo@finperiti.com"
+# Wikimedia's User-Agent policy asks for an email address or a URL to reach the operator.
+DEFAULT_CONTACT = "https://github.com/Pablokaer/travelist"
 
 
 def user_agent() -> str:

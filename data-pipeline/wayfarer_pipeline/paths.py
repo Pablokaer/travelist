@@ -15,6 +15,7 @@ COUNTRIES_JSON = DATA_DIR / "countries.json"
 COUNTRY_OVERRIDES = DATA_DIR / "country_overrides.yaml"
 VISA_CSV = DATA_DIR / "visa.csv"
 VISA_META = DATA_DIR / "visa_source.json"
+CITY_SUMMARIES_JSON = DATA_DIR / "city_summaries.json"
 PRETTIER = REPO_ROOT / "node_modules" / ".bin" / "prettier"
 
 

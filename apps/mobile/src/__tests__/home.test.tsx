@@ -131,11 +131,11 @@ test('Home search filters cities, not attractions', async () => {
   expect(screen.getByText('No cities match your search.')).toBeOnTheScreen();
 });
 
-test('a city card opens that city with its attractions, search and filters; the logo goes back', async () => {
-  const app = renderRouter(routes, { initialUrl: '/' });
-  await userEvent.press(await screen.findByTestId('city-card-amsterdam'));
+// A city card opens the city page (/short/[slug], city-hub.test.tsx); its attractions are at
+// /city/[slug], unchanged (D-033).
+test('the attractions page of a city has its places, search and filters; the logo goes back', async () => {
+  const app = renderRouter(routes, { initialUrl: '/city/amsterdam' });
 
-  expect(app.getPathname()).toBe('/city/amsterdam');
   expect(await screen.findByText('Rijksmuseum')).toBeOnTheScreen();
   expect(screen.getByText('2 places')).toBeOnTheScreen();
   expect(screen.getByLabelText('Search places in Amsterdam')).toBeOnTheScreen();
@@ -145,15 +145,13 @@ test('a city card opens that city with its attractions, search and filters; the 
   expect(await screen.findByText('1 place')).toBeOnTheScreen();
   expect(screen.getByText('Dam Square')).toBeOnTheScreen();
 
-  await userEvent.press(screen.getByRole('link', { name: 'Wayfarer — all destinations' }));
+  await userEvent.press(screen.getByRole('link', { name: 'Travelist — all destinations' }));
   expect(app.getPathname()).toBe('/');
   expect(await screen.findByTestId('city-card-lisbon')).toBeOnTheScreen();
 });
 
 test('another city loads its own attractions', async () => {
-  const app = renderRouter(routes, { initialUrl: '/' });
-  await userEvent.press(await screen.findByTestId('city-card-lisbon'));
-  expect(app.getPathname()).toBe('/city/lisbon');
+  renderRouter(routes, { initialUrl: '/city/lisbon' });
   expect(await screen.findByText('Belém Tower')).toBeOnTheScreen();
   expect(screen.getByLabelText('Search places in Lisbon')).toBeOnTheScreen();
   expect(screen.queryByText('Rijksmuseum')).toBeNull();

@@ -1,10 +1,15 @@
-// Attraction reviews (D-028): read through `list_attraction_reviews` and the
-// `attraction_rating_summary` view, written through `save_review` (create or edit) and a plain
-// delete. RLS lets each user change only their own review.
+// Reviews (D-028, any target since D-034): an attraction, a city or a walk list. Read through
+// `list_reviews` and the `rating_summary` view (city page cards: `attraction_rating_summary`),
+// written through `save_review` (create or edit) and a plain delete. RLS lets each user change
+// only their own review.
 import type { ReviewForm } from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { avatarUrl } from '@/features/profile/avatar-api';
 import { check, supabase, unwrap } from '@/lib/supabase';
+
+/** What a review is about; `id` is the attraction or trip id, or the city slug. */
+export type ReviewTarget = { kind: 'attraction' | 'city' | 'trip'; id: string };
 
 export type Review = {
   id: string;
@@ -16,11 +21,20 @@ export type Review = {
   authorName: string | null;
   /** True for the signed-in user's own review. */
   isOwn: boolean;
+  /** The author's profile photo (D-039); null shows their initials. */
+  authorAvatarUrl: string | null;
+  /** Opens the author's public profile (D-045); null for an author without one. */
+  authorPublicId: string | null;
 };
 
-export type RatingSummary = { count: number; average: number | null };
+export type RatingSummary = {
+  count: number;
+  average: number | null;
+  /** Reviews per star, index 0 = 1 star … 4 = 5 stars (when the source has it). */
+  distribution?: number[];
+};
 
-/** A `list_attraction_reviews` row. The generated type misses that name and comment can be null. */
+/** A `list_reviews` row. The generated type misses that name and comment can be null. */
 type ReviewRow = {
   id: string;
   rating: number;
@@ -29,19 +43,41 @@ type ReviewRow = {
   updated_at: string;
   author_name: string | null;
   is_own: boolean;
+  author_avatar_path: string | null;
+  author_public_id?: string | null;
 };
 
-type SummaryRow = { review_count: number | null; rating_avg: number | null };
+type SummaryRow = {
+  review_count: number | null;
+  rating_avg: number | null;
+  rating_counts?: number[] | null;
+};
 type CitySummaryRow = SummaryRow & { attraction_id: string | null };
 
+/** The `reviews` / `rating_summary` column and the RPC parameter of each target. */
+const TARGET_COLUMN = {
+  attraction: 'attraction_id',
+  city: 'city_slug',
+  trip: 'trip_id',
+} as const;
+
 export const reviewKeys = {
-  list: (attractionId: string) => ['reviews', attractionId] as const,
-  summary: (attractionId: string) => ['reviews', attractionId, 'summary'] as const,
-  city: (citySlug: string) => ['reviews', 'city', citySlug] as const,
+  list: (target: ReviewTarget) => ['reviews', target.kind, target.id] as const,
+  summary: (target: ReviewTarget) => ['reviews', target.kind, target.id, 'summary'] as const,
+  /** Every place's rating on a city page's cards. */
+  cards: (citySlug: string) => ['reviews', 'cards', citySlug] as const,
 };
 
 /**
- * Maps a `list_attraction_reviews` row.
+ * The RPC parameter naming a review target.
+ * @example targetParams({ kind: 'city', id: 'lisbon' }) // { p_city_slug: 'lisbon' }
+ */
+export function targetParams(target: ReviewTarget): Record<string, string> {
+  return { [`p_${TARGET_COLUMN[target.kind]}`]: target.id };
+}
+
+/**
+ * Maps a `list_reviews` row.
  * @example reviewFromRow(row).authorName // 'Carla'
  */
 export function reviewFromRow(r: ReviewRow): Review {
@@ -53,15 +89,18 @@ export function reviewFromRow(r: ReviewRow): Review {
     updatedAt: r.updated_at,
     authorName: r.author_name,
     isOwn: r.is_own,
+    authorAvatarUrl: avatarUrl(r.author_avatar_path),
+    authorPublicId: r.author_public_id ?? null,
   };
 }
 
 /**
- * Maps an `attraction_rating_summary` row; no row means no reviews.
+ * Maps a rating summary row; no row means no reviews.
  * @example summaryFromRow(null) // { count: 0, average: null }
  */
 export function summaryFromRow(r: SummaryRow | null): RatingSummary {
-  return { count: r?.review_count ?? 0, average: r?.rating_avg ?? null };
+  const summary: RatingSummary = { count: r?.review_count ?? 0, average: r?.rating_avg ?? null };
+  return r?.rating_counts ? { ...summary, distribution: r.rating_counts } : summary;
 }
 
 /**
@@ -77,7 +116,7 @@ export function ratingsByAttraction(rows: readonly CitySummaryRow[]): Map<string
 /** Average rating and review count of every rated place of a city, for the city page cards. */
 export function useCityRatings(citySlug: string | undefined) {
   return useQuery({
-    queryKey: reviewKeys.city(citySlug ?? ''),
+    queryKey: reviewKeys.cards(citySlug ?? ''),
     enabled: !!citySlug,
     queryFn: async (): Promise<Map<string, RatingSummary>> => {
       const rows = unwrap(
@@ -92,28 +131,26 @@ export function useCityRatings(citySlug: string | undefined) {
   });
 }
 
-/** An attraction's reviews, newest first (up to 50). */
-export function useAttractionReviews(attractionId: string) {
+/** The reviews of an attraction, a city or a walk list, newest first (up to 50). */
+export function useReviews(target: ReviewTarget) {
   return useQuery({
-    queryKey: reviewKeys.list(attractionId),
+    queryKey: reviewKeys.list(target),
     queryFn: async (): Promise<Review[]> => {
-      const rows = unwrap(
-        await supabase.rpc('list_attraction_reviews', { p_attraction_id: attractionId }),
-      );
+      const rows = unwrap(await supabase.rpc('list_reviews', targetParams(target)));
       return (rows as ReviewRow[]).map(reviewFromRow);
     },
   });
 }
 
-/** Average rating and number of reviews of an attraction. */
-export function useRatingSummary(attractionId: string) {
+/** Average rating, number of reviews and reviews per star of a target. */
+export function useRatingSummary(target: ReviewTarget) {
   return useQuery({
-    queryKey: reviewKeys.summary(attractionId),
+    queryKey: reviewKeys.summary(target),
     queryFn: async (): Promise<RatingSummary> => {
       const { data, error } = await supabase
-        .from('attraction_rating_summary')
-        .select('review_count, rating_avg')
-        .eq('attraction_id', attractionId)
+        .from('rating_summary')
+        .select('review_count, rating_avg, rating_counts')
+        .eq(TARGET_COLUMN[target.kind], target.id)
         .maybeSingle();
       if (error) throw new Error(error.message);
       return summaryFromRow(data);
@@ -121,27 +158,31 @@ export function useRatingSummary(attractionId: string) {
   });
 }
 
-/** Refetches the list, the summary (both prefix `['reviews', id]`) and the city cards' ratings. */
-function useInvalidateReviews(attractionId: string) {
+/**
+ * Refetches the target's list and summary (both prefix `reviewKeys.list`), the city cards'
+ * ratings and the walk list cards (their averages).
+ */
+function useInvalidateReviews(target: ReviewTarget) {
   const queryClient = useQueryClient();
   return () =>
     Promise.all([
-      queryClient.invalidateQueries({ queryKey: reviewKeys.list(attractionId) }),
-      queryClient.invalidateQueries({ queryKey: ['reviews', 'city'] }),
+      queryClient.invalidateQueries({ queryKey: reviewKeys.list(target) }),
+      queryClient.invalidateQueries({ queryKey: ['reviews', 'cards'] }),
+      queryClient.invalidateQueries({ queryKey: ['walklists'] }),
     ]);
 }
 
 /**
- * Publishes the caller's review of an attraction, or updates it when there is one.
- * @example saveReview.mutate({ rating: 5, comment: 'Worth the climb' })
+ * Publishes the caller's review of a target, or updates it when there is one.
+ * @example useSaveReview({ kind: 'city', id: 'lisbon' }).mutate({ rating: 5, comment: '' })
  */
-export function useSaveReview(attractionId: string) {
-  const invalidate = useInvalidateReviews(attractionId);
+export function useSaveReview(target: ReviewTarget) {
+  const invalidate = useInvalidateReviews(target);
   return useMutation({
     mutationFn: async (form: ReviewForm) => {
       unwrap(
         await supabase.rpc('save_review', {
-          p_attraction_id: attractionId,
+          ...targetParams(target),
           p_rating: form.rating,
           p_comment: form.comment.trim() || undefined,
         }),
@@ -151,12 +192,12 @@ export function useSaveReview(attractionId: string) {
   });
 }
 
-/** Deletes the caller's review of an attraction (RLS: only their own row can match). */
-export function useDeleteReview(attractionId: string) {
-  const invalidate = useInvalidateReviews(attractionId);
+/** Deletes the caller's review (RLS: only their own row can match). */
+export function useDeleteReview(target: ReviewTarget) {
+  const invalidate = useInvalidateReviews(target);
   return useMutation({
     mutationFn: async (reviewId: string) => {
-      check(await supabase.from('attraction_reviews').delete().eq('id', reviewId));
+      check(await supabase.from('reviews').delete().eq('id', reviewId));
     },
     onSuccess: invalidate,
   });

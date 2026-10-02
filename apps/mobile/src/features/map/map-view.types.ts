@@ -1,4 +1,5 @@
 import type { LineString } from '@wayfarer/shared';
+import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 import { palette } from '@/theme/colors';
@@ -12,7 +13,31 @@ export type MapPoint = {
   selected?: boolean;
   /** 1-based position when the point is a route stop. */
   order?: number;
+  /** Photo markers: the place's image (null → the photo placeholder) and its name. */
+  imageUrl?: string | null;
+  name?: string;
 };
+
+export type MapInsets = { top?: number; bottom?: number };
+
+/** Space between a popup and a covered band or the map edge, in px. */
+const POPUP_MARGIN = 12;
+
+/**
+ * How far to pan the map vertically so a popup clears the covered bands: positive moves the
+ * content up, negative down, 0 when it already fits.
+ * @example popupPanY({ top: 500, bottom: 700 }, { top: 0, bottom: 800 }, { bottom: 150 }) // 62
+ */
+export function popupPanY(
+  popup: { top: number; bottom: number },
+  map: { top: number; bottom: number },
+  insets: MapInsets = {},
+): number {
+  const below = popup.bottom - (map.bottom - (insets.bottom ?? 0) - POPUP_MARGIN);
+  if (below > 0) return below;
+  const above = map.top + (insets.top ?? 0) + POPUP_MARGIN - popup.top;
+  return above > 0 ? -above : 0;
+}
 
 /** One walking route drawn on the map; split routes each get their own colour. */
 export type RouteLine = { geometry: LineString; color: string };
@@ -24,6 +49,22 @@ export type MapViewProps = {
   points: MapPoint[];
   routes?: RouteLine[];
   onPointPress?: (id: string) => void;
+  /**
+   * `circle` (default): coloured dots drawn by the map (route and trip maps). `photo`: each
+   * point is a round photo marker (city page, D-029).
+   */
+  markers?: 'circle' | 'photo';
+  /** Photo markers: the selected point, drawn larger and above the others. */
+  selectedId?: string | null;
+  /** Photo markers: shown over the map, attached to the selected point (e.g. its card). */
+  popup?: ReactNode;
+  /** A press on the map that hits no marker or popup (e.g. to close the popup). */
+  onMapPress?: () => void;
+  /**
+   * Bands of the map covered by the app's floating UI (px from the top and bottom edges); the
+   * map pans an opening popup out of them.
+   */
+  overlayInsets?: MapInsets;
   style?: StyleProp<ViewStyle>;
   testID?: string;
   accessibilityLabel?: string;

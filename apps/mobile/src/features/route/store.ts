@@ -10,8 +10,12 @@ import { create } from 'zustand';
 
 import type { AttractionSummary } from '@/features/destinations/api';
 
-/** What `toggle` did: the tray only holds one city and at most ROUTE_MAX_STOPS stops. */
-export type ToggleOutcome = 'added' | 'removed' | 'full' | 'startedNewCity';
+/**
+ * What `toggle` did: the tray only holds one city and at most `capacity` stops — the plan's
+ * places per list (D-047), within ROUTE_MAX_STOPS; `planLimit` when the plan's limit is the one
+ * reached.
+ */
+export type ToggleOutcome = 'added' | 'removed' | 'full' | 'planLimit' | 'startedNewCity';
 
 type Stop = AttractionSummary;
 
@@ -23,15 +27,18 @@ type RouteState = {
   routes: Stop[][];
   /** True once the user reorders by hand: new stops are then slotted in, not re-sorted. */
   manualOrder: boolean;
-  /** Returns false when the tray is full or the stop belongs to another city. */
-  add: (stop: Stop) => boolean;
+  /**
+   * Returns false when the tray is full (`capacity`, default ROUTE_MAX_STOPS) or the stop
+   * belongs to another city.
+   */
+  add: (stop: Stop, capacity?: number) => boolean;
   remove: (id: string) => void;
   /**
    * Adds or removes a stop. A stop from another city replaces the tray (new route); a full tray
-   * is left unchanged.
-   * @example const outcome = useRouteStore.getState().toggle(attraction); // 'added'
+   * is left unchanged. `capacity` is the plan's places per list (D-047), within ROUTE_MAX_STOPS.
+   * @example const outcome = useRouteStore.getState().toggle(attraction, 5); // 'added'
    */
-  toggle: (stop: Stop) => ToggleOutcome;
+  toggle: (stop: Stop, capacity?: number) => ToggleOutcome;
   /** Moves a stop one place within its route; switches to manual order. */
   move: (id: string, direction: -1 | 1) => void;
   /**
@@ -101,22 +108,23 @@ export const useRouteStore = create<RouteState>((set, get) => ({
   stops: [],
   routes: [],
   manualOrder: false,
-  add: (stop) => {
+  add: (stop, capacity = ROUTE_MAX_STOPS) => {
     const { stops, citySlug, routes, manualOrder } = get();
     if (stops.some((s) => s.id === stop.id)) return true;
     if (citySlug && citySlug !== stop.citySlug && stops.length > 0) return false;
-    if (stops.length >= ROUTE_MAX_STOPS) return false;
+    if (stops.length >= Math.min(capacity, ROUTE_MAX_STOPS)) return false;
     set({ citySlug: stop.citySlug, ...withRoutes(insertStop(routes, stop, manualOrder)) });
     return true;
   },
-  toggle: (stop) => {
+  toggle: (stop, capacity = ROUTE_MAX_STOPS) => {
     const { stops, add, remove } = get();
     if (stops.some((s) => s.id === stop.id)) {
       remove(stop.id);
       return 'removed';
     }
-    if (add(stop)) return 'added';
+    if (add(stop, capacity)) return 'added';
     if (stops.length >= ROUTE_MAX_STOPS) return 'full';
+    if (stops.length >= capacity) return 'planLimit';
     set({ citySlug: stop.citySlug, manualOrder: false, ...withRoutes([[stop]]) });
     return 'startedNewCity';
   },

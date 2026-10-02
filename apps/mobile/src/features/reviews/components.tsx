@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/avatar';
 import { Badge } from '@/components/card';
 import { Text } from '@/components/text';
+import { AuthorName } from '@/features/profile/author-name';
 import type { RatingSummary, Review } from '@/features/reviews/api';
 import { Stars } from '@/features/reviews/star-rating';
 import { formatDate, formatRating } from '@/lib/format';
@@ -113,11 +114,9 @@ function ReviewAuthor({ review }: { review: Review }) {
   const date = formatDate(review.createdAt, t('common.locale'));
   return (
     <View style={styles.author}>
-      <Avatar name={name} size={40} />
+      <Avatar name={name} uri={review.authorAvatarUrl} size={40} />
       <View style={styles.flex}>
-        <Text variant="subtitle" numberOfLines={1}>
-          {name}
-        </Text>
+        <AuthorName name={name} publicId={review.authorPublicId} variant="subtitle" />
         <Text variant="caption" secondary>
           {wasEdited(review) ? `${date} · ${t('reviews.edited')}` : date}
         </Text>

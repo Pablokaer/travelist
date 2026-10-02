@@ -13,6 +13,8 @@ const envSchema = z.object({
     emptyToUndefined,
     z.url().default('https://tiles.openfreemap.org/styles/liberty'),
   ),
+  /** Public web address of the app (e.g. https://wayfarer.app); shared trip links use it (D-031). */
+  webUrl: z.preprocess(emptyToUndefined, z.url().optional()),
   sentryDsn: z.preprocess(emptyToUndefined, z.string().optional()),
   posthogKey: z.preprocess(emptyToUndefined, z.string().optional()),
   posthogHost: z.preprocess(emptyToUndefined, z.url().default('https://eu.i.posthog.com')),
@@ -32,7 +34,10 @@ const envSchema = z.object({
 export type AppEnv = z.infer<typeof envSchema>;
 
 export function parseEnv(
-  raw: Omit<Record<keyof AppEnv, string | undefined>, 'authProviders'> & { authProviders?: string },
+  raw: Omit<Record<keyof AppEnv, string | undefined>, 'authProviders' | 'webUrl'> & {
+    authProviders?: string;
+    webUrl?: string;
+  },
 ): AppEnv {
   const result = envSchema.safeParse(raw);
   if (!result.success) {
@@ -45,6 +50,7 @@ export const env: AppEnv = parseEnv({
   supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
   supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
   mapStyleUrl: process.env.EXPO_PUBLIC_MAP_STYLE_URL,
+  webUrl: process.env.EXPO_PUBLIC_WEB_URL,
   sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY,
   posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST,

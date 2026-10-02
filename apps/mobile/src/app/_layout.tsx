@@ -7,13 +7,14 @@ import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Appearance, Platform } from 'react-native';
+import { Appearance, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppMenuButton } from '@/components/app-menu';
 import { LoadingState } from '@/components/states';
 import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 import { useProfile } from '@/features/profile/api';
+import { UpgradeButton } from '@/features/subscription/upgrade-button';
 import { createQueryClient } from '@/lib/query-client';
 import { fontAssets, fontFamilyFor } from '@/theme/fonts';
 import { navigationTheme } from '@/theme/navigation';
@@ -47,7 +48,8 @@ function RootNavigator() {
         headerTitleStyle: { fontFamily: fontFamilyFor('600'), fontSize: 16 },
         contentStyle: { backgroundColor: theme.background },
         // Logo + menu on every stacked screen, so a deep link (e.g. /trip/…) is never a dead end.
-        headerRight: signedIn && onboarded ? () => <AppMenuButton /> : undefined,
+        // "Upgrade" (free plan, D-047) beside the menu on every stacked screen.
+        headerRight: signedIn && onboarded ? () => <HeaderActions /> : undefined,
       }}>
       <Stack.Protected guard={signedIn && onboarded}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -59,6 +61,12 @@ function RootNavigator() {
         <Stack.Screen name="route" options={{ title: t('route.title') }} />
         <Stack.Screen name="trip/[id]" options={{ title: t('trips.detailTitle') }} />
         <Stack.Screen name="edit-profile" options={{ title: t('profile.edit') }} />
+        {/* Free and Premium (D-047). */}
+        <Stack.Screen name="plans" options={{ title: t('plans.title') }} />
+        {/* A walk list's group chat (D-043): /walk-chat?id=…, members only. */}
+        <Stack.Screen name="walk-chat" options={{ title: t('chat.title') }} />
+        {/* A traveller's public profile (D-045): /traveller?id=<public id>. */}
+        <Stack.Screen name="traveller" options={{ title: t('traveller.title') }} />
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !onboarded}>
         <Stack.Screen
@@ -70,8 +78,20 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+      {/* Shared walk lists open for anyone with the link, signed in or not (D-031). */}
+      <Stack.Screen name="shared" options={{ title: t('sharing.sharedTitle') }} />
       <Stack.Screen name="about" options={{ title: t('about.title') }} />
     </Stack>
+  );
+}
+
+/** The right side of stacked screens' headers: "Upgrade" (free plan) and the app menu. */
+function HeaderActions() {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <UpgradeButton />
+      <AppMenuButton />
+    </View>
   );
 }
 

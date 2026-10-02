@@ -37,7 +37,10 @@ export const DEFAULT_VISIT_MINUTES: Record<AttractionCategory, number> = {
 };
 
 export const ROUTE_MIN_STOPS = 2;
-export const ROUTE_MAX_STOPS = 12;
+/** Stops per route (the whole tray, before any split); raised from 12 (D-030). */
+export const ROUTE_MAX_STOPS = 20;
+/** "Suggest a split" offers at most this many routes (what 12 stops allowed). */
+export const ROUTE_MAX_SPLIT_PARTS = 6;
 /** A route with at least this many stops can be split into several routes. */
 export const ROUTE_SPLIT_MIN_STOPS = 5;
 
@@ -64,6 +67,30 @@ export const REVIEW_RATING_MIN = 1;
 export const REVIEW_RATING_MAX = 5;
 /** Longest review comment, in characters (mirrored by a DB check). */
 export const REVIEW_COMMENT_MAX = 1000;
+
+/**
+ * Who can open a saved trip (walk list) by its link (D-031): only the owner, anyone, or anyone
+ * with the password. Mirrored by a DB check on `trips.visibility`.
+ */
+export const TRIP_VISIBILITIES = ['private', 'public', 'password'] as const;
+export type TripVisibility = (typeof TRIP_VISIBILITIES)[number];
+export const DEFAULT_TRIP_VISIBILITY: TripVisibility = 'private';
+/** Trip password length, in characters; bcrypt reads at most 72 bytes (`set_trip_visibility`). */
+export const TRIP_PASSWORD_MIN = 4;
+export const TRIP_PASSWORD_MAX = 72;
+
+/**
+ * Orders of the public walk list listing (D-035), as `list_walklists(p_sort)` accepts them:
+ * best average first, lowest first, most reviews first, newest first.
+ */
+export const WALKLIST_SORTS = ['top', 'lowest', 'most_reviewed', 'newest'] as const;
+export type WalklistSort = (typeof WALKLIST_SORTS)[number];
+/** Lists per page on "View all walk lists" (`list_walklists` returns at most 50). */
+export const WALKLIST_PAGE_SIZE = 20;
+/** Lists in each preview section of the city page (community, official). */
+export const WALKLIST_PREVIEW_COUNT = 6;
+/** Soonest meetups ranked on the city page (D-041). */
+export const MEETUP_PREVIEW_COUNT = 5;
 
 /** EU member states (ISO alpha-2). */
 export const EU_COUNTRIES = [
