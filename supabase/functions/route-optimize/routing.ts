@@ -10,6 +10,7 @@ import {
   type RoutePoint,
 } from '@wayfarer/shared';
 
+import { CircuitBreaker, isUpstreamOutage } from '../_shared/breaker.ts';
 import type { FetchJson } from '../_shared/http.ts';
 import { decodePolyline } from './polyline.ts';
 
@@ -34,6 +35,13 @@ export const ORS_BASE_URL = 'https://api.openrouteservice.org';
 /** ORS foot-walking directions, answered as GeoJSON (geometry + one segment per leg). */
 export const ORS_DIRECTIONS_PATH = '/v2/directions/foot-walking/geojson';
 export const ORS_TIMEOUT_MS = 8000;
+/**
+ * After a 429, 5xx or timeout, that ORS service is skipped for this long (D-063): during an
+ * outage every request would otherwise wait up to 8 s for the optimiser and 8 s more for the
+ * directions before the straight-line fallback. ORS rate limits are per minute, so a 429 has
+ * cleared by the time it is tried again.
+ */
+export const ORS_COOL_DOWN_SECONDS = 60;
 export const ORS_ATTRIBUTION =
   '© openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors';
 export const FALLBACK_ATTRIBUTION = 'Estimated straight-line route';
@@ -144,6 +152,8 @@ export function routeFromVroom(
   };
 }
 
+type OrsDeps = { apiKey: string; fetchJson: FetchJson; baseUrl?: string; timeoutMs?: number };
+
 /** The part of an ORS directions GeoJSON answer we read. */
 type DirectionsResponse = {
   features?: {
@@ -189,15 +199,24 @@ export function parseDirections(
 /**
  * OpenRouteService routing: `optimize` makes one `/optimization` call (VROOM on the foot-walking
  * network) that returns the order, the per-leg totals and the geometry; `directions` follows
- * the streets for an order already known (D-046). They have separate quotas.
+ * the streets for an order already known (D-046). They have separate quotas, so each has its own
+ * breaker name: an outage of one skips only that one (D-063). Create it once per isolate, so the
+ * breaker outlives a request.
  * @example const route = await createOrsRouting({ apiKey, fetchJson }).optimize(stops, true);
  */
-export function createOrsRouting(deps: {
-  apiKey: string;
-  fetchJson: FetchJson;
-  baseUrl?: string;
-  timeoutMs?: number;
-}): OrsRouting {
+export function createOrsRouting(deps: OrsDeps & { breaker?: CircuitBreaker }): OrsRouting {
+  const breaker = deps.breaker ?? new CircuitBreaker(ORS_COOL_DOWN_SECONDS);
+  const { optimize, directions } = createOrsCalls(deps);
+  return {
+    optimize: (stops, fixedStart) =>
+      breaker.run('ors:optimize', () => optimize(stops, fixedStart), isUpstreamOutage),
+    directions: (ordered) =>
+      breaker.run('ors:directions', () => directions(ordered), isUpstreamOutage),
+  };
+}
+
+/** The two ORS calls themselves, without the breaker. */
+function createOrsCalls(deps: OrsDeps): OrsRouting {
   const base = deps.baseUrl ?? ORS_BASE_URL;
   const opts = {
     headers: { Authorization: deps.apiKey },

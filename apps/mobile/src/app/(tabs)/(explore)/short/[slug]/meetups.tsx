@@ -11,7 +11,12 @@ import { CityNotFound } from '@/features/destinations/city-not-found';
 import { openWalklist } from '@/features/trips/city-walklists-section';
 import { useWalklistPages } from '@/features/trips/community-api';
 import { MeetupRow } from '@/features/trips/meetup-row';
-import { FALLBACK_TIME_ZONE, groupByLocalDay, type MeetupDay } from '@/features/trips/meetup-time';
+import {
+  FALLBACK_TIME_ZONE,
+  groupByLocalDay,
+  meetupDayLabel,
+  type MeetupDay,
+} from '@/features/trips/meetup-time';
 import { cityMeetupsQuery } from '@/features/trips/upcoming-meetups-section';
 import { useNow } from '@/lib/use-now';
 import { spacing } from '@/theme/colors';
@@ -43,12 +48,7 @@ function DayHeading({
   const label =
     day === 'today' || day === 'tomorrow'
       ? t(`meetups.${day}`)
-      : new Intl.DateTimeFormat(locale, {
-          timeZone,
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long',
-        }).format(new Date(`${day}T12:00:00Z`));
+      : meetupDayLabel(day, locale, timeZone);
   return (
     <Text variant="heading" accessibilityRole="header">
       {label}

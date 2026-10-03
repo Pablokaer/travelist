@@ -1,94 +1,121 @@
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
-import { Badge, StatTile } from '@/components/card';
+import { Badge } from '@/components/card';
 import { categoryIcon } from '@/components/icon';
-import { ListRow, RowGroup } from '@/components/list-row';
-import { Screen, Section } from '@/components/screen';
+import { Screen } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
-import { localizedName, useAttraction } from '@/features/destinations/api';
+import {
+  localizedName,
+  useAttraction,
+  type AttractionDetail,
+  type AttractionSummary,
+} from '@/features/destinations/api';
+import {
+  AttractionAbout,
+  AttractionDetailsSkeleton,
+  AttractionLinks,
+} from '@/features/destinations/attraction-details';
 import { routeNotice } from '@/features/route/notice';
-import { useToggleStop } from '@/features/route/use-toggle-stop';
-import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 import { useRatingSummary } from '@/features/reviews/api';
 import { RatingSummaryLine } from '@/features/reviews/components';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useRouteStore } from '@/features/route/store';
-import { preferredArticle, wikipediaUrl } from '@/lib/wikipedia';
 import { radius, spacing } from '@/theme/colors';
-import { useTheme } from '@/theme/use-theme';
 
+/**
+ * An attraction's page (`/attraction/[id]`). Opened from a city list, the header (photo, name,
+ * category, visit time) shows at once from the cached list row; the rest has a skeleton until
+ * its full row arrives (D-062).
+ */
 export default function AttractionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { t, i18n } = useTranslation();
-  const lang = i18n.resolvedLanguage ?? 'en';
+  const { t } = useTranslation();
   const attraction = useAttraction(id);
-  const rating = useRatingSummary({ kind: 'attraction', id });
   const inRoute = useRouteStore((s) => s.stops.some((x) => x.id === id));
-  // Within the plan's places per list (D-047).
-  const toggle = useToggleStop();
-  const [planLimited, setPlanLimited] = useState(false);
+  const toggle = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
 
   if (attraction.isPending) return <LoadingState />;
   if (attraction.isError) return <ErrorState onRetry={() => attraction.refetch()} />;
-  const a = attraction.data;
-  const name = localizedName(a, lang);
-  const description =
-    lang === 'pt' ? (a.descriptionPt ?? a.descriptionEn) : (a.descriptionEn ?? a.descriptionPt);
-  const article = preferredArticle(lang, a.wikipediaEn, a.wikipediaPt);
-  const articleUrl = article ? wikipediaUrl(article) : null;
-
+  const { summary: a, detail } = attraction.data;
   const toggleRoute = () => {
-    const outcome = toggle(a);
-    setPlanLimited(outcome === 'planLimit');
-    setNotice(routeNotice(outcome, t));
+    setNotice(routeNotice(toggle(detail ?? a), t));
   };
-
-  const open = (url: string) => void WebBrowser.openBrowserAsync(url);
-  const fee = a.fee
-    ? a.fee === 'yes'
-      ? t('attraction.feeYes')
-      : a.fee === 'no'
-        ? t('attraction.feeNo')
-        : a.fee
-    : null;
 
   return (
     <Screen
       edges={['left', 'right']}
-      footer={
-        <>
-          <View style={styles.footerText}>
-            <Text variant="subtitle">
-              {t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
-            </Text>
-            {notice ? (
-              <Text variant="helper" secondary accessibilityLiveRegion="polite">
-                {notice}
-              </Text>
-            ) : (
-              <Text variant="helper" secondary numberOfLines={1}>
-                {t('attraction.visitTime')}
-              </Text>
-            )}
-          </View>
-          <Button
-            label={inRoute ? t('route.removeStop') : t('route.addStop')}
-            variant={inRoute ? 'secondary' : 'primary'}
-            onPress={toggleRoute}
-            testID="toggle-route"
-          />
-        </>
-      }>
+      footer={<VisitFooter a={a} inRoute={inRoute} notice={notice} onToggleRoute={toggleRoute} />}>
+      <AttractionHeader a={a} detail={detail} />
+      {detail ? <AttractionAbout a={detail} /> : <AttractionDetailsSkeleton />}
+      <ReviewsSection target={{ kind: 'attraction', id: a.id }} />
+      {detail ? <AttractionLinks a={detail} /> : null}
+      <Text variant="helper" secondary>
+        {t('attraction.dataCredit')}
+      </Text>
+    </Screen>
+  );
+}
+
+/** Visit time, the route notice and Add / Remove from the route. */
+function VisitFooter({
+  a,
+  inRoute,
+  notice,
+  onToggleRoute,
+}: {
+  a: AttractionSummary;
+  inRoute: boolean;
+  notice: string | null;
+  onToggleRoute: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <View style={styles.footerText}>
+        <Text variant="subtitle">
+          {t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
+        </Text>
+        {notice ? (
+          <Text variant="helper" secondary accessibilityLiveRegion="polite">
+            {notice}
+          </Text>
+        ) : (
+          <Text variant="helper" secondary numberOfLines={1}>
+            {t('attraction.visitTime')}
+          </Text>
+        )}
+      </View>
+      <Button
+        label={inRoute ? t('route.removeStop') : t('route.addStop')}
+        variant={inRoute ? 'secondary' : 'primary'}
+        onPress={onToggleRoute}
+        testID="toggle-route"
+      />
+    </>
+  );
+}
+
+/** Photo with its credit (once the full row has it), name, rating and badges. */
+function AttractionHeader({
+  a,
+  detail,
+}: {
+  a: AttractionSummary;
+  detail: AttractionDetail | null;
+}) {
+  const { t, i18n } = useTranslation();
+  const name = localizedName(a, i18n.resolvedLanguage ?? 'en');
+  const rating = useRatingSummary({ kind: 'attraction', id: a.id });
+  return (
+    <>
       <Stack.Screen options={{ title: name }} />
-      {planLimited ? <PlanLimitNotice limit="items" /> : null}
       {a.imageUrl ? (
         <View style={styles.hero}>
           <Image
@@ -98,11 +125,14 @@ export default function AttractionScreen() {
             accessibilityLabel={t('attraction.photoOf', { name })}
             transition={200}
           />
+          {/* Same height before the credit is known, so nothing jumps when it arrives. */}
           <Text variant="helper" secondary>
-            {t('attraction.photoCredit', {
-              author: a.imageAuthor ?? t('attraction.unknownAuthor'),
-              license: a.imageLicense ?? '',
-            })}
+            {detail
+              ? t('attraction.photoCredit', {
+                  author: detail.imageAuthor ?? t('attraction.unknownAuthor'),
+                  license: detail.imageLicense ?? '',
+                })
+              : ' '}
           </Text>
         </View>
       ) : null}
@@ -115,75 +145,8 @@ export default function AttractionScreen() {
           {a.isUnesco ? <Badge icon="globe" label={t('attraction.unesco')} /> : null}
         </View>
       </View>
-
-      {description ? <Text style={styles.description}>{description}</Text> : null}
-
-      <Divider />
-
-      <Section title={t('attraction.details')}>
-        <View style={styles.tiles}>
-          <StatTile
-            icon="clock"
-            label={t('attraction.visitTime')}
-            value={t('attraction.visitMinutes', { minutes: a.avgVisitMinutes })}
-          />
-          {fee ? <StatTile icon="ticket" label={t('attraction.fee')} value={fee} /> : null}
-        </View>
-        {/* Opening hours are free-form OSM strings, often too long for a tile. */}
-        <RowGroup>
-          <ListRow
-            icon="calendar"
-            label={t('attraction.openingHours')}
-            value={a.openingHours ?? t('attraction.notAvailable')}
-          />
-        </RowGroup>
-      </Section>
-
-      <ReviewsSection target={{ kind: 'attraction', id: a.id }} />
-
-      {a.website || articleUrl || a.imagePageUrl ? (
-        <Section title={t('attraction.links')}>
-          <RowGroup>
-            {a.website ? (
-              <ListRow
-                icon="globe"
-                role="link"
-                external
-                label={t('attraction.website')}
-                onPress={() => open(a.website!)}
-              />
-            ) : null}
-            {articleUrl ? (
-              <ListRow
-                icon="info"
-                role="link"
-                external
-                label={t('attraction.wikipedia')}
-                onPress={() => open(articleUrl)}
-              />
-            ) : null}
-            {a.imagePageUrl ? (
-              <ListRow
-                icon="photo"
-                role="link"
-                external
-                label={t('attraction.imageSource')}
-                onPress={() => open(a.imagePageUrl!)}
-              />
-            ) : null}
-          </RowGroup>
-        </Section>
-      ) : null}
-      <Text variant="helper" secondary>
-        {t('attraction.dataCredit')}
-      </Text>
-    </Screen>
+    </>
   );
-}
-
-function Divider() {
-  const theme = useTheme();
-  return <View style={[styles.divider, { backgroundColor: theme.border }]} />;
 }
 
 const styles = StyleSheet.create({
@@ -191,8 +154,5 @@ const styles = StyleSheet.create({
   image: { width: '100%', aspectRatio: 16 / 10, maxHeight: 460, borderRadius: radius.xl },
   titleBlock: { gap: spacing.md - 4 },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  description: { fontSize: 17, lineHeight: 27 },
-  divider: { height: StyleSheet.hairlineWidth },
-  tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md - 4 },
   footerText: { flex: 1, gap: spacing.xxs },
 });

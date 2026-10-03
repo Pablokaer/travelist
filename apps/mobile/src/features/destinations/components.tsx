@@ -4,6 +4,7 @@ import { FlatList, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { useTranslation } from 'react-i18next';
 
 import { localizedName, type AttractionSummary, type City } from './api';
+import { normalizeSearch } from './search';
 import { Thumbnail } from './thumbnail';
 
 import { Icon, categoryIcon } from '@/components/icon';
@@ -15,7 +16,8 @@ import { categoryColors, MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
-const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+/** Side of a list row's photo, in points. */
+const ROW_PHOTO_SIZE = 64;
 
 /** Search-style pill showing the current city; opens the city picker. */
 export function CitySwitcher({
@@ -35,10 +37,12 @@ export function CitySwitcher({
   const lang = i18n.resolvedLanguage ?? 'en';
   const name = (c: City) => (lang === 'pt' ? c.namePt : c.nameEn);
 
-  const q = normalize(query.trim());
+  const q = normalizeSearch(query);
   const filtered = [...cities]
     .sort((a, b) => name(a).localeCompare(name(b), lang))
-    .filter((c) => !q || normalize(c.nameEn).includes(q) || normalize(c.namePt).includes(q));
+    .filter(
+      (c) => !q || normalizeSearch(c.nameEn).includes(q) || normalizeSearch(c.namePt).includes(q),
+    );
 
   const close = () => {
     setOpen(false);
@@ -286,7 +290,12 @@ export function AttractionRow({
         },
       ]}>
       <View>
-        <Thumbnail uri={item.imageUrl} style={styles.thumb} />
+        <Thumbnail
+          uri={item.imageUrl}
+          width={ROW_PHOTO_SIZE}
+          style={styles.thumb}
+          testID="attraction-row-photo"
+        />
         {index != null ? (
           <View
             style={[
@@ -379,7 +388,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  thumb: { width: 64, height: 64, borderRadius: radius.md },
+  thumb: { width: ROW_PHOTO_SIZE, height: ROW_PHOTO_SIZE, borderRadius: radius.md },
   rowBadge: {
     position: 'absolute',
     top: -6,

@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 
 import { walklistFromRow, walklistParams, type WalklistCard } from '@/features/trips/community-api';
 import { AttendButton } from '@/features/trips/attend-button';
-import { groupByLocalDay, meetupWhen } from '@/features/trips/meetup-time';
+import { groupByLocalDay, meetupDayLabel, meetupWhen } from '@/features/trips/meetup-time';
 import { UpcomingMeetupsSection } from '@/features/trips/upcoming-meetups-section';
 import '@/lib/i18n';
 import { fakeCity } from '@/testing/fixtures';
@@ -101,6 +101,13 @@ describe('meetup time', () => {
     const when = meetupWhen('2026-10-03T13:05:00Z', 'Europe/Amsterdam', now, 'en-GB');
     expect(when.local).toBe('Sat 3 Oct, 15:05');
     expect(when.countdown).toEqual({ days: 2, hours: 3, minutes: 5 });
+  });
+
+  test('a later day heading is the date written out in the city', () => {
+    expect(meetupDayLabel('2026-10-05', 'en-GB', 'Europe/Amsterdam')).toBe('Monday 5 October');
+    expect(meetupDayLabel('2026-10-05', 'pt-PT', 'Europe/Lisbon')).toBe(
+      'segunda-feira, 5 de outubro',
+    );
   });
 
   test('meetups are grouped by the city day: today, tomorrow, then dates', () => {

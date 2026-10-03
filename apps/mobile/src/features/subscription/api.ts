@@ -1,8 +1,8 @@
-// Plans and subscriptions (D-047). The plans and their limits are rows of the `plans` table;
-// the caller's plan comes from `my_subscription` (Free without an active subscription). The
-// database enforces the limits; the app reads the same rules to explain them before a request
-// and maps the database's plan-limit errors (WF001–WF003) to `PlanLimitError`.
-import { planLimitFromCode, type PlanLimit, type PlanRules } from '@wayfarer/shared';
+// Plans and subscriptions (D-047). The plans are rows of the `plans` table; the caller's plan
+// comes from `my_subscription` (Free without an active subscription). No plan limits are
+// enforced for now (D-065) and the paid plans UI is hidden behind `FEATURES.paidPlans`; the model
+// stays for when payments return.
+import type { PlanRules } from '@wayfarer/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { supabase } from '@/lib/supabase';
@@ -25,7 +25,7 @@ export type Subscription = {
   startedAt: string | null;
   /** End of the paid period ("valid until"), when there is one. */
   validUntil: string | null;
-  /** The caller's walk lists, for the list limit. */
+  /** The caller's walk lists. */
   listCount: number;
 };
 
@@ -80,34 +80,6 @@ export function subscriptionFrom(r: SubscriptionResult): Subscription {
     validUntil: r.valid_until,
     listCount: r.list_count,
   };
-}
-
-/** A request refused by the database because of the plan (WF001–WF003). */
-export class PlanLimitError extends Error {
-  constructor(
-    readonly limit: PlanLimit,
-    message: string,
-  ) {
-    super(message);
-  }
-
-  /**
-   * The plan-limit error behind a Supabase error, or null for any other error.
-   * @example PlanLimitError.from(result.error)?.limit // 'lists'
-   */
-  static from(error: { code?: string; message: string } | null): PlanLimitError | null {
-    const limit = planLimitFromCode(error?.code);
-    return limit && error ? new PlanLimitError(limit, error.message) : null;
-  }
-}
-
-/**
- * Throws the Supabase error of a write — as a PlanLimitError when a plan limit refused it.
- * @example throwIfError(await supabase.rpc('save_trip', …))
- */
-export function throwIfError(result: { error: { code?: string; message: string } | null }) {
-  if (!result.error) return;
-  throw PlanLimitError.from(result.error) ?? new Error(result.error.message);
 }
 
 /** Every plan, in display order (from the `plans` table; readable by everyone). */

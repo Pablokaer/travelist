@@ -1,7 +1,8 @@
 // Plans (D-047), /plans: Free and Premium side by side, from the `plans` table. "Upgrade to
-// Premium" is where checkout will start (`startCheckout`); no payment is taken yet.
+// Premium" is where checkout will start (`startCheckout`); no payment is taken yet. While paid
+// plans are hidden (D-065) the address sends the user home instead.
 import { ROUTE_MAX_STOPS } from '@wayfarer/shared';
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +15,7 @@ import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { startCheckout, useMySubscription, usePlans, type Plan } from '@/features/subscription/api';
 import { planFeatures, planName, planPrice } from '@/features/subscription/plan-text';
+import { useFeatures } from '@/lib/features';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -54,7 +56,15 @@ function PlanCard({
   );
 }
 
-export default function PlansScreen() {
+/**
+ * The route: the plans when paid plans are on, otherwise home (D-065).
+ * @example router.push('/plans')
+ */
+export default function PlansRoute() {
+  return useFeatures().paidPlans ? <PlansScreen /> : <Redirect href="/" />;
+}
+
+function PlansScreen() {
   const { t } = useTranslation();
   const plans = usePlans();
   const subscription = useMySubscription();

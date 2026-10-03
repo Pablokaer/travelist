@@ -4,15 +4,13 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/text';
-import { Thumbnail, thumbnailUrl } from '@/features/destinations/thumbnail';
+import { Thumbnail } from '@/features/destinations/thumbnail';
 import { palette } from '@/theme/colors';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
 /** Diameters in px: small enough for dense areas, larger for the selected place. */
 export const MARKER_SIZE = 36;
 export const MARKER_SELECTED_SIZE = 48;
-/** Commons standard width loaded for markers (enough for a 48 px circle at 2×). */
-const MARKER_PHOTO_WIDTH = 120;
 
 type Props = {
   imageUrl: string | null;
@@ -52,7 +50,10 @@ export function PhotoMarker({ imageUrl, selected, order }: Props) {
           selected && styles.circleSelected,
         ]}>
         <Thumbnail
-          uri={thumbnailUrl(imageUrl, MARKER_PHOTO_WIDTH)}
+          uri={imageUrl}
+          // The circle's own size: the 60 px Commons thumbnail up to 2× screens, 120 px on 3×
+          // ones and for the selected marker (D-050, D-062).
+          width={size}
           style={styles.photo}
           iconSize={Math.round(size * 0.45)}
           testID="photo-marker-image"

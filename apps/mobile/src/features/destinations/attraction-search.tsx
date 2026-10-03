@@ -1,5 +1,4 @@
-import { Image } from 'expo-image';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,10 +8,10 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { localizedName, type AttractionSummary } from './api';
-import { searchAttractions } from './search';
+import { buildSearchIndex, searchIndex } from './search';
+import { Thumbnail } from './thumbnail';
 
 import { IconButton } from '@/components/button';
-import { Icon } from '@/components/icon';
 import { SEARCH_FIELD_HEIGHT, SearchField } from '@/components/search-field';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
@@ -21,6 +20,8 @@ import { useShadows, useTheme } from '@/theme/use-theme';
 
 /** Suggestions shown in the dropdown; the grid below shows every match. */
 const MAX_SUGGESTIONS = 8;
+/** Side of a suggestion's photo, in points. */
+const SUGGESTION_PHOTO_SIZE = 40;
 // Lets a tap on a suggestion land before the input's blur closes the dropdown.
 const BLUR_CLOSE_DELAY_MS = 180;
 
@@ -48,11 +49,14 @@ export function AttractionSearch(props: Props) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const suggestions = searchAttractions(
-    items,
-    query,
-    i18n.resolvedLanguage ?? 'en',
-    MAX_SUGGESTIONS,
+  const language = i18n.resolvedLanguage ?? 'en';
+  // Names are normalised once per list of places, not on every keystroke.
+  const index = useMemo(() => buildSearchIndex(items), [items]);
+  // Only when the places, the text or the language change: the city page re-renders this on
+  // every selection and route change too. The live query, so suggestions keep up with typing.
+  const suggestions = useMemo(
+    () => searchIndex(index, query, language, MAX_SUGGESTIONS),
+    [index, query, language],
   );
   const showDropdown = open && query.trim().length > 0;
 
@@ -151,18 +155,13 @@ function Suggestion({
           styles.pick,
           hovered && !active && { backgroundColor: theme.surfaceMuted },
         ]}>
-        {item.imageUrl ? (
-          <Image
-            source={item.imageUrl}
-            style={styles.thumb}
-            contentFit="cover"
-            accessible={false}
-          />
-        ) : (
-          <View style={[styles.thumb, styles.thumbEmpty, { backgroundColor: theme.surfaceMuted }]}>
-            <Icon name="photo" size={16} color={theme.textSecondary} />
-          </View>
-        )}
+        <Thumbnail
+          uri={item.imageUrl}
+          width={SUGGESTION_PHOTO_SIZE}
+          style={styles.thumb}
+          iconSize={16}
+          testID="search-suggestion-photo"
+        />
         <View style={styles.text}>
           <Text variant="subtitle" numberOfLines={1}>
             {name}
@@ -219,8 +218,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md - 4,
     borderRadius: radius.md,
   },
-  thumb: { width: 40, height: 40, borderRadius: radius.sm },
-  thumbEmpty: { alignItems: 'center', justifyContent: 'center' },
+  thumb: { width: SUGGESTION_PHOTO_SIZE, height: SUGGESTION_PHOTO_SIZE, borderRadius: radius.sm },
   text: { flex: 1, gap: spacing.xxs },
   check: {
     width: 24,

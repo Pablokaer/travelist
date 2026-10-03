@@ -11,12 +11,11 @@ import { Sheet } from '@/components/sheet';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
+import { normalizeSearch } from '@/features/destinations/search';
 import { flagEmoji } from '@/lib/format';
 import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { fontFamilyFor } from '@/theme/fonts';
 import { useTheme } from '@/theme/use-theme';
-
-const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 type Props = {
   label: string;
@@ -43,15 +42,15 @@ export function CountryPicker({ label, value, onChange, multiple, max = 5, error
     [countries.data],
   );
   const filtered = useMemo(() => {
-    const q = normalize(query.trim());
+    const q = normalizeSearch(query);
     const list = [...(countries.data ?? [])].sort((a, b) =>
       countryName(a, lang).localeCompare(countryName(b, lang), lang),
     );
     if (!q) return list;
     return list.filter(
       (c) =>
-        normalize(c.name_en).includes(q) ||
-        normalize(c.name_pt).includes(q) ||
+        normalizeSearch(c.name_en).includes(q) ||
+        normalizeSearch(c.name_pt).includes(q) ||
         c.code.toLowerCase() === q,
     );
   }, [countries.data, query, lang]);

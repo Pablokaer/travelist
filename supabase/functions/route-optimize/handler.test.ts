@@ -1,5 +1,4 @@
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { type RouteResponse, routeResponseSchema } from '@wayfarer/shared';
 
 import { cacheKey, createCached, noCache } from '../_shared/cache.ts';
 import { HttpError } from '../_shared/http.ts';

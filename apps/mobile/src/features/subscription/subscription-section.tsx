@@ -1,5 +1,6 @@
 // Settings → Subscription (D-047): the current plan and, for a paid plan, its price, validity
-// and "Manage subscription" (the plans page until billing management arrives).
+// and "Manage subscription" (the plans page until billing management arrives). Hidden, with the
+// rest of the paid plans UI, while `FEATURES.paidPlans` is off (D-065).
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,7 @@ import { LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
 import { useMySubscription } from '@/features/subscription/api';
 import { planName, planPrice } from '@/features/subscription/plan-text';
+import { useFeatures } from '@/lib/features';
 import { formatDate } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 
@@ -17,6 +19,10 @@ import { spacing } from '@/theme/colors';
  * @example <SubscriptionSection />
  */
 export function SubscriptionSection() {
+  return useFeatures().paidPlans ? <CurrentSubscription /> : null;
+}
+
+function CurrentSubscription() {
   const { t } = useTranslation();
   const subscription = useMySubscription();
   const s = subscription.data;

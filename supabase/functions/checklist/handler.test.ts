@@ -84,10 +84,19 @@ function fakeDeps(over: Partial<ChecklistDeps> = {}): { deps: ChecklistDeps; cal
   const calls: Calls = { forecast: [], climate: [], fx: [] };
   const deps: ChecklistDeps = {
     db: {
-      getCity: (slug) => Promise.resolve(slug === 'lisbon' ? LISBON : null),
-      getCountries: (codes) => Promise.resolve(COUNTRIES.filter((c) => codes.includes(c.code))),
-      getVisaOptions: (dest, passports) =>
-        Promise.resolve(dest === 'PT' ? VISA.filter((v) => passports.includes(v.nationality)) : []),
+      getPlace: (slug, home) =>
+        Promise.resolve(
+          slug === 'lisbon'
+            ? {
+              city: LISBON,
+              countries: COUNTRIES.filter((c) => c.code === 'PT' || c.code === home),
+            }
+            : null,
+        ),
+      getVisaOptions: (citySlug, passports) =>
+        Promise.resolve(
+          citySlug === 'lisbon' ? VISA.filter((v) => passports.includes(v.nationality)) : [],
+        ),
     },
     weather: {
       forecast: (q) => {
@@ -329,6 +338,34 @@ Deno.test('checklist: a failing DB visa lookup does not fail the response', asyn
   const r = await ok(deps, { city: 'lisbon', nationalities: ['BR'] });
   assertEquals(r.visa.status, 'unavailable');
   okSection(r.weather);
+});
+
+Deno.test('checklist: one read for the city and its countries, the visa rules read alongside', async () => {
+  const { deps } = fakeDeps();
+  const place = deps.db.getPlace;
+  const visa = deps.db.getVisaOptions;
+  let placeReads = 0;
+  let placeAnswered = false;
+  let visaWaitedForPlace = true;
+  deps.db.getPlace = async (...args) => {
+    placeReads++;
+    const answer = await place(...args);
+    placeAnswered = true;
+    return answer;
+  };
+  deps.db.getVisaOptions = (...args) => {
+    visaWaitedForPlace = placeAnswered;
+    return visa(...args);
+  };
+  okSection((await ok(deps, { city: 'lisbon', nationalities: ['BR'], homeCountry: 'BR' })).visa);
+  assertEquals(placeReads, 1);
+  assertEquals(visaWaitedForPlace, false);
+});
+
+Deno.test('checklist: an unknown city is a 404, even when the visa read fails', async () => {
+  const { deps } = fakeDeps();
+  deps.db.getVisaOptions = () => Promise.reject(new Error('db down'));
+  assertEquals((await post(deps, { city: 'atlantis', nationalities: ['BR'] })).status, 404);
 });
 
 Deno.test('checklist: passport expiry maps to validity', async () => {

@@ -3,7 +3,6 @@ import { expect, test } from '@playwright/test';
 import {
   addLisbonPlaces,
   byTestIdOn,
-  makePremium,
   openLisbonAttractions,
   roleOn,
   signUpAndOnboard,
@@ -53,8 +52,6 @@ test('orders picks automatically, splits them into two routes and saves both', a
   test.setTimeout(150_000);
   const byTestId = byTestIdOn(page);
   await signUpAndOnboard(page);
-  // Six places in a list need Premium (the Free plan allows 5 per list, D-047).
-  await makePremium(page);
   await addLisbonPlaces(page, 6);
 
   await byTestId('open-route').click();
@@ -156,7 +153,11 @@ test('map: photo markers open a compact card; + adds to the route; the card open
   const markers = page.locator('.maplibregl-marker.wayfarer-marker');
   await expect(markers.first()).toBeVisible({ timeout: 20_000 });
   expect(await markers.count()).toBeGreaterThan(50);
-  await expect(markers.first().locator('img').first()).toHaveAttribute('src', /\/120px-/);
+  // maplibre's stylesheet is added when the map opens (no page links it up front, D-062).
+  await expect(markers.first()).toHaveCSS('position', 'absolute');
+  await expect(page.locator('.maplibregl-ctrl-group').first()).toHaveCSS('border-radius', '4px');
+  // A small Commons thumbnail: 60 px on the 1× desktop, 120 px on the 2.6× phone (D-050, D-062).
+  await expect(markers.first().locator('img').first()).toHaveAttribute('src', /\/(60|120)px-/);
 
   // Markers of dense areas overlap: use ones whose centre is not covered by another.
   const uncovered = await page.evaluate(() =>
@@ -236,8 +237,6 @@ test('a route holds up to 20 places: the 21st is refused with a notice; 20 are s
   test.setTimeout(150_000);
   const byTestId = byTestIdOn(page);
   await signUpAndOnboard(page);
-  // Twenty places in a list need Premium (the Free plan allows 5 per list, D-047).
-  await makePremium(page);
   await openLisbonAttractions(page);
   await page
     .getByRole('radio', { name: 'List' })

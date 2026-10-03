@@ -1,59 +1,37 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { VisaOption, VisaRequirement } from '@wayfarer/shared';
 
-import type { ChecklistDb, CityRow, CountryRow } from './types.ts';
+import type { ChecklistDb, Place } from './types.ts';
 
-const COUNTRY_COLUMNS = [
-  'code',
-  'name_en',
-  'name_pt',
-  'currency_codes',
-  'plug_types',
-  'voltage',
-  'frequency_hz',
-  'driving_side',
-  'calling_code',
-  'emergency_number',
-  'police_number',
-  'ambulance_number',
-  'fire_number',
-  'languages',
-  'timezones',
-].join(',');
+type VisaRow = { passport: string; requirement: VisaRequirement; max_stay_days: number | null };
 
+/**
+ * The checklist's reads, two RPCs started together (D-054): `checklist_place` (city, its country
+ * and the home country) and `visa_options_for_city`; before, city → countries → visa were three
+ * round trips one after another.
+ * @example const place = await supabaseChecklistDb(serviceClient()).getPlace('lisbon', 'BR');
+ */
 export function supabaseChecklistDb(client: SupabaseClient): ChecklistDb {
   return {
-    async getCity(slug) {
-      const { data, error } = await client
-        .from('city_list')
-        .select('slug,name_en,name_pt,country_code,lat,lng,timezone')
-        .eq('slug', slug)
-        .maybeSingle();
+    async getPlace(citySlug, homeCountry) {
+      const { data, error } = await client.rpc('checklist_place', {
+        p_city: citySlug,
+        p_home: homeCountry,
+      });
       if (error) throw error;
-      return (data as CityRow | null) ?? null;
+      return (data as Place | null) ?? null;
     },
-    async getCountries(codes) {
-      const { data, error } = await client.from('countries').select(COUNTRY_COLUMNS).in(
-        'code',
-        codes,
-      );
+    async getVisaOptions(citySlug, passports) {
+      const { data, error } = await client.rpc('visa_options_for_city', {
+        p_city: citySlug,
+        p_passports: passports,
+      });
       if (error) throw error;
-      return (data ?? []) as unknown as CountryRow[];
-    },
-    async getVisaOptions(destination, passports) {
-      const { data, error } = await client
-        .from('visa_requirements')
-        .select('passport,requirement,max_stay_days')
-        .eq('destination', destination)
-        .in('passport', passports);
-      if (error) throw error;
-      return (data ?? []).map(
-        (r: { passport: string; requirement: VisaRequirement; max_stay_days: number | null }) => ({
-          nationality: r.passport,
-          requirement: r.requirement,
-          maxStayDays: r.max_stay_days,
-        } satisfies VisaOption),
-      );
+      return ((data ?? []) as VisaRow[]).map((r) => ({
+        nationality: r.passport,
+        requirement: r.requirement,
+        maxStayDays: r.max_stay_days,
+      } satisfies VisaOption));
     },
   };
 }

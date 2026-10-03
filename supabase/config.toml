@@ -246,14 +246,8 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Bilingual (EN/PT) templates that include both the link and the 6-digit code.
-[auth.email.template.magic_link]
-subject = "Your Travelist sign-in link · O seu link de acesso ao Travelist"
-content_path = "./supabase/templates/magic_link.html"
-
-[auth.email.template.confirmation]
-subject = "Confirm your Travelist account · Confirme a sua conta Travelist"
-content_path = "./supabase/templates/confirmation.html"
+# Auth emails are not templated here: the Send Email Hook below (D-066) sends every one of them,
+# in the user's language, from supabase/functions/_shared/email-templates.
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -296,6 +290,17 @@ max_frequency = "5s"
 # [auth.hook.custom_access_token]
 # enabled = true
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
+
+# Every auth email (sign-up, recovery, magic link, email change...) goes through the auth-email
+# Edge Function, which writes it in the user's language and sends it with our mailer (D-066):
+# Resend in production, Mailpit locally. While enabled, Auth no longer sends email over SMTP.
+# Local: Auth reaches the function through the API gateway on the host. Hosted: enable it in the
+# dashboard (Authentication → Hooks) with https://<ref>.supabase.co/functions/v1/auth-email.
+[auth.hook.send_email]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/auth-email"
+# "v1,whsec_<base64>", shared with the function (same variable in .env).
+secrets = "env(SEND_EMAIL_HOOK_SECRET)"
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 [auth.sms.twilio]
@@ -440,10 +445,20 @@ enabled = true
 [functions.health]
 verify_jwt = false
 
-# User-only functions. The gateway checks the JWT signature; the functions additionally
-# resolve the user with auth.getUser() so the public anon key alone is rejected.
+# User-only functions. The gateway checks the JWT signature; the functions additionally verify
+# the token's claims (auth.getClaims(), D-053) so the public anon key alone is rejected.
 [functions.checklist]
 verify_jwt = true
 
 [functions.route-optimize]
 verify_jwt = true
+
+# Sends the signed-in user's welcome email once (D-066).
+[functions.welcome-email]
+verify_jwt = true
+
+# Called by Supabase Auth (Send Email Hook), not by users: Auth signs each call with
+# SEND_EMAIL_HOOK_SECRET (Standard Webhooks) and sends no user JWT, so the gateway check is off
+# and the function verifies the signature itself.
+[functions.auth-email]
+verify_jwt = false

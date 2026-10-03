@@ -30,20 +30,34 @@ function distanceMatrix(points: readonly RoutePoint[]): number[][] {
   return points.map((a) => points.map((b) => haversineMeters(a, b)));
 }
 
-/** Held-Karp tables: `cost[mask·n + last]` is the shortest path over `mask` ending at `last`. */
-type PathTables = { n: number; cost: Float64Array; prev: Int8Array };
+/**
+ * Held-Karp tables: `cost[mask·n + last]` is the shortest path over `mask` ending at `last`;
+ * `d[i·n + j]` the distance from stop i to stop j. Flat typed arrays keep the inner loop cheap
+ * on Hermes, which has no JIT (the loop ran ~1.9× faster than over nested arrays).
+ */
+type PathTables = { n: number; d: Float64Array; cost: Float64Array; prev: Int8Array };
+
+/** The distance matrix in one flat array, row after row. */
+function flatten(d: readonly number[][]): Float64Array {
+  const flat = new Float64Array(d.length * d.length);
+  d.forEach((row, i) => flat.set(row, i * d.length));
+  return flat;
+}
 
 /** Relaxes every path over `mask` by one more stop. */
-function extendPaths(d: readonly number[][], mask: number, t: PathTables): void {
-  for (let last = 0; last < t.n; last++) {
-    const here = t.cost[mask * t.n + last]!;
+function extendPaths(mask: number, { n, d, cost, prev }: PathTables): void {
+  // Locals, not `t.cost[…]`: an interpreter looks a property up on every access.
+  for (let last = 0; last < n; last++) {
+    const here = cost[mask * n + last]!;
     if (here === Infinity) continue;
-    for (let next = 0; next < t.n; next++) {
+    for (let next = 0; next < n; next++) {
       if (mask & (1 << next)) continue;
-      const slot = (mask | (1 << next)) * t.n + next;
-      const cost = here + d[last]![next]!;
+      const slot = (mask | (1 << next)) * n + next;
+      const total = here + d[last * n + next]!;
       // Strict comparison (lowest index wins ties) keeps the result deterministic.
-      if (cost < t.cost[slot]! - 1e-9) [t.cost[slot], t.prev[slot]] = [cost, last];
+      if (!(total < cost[slot]! - 1e-9)) continue;
+      cost[slot] = total;
+      prev[slot] = last;
     }
   }
 }
@@ -73,11 +87,14 @@ function shortestOpenPath(d: readonly number[][], start: number | null): number[
   const size = (1 << n) * n;
   const t: PathTables = {
     n,
+    d: flatten(d),
     cost: new Float64Array(size).fill(Infinity),
     prev: new Int8Array(size).fill(-1),
   };
   for (let j = 0; j < n; j++) if (start === null || j === start) t.cost[(1 << j) * n + j] = 0;
-  for (let mask = 1; mask < 1 << n; mask++) extendPaths(d, mask, t);
+  // With a fixed start, a subset without it has no path: skipping it halves the work.
+  const startBit = start === null ? 0 : 1 << start;
+  for (let mask = 1; mask < 1 << n; mask++) if (mask & startBit || !startBit) extendPaths(mask, t);
   const order = tracePath(t);
   // With a free start a path and its reverse are equally short: start from the stop listed
   // first, so e.g. the second half of a split carries on from where the first one ended.

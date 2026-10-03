@@ -13,3 +13,10 @@ onlyBuiltDependencies:
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'
+
+# Advisories with no fixed version that only reach dev tooling (not the app bundle).
+# Review on every Expo upgrade and drop an entry once a patch exists (D-049).
+auditConfig:
+  ignoreGhsas:
+    # node-forge RSA signature check, via expo > @expo/cli (dev server only); no patched version.
+    - GHSA-86w9-cpqp-85rv

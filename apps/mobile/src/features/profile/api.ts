@@ -26,6 +26,8 @@ export type Profile = {
   nationalities: string[];
   /** Profile photo in the avatars bucket (D-039); null shows the initials. */
   avatarPath: string | null;
+  /** Whether the welcome email went out (D-066); the app asks for it until it has. */
+  welcomeEmailSent: boolean;
 };
 
 export const profileKeys = {
@@ -54,7 +56,7 @@ async function fetchProfile(userId: string): Promise<Profile> {
     await supabase
       .from('profiles')
       .select(
-        'id, display_name, nickname, home_country, language, units, theme, passport_expiry, onboarded_at, avatar_path, profile_nationalities(country_code)',
+        'id, display_name, nickname, home_country, language, units, theme, passport_expiry, onboarded_at, avatar_path, welcome_email_sent_at, profile_nationalities(country_code)',
       )
       .eq('id', userId)
       .single(),
@@ -71,6 +73,8 @@ async function fetchProfile(userId: string): Promise<Profile> {
     onboardedAt: row.onboarded_at,
     nationalities: (row.profile_nationalities ?? []).map((n) => n.country_code).sort(),
     avatarPath: row.avatar_path,
+    // Only an explicit null means "not yet": a row without the column never triggers a send.
+    welcomeEmailSent: row.welcome_email_sent_at !== null,
   };
 }
 

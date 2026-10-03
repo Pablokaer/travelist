@@ -1,5 +1,5 @@
 import { useState, type ReactElement } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 
 import { spacing } from '@/theme/colors';
 import { gridColumns, gridItemWidth } from '@/theme/grid';
@@ -7,6 +7,11 @@ import { gridColumns, gridItemWidth } from '@/theme/grid';
 const GRID_GAP = spacing.lg;
 /** Cards stay at least this wide; the column count follows the space the grid really has. */
 const CARD_MIN_WIDTH = 240;
+/**
+ * Screens of cards kept rendered around the visible one (FlatList's default is 21). Image cards
+ * are heavy: 7 keeps scrolling smooth with far fewer mounted cards (D-062).
+ */
+const GRID_WINDOW_SIZE = 7;
 
 type Props<T> = {
   items: readonly T[];
@@ -41,6 +46,9 @@ export function CardGrid<T>(props: Props<T>) {
       data={props.items}
       keyExtractor={props.keyOf}
       numColumns={columns}
+      windowSize={GRID_WINDOW_SIZE}
+      // Detaches off-screen cards from the native view tree; the web has no such views.
+      removeClippedSubviews={Platform.OS !== 'web'}
       columnWrapperStyle={columns > 1 ? { gap: GRID_GAP } : undefined}
       contentContainerStyle={[
         styles.content,

@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects } from 'jsr:@std/assert@1';
 
-import { noCache } from '../_shared/cache.ts';
+import { type Cached, noCache } from '../_shared/cache.ts';
 import { type FetchJson, HttpError } from '../_shared/http.ts';
 import {
   climateFromDaily,
@@ -45,38 +45,98 @@ Deno.test('climateFromDaily: averages the travel month across years', () => {
   });
 });
 
-Deno.test('open-meteo forecast maps daily arrays', async () => {
-  const { fetchJson, calls } = fakeFetch([[
-    'https://api.open-meteo.com/v1/forecast',
-    () => ({
-      daily: {
-        time: ['2026-09-27', '2026-09-28'],
-        temperature_2m_max: [28.1, 26.4],
-        temperature_2m_min: [20.9, 18.2],
-        precipitation_sum: [0, 1.8],
-        precipitation_probability_max: [0, 59],
-        weather_code: [3, 80],
-      },
-    }),
-  ]]);
-  const days = await createOpenMeteo({ fetchJson, cached: noCache }).forecast({
-    lat: 38.7223,
-    lng: -9.1393,
+/** Open-Meteo's answer for the 16 days from `firstDay`, as `/v1/forecast` returns it. */
+function sixteenDayForecast(firstDay: string) {
+  const time = Array.from({ length: 16 }, (_, i) => {
+    const d = new Date(`${firstDay}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+  return {
+    daily: {
+      time,
+      temperature_2m_max: time.map((_, i) => 20 + i),
+      temperature_2m_min: time.map((_, i) => 10 + i),
+      precipitation_sum: time.map((_, i) => (i === 1 ? 1.8 : 0)),
+      precipitation_probability_max: time.map((_, i) => (i === 1 ? 59 : 0)),
+      weather_code: time.map((_, i) => (i === 1 ? 80 : 3)),
+    },
+  };
+}
+
+/** A `cached` that keeps every value in memory by key (a warm `api_cache`). */
+class MemoryCached {
+  values = new Map<string, unknown>();
+  cached: Cached = async <T>(key: string, _ttl: unknown, fetcher: () => Promise<T>) => {
+    if (!this.values.has(key)) this.values.set(key, await fetcher());
+    return this.values.get(key) as T;
+  };
+}
+
+const LISBON = { lat: 38.7223, lng: -9.1393 };
+/** 10:00 UTC on 27 September: the forecast may be asked for 27 September – 12 October. */
+const SEP_27 = () => new Date('2026-09-27T10:00:00Z');
+const forecastFetch = () =>
+  fakeFetch([['https://api.open-meteo.com/v1/forecast', (url) => {
+    return sixteenDayForecast(new URL(url).searchParams.get('start_date')!);
+  }]]);
+
+Deno.test('open-meteo forecast maps daily arrays of the trip window', async () => {
+  const { fetchJson, calls } = forecastFetch();
+  const days = await createOpenMeteo({ fetchJson, cached: noCache, now: SEP_27 }).forecast({
+    ...LISBON,
     start: '2026-09-27',
     end: '2026-09-28',
   });
+  assertEquals(days.map((d) => d.date), ['2026-09-27', '2026-09-28']);
   assertEquals(days[1], {
     date: '2026-09-28',
-    tempMinC: 18.2,
-    tempMaxC: 26.4,
+    tempMinC: 11,
+    tempMaxC: 21,
     precipitationMm: 1.8,
     precipitationProbability: 59,
     weatherCode: 80,
   });
   const url = new URL(calls[0]!);
   assertEquals(url.searchParams.get('latitude'), '38.72');
+  // The whole range Open-Meteo accepts (UTC today + 15), whatever the window asked for.
   assertEquals(url.searchParams.get('start_date'), '2026-09-27');
+  assertEquals(url.searchParams.get('end_date'), '2026-10-12');
   assertEquals(url.searchParams.get('timezone'), 'auto');
+});
+
+Deno.test('open-meteo forecast: one fetch per place and day serves every trip window', async () => {
+  const { fetchJson, calls } = forecastFetch();
+  const cached = new MemoryCached().cached;
+  let now = SEP_27();
+  const meteo = createOpenMeteo({ fetchJson, cached, now: () => now });
+  const first = await meteo.forecast({ ...LISBON, start: '2026-09-27', end: '2026-10-03' });
+  const second = await meteo.forecast({ ...LISBON, start: '2026-10-08', end: '2026-10-12' });
+  assertEquals(calls.length, 1);
+  assertEquals(first.length, 7);
+  assertEquals(second.map((d) => d.date), [
+    '2026-10-08',
+    '2026-10-09',
+    '2026-10-10',
+    '2026-10-11',
+    '2026-10-12',
+  ]);
+  assertEquals(second[0]!.tempMaxC, 31); // the 12th day of the answer
+  now = new Date('2026-09-28T00:30:00Z'); // the next UTC day reaches one day further
+  const later = await meteo.forecast({ ...LISBON, start: '2026-10-13', end: '2026-10-13' });
+  assertEquals([calls.length, later[0]!.date], [2, '2026-10-13']);
+});
+
+Deno.test('open-meteo forecast: a window outside the forecast range is an error, as before', async () => {
+  const meteo = createOpenMeteo({
+    fetchJson: forecastFetch().fetchJson,
+    cached: noCache,
+    now: SEP_27,
+  });
+  // Open-Meteo answered 400 ("out of allowed range") for these per-window requests.
+  for (const [start, end] of [['2026-10-12', '2026-10-13'], ['2026-09-26', '2026-09-27']]) {
+    await assertRejects(() => meteo.forecast({ ...LISBON, start, end }), Error, 'outside');
+  }
 });
 
 Deno.test('open-meteo climate requests the month span of the chosen years', async () => {
@@ -186,4 +246,47 @@ Deno.test('advisory: compacts the GAC index and maps fields', async () => {
   });
   assertEquals(await advisory('FR'), null);
   assertEquals(calls.length, 2); // noCache: one fetch per call
+});
+
+/** A pass-through `cached` that records the stale window each namespace asks for. */
+class RecordingCache {
+  staleFor: Record<string, number | undefined> = {};
+  cached: Cached = (key, _ttl, fetcher, options) => {
+    this.staleFor[key.slice(0, key.lastIndexOf(':'))] = options?.staleFor;
+    return fetcher();
+  };
+}
+
+Deno.test('advisories, exchange rates and climate may be answered stale while they refresh', async () => {
+  const cache = new RecordingCache();
+  const { fetchJson } = fakeFetch([
+    ['https://data.international.gc.ca', () => GAC_SAMPLE],
+    [
+      'https://api.frankfurter.dev',
+      () => ({ base: 'BRL', date: '2026-09-25', rates: { EUR: 0.17 } }),
+    ],
+    [
+      'https://archive-api.open-meteo.com',
+      () => ({
+        daily: {
+          time: ['2025-02-01'],
+          temperature_2m_min: [8],
+          temperature_2m_max: [15],
+          precipitation_sum: [3],
+        },
+      }),
+    ],
+    ['https://api.open-meteo.com', () => ({ daily: { time: ['2026-09-27'] } })],
+  ]);
+  await createGacAdvisory({ fetchJson, cached: cache.cached })('PT');
+  await createFx({ fetchJson, cached: cache.cached })('BRL', 'EUR');
+  const meteo = createOpenMeteo({ fetchJson, cached: cache.cached, now: SEP_27 });
+  await meteo.climate({ lat: 38.72, lng: -9.14, month: 2, fromYear: 2025, toYear: 2025 });
+  await meteo.forecast({ lat: 38.72, lng: -9.14, start: '2026-09-27', end: '2026-09-27' });
+  assertEquals(cache.staleFor, {
+    advisory: 7 * 86_400,
+    fx: 7 * 86_400,
+    'weather:climate': 30 * 86_400,
+    'weather:forecast': undefined, // a forecast is for given days: never answered stale
+  });
 });

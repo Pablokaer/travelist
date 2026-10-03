@@ -20,6 +20,18 @@ export type MapPoint = {
 
 export type MapInsets = { top?: number; bottom?: number };
 
+/** What a photo marker shows: a point rebuilt with the same values needs no re-render. */
+const MARKER_FIELDS = ['id', 'lat', 'lng', 'imageUrl', 'name', 'selected', 'order'] as const;
+
+/**
+ * True when two points draw the same photo marker (D-051): the city page rebuilds every point on
+ * each selection, so markers compare values, not objects, and only the changed ones re-render.
+ * @example samePhotoMarker(point, { ...point }) // true
+ */
+export function samePhotoMarker(a: MapPoint, b: MapPoint): boolean {
+  return MARKER_FIELDS.every((field) => a[field] === b[field]);
+}
+
 /** Space between a popup and a covered band or the map edge, in px. */
 const POPUP_MARGIN = 12;
 

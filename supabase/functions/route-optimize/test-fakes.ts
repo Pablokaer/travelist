@@ -44,10 +44,8 @@ export function fakeOrsFetch(responses: {
 export function memoryStore() {
   const rows = new Map<string, { value: unknown; expiresAt: Date }>();
   const store: CacheStore = {
-    get: (k, now) => {
-      const r = rows.get(k);
-      return Promise.resolve(r && r.expiresAt > now ? r.value : undefined);
-    },
+    // Fresh or expired: the cache itself decides what it may answer.
+    get: (k) => Promise.resolve(rows.get(k)),
     set: (k, value, expiresAt) => {
       rows.set(k, { value, expiresAt });
       return Promise.resolve();

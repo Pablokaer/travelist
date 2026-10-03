@@ -1,10 +1,15 @@
-import type { LineString, RouteResponse, TripVisibility } from '@wayfarer/shared';
+import type {
+  AttractionCategory,
+  LineString,
+  RouteResponse,
+  TripVisibility,
+} from '@wayfarer/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AttractionSummary, PhotoCover } from '@/features/destinations/api';
 import { walklistCoverFrom } from '@/features/trips/walklist-cover';
-import { supabase, unwrap } from '@/lib/supabase';
-import { subscriptionKeys, throwIfError } from '@/features/subscription/api';
+import { check, supabase, unwrap } from '@/lib/supabase';
+import { subscriptionKeys } from '@/features/subscription/api';
 
 export type TripSummary = {
   id: string;
@@ -100,15 +105,15 @@ export function useTrip(id: string | undefined) {
     queryKey: tripKeys.detail(id ?? ''),
     enabled: !!id,
     queryFn: async (): Promise<TripDetail | null> => {
+      // One request (D-057): the trip with its stops' places, embedded through trip_stops.
       const { data: trip, error } = await supabase
         .from('trips')
-        .select('*, trip_stops(position, attraction_id)')
+        .select(TRIP_WITH_STOP_PLACES)
         .eq('id', id!)
         .maybeSingle();
       if (error) throw new Error(error.message);
       if (!trip) return null;
-      const stopRows = [...trip.trip_stops].sort((a, b) => a.position - b.position);
-      const stops = await fetchTripStops(stopRows.map((s) => s.attraction_id));
+      const stops = stopPlacesInOrder(trip.trip_stops);
       return tripDetailFromRow({ ...trip, visibility: trip.visibility as TripVisibility }, stops);
     },
   });
@@ -156,36 +161,68 @@ export function tripDetailFromRow(trip: TripRow, stops: AttractionSummary[]): Tr
   };
 }
 
+/** The `attraction_details` columns a stop's card shows. */
+const STOP_PLACE_COLUMNS =
+  'id, city_slug, name_en, name_pt, category, lat, lng, popularity, avg_visit_minutes, image_url, is_unesco';
+const TRIP_WITH_STOP_PLACES =
+  `*, trip_stops(position, attraction_details(${STOP_PLACE_COLUMNS}))` as const;
+
+/** A stop's place as `attraction_details` (columns nullable in a view) or `shared_trip` has it. */
+export type StopPlaceRow = {
+  id: string | null;
+  city_slug: string | null;
+  name_en: string | null;
+  name_pt: string | null;
+  category: AttractionCategory | null;
+  lat: number | null;
+  lng: number | null;
+  popularity: number | null;
+  avg_visit_minutes: number | null;
+  image_url: string | null;
+  is_unesco: boolean | null;
+};
+
+/**
+ * @example placeFromDetailRow(row).nameEn // 'Belém Tower'
+ */
+export function placeFromDetailRow(d: StopPlaceRow): AttractionSummary {
+  return {
+    id: d.id!,
+    citySlug: d.city_slug!,
+    nameEn: d.name_en!,
+    namePt: d.name_pt,
+    category: d.category!,
+    lat: d.lat!,
+    lng: d.lng!,
+    popularity: d.popularity ?? 0,
+    avgVisitMinutes: d.avg_visit_minutes ?? 30,
+    imageUrl: d.image_url,
+    isUnesco: d.is_unesco ?? false,
+  };
+}
+
+/** The places of embedded `trip_stops`, in walking order. */
+function stopPlacesInOrder(
+  stops: readonly { position: number; attraction_details: StopPlaceRow | null }[],
+): AttractionSummary[] {
+  return [...stops]
+    .sort((a, b) => a.position - b.position)
+    .flatMap((s) => (s.attraction_details ? [placeFromDetailRow(s.attraction_details)] : []));
+}
+
 /**
  * Loads the stops' attraction details (readable by everyone) and keeps the order of `ids`.
  * @example const stops = await fetchTripStops(['a2', 'a1']); // [a2, a1]
  */
 export async function fetchTripStops(ids: string[]): Promise<AttractionSummary[]> {
   const details = unwrap(
-    await supabase
-      .from('attraction_details')
-      .select(
-        'id, city_slug, name_en, name_pt, category, lat, lng, popularity, avg_visit_minutes, image_url, is_unesco',
-      )
-      .in('id', ids),
+    await supabase.from('attraction_details').select(STOP_PLACE_COLUMNS).in('id', ids),
   );
   const byId = new Map(details.map((d) => [d.id, d]));
   return ids
     .map((aid) => byId.get(aid))
     .filter((d): d is NonNullable<typeof d> => !!d)
-    .map((d) => ({
-      id: d.id!,
-      citySlug: d.city_slug!,
-      nameEn: d.name_en!,
-      namePt: d.name_pt,
-      category: d.category!,
-      lat: d.lat!,
-      lng: d.lng!,
-      popularity: d.popularity ?? 0,
-      avgVisitMinutes: d.avg_visit_minutes ?? 30,
-      imageUrl: d.image_url,
-      isUnesco: d.is_unesco ?? false,
-    }));
+    .map(placeFromDetailRow);
 }
 
 export type SaveTripInput = {
@@ -213,9 +250,7 @@ async function saveTrip(input: SaveTripInput): Promise<string> {
     p_provider: input.route?.provider ?? undefined,
     p_starts_at: input.startsAt ?? undefined,
   });
-  // A plan limit (D-047) becomes a PlanLimitError the screen can explain.
-  throwIfError(result);
-  return result.data!;
+  return unwrap(result);
 }
 
 /**
@@ -247,7 +282,7 @@ export function useDeleteTrip() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      throwIfError(await supabase.rpc('delete_trip', { p_trip_id: id }));
+      check(await supabase.rpc('delete_trip', { p_trip_id: id }));
     },
     // My Trips (exact key) and the plan usage only: re-reading the deleted list's own page would
     // redirect it to "not available" (D-040) before the screen goes back.

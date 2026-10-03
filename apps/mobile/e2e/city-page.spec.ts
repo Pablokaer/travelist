@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  builtWith,
   byTestIdOn,
   chooseVisibility,
   openLisbon,
@@ -119,12 +120,25 @@ test('a walk list with a date and time is a meetup other travellers join', async
   await role('button', "I'm going").click();
   await expect(banner).toContainText('1 going');
   await expect(role('button', 'Not going')).toBeVisible();
+  if (builtWith.walkChat) return;
+  // While the walk chat is hidden (D-065): going says nothing about a chat and opens none, and
+  // the chat's address leads back to the list.
+  await expect(banner).not.toContainText(/chat/i);
+  await expect(role('button', 'Open group chat')).toHaveCount(0);
+  const listUrl = other.url();
+  await other.goto(listUrl.replace('/shared?', '/walk-chat?'));
+  await expect(other).toHaveURL(/\/shared\?id=/);
+  await expect(byTestIdOn(other)('meetup-banner')).toContainText('1 going');
 });
 
 test('going opens the group chat, where messages arrive instantly (D-043)', async ({
   page,
   browser,
 }) => {
+  test.skip(
+    !builtWith.walkChat,
+    'walk chat hidden (D-065): build with EXPO_PUBLIC_FEATURE_WALK_CHAT=true',
+  );
   test.setTimeout(240_000);
   const name = `E2E chat walk ${unique()}`;
   const date = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);

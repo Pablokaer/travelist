@@ -1,9 +1,8 @@
 // Web implementation (maplibre-gl). Native lives in map-view.native.tsx.
-import 'maplibre-gl/dist/maplibre-gl.css';
 import './map-view.css';
 
 import type { GeoJSONSource, Map as MapLibreMap } from 'maplibre-gl';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import {
@@ -14,9 +13,24 @@ import {
   toRouteFeature,
   type MapViewProps,
 } from './map-view.types';
+import { loadStylesheet } from './stylesheet';
 import { WebPhotoMarker, WebPopup } from './web-annotations';
 
 type Loaded = { lib: typeof import('maplibre-gl'); map: MapLibreMap };
+
+/** Copied into public/ by scripts/copy-maplibre-worker.mjs, with the worker. */
+const MAPLIBRE_CSS_URL = '/maplibre/maplibre-gl.css';
+
+/**
+ * maplibre-gl and its stylesheet, loaded when the first map is created: imported statically,
+ * its 83 kB of CSS was a render-blocking <link> on every exported page (D-062). Waiting for the
+ * sheet keeps the controls and popups from showing unstyled.
+ * @example const maplibregl = await loadMapLibre();
+ */
+async function loadMapLibre(): Promise<typeof import('maplibre-gl')> {
+  const [lib] = await Promise.all([import('maplibre-gl'), loadStylesheet(MAPLIBRE_CSS_URL)]);
+  return lib;
+}
 
 /** Press on the map itself, not on a marker, the popup or a circle point. */
 function isEmptySpot(m: MapLibreMap, e: { point: { x: number; y: number }; originalEvent: Event }) {
@@ -58,7 +72,7 @@ export function MapView({
   useEffect(() => {
     let cancelled = false;
     let instance: MapLibreMap | null = null;
-    void import('maplibre-gl').then((maplibregl) => {
+    void loadMapLibre().then((maplibregl) => {
       const el = container.current as unknown as HTMLElement | null;
       if (cancelled || !el) return;
       // Served from public/ (see scripts/copy-maplibre-worker.mjs).
@@ -141,6 +155,8 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- compare by value
   }, [boundsKey]);
 
+  // Stable, so the memoised markers do not all re-render with each new selection.
+  const pressPoint = useCallback((id: string) => latest.current.onPointPress?.(id), []);
   const selected = markers === 'photo' ? points.find((p) => p.id === selectedId) : undefined;
   return (
     <View
@@ -155,7 +171,7 @@ export function MapView({
               lib={ready.lib}
               map={ready.map}
               point={p}
-              onPress={(id) => latest.current.onPointPress?.(id)}
+              onPress={pressPoint}
             />
           ))
         : null}

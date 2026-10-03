@@ -1,5 +1,6 @@
 // The attraction card: a grid card in List mode and, `compact`, the popup of a selected map
 // marker — one design for both, so a place looks the same in either view.
+import { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -16,13 +17,15 @@ import { CardRating, ratingLabel } from '@/features/reviews/components';
 import { palette, radius, spacing } from '@/theme/colors';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
+// Handlers take the place, so a screen passes the same function to every card and a card
+// re-renders only when its own place, stop number or rating changes (D-062).
 type CardProps = {
   item: AttractionSummary;
-  onPress?: () => void;
+  onPress?: (item: AttractionSummary) => void;
   /** Position in the current route, when the place is in it. */
   order?: number;
   /** Shows a checkbox that adds/removes the place without opening it. */
-  onToggleRoute?: () => void;
+  onToggleRoute?: (item: AttractionSummary) => void;
   /** Average rating; omitted for places without reviews (D-028). */
   rating?: RatingSummary;
   /** Map popup: a narrower card on its own surface, rating on its own line. */
@@ -65,9 +68,11 @@ function useCompactSurface(compact: boolean | undefined) {
 
 /**
  * Image-led card for an attraction: photo, name, category, rating and the "+" route checkbox.
+ * Memoised: pass stable `onPress` / `onToggleRoute` (they receive the place) and the rating
+ * object from the ratings query, so toggling one stop leaves the other cards alone.
  * @example <AttractionCard item={a} onPress={open} onToggleRoute={toggle} rating={r} compact />
  */
-export function AttractionCard(props: CardProps) {
+export const AttractionCard = memo(function AttractionCard(props: CardProps) {
   const { item, onPress, order, onToggleRoute, rating, compact } = props;
   const { t, i18n } = useTranslation();
   const name = localizedName(item, i18n.resolvedLanguage ?? 'en');
@@ -75,7 +80,7 @@ export function AttractionCard(props: CardProps) {
   return (
     <View style={useCompactSurface(compact)} testID={`attraction-card-${item.id}`}>
       <Tappable
-        onPress={onPress}
+        onPress={onPress && (() => onPress(item))}
         disabled={!onPress}
         pressScale={0.98}
         accessibilityRole="button"
@@ -101,14 +106,14 @@ export function AttractionCard(props: CardProps) {
       {/* A sibling of the card, not a child, so its press never opens the attraction. */}
       <View style={styles.selectSlot} pointerEvents="box-none">
         {onToggleRoute ? (
-          <RouteCheckbox name={name} order={order} onPress={onToggleRoute} />
+          <RouteCheckbox name={name} order={order} onPress={() => onToggleRoute(item)} />
         ) : order != null ? (
           <OrderBadge order={order} />
         ) : null}
       </View>
     </View>
   );
-}
+});
 
 function OrderBadge({ order }: { order: number }) {
   const theme = useTheme();

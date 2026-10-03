@@ -43,16 +43,6 @@ class MockCityServer {
   ];
 }
 
-/** The caller's plan (D-047): Free, 5 places per list. */
-jest.mock('@/features/subscription/api', () => ({
-  ...jest.requireActual('@/features/subscription/api'),
-  useMySubscription: () => ({
-    isPending: false,
-    isError: false,
-    data: jest.requireActual('@/testing/subscription').freeSubscription(),
-  }),
-}));
-
 /** Stand-in for the map: markers are buttons, the popup is rendered as given. */
 class MockMap {
   static last: MapViewProps | null = null;
@@ -151,14 +141,13 @@ test('one place is selected at a time; an empty spot on the map closes the card'
   expect(MockMap.last?.selectedId).toBeNull();
 });
 
-test('Free: a sixth place is refused with the plan limit and a way to Premium (D-047)', async () => {
+test('a sixth place joins the route like any other: no plan limit (D-065)', async () => {
   for (const id of ['a', 'b', 'c', 'd', 'e'])
     useRouteStore.getState().add(MockCityServer.place(id, id, null));
   render(<CityScreen />);
   await userEvent.press(screen.getByTestId('marker-rijks'));
   await userEvent.press(screen.getByTestId('route-checkbox'));
-  expect(useRouteStore.getState().stops).toHaveLength(5);
-  expect(screen.getByText('Free accounts can add up to 5 places per list.')).toBeOnTheScreen();
-  await userEvent.press(screen.getByRole('button', { name: 'Upgrade to Premium' }));
-  expect(router.push).toHaveBeenCalledWith('/plans');
+  expect(useRouteStore.getState().stops).toHaveLength(6);
+  expect(screen.queryByText(/places per list/)).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Upgrade to Premium' })).toBeNull();
 });

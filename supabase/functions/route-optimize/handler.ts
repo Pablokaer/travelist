@@ -154,7 +154,8 @@ export function createHandler(deps: RouteDeps): (req: Request) => Promise<Respon
         try {
           result = await streetRoute(deps.ors, deps, input, normalized);
         } catch (err) {
-          // Neither ORS service answered: the estimate, labelled in the app and not cached.
+          // Neither ORS service answered (or both are cooling down after an outage, D-063): the
+          // estimate, labelled in the app and not cached.
           console.warn('ORS routing failed, using straight lines:', err);
           result = await straightLines(input, normalized);
         }

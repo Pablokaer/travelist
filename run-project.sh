@@ -123,6 +123,19 @@ write_local_keys_to_env() {
   set_env_value SUPABASE_SERVICE_ROLE_KEY "$service_key"
 }
 
+# Local email (D-066): an older .env has no email settings, and `supabase start` refuses a config
+# whose Send Email Hook has no secret. Adds the .env.example defaults (Mailpit) when missing.
+ensure_local_email_env() {
+  local key
+  [ -f "$ENV_FILE" ] || cp "$ROOT_DIR/.env.example" "$ENV_FILE"
+  env_targets_local_stack || return 0
+  for key in MAILPIT_URL EMAIL_FROM SEND_EMAIL_HOOK_SECRET AUTH_PUBLIC_URL APP_URL; do
+    grep -q "^$key=" "$ENV_FILE" && continue
+    log "Adding the local default of $key to .env..."
+    grep "^$key=" "$ROOT_DIR/.env.example" >>"$ENV_FILE"
+  done
+}
+
 prepare_env_file() {
   [ -f "$ENV_FILE" ] || cp "$ROOT_DIR/.env.example" "$ENV_FILE"
   if env_targets_local_stack; then
@@ -176,6 +189,8 @@ main() {
   ensure_pnpm
   ensure_docker
   install_dependencies
+  # Before the stack starts: config.toml reads SEND_EMAIL_HOOK_SECRET from .env.
+  ensure_local_email_env
   start_supabase
   prepare_env_file
   trap stop_edge_functions EXIT

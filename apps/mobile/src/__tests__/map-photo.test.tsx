@@ -1,4 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
+import { PixelRatio } from 'react-native';
 
 import type { AttractionSummary } from '@/features/destinations/api';
 import { AttractionCard } from '@/features/destinations/attraction-card';
@@ -38,7 +39,10 @@ describe('thumbnailUrl', () => {
 });
 
 describe('PhotoMarker', () => {
+  afterEach(() => jest.restoreAllMocks());
+
   test("shows the attraction's own photo, small, in a circle", () => {
+    jest.spyOn(PixelRatio, 'get').mockReturnValue(3);
     render(<PhotoMarker imageUrl={COMMONS} name="Rijksmuseum" />);
     const photo = screen.getByTestId('photo-marker-image', { includeHiddenElements: true });
     // expo-image normalises `source` to [{ uri }].
@@ -49,6 +53,13 @@ describe('PhotoMarker', () => {
       borderRadius: 18,
       borderColor: '#FFFFFF',
     });
+  });
+
+  test('on a 2× screen a marker loads the 60 px thumbnail (~3.5 kB instead of ~8.5 kB)', () => {
+    jest.spyOn(PixelRatio, 'get').mockReturnValue(2);
+    render(<PhotoMarker imageUrl={COMMONS} name="Rijksmuseum" />);
+    const photo = screen.getByTestId('photo-marker-image', { includeHiddenElements: true });
+    expect(JSON.stringify(photo.props.source)).toContain('/60px-Belem.jpg');
   });
 
   test('uses the existing placeholder when the place has no photo', () => {

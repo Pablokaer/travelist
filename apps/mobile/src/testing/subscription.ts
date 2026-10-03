@@ -7,9 +7,10 @@ export const freePlanRow = {
   price_cents: 0,
   currency: 'EUR',
   billing_interval: null,
-  max_lists: 5,
-  max_items_per_list: 5,
-  can_delete_lists: false,
+  // No limits since D-065 (migration 20261006000100_plan_limits_lifted).
+  max_lists: null,
+  max_items_per_list: null,
+  can_delete_lists: true,
 };
 
 export const premiumPlanRow = {

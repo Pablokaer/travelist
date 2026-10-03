@@ -7,9 +7,6 @@ import {
   type RouteResponse,
   type SaveTripForm,
   meetupStart,
-  canAddItemToList,
-  canCreateList,
-  type PlanLimit,
 } from '@wayfarer/shared';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -39,8 +36,6 @@ import { FALLBACK_TIME_ZONE } from '@/features/trips/meetup-time';
 import { env } from '@/lib/env';
 import { radius, spacing } from '@/theme/colors';
 import { useBreakpoint, useShadows } from '@/theme/use-theme';
-import { PlanLimitError, useMySubscription, type Subscription } from '@/features/subscription/api';
-import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 
 /** Identifies a route by its stops in order, so a result only applies to the exact route. */
 const routeKey = (route: readonly AttractionSummary[]) => route.map((s) => s.id).join(',');
@@ -62,17 +57,6 @@ function routePoints(
   );
 }
 
-/**
- * The plan limit that saving these routes would break — one new list per route, each within the
- * plan's places per list — or null.
- */
-function planBlockFor(subscription: Subscription, routes: readonly unknown[][]): PlanLimit | null {
-  const rules = subscription.plan.rules;
-  if (!canCreateList(rules, subscription.listCount + routes.length - 1)) return 'lists';
-  if (routes.some((r) => !canAddItemToList(rules, r.length - 1))) return 'items';
-  return null;
-}
-
 export default function RouteScreen() {
   const { t, i18n } = useTranslation();
   const store = useRouteStore();
@@ -82,8 +66,6 @@ export default function RouteScreen() {
   const city = cities.data?.find((c) => c.slug === citySlug);
   const optimize = useOptimizeRoutes();
   const save = useSaveTrips();
-  const subscription = useMySubscription().data;
-  const [planBlock, setPlanBlock] = useState<PlanLimit | null>(null);
   const [results, setResults] = useState<Record<string, RouteResponse>>({});
   // The page stops scrolling while a stop is dragged, so the gesture moves the stop.
   const [dragging, setDragging] = useState(false);
@@ -149,10 +131,6 @@ export default function RouteScreen() {
   };
 
   const onSave = handleSubmit((form) => {
-    // The plan's limits (D-047), checked before sending; the database checks them again.
-    const blocked = subscription ? planBlockFor(subscription, routes) : null;
-    setPlanBlock(blocked);
-    if (blocked) return;
     // The time is the city's wall-clock time (D-041); it must still be to come.
     const start = meetupStart(form, city?.timezone ?? FALLBACK_TIME_ZONE, new Date());
     if ('error' in start) return setError('startTime', { message: start.error });
@@ -312,11 +290,7 @@ export default function RouteScreen() {
             {t('route.saveSplitHint')}
           </Text>
         ) : null}
-        {planBlock || save.error instanceof PlanLimitError ? (
-          <PlanLimitNotice limit={planBlock ?? (save.error as PlanLimitError).limit} />
-        ) : (
-          <FormError message={save.error ? save.error.message : null} />
-        )}
+        <FormError message={save.error ? save.error.message : null} />
         <Button
           variant={optimized ? 'primary' : 'secondary'}
           label={

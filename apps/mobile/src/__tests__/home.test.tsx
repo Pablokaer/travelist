@@ -150,6 +150,38 @@ test('the attractions page of a city has its places, search and filters; the log
   expect(await screen.findByTestId('city-card-lisbon')).toBeOnTheScreen();
 });
 
+test('category tabs filter the places already loaded: no new request, nothing reloads', async () => {
+  renderRouter(routes, { initialUrl: '/city/amsterdam' });
+  expect(await screen.findByText('Rijksmuseum')).toBeOnTheScreen();
+  const requests = jest.mocked(supabase.rpc).mock.calls.length;
+
+  await userEvent.press(screen.getByRole('checkbox', { name: 'Landmarks' }));
+  // Synchronous: the filtered list is there at once, without a loading state.
+  expect(screen.getByText('1 place')).toBeOnTheScreen();
+  expect(screen.queryByText('Rijksmuseum')).toBeNull();
+  await userEvent.press(screen.getByRole('checkbox', { name: 'Museums' }));
+  expect(screen.getByText('2 places')).toBeOnTheScreen();
+  expect(jest.mocked(supabase.rpc).mock.calls.length).toBe(requests);
+});
+
+test('a city list cut at the 500-place limit is filtered by the server instead', async () => {
+  const server = new FakeAttractionsRpc();
+  server.rows = [
+    ...Array.from({ length: 499 }, (_, i) => attractionRow(`m${i}`, 'amsterdam', `Museum ${i}`)),
+    attractionRow('a2', 'amsterdam', 'Dam Square', 'landmark'),
+  ];
+  jest.mocked(supabase.rpc).mockImplementation(server.call as never);
+  renderRouter(routes, { initialUrl: '/city/amsterdam' });
+  expect(await screen.findByText('500 places')).toBeOnTheScreen();
+
+  await userEvent.press(screen.getByRole('checkbox', { name: 'Landmarks' }));
+  expect(await screen.findByText('1 place')).toBeOnTheScreen();
+  expect(supabase.rpc).toHaveBeenLastCalledWith(
+    'attractions_in_view',
+    expect.objectContaining({ categories: ['landmark'] }),
+  );
+});
+
 test('another city loads its own attractions', async () => {
   renderRouter(routes, { initialUrl: '/city/lisbon' });
   expect(await screen.findByText('Belém Tower')).toBeOnTheScreen();

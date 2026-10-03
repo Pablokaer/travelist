@@ -433,3 +433,137 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - Nickname sign-in takes two requests.
   - The lock can be used to block someone's nickname sign-in for 15 minutes (email sign-in is unaffected).
   - Nicknames are public, and `nickname_available` confirms whether one exists.
+
+## D-049 — Security CI: CodeQL, dependency review, gitleaks, audits and actionlint
+
+- **Context:** CI proved the code builds and its tests pass, but nothing reviewed it for vulnerabilities, leaked secrets, vulnerable dependencies or broken workflow files.
+- **Decision:**
+  - **A separate `Security` workflow** (`.github/workflows/security.yml`) runs on PRs, on `main` and every Monday. The weekly run catches advisories published after a merge. Keeping it out of `ci.yml` means a new advisory never blocks the product checks.
+  - **CodeQL** with `security-and-quality` queries for `javascript-typescript` and `python`, `build-mode: none` (nothing to compile). It is free because the repository is public.
+  - **Dependency review** fails a PR that adds a dependency with a high or critical advisory.
+  - **gitleaks** scans the full history with the release binary pinned to a version, not `gitleaks-action` (which needs a licence for organisation accounts).
+  - **`pnpm audit --audit-level high`** and **`pip-audit`** cover what is already installed.
+  - **actionlint**, pinned to a version, checks the workflows themselves.
+- **Unpatched advisories:** `node-forge` (GHSA-86w9-cpqp-85rv) reaches only `@expo/cli`, the dev server, and has no fixed version. It is ignored in `pnpm-workspace.yaml` (`auditConfig.ignoreGhsas`) with its reason, to be removed once Expo ships a fix. Moderate advisories are reported but don't fail.
+- **Alternatives:**
+  - Snyk or Socket (rejected: an external account and token for what GitHub gives a public repository for free);
+  - `pnpm audit` at `moderate` (rejected: fails today on unpatched transitive packages of Expo that the project cannot fix);
+  - AI review of every PR (not now: needs an API key secret and has a cost per PR).
+- **Trade-offs:**
+  - Pinned tool versions need manual bumps.
+  - The ignore list must be reviewed on every Expo upgrade.
+  - Dependency review needs the dependency graph, which is on by default only for public repositories.
+
+## D-050 — Photos load at the Commons width they are shown at
+
+- **Context:** the pipeline stores each place's 960 px Commons thumbnail, and every card, list row and search suggestion loaded it: the Home downloaded 11.1 MiB of city photos before any scrolling (18.4 MiB after it), and a 64 px route row loaded ~296 kB where a 120 px thumbnail is ~6.5 kB (Berlin's 20 most popular photos: 960 px 296 kB, 500 px 87 kB, 330 px 40 kB, 120 px 6.5 kB).
+- **Decision:** `Thumbnail` picks the smallest Commons standard width (120, 250, 330, 500, 960) covering 80% of the box's physical pixels (`thumbnailWidthFor(layout width, pixel ratio)`). Fixed boxes pass their size (rows 64, suggestions 40, markers 36/48); cards measure themselves first. Heroes keep the 960 px photo.
+- **Alternatives:** expo-image's source arrays (rejected: selection differs per platform — CSS pixels on web, pixel count on iOS — and needs each source's height, unknown before loading); full coverage (100%) instead of 80% (rejected: a 282 px card on a 2× screen would still need the 960 px photo).
+- **Trade-offs:** a measured card shows its photo one layout later; photos may be up to 20% under the screen's density (not visible on photos); only `/thumb/` URLs are resized (smaller originals load as they are). Measured: Home 11.1 → 1.35 MiB before scrolling, 18.4 → 2.0 MiB after (1× screen).
+
+## D-051 — City map: one photo marker per place, memoised
+
+- **Context:** the performance audit suspected the city map's up to 300 DOM photo markers of slowing panning (19 fps) and selection (282 ms). Re-measured properly — warm tiles, GPU rendering, CPU slowed 4× and 6× — 300 markers pan at 60 fps (as with the markers hidden), and a selection opens its card in 13–50 ms, React taking ~4–5 ms of it: the first numbers came from software WebGL and an open search dropdown.
+- **Decision:** keep one photo marker per place (D-029). Markers are memoised (`samePhotoMarker`, stable press handlers), so a new selection re-renders the two markers it changes instead of all of them.
+- **Alternatives:** photo markers only for the 60 most popular places in view, dots for the rest (built, then reverted: no measured gain on web, and a visible change); a symbol layer with clustering (not needed on web).
+- **Trade-offs:** native (MapLibre React Native view annotations on Hermes) was not profiled; revisit with on-device numbers before changing the map's look.
+
+## D-052 — Category filters run on the device
+
+- **Context:** each category tab combination was a new `attractions_in_view` request, and the map emptied (300 → 0 markers) until it answered.
+- **Decision:** the city page loads all of a city's places once (cities hold ≤ 300, under the 500 the page asks for) and filters by category on the device, in the server's order. A list cut at the 500 limit — no city today — falls back to filtering on the server.
+- **Trade-offs:** none visible: same places, same order; the first load is the only request.
+
+## D-053 — Edge Functions verify the access token locally
+
+- **Context:** `requireUser` asked Supabase Auth for the user (`getUser`) on every `checklist` and `route-optimize` call: 14–17 ms of a ~30 ms warm checklist call locally, one Auth round trip per call in production.
+- **Decision:** `auth.getClaims(token)` verifies the token against the project's JWT signing keys (JWKS, cached; 0.3 ms) and requires `role: authenticated` and a `sub`, so the anon and service keys are still rejected. The verifier depends on a thin interface (`ClaimsClient`), faked in tests.
+- **Trade-offs:** a token stays valid until it expires (1 h) after its user signs out — acceptable for these compute-only functions. Projects still on the legacy shared JWT secret are verified by Auth as before (no gain, no regression): the hosted project should use asymmetric signing keys.
+
+## D-054 — Edge Function cache in memory, served stale while it refreshes; checklist reads in parallel
+
+- **Context:** every checklist call read each cached source from `api_cache` over the network (the whole advisory index: 36 kB for one country), and the daily refill of a slow source made that call wait (the GAC index takes 1–12 s). The city, its countries and the visa rules were three reads one after another.
+- **Decision:**
+  - `createCached` keeps a small in-isolate memory (256 entries) in front of `api_cache`, fetches each key once at a time (single-flight), and with `staleFor` answers an expired value at once while `EdgeRuntime.waitUntil` refreshes it: advisories and exchange rates up to 7 days, climate up to 30. Forecasts are never answered stale. Expired rows are purged only after 30 days.
+  - `checklist_place` (city + its country + the home country) and `visa_options_for_city` are read together; the visa read stays separate so that its failure only marks the visa section unavailable.
+- **Trade-offs:** an advisory or rate can be up to a week old for the request that triggers its refresh; each isolate keeps its own memory. Measured: a warm checklist call 30.1 → 6.8 ms locally (with D-053).
+
+## D-055 — Rating totals kept by triggers; walk lists sort from an index
+
+- **Context:** `list_walklists` aggregated the reviews of every public list of a city before sorting (85 ms at 20k lists; ~210 ms once plpgsql's plan cache switched to a generic plan; 206 ms for "newest", 1.3 ms with a custom plan), and the city cards' ratings aggregated every review of the city's places (16.5 ms at 60k reviews, sorting on disk).
+- **Decision:** walk lists carry `review_count`, `rating_sum` and `rating_avg`; places have `attraction_review_totals`. Statement-level triggers on `reviews` sum each statement's rows per target (one update per list or place, however many reviews a statement touches). `rating_avg` is `round(rating_sum / review_count, 2)`, the value `round(avg(rating), 2)` gave. A partial index serves the "top" sort; `list_walklists` always gets a custom plan (`plan_cache_mode`).
+- **Alternatives:** row-level triggers (rejected: a bulk insert updated a list once per review, leaving hundreds of row versions — reads of that list went 1.3 → 8 ms until vacuum); a materialised view (rejected: stale between refreshes).
+- **Trade-offs:** each review also writes its target's totals; `trips.updated_at` now follows the list's own columns only. Measured at 20k lists / 60k reviews: top 210 → 0.5 ms, newest 206 → 1.1 ms, meetups 28 → 0.5 ms, city cards 16.5 → 0.12 ms; totals equal the reviews' aggregates on the local data.
+
+## D-056 — The walk chat re-reads only what is new
+
+- **Context:** each open chat re-read its newest 100 messages every 10 s and on every live event (D-044), for every member, plus the participant list every 10 s.
+- **Decision:** after the first read, re-reads ask `list_walk_messages(p_after)` for the messages since a minute before the newest one shown (a message is stamped when its transaction starts, so it can be saved after a newer one was read) and merge them by id; a full page replaces the list. The participant list is re-read every 30 s.
+- **Alternatives:** Realtime Broadcast instead of Postgres Changes (later: it changes the channel authorisation, and the load is low today).
+- **Trade-offs:** someone who joins appears within 30 s in the participant line instead of 10 s.
+
+## D-057 — Trip pages in one request
+
+- **Context:** the owner's trip page and a shared link read the trip, then its stops' places: two requests one after another.
+- **Decision:** the owner's page embeds the stops' places (`trip_stops(attraction_details(…))`); `shared_trip` also returns `stops` in walking order. An app talking to a backend without `stops` reads them separately, as before.
+- **Trade-offs:** none visible; `stop_ids` stays for apps built earlier.
+
+## D-058 — zod's unused locales are left out of the bundles
+
+- **Context:** zod re-exports every locale (`export * as locales`) and Metro does not tree-shake: 267 KiB of the 2.75 MB web entry bundle (39 KiB gzipped), unused by the app. Expo's experimental tree shaking did not remove it.
+- **Decision:** `metro.config.js` resolves zod's locale index to an English-only stub (`scripts/metro/zod-locales.js`); English messages, which zod imports directly, are unchanged.
+- **Trade-offs:** a build-time hook tied to zod 4's layout (unit-tested; a zod upgrade that moves the file just stops matching). Measured: web entry bundle 2,752 → 2,468 KiB, 717 → 678 KiB gzipped.
+
+## D-059 — Web fonts: Inter as WOFF2, the app's own cut of Material Symbols
+
+- **Context:** the web loaded Inter as four uncompressed TTFs (~335 KiB each, ~160 KiB gzipped) and, through expo-symbols, the whole Material Symbols font (943 KiB; 420 KiB gzipped) for 51 icons; the splash screen waits for the fonts.
+- **Decision:** `scripts/build-web-fonts.py` (fonttools) writes Inter unchanged as WOFF2 (~114 KiB per weight; every glyph kept, as the data has Greek and Cyrillic text) and Material Symbols cut to the app's icons, by code point (3.9 KiB). On the web, `Icon` (`icon.web.tsx`) draws the glyph itself and the fonts load with the app's other fonts; iOS and Android are unchanged. A unit test fails when an icon is added without rebuilding the fonts.
+- **Alternatives:** Latin-only Inter subsets (51 KiB per weight; rejected: Greek and Cyrillic names and credits would fall back to another font).
+- **Trade-offs:** the fonts are generated files kept in the repository (with their licences: OFL 1.1 and Apache 2.0); new icons need the script. Measured: fonts on a cold start 2.28 MB raw / ~1.06 MiB gzipped → 460 KiB; the web entry bundle lost expo-symbols too (2,468 → 2,383 KiB).
+
+## D-060 — Cities are ingested side by side
+
+- **Context:** `ingest --all` ran cities one after another (30–60 min without a cache), each waiting on Wikidata, Overpass, the pageviews API and Commons in turn.
+- **Decision:** `ingest --all --jobs N` ingests N cities at once (the monthly refresh uses 3). The HTTP client's per-host gates are shared, so each API keeps its own rate limit; the Wikidata class cache is shared and updated under a lock; each city is written as soon as it is done; prettier runs once over every file instead of once per city.
+- **Trade-offs:** log lines of different cities interleave (each keeps its `[city]` prefix); the default stays one city at a time.
+
+## D-061 — Listings read only their page; a walk chat hears joins instead of polling
+
+- **Context:** on a synthetic dataset (20k public lists in one city, 389k reviews, one list with 3,000 reviews and 2,000 people going), `list_walklists` computed each card's extras (stops, cover, attendees, flags) for every row `OFFSET` skipped (84–116 ms at offset 1000), its saved filter checked a correlated `exists` on every public list (36 ms), and "lowest" / "most reviewed" sorted the whole city (24–25 ms). `list_reviews` and `rating_summary` ran the reviews policy's security-definer `trip_visible_to_caller` once per review (9.2 and 6.3 ms for one list). `shared_trip` recounted reviews already totalled in D-055. Each open chat re-read all its participants every 30 s.
+- **Decision:** `list_walklists` selects the page first (from an index per sort) and builds the cards for those rows only, in the page's order; saved lists are looked up by id (`t.id = any(array(…))`, read once). Indexes for the lowest and most-reviewed sorts; the newest sort takes over `trips_public_city_idx`. `list_reviews` checks the visibility once and always gets a custom plan, with newest-first indexes per target. Per-star totals per walk list (`trip_rating_counts`, kept by a statement trigger, readable under the same rule) feed `rating_summary`; places and cities still aggregate. `shared_trip` reads `trips.review_count` / `rating_avg`. `list_walk_participants` returns the count and the first `p_limit` people; joins and leaves are broadcast on a private Realtime topic per list (`walk-people:<trip id>`, members only), so the chat re-reads its people then, and every 5 min otherwise. `subscription_grants_plan` is stable.
+- **Alternatives:** a separate `UNION ALL` branch for saved lists (rejected: the planner kept it as a subquery and lost the newest-first index, top 1.7 → 16 ms); a security-definer `rating_summary` (rejected: bypasses RLS and the advisor flags it); adding `walk_attendees` to the Realtime publication (rejected: rows are owner-only, so members would never hear of others, and delete events reach every subscriber regardless of RLS).
+- **Trade-offs:** every review now also writes `trip_rating_counts`, and the trips row carries three sort indexes plus newest (each review rewrites that row); the people line can miss a name or photo change for up to 5 min; apps built before get at most 100 participants. Measured: offset 1000 ~100 → ~2 ms, lowest / most reviewed ~25 → 1.8 ms, saved 36 → 0.5 ms, a list's reviews 9.2 → 0.2 ms, its summary 6.3 → 0.1 ms, participants (2,000 going) 11.5 → 1.9 ms; answers identical to the previous definitions in every sort and page (pgTAP compares them over 47 combinations).
+
+## D-062 — Lighter city pages: small marker photos, indexed search, cached headers, one minute clock, MapLibre CSS on demand
+
+- **Context:** markers loaded the 120 px thumbnail (~8.5 kB) where 60 px (~3.5 kB, a Commons standard width) covers a 36 px circle on 1×/2× screens — 300 markers ≈ 2.5 MiB per city open. The attraction search re-normalised every name twice per keystroke (~0.5 ms for 300 places). The attraction page showed a spinner although its list row was cached, and the Map / List page loaded only once opened. Toggling one stop re-rendered every card. Each meetup row ran its own 30 s timer and built `Intl.DateTimeFormat`s on every render. The static web export linked MapLibre's 83 KB stylesheet from all 44 pages.
+- **Decision:** 60 px joins `COMMONS_THUMB_WIDTHS`, with the 80% coverage rule kept (D-050). `buildSearchIndex` keeps normalised names and words per city and ranks exactly as before; the grid and the map read `useDeferredValue(query)`. `useAttraction` returns `{ summary, detail }` and starts from the cached `['attractions', …]` row. The city hub prefetches the same query definitions the attractions page uses. `AttractionCard` is memoised with handlers that take the place; `CardGrid` uses `windowSize` 7 and `removeClippedSubviews` on native. One `MinuteClock` (`useSyncExternalStore`) ticks on the minute while a focused screen listens and the app is in the foreground; `dateFormatCache` (shared) keeps one formatter per locale and time zone. `maplibre-gl.css` is copied to `public/maplibre/` and linked by the map when it is created.
+- **Alternatives:** a dynamic `import()` of the CSS (rejected: Expo's static export links every CSS asset, async chunks included, from every page). Removing react-native-reanimated / worklets / gesture-handler (rejected for now: they stay installed and autolinked as required peers of expo-router's `react-native-drawer-layout`; excluding them from autolinking risks iOS's `ExpoModulesWorkletsAdapter` and needs a native build to confirm).
+- **Trade-offs:** photos up to 20% under screen density, as in D-050; the attraction photo's credit line is blank until the details arrive; countdowns can lag by up to a minute; the first map waits for one extra stylesheet request. Measured: marker photos ~2.5 → ~1.0 MiB per city (1×/2×); search ~490 → ~32–60 µs per keystroke (index ~0.25 ms per city); 44 → 0 pages linking MapLibre's CSS.
+
+## D-063 — Upstream outages are not waited on by every request; cache writes after the response
+
+- **Context:** during an OpenRouteService outage every `route-optimize` request waited up to 8 s for the optimiser, then up to 8 s for the directions, before the straight-line fallback. When a slow source behind `staleFor` was down (the GAC advisory index, for days at a time), every checklist call re-read the stale row from `api_cache` and started another refresh with a 20 s timeout. Every cache miss also waited for the `api_cache` upsert, and the forecast was cached per trip window, so each date range was its own Open-Meteo call.
+- **Decision:** one small per-isolate circuit breaker (`_shared/breaker.ts`, injected clock). `route-optimize` runs each ORS service through it (`ors:optimize`, `ors:directions`, separate quotas): after a 429, 5xx or timeout that service is skipped for 60 s (ORS limits are per minute) and the existing fallback answers at once; a 403 (quota) or a malformed answer does not trip it. In the cache, a failed background refresh trips its key for 5 min, while the stale value is answered from memory. Cache writes go to `EdgeRuntime.waitUntil`; memory is set before the response. The forecast is fetched once per place and UTC day for the whole range Open-Meteo accepts with explicit dates (today to today + 15) and cut to the trip's dates — not `forecast_days=16`, which counts from the place's local day and drops the last day west of UTC (Honolulu, checked 2026-10-03).
+- **Alternatives:** a breaker shared across isolates in the database (rejected: a round trip per request to learn of an outage the isolate finds in one call); keying the forecast on coordinates only with `forecast_days=16` (rejected, above).
+- **Trade-offs:** each isolate learns of an outage from its own first failed call; for up to 60 s after ORS recovers that isolate still answers with straight lines; an advisory refresh is retried at most every 5 min per isolate; a write that fails after the response is only logged; the forecast entry holds ~16 days, not ~7.
+
+## D-064 — Fewer, bounded Wikidata queries in attraction ingestion
+
+- **Context:** the monthly refresh spent most of its Wikidata time on details for items it then dropped: 55,720 of 75,657 candidates have 1–2 sitelinks and only 3,013 of those have an en/pt Wikipedia article, so ~52k items got the full details query only to fail `is_notable`. Wikidata ran one query at a time, and every host waited up to 360 s per attempt (×7), although WDQS stops queries at 60 s — one hung connection could take ~42 min of the 150-min CI timeout. The class-hierarchy cache was rebuilt on every CI run.
+- **Decision:** items with fewer than 3 sitelinks first go through a cheap article check (500 ids per query, the same pattern as the details query's Wikipedia fields); only those that pass, plus the ≥ 3-sitelink items, get full details. Timeouts move into each host's policy: Wikidata 75 s per read / 90 s per request, Overpass 300 s / 360 s (its queries set `[timeout:300]`), 60 s / 120 s elsewhere. Wikidata runs up to 2 queries at a time, still one start per second. The refresh workflow caches `class_roots.json` with `actions/cache`, keyed on `categories.py` and the quarter.
+- **Trade-offs:** one more query to keep in step with the details query; a full run drops from ~793 to ~418 SPARQL queries with the same output (verified live on Belfast, Edinburgh and Lisbon: identical JSON). A query that legitimately takes more than 90 s is retried and then fails. 2 parallel queries, not WDQS's 5, because GitHub runners share IPs. A class re-parented in Wikidata keeps its cached category until the key changes (next quarter or a `categories.py` change).
+
+## D-065 — Walk chat and paid plans hidden behind build flags; plan limits lifted
+
+- **Context:** the product owner asked, for now, to hide the walk group chat (going to a meetup must not mention or open a chat) and the paid subscription UI, and to drop the Free limits (5 lists, 5 places per list, no deleting). No payment is live (D-047), so the limits were a wall only Premium could lift, with no way to buy it.
+- **Decision:** a small feature-flag module (`apps/mobile/src/lib/features.ts`) reads `EXPO_PUBLIC_FEATURE_WALK_CHAT` and `EXPO_PUBLIC_FEATURE_PAID_PLANS` at build time — off unless `true`/`1`, any other value a startup error — and exposes them through a context (`useFeatures`) so tests inject flags. Only entry points are gated: **Open group chat** and its hint, `/walk-chat` (redirects to the list), **Upgrade**, Settings → Subscription and `/plans` (redirects home); chat and plans code, routes and backend stay. The limits are removed outright: migration `20261006000100_plan_limits_lifted` drops the limit triggers, their functions and `plan_allows_deleting_lists`, makes the trips delete policy and `delete_trip` owner-only again, and sets the Free row to unlimited; the app's limit checks, notices and the shared limit helpers go. `plans`, `subscriptions`, `effective_plan` and `my_subscription` stay. Supersedes the chat entry points of D-043 and the limits and Upgrade / Settings UI of D-047.
+- **Alternatives:** a constant `FEATURES` object in code (rejected: turning a feature on would need a code change and could not differ between staging and production); deleting the chat and plans UI (rejected: the owner wants them back later); keeping the limit triggers with an unlimited Free row (rejected: enforcement nobody needs, a data edit away from coming back by accident).
+- **Trade-offs:** flags are baked into each build, so changing one needs a rebuild (no remote config); e2e specs for hidden features need the same variables at build and run time (`builtWith`). The walk chat's database, RLS and Realtime stay live while hidden, so a direct API client could still use it. Bringing limits back is a new migration (see `20261003000800`) plus the client checks from git history (d7cf1fe).
+
+## D-066 — Our own email service: Resend behind a Mailer, Auth's Send Email Hook, a client-requested welcome email
+
+- **Context:** the app had no password recovery and no welcome email. Auth emails used Supabase's SMTP with bilingual EN/PT templates, because Auth templates can't follow the user's language.
+- **Decision:** Edge Functions send all mail through a small `Mailer` interface (`_shared/mailer.ts`): `ResendMailer` (HTTPS API) in production, `MailpitMailer` (Mailpit's HTTP API) locally, chosen by env and failing loudly when neither is set. Supabase Auth's **Send Email Hook** calls `auth-email` for every auth email; it checks the Standard Webhooks signature (`standardwebhooks`, wrapped) and writes the email in the profile's language (then the sign-up language, then English) from our templates. Recovery links go straight to `/auth/reset-password?token_hash=…`, where the app calls `verifyOtp`, instead of Auth's verify redirect with a PKCE `?code=`. The welcome email comes from `welcome-email`, which the app calls once onboarding is finished and again on later launches while `profiles.welcome_email_sent_at` is null; a claim in the database (`update … where … is null returning`) sends it once, and a failed send releases the claim.
+- **Alternatives:** Auth's custom SMTP with Resend (rejected: one template per email type, no per-user language, and the welcome email would still need its own sender). Postmark, SendGrid or SES (comparable; Resend has the simplest API, a free tier of 3,000 emails per month, and works from Deno with a single fetch). A database webhook on `onboarded_at` for the welcome email (rejected for now: needs `pg_net` and a webhook secret per environment, harder to test locally). Auth's verify links for recovery (rejected: a PKCE code only works in the browser that asked, and mail scanners that open links use the token up).
+- **Trade-offs:** auth email depends on our function and Resend being up, and Auth reports a failure to the user with no retry queue. A new Edge Function secret must be set and the hook enabled by hand in the hosted dashboard. The welcome email relies on the app being opened again after a failed send. The local hook secret is committed in `.env.example` (local only).

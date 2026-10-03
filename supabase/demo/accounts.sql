@@ -47,9 +47,11 @@ select a.id::text, a.id,
 on conflict (provider_id, provider) do nothing;
 
 -- The on_auth_user_created trigger made the profiles; finish onboarding so sign-in lands on the app.
+-- Demo accounts count as welcomed (D-066), so signing in does not send them a welcome email.
 update public.profiles p
    set display_name = a.display_name, nickname = a.nickname, home_country = a.home_country,
-       onboarded_at = coalesce(p.onboarded_at, a.created_at)
+       onboarded_at = coalesce(p.onboarded_at, a.created_at),
+       welcome_email_sent_at = coalesce(p.welcome_email_sent_at, a.created_at)
   from demo_account a
  where p.id = a.id;
 

@@ -5,14 +5,14 @@ import type { ReactNode } from 'react';
 import { tripKeys, useDeleteTrip } from '@/features/trips/api';
 import { supabase } from '@/lib/supabase';
 
-/** Fake `delete_trip`: succeeds, or refuses like the Free plan (WF003). */
+/** Fake `delete_trip`: succeeds, or refuses a list that is not the caller's (P0002). */
 class FakeDeleteRpc {
   static refuse = false;
   static calls: unknown[] = [];
   static call = async (fn: string, args: unknown) => {
     FakeDeleteRpc.calls.push({ fn, args });
     return FakeDeleteRpc.refuse
-      ? { data: null, error: { code: 'WF003', message: 'plan limit: delete' } }
+      ? { data: null, error: { code: 'P0002', message: 'trip t1 not found for the caller' } }
       : { data: null, error: null };
   };
 }
@@ -20,7 +20,10 @@ class FakeDeleteRpc {
 jest.mock('@/lib/supabase', () => ({
   supabase: { rpc: jest.fn(), from: jest.fn() },
   unwrap: (r: { data: unknown }) => r.data,
-  check: () => undefined,
+  // Like the real `check`: a Supabase error becomes an Error with its message.
+  check: (r: { error: { message: string } | null }) => {
+    if (r.error) throw new Error(r.error.message);
+  },
 }));
 
 function setup() {
@@ -55,11 +58,12 @@ test('deleting goes through delete_trip and refreshes the list, not the deleted 
   expect(invalidated).not.toContainEqual({ key: tripKeys.all, exact: false });
 });
 
-test('a plan refusal is a PlanLimitError (D-047)', async () => {
+test('a refused delete fails with the database message (no plan error since D-065)', async () => {
   FakeDeleteRpc.refuse = true;
   const { wrapper } = setup();
   const { result } = renderHook(() => useDeleteTrip(), { wrapper });
   await act(async () => result.current.mutate('t1'));
   await waitFor(() => expect(result.current.isError).toBe(true));
-  expect((result.current.error as { limit?: string }).limit).toBe('delete');
+  expect(result.current.error).toEqual(new Error('trip t1 not found for the caller'));
+  expect(result.current.error).not.toHaveProperty('limit');
 });

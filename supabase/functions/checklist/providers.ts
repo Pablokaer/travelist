@@ -4,9 +4,17 @@ import { CACHE_TTL, type WeatherDay } from '@wayfarer/shared';
 
 import { type Cached, cacheKey } from '../_shared/cache.ts';
 import { type FetchJson, HttpError } from '../_shared/http.ts';
+import { addDays, FORECAST_HORIZON_DAYS, isoDay } from './handler.ts';
 import type { Advisory, AdvisoryProvider, Climate, FxProvider, WeatherProvider } from './types.ts';
 
 const CLIMATE_TTL = 30 * 24 * 3600;
+/**
+ * How long past its expiry a value may still be answered while a fresh one is fetched in the
+ * background (D-054): climate averages, exchange rates and advisories change slowly, and their
+ * sources are slow (the GAC index took 1–12 s) — a forecast is never answered stale.
+ */
+const CLIMATE_STALE = { staleFor: 30 * 24 * 3600 };
+const DAILY_STALE = { staleFor: 7 * 24 * 3600 };
 const round1 = (n: number) => Math.round(n * 10) / 10;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
@@ -69,36 +77,84 @@ export function climateFromDaily(
   };
 }
 
-export function createOpenMeteo(deps: { fetchJson: FetchJson; cached: Cached }): WeatherProvider {
+/** Pure: Open-Meteo `daily` arrays as one WeatherDay per date. */
+function weatherDays(d: NonNullable<OpenMeteoDaily['daily']>): WeatherDay[] {
+  return d.time.map((date, i) => ({
+    date,
+    tempMinC: at(d.temperature_2m_min, i),
+    tempMaxC: at(d.temperature_2m_max, i),
+    precipitationMm: at(d.precipitation_sum, i),
+    precipitationProbability: at(d.precipitation_probability_max, i),
+    weatherCode: at(d.weather_code, i),
+  }));
+}
+
+/** The dates Open-Meteo accepts on `date` (UTC): today to today + 15, both inclusive. */
+export function forecastRange(now: Date): { from: string; to: string } {
+  const from = isoDay(now);
+  return { from, to: addDays(from, FORECAST_HORIZON_DAYS) };
+}
+
+/**
+ * The whole forecast range of a place, so that one cached answer serves every trip window there.
+ * Explicit dates, not `forecast_days=16`: that counts from the place's own today, so west of UTC
+ * it ends a day before the UTC-based range the handler offers (Honolulu, checked 2026-10-03).
+ */
+async function fetchForecastRange(
+  fetchJson: FetchJson,
+  place: { lat: string; lng: string; from: string; to: string },
+): Promise<WeatherDay[]> {
+  const url = new URL('https://api.open-meteo.com/v1/forecast');
+  url.search = new URLSearchParams({
+    latitude: place.lat,
+    longitude: place.lng,
+    daily:
+      'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code',
+    timezone: 'auto',
+    start_date: place.from,
+    end_date: place.to,
+  }).toString();
+  const res = await fetchJson<OpenMeteoDaily>(url.toString());
+  if (!res.daily?.time?.length) throw new Error(`empty forecast for ${JSON.stringify(place)}`);
+  return weatherDays(res.daily);
+}
+
+/**
+ * Pure: the days of a forecast `range` within [start, end] (ISO dates, inclusive). A window
+ * reaching outside the range is an error, as the per-window request was (Open-Meteo: 400).
+ * @example daysWithin(days, { from, to }, '2026-10-01', '2026-10-03').length // 3
+ */
+export function daysWithin(
+  days: WeatherDay[],
+  range: { from: string; to: string },
+  start: string,
+  end: string,
+): WeatherDay[] {
+  if (start < range.from || end > range.to) {
+    throw new Error(`forecast window ${start}..${end} is outside ${range.from}..${range.to}`);
+  }
+  const within = days.filter((d) => d.date >= start && d.date <= end);
+  if (!within.length) throw new Error(`empty forecast for ${start}..${end}`);
+  return within;
+}
+
+export function createOpenMeteo(
+  deps: { fetchJson: FetchJson; cached: Cached; now?: () => Date },
+): WeatherProvider {
   const coord = (n: number) => round2(n).toFixed(2);
+  const now = deps.now ?? (() => new Date());
   return {
     async forecast({ lat, lng, start, end }) {
-      const input = { lat: coord(lat), lng: coord(lng), start, end };
-      return deps.cached(await cacheKey('weather:forecast', input), CACHE_TTL.weather, async () => {
-        const url = new URL('https://api.open-meteo.com/v1/forecast');
-        url.search = new URLSearchParams({
-          latitude: input.lat,
-          longitude: input.lng,
-          daily:
-            'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code',
-          timezone: 'auto',
-          start_date: start,
-          end_date: end,
-        }).toString();
-        const res = await deps.fetchJson<OpenMeteoDaily>(url.toString());
-        const d = res.daily;
-        if (!d?.time?.length) throw new Error('empty forecast');
-        return d.time.map(
-          (date, i): WeatherDay => ({
-            date,
-            tempMinC: at(d.temperature_2m_min, i),
-            tempMaxC: at(d.temperature_2m_max, i),
-            precipitationMm: at(d.precipitation_sum, i),
-            precipitationProbability: at(d.precipitation_probability_max, i),
-            weatherCode: at(d.weather_code, i),
-          }),
-        );
-      });
+      // Keyed on the place and the range's first day, not the trip window (D-063): every
+      // window there shares one Open-Meteo call, and the next UTC day starts a new range.
+      const range = forecastRange(now());
+      const place = { lat: coord(lat), lng: coord(lng), ...range };
+      const days = await deps.cached(
+        await cacheKey('weather:forecast', place),
+        CACHE_TTL.weather,
+        () => fetchForecastRange(deps.fetchJson, place),
+      );
+      return daysWithin(days, range, start, end);
     },
 
     async climate({ lat, lng, month, fromYear, toYear }) {
@@ -117,7 +173,7 @@ export function createOpenMeteo(deps: { fetchJson: FetchJson; cached: Cached }):
         const res = await deps.fetchJson<OpenMeteoDaily>(url.toString(), { timeoutMs: 10000 });
         if (!res.daily?.time?.length) throw new Error('empty climate archive');
         return climateFromDaily(res.daily, month);
-      });
+      }, CLIMATE_STALE);
     },
   };
 }
@@ -186,7 +242,7 @@ export function createFx(deps: {
       }
       if (primaryError) throw primaryError;
       return null;
-    });
+    }, DAILY_STALE);
   };
 }
 
@@ -230,14 +286,15 @@ export function createGacAdvisory(
 ): AdvisoryProvider {
   return async (code) => {
     const index = await deps.cached('advisory:gac-index', CACHE_TTL.advisory, async () => {
-      // The GAC endpoint is slow (7–12 s observed); it is fetched at most once a day.
+      // The GAC endpoint is slow (1–12 s observed): fetched at most once a day, and refreshed
+      // in the background once expired (DAILY_STALE), so no request waits for it.
       const raw = await deps.fetchJson<{ data?: Record<string, GacEntry> }>(GAC_INDEX_URL, {
         timeoutMs: 20000,
       });
       const compact = compactAdvisoryIndex(raw);
       if (!Object.keys(compact).length) throw new Error('empty advisory index');
       return compact;
-    });
+    }, DAILY_STALE);
     return index[code] ?? null;
   };
 }

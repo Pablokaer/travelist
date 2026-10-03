@@ -79,6 +79,7 @@ export default function SignInScreen() {
           />
         )}
       />
+      <TextLink href="/forgot-password" label={t('auth.forgotPassword')} />
       <FormError message={error} />
       <Button label={t('auth.signIn')} loading={formState.isSubmitting} onPress={onSubmit} />
       <TextLink href="/magic-link" label={t('auth.useMagicLink')} />

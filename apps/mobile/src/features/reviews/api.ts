@@ -3,7 +3,7 @@
 // written through `save_review` (create or edit) and a plain delete. RLS lets each user change
 // only their own review.
 import type { ReviewForm } from '@wayfarer/shared';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { avatarUrl } from '@/features/profile/avatar-api';
 import { check, supabase, unwrap } from '@/lib/supabase';
@@ -113,9 +113,13 @@ export function ratingsByAttraction(rows: readonly CitySummaryRow[]): Map<string
   );
 }
 
-/** Average rating and review count of every rated place of a city, for the city page cards. */
-export function useCityRatings(citySlug: string | undefined) {
-  return useQuery({
+/**
+ * The query of a city's attraction ratings: one definition for the city page and the hub's
+ * prefetch.
+ * @example queryClient.prefetchQuery(cityRatingsQueryOptions('lisbon'))
+ */
+export function cityRatingsQueryOptions(citySlug: string | undefined) {
+  return queryOptions({
     queryKey: reviewKeys.cards(citySlug ?? ''),
     enabled: !!citySlug,
     queryFn: async (): Promise<Map<string, RatingSummary>> => {
@@ -129,6 +133,11 @@ export function useCityRatings(citySlug: string | undefined) {
       return ratingsByAttraction(rows);
     },
   });
+}
+
+/** Average rating and review count of every rated place of a city, for the city page cards. */
+export function useCityRatings(citySlug: string | undefined) {
+  return useQuery(cityRatingsQueryOptions(citySlug));
 }
 
 /** The reviews of an attraction, a city or a walk list, newest first (up to 50). */

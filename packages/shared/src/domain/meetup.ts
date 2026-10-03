@@ -1,23 +1,27 @@
 // Walk meetups (D-041): a walk list's start is a moment (UTC), chosen and shown as a wall-clock
 // date and time in the city's time zone, so a meetup in Lisbon reads 10:00 wherever you are.
 
+import { dateFormatCache } from './date-format-cache.ts';
+
 export type LocalDateTime = { date: string; time: string };
 export type Countdown = { days: number; hours: number; minutes: number };
 
 const MINUTE_MS = 60_000;
 
+/** Every field of a wall-clock moment, read back by zoneOffsetMs (one formatter per zone). */
+const wallClockParts = dateFormatCache({
+  hourCycle: 'h23',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
 /** Offset of `timeZone` from UTC at `instant`, in ms (positive east of Greenwich). */
 function zoneOffsetMs(instant: Date, timeZone: string): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    hourCycle: 'h23',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(instant);
+  const parts = wallClockParts('en-US', timeZone).formatToParts(instant);
   const part = (type: string) => Number(parts.find((p) => p.type === type)?.value);
   const asUtc = Date.UTC(
     part('year'),
