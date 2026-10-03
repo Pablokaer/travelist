@@ -2,11 +2,11 @@
 // through portals into maplibre-gl's native Marker and Popup, which place them on the map,
 // move them with it and keep the popup inside the viewport (automatic anchor).
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { memo, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { MARKER_SELECTED_SIZE, PhotoMarker } from './photo-marker';
-import { popupPanY, type MapInsets, type MapPoint } from './map-view.types';
+import { popupPanY, samePhotoMarker, type MapInsets, type MapPoint } from './map-view.types';
 
 type MapLibre = typeof import('maplibre-gl');
 
@@ -58,21 +58,14 @@ function useMarkerElement(onPress: () => void, { label, pressed, zIndex }: Marke
   return el;
 }
 
-/**
- * One place as a round photo marker on the web map.
- * @example <WebPhotoMarker lib={maplibregl} map={map} point={p} onPress={select} />
- */
-export function WebPhotoMarker({
-  lib,
-  map,
-  point,
-  onPress,
-}: {
+type WebPhotoMarkerProps = {
   lib: MapLibre;
   map: MapLibreMap;
   point: MapPoint;
   onPress: (id: string) => void;
-}) {
+};
+
+function WebPhotoMarkerView({ lib, map, point, onPress }: WebPhotoMarkerProps) {
   const el = useMarkerElement(() => onPress(point.id), {
     label: point.name ?? '',
     pressed: !!point.selected,
@@ -92,6 +85,20 @@ export function WebPhotoMarker({
     el,
   );
 }
+
+/**
+ * One place as a round photo marker on the web map, re-rendered only when what it shows
+ * changes (D-051): a new selection re-renders two markers, not all of them.
+ * @example <WebPhotoMarker lib={maplibregl} map={map} point={p} onPress={select} />
+ */
+export const WebPhotoMarker = memo(
+  WebPhotoMarkerView,
+  (a: WebPhotoMarkerProps, b: WebPhotoMarkerProps) =>
+    a.lib === b.lib &&
+    a.map === b.map &&
+    a.onPress === b.onPress &&
+    samePhotoMarker(a.point, b.point),
+);
 
 /**
  * The selected place's card, in maplibre's Popup above its marker.

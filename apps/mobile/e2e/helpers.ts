@@ -7,6 +7,17 @@ import { expect } from '@playwright/test';
 
 export type Page = import('@playwright/test').Page;
 
+/**
+ * Features hidden for now (D-065) that the web build under test turns on. Flags are baked in at
+ * build time, so build and run with the same variables, e.g.
+ *   EXPO_PUBLIC_FEATURE_WALK_CHAT=true pnpm build:web
+ *   EXPO_PUBLIC_FEATURE_WALK_CHAT=true E2E_BACKEND=1 pnpm e2e walk-chat
+ */
+export const builtWith = {
+  walkChat: process.env.EXPO_PUBLIC_FEATURE_WALK_CHAT === 'true',
+  paidPlans: process.env.EXPO_PUBLIC_FEATURE_PAID_PLANS === 'true',
+};
+
 export const byTestIdOn = (page: Page) => (id: string) =>
   page.getByTestId(id).filter({ visible: true });
 export const roleOn =
@@ -42,6 +53,9 @@ export async function signUpAndOnboard(page: Page) {
   await role('button', 'Next').click();
   await byTestId('passportExpiry').fill('2030-01-31');
   await role('button', 'Start exploring').click();
+  // Onboarding is saved before the Home opens: a test that reloads the page right away would
+  // otherwise abort the save and leave the user not onboarded (protected screens then refuse it).
+  await expect(page.getByText('Where to next?').filter({ visible: true })).toBeVisible();
 }
 
 /** Opens Lisbon's city page from the Home (D-033). */

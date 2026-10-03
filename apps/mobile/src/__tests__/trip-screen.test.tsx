@@ -4,6 +4,7 @@ import { zonedToUtc } from '@wayfarer/shared';
 import TripScreen from '@/app/trip/[id]';
 import type { TripDetail } from '@/features/trips/api';
 import '@/lib/i18n';
+import { featuresWrapper } from '@/testing/features';
 
 /** The owner's trip and whether they are a moderator. */
 class MockOwnTripServer {
@@ -11,7 +12,6 @@ class MockOwnTripServer {
   static trip: TripDetail | null;
   static moderator = false;
   static schedules: (string | null)[] = [];
-  static subscription: unknown = jest.requireActual('@/testing/subscription').freeSubscription();
 }
 
 jest.mock('expo-router', () => {
@@ -52,10 +52,6 @@ jest.mock('@/features/reviews/api', () => ({
   useRatingSummary: () => ({ data: { count: 1, average: 5 } }),
 }));
 jest.mock('@/features/profile/api', () => ({ useProfile: () => ({ data: undefined }) }));
-jest.mock('@/features/subscription/api', () => ({
-  ...jest.requireActual('@/features/subscription/api'),
-  useMySubscription: () => ({ data: MockOwnTripServer.subscription }),
-}));
 jest.mock('@/features/destinations/api', () => ({
   ...jest.requireActual('@/features/destinations/api'),
   useCities: () => ({
@@ -87,7 +83,6 @@ beforeEach(() => {
   MockOwnTripServer.trip = trip();
   MockOwnTripServer.moderator = false;
   MockOwnTripServer.schedules = [];
-  MockOwnTripServer.subscription = jest.requireActual('@/testing/subscription').freeSubscription();
 });
 
 test('the owner reads the reviews of their list but has no form to rate it', () => {
@@ -152,31 +147,34 @@ describe('date and time (D-041)', () => {
 });
 
 describe('group chat for the organiser (D-044)', () => {
+  /** The walk chat is hidden for now (D-065); these tests describe it turned on. */
+  const withChat = { wrapper: featuresWrapper({ walkChat: true }) };
+
   test('the organiser of a public list opens its chat, with or without a time', () => {
     MockOwnTripServer.trip = trip({ visibility: 'public', startsAt: null });
-    render(<TripScreen />);
+    render(<TripScreen />, withChat);
     expect(screen.getByRole('button', { name: 'Open group chat' })).toBeOnTheScreen();
   });
 
   test('a private list gathers nobody, so it offers no chat', () => {
     MockOwnTripServer.trip = trip({ visibility: 'private' });
+    render(<TripScreen />, withChat);
+    expect(screen.queryByRole('button', { name: 'Open group chat' })).toBeNull();
+  });
+
+  test('while the walk chat is hidden (D-065), the organiser is offered no chat', () => {
+    MockOwnTripServer.trip = trip({ visibility: 'public' });
     render(<TripScreen />);
     expect(screen.queryByRole('button', { name: 'Open group chat' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Save date and time' })).toBeOnTheScreen();
   });
 });
 
-describe('deleting a list is a Premium feature (D-047)', () => {
-  test('Free: no delete, but why and the way to Premium', () => {
+describe('every owner deletes their lists (D-065)', () => {
+  test('the owner deletes the list after confirming, with no plan notice', async () => {
     render(<TripScreen />);
-    expect(screen.queryByRole('button', { name: 'Delete trip' })).toBeNull();
-    expect(screen.getByText('Deleting lists is a Premium feature.')).toBeOnTheScreen();
-  });
-
-  test('Premium: the owner deletes the list', () => {
-    MockOwnTripServer.subscription = jest
-      .requireActual('@/testing/subscription')
-      .premiumSubscription();
-    render(<TripScreen />);
-    expect(screen.getByRole('button', { name: 'Delete trip' })).toBeOnTheScreen();
+    expect(screen.queryByText(/Premium/)).toBeNull();
+    await userEvent.press(screen.getByRole('button', { name: 'Delete trip' }));
+    expect(screen.getByText(/Delete this trip\?/)).toBeOnTheScreen();
   });
 });

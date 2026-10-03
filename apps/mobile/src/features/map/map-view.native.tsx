@@ -6,13 +6,14 @@ import {
   Marker,
   type CameraRef,
 } from '@maplibre/maplibre-react-native';
-import { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { View } from 'react-native';
 
 import {
   circlePaint,
   labelLayout,
   routePaint,
+  samePhotoMarker,
   toFeatureCollection,
   toRouteFeature,
   type MapPoint,
@@ -20,25 +21,37 @@ import {
 } from './map-view.types';
 import { MARKER_SELECTED_SIZE, PhotoMarker } from './photo-marker';
 
-/** Photo markers as native map annotations (D-029); the selected one is drawn last, on top. */
-function PhotoMarkers({ points, onPress }: { points: MapPoint[]; onPress?: (id: string) => void }) {
-  const ordered = [...points.filter((p) => !p.selected), ...points.filter((p) => p.selected)];
-  return ordered.map((p) => (
+type MarkerProps = { point: MapPoint; onPress?: (id: string) => void };
+
+/** One place as a native map annotation (D-029). */
+function NativePhotoMarker({ point, onPress }: MarkerProps) {
+  return (
     <Marker
-      key={p.id}
-      id={p.id}
-      lngLat={[p.lng, p.lat]}
-      onPress={() => onPress?.(p.id)}
-      accessibilityLabel={p.name}
+      id={point.id}
+      lngLat={[point.lng, point.lat]}
+      onPress={() => onPress?.(point.id)}
+      accessibilityLabel={point.name}
       accessibilityRole="button">
       <PhotoMarker
-        imageUrl={p.imageUrl ?? null}
-        name={p.name ?? ''}
-        selected={p.selected}
-        order={p.order}
+        imageUrl={point.imageUrl ?? null}
+        name={point.name ?? ''}
+        selected={point.selected}
+        order={point.order}
       />
     </Marker>
-  ));
+  );
+}
+
+/** Re-renders only the markers whose content changed, e.g. the two a new selection touches. */
+const MemoPhotoMarker = memo(
+  NativePhotoMarker,
+  (a: MarkerProps, b: MarkerProps) => a.onPress === b.onPress && samePhotoMarker(a.point, b.point),
+);
+
+/** Photo markers; the selected one is drawn last, on top. */
+function PhotoMarkers({ points, onPress }: { points: MapPoint[]; onPress?: (id: string) => void }) {
+  const ordered = [...points.filter((p) => !p.selected), ...points.filter((p) => p.selected)];
+  return ordered.map((p) => <MemoPhotoMarker key={p.id} point={p} onPress={onPress} />);
 }
 
 export function MapView({

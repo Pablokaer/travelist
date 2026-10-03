@@ -5,7 +5,7 @@ python -m wayfarer_pipeline countries          # Wikidata → data/countries.jso
 python -m wayfarer_pipeline cities             # cities.yaml → 20_cities.sql
 python -m wayfarer_pipeline city-summaries     # Wikipedia leads → data/city_summaries.json → 20
 python -m wayfarer_pipeline visa               # passport-index → data/visa.csv → 30_visa.sql
-python -m wayfarer_pipeline ingest --city lisbon | --all   # → data/attractions/*.json → 40
+python -m wayfarer_pipeline ingest --city lisbon | --all [--jobs 3]  # → data/attractions → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
 python -m wayfarer_pipeline seed               # regenerate every seed file, no network
 python -m wayfarer_pipeline cities-doc [--check]   # docs/CITIES.md (ingest/seed/cities rewrite it)
@@ -97,12 +97,11 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
     config = load_cities(args.config)
     cities = config.cities if args.all else [config.get(args.city)]
     client = _client(args)
-    reports = []
-    for city in cities:
-        print(f"== {city.slug}", flush=True)
-        doc = pipeline.ingest_city(client, city)
-        print(f"  wrote {pipeline.save_city(doc)}")
-        reports.append(pipeline.quality_report(doc))
+    print(f"== {len(cities)} cities, {args.jobs} at a time", flush=True)
+    results = pipeline.ingest_cities(client, cities, jobs=args.jobs)
+    for _, written in results:
+        print(f"  wrote {written}")
+    reports = [pipeline.quality_report(doc) for doc, _ in results]
     path, warnings = seed.write_attractions()
     for w in warnings:
         print(f"WARNING: {w}")
@@ -194,6 +193,12 @@ def build_parser() -> argparse.ArgumentParser:
     target = ingest.add_mutually_exclusive_group(required=True)
     target.add_argument("--city", help="city slug from cities.yaml")
     target.add_argument("--all", action="store_true", help="all cities")
+    ingest.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="cities ingested at once (each API keeps its own rate limit; D-060)",
+    )
     ingest.set_defaults(func=_cmd_ingest)
 
     sub.add_parser("report", help="attraction quality report").set_defaults(func=_cmd_report)

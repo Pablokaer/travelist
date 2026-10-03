@@ -13,6 +13,12 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- Password recovery (D-066): **Forgot password?** on sign-in opens `/forgot-password`, which always answers "If an account exists for {email}, we've sent it a link…" (no account enumeration). The email's link opens `/auth/reset-password` on any device: new password and confirmation (min 8 characters), then you are signed in; an invalid or expired link offers **Request a new link**.
+- Welcome email (D-066): once onboarding is finished, every new account gets one welcome email in its chosen language (EN/PT), sent by the new `welcome-email` Edge Function exactly once (`profiles.welcome_email_sent_at`, new migration) and retried on a later app start if sending failed. Accounts onboarded before this change are marked as welcomed.
+- Email service (D-066): a `Mailer` abstraction for Edge Functions (Resend in production, Mailpit locally) with localized, branded HTML and text templates.
+- Feature flags `EXPO_PUBLIC_FEATURE_WALK_CHAT` and `EXPO_PUBLIC_FEATURE_PAID_PLANS` (`apps/mobile/src/lib/features.ts`; off unless `true`/`1`) (D-065).
+
+- Security CI (D-049): a new `Security` workflow (`.github/workflows/security.yml`) runs on every pull request, on pushes to `main` and every Monday. It runs **CodeQL** (TypeScript/JavaScript, including the Edge Functions, and Python; `security-and-quality` queries, results in the Security tab), **dependency review** (a PR adding a dependency with a high or critical advisory fails), **gitleaks** over the whole git history, **pnpm audit** (high and above) and **pip-audit** on the pipeline, and **actionlint** on the workflows. The one unpatched dev-only advisory (`node-forge` via `@expo/cli`, GHSA-86w9-cpqp-85rv) is ignored in `pnpm-workspace.yaml`, to be dropped once Expo ships a fix.
 - Nicknames (D-048):
   - **Sign-up** asks for a unique nickname (3–20 lowercase letters, digits or `_`), checked before the account is created. Google, Apple and magic-link users, and older accounts, choose one in onboarding; it can be changed in Edit profile, and the Profile tab shows it.
   - **Sign-in** takes **Email or nickname**. A wrong nickname fails exactly like a wrong password, and 10 failures in 15 minutes lock that nickname for a while.
@@ -51,6 +57,14 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Tests: the city page's "View all walk lists" test could exceed Jest's 5 s timeout under a full parallel run (it waits on the real 300 ms search debounce); it now has 15 s.
+- route-optimize during an OpenRouteService outage (D-063): after a 429, 5xx or timeout that ORS service is skipped for 60 s and requests get the straight-line fallback at once, instead of each waiting up to 8 s for the optimiser and 8 s more for the directions.
+- Checklist when a slow source is down (D-063): after a failed background refresh the stale value (e.g. the Canada travel advisories) is served from memory for 5 minutes, without re-reading `api_cache` or starting another 20 s refresh on every request.
+- Web: MapLibre's 83 KB stylesheet is no longer a render-blocking link on every exported page (44 → 0); the map adds it when it opens (D-062).
+- `subscription_grants_plan` was declared immutable although it reads the clock; it is now stable (D-061).
+
+- Tests: the walk participation tests kept Jest running ~5 minutes after they finished (query cache timers); Edge Function `deno lint` errors in the route tests (unused imports, async callbacks without `await`); the E2E sign-up helper returned before onboarding was saved, so a test that reloaded at once left its second traveller not onboarded and the group chat refused them (now it waits for the Home).
+
 - Deleting a walk list could land on "Walk list not available" instead of going back (the deleted list's page was re-read and redirected, D-040); only My Trips is refreshed now.
 
 - Walking routes follow the streets (D-046): routes were drawn as straight lines between destinations whenever the OpenRouteService optimisation was unavailable (its daily quota was used up: 403). The route is now always walked along the streets and footways when ORS answers at all — the optimisation, or else a local order walked with ORS foot-walking directions — and straight lines are only the last resort. Stops far from a footway (e.g. the 25 de Abril Bridge) join the path at the nearest walkable point instead of failing the route. In manual order, **Optimise** keeps the order set by hand and computes only its path (`keepOrder`). The walk between stops in the list shows the street distance and time once computed.
@@ -64,6 +78,35 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 - Route builder: the remove button's screen-reader label uses the stop's name in the app language (it was always English).
 
 ### Changed
+
+- The walk group chat is hidden for now (D-065): the **Walk together** card and the organiser's list page no longer show **Open group chat** or the "Going adds you to the group chat…" hint, and `/walk-chat` opens the walk list instead. Attendance (**I'm going** / **Not going**, count, countdown) is unchanged. The sign-up nickname hint no longer mentions walk chats.
+- Paid plans are hidden for now (D-065): no **Upgrade** in the top bar, no Settings → Subscription, and `/plans` goes to Home.
+- Every auth email (sign-up confirmation, magic link with 6-digit code, password reset, email change, invite, reauthentication) is sent by the new `auth-email` Edge Function through Supabase's Send Email Hook, in the user's language (profile → sign-up language → English) instead of bilingual; `supabase/templates/` is removed (D-066).
+- `run-project.sh` adds the local email settings to an existing `.env`; CI sets the local hook secret for the database job (D-066).
+
+- Performance, second pass (measured before and after; details in D-061 – D-064):
+  - **Walk list listings** (D-061): pages deep in a list (offset 1000: ~100 → ~2 ms), the **Lowest rated** and **Most reviewed** sorts (~25 → ~2 ms), saved lists (36 → 0.5 ms), a walk list's reviews (9 → 0.2 ms with 3,000 reviews) and its rating summary (6 → 0.1 ms); results identical in every sort and page. Backend (new migration): `list_walklists` picks the page before reading each card's extras and looks saved lists up by id; new indexes `trips_public_lowest_idx`, `trips_public_most_reviewed_idx` and `reviews_{trip,city,attraction}_created_idx`, and `trips_public_city_idx` becomes `(city_slug, is_official, created_at desc, id)`; `list_reviews` checks a list's visibility once; walk lists' per-star totals live in `trip_rating_counts` (kept by a trigger on `reviews`), which `rating_summary` reads; `shared_trip` reads the list's own totals.
+  - **Walk group chat** (D-061): the header names the first 5 people and counts everyone ("12 people: Ana (organiser), Ben, Cid, Dee, Eve, …") and updates as soon as someone joins or leaves (a private Realtime topic per list, members only) instead of re-reading every 30 s; a re-read every 5 min remains as a safety net. `list_walk_participants(p_trip_id, p_limit)` returns `participant_count`.
+  - **City map** (D-062): markers load the 60 px Commons thumbnail on 1×/2× screens (120 px on 3× or when selected): ~1.0 MiB instead of ~2.5 MiB of marker photos per city.
+  - **City search** (D-062): names are normalised once per city, not on every keystroke (~0.5 → ~0.05 ms per keystroke for 300 places); the grid and the map follow typing at low priority while suggestions stay instant.
+  - **Attraction page** (D-062): opened from a city list, it shows its photo, name, category and visit time at once from the cached row; the description and details show a skeleton until they load. The city page preloads the city's attractions and ratings, so **Explore attractions** opens without a spinner.
+  - **Attractions grid** (D-062): adding or removing a stop re-renders only that card, and fewer off-screen cards stay mounted.
+  - **Meetup countdowns** (D-062): one shared clock ticks on the minute and pauses while the screen is out of focus or the app is in the background (was one 30 s timer per row); date formatters are reused.
+  - **Edge Functions** (D-063): a cache miss no longer waits for the `api_cache` write (memory is set at once, the table is written after the response). The checklist forecast is fetched once per place and UTC day for today + 15 days and cut to each trip's dates, so different trip windows share one call.
+  - **Pipeline** (D-064): items with fewer than 3 sitelinks are checked for an en/pt Wikipedia article before the full Wikidata details query (70% fewer items need details, ~47% fewer SPARQL queries per full run, same output); each host has its own timeouts (Wikidata gives up after 90 s instead of 360 s); up to 2 Wikidata queries at a time; the monthly refresh keeps the class-hierarchy cache (`class_roots.json`) for a quarter with `actions/cache`.
+
+- Performance (measured in the audit and after each change; details in D-050 – D-060):
+  - **Photos** load at the Commons width they are shown at (D-050): 120–500 px for cards, list rows, search suggestions and map markers instead of the stored 960 px; the Home downloads 1.35 MiB of photos instead of 11.1 MiB before scrolling, 2.0 MiB instead of 18.4 MiB after.
+  - **City map** (D-051): photo markers re-render only when what they show changes (a selection re-renders two, not all); every place keeps its photo marker (D-029) — a 60-marker cap was measured, brought no gain on the web and was dropped.
+  - **Category tabs** filter the city's places on the device (D-052): no request and no empty map while switching.
+  - **Edge Functions** verify the access token locally against the project's signing keys instead of asking Supabase Auth on each call (D-053), cache in memory in front of `api_cache`, answer slow, slowly changing data (advisories, exchange rates, climate) from cache while refreshing it in the background, and read the checklist's city, countries and visa rules in two parallel calls (`checklist_place`, `visa_options_for_city`; D-054): a warm checklist call takes 6.8 ms instead of 30 ms locally.
+  - **Walk lists and ratings** (D-055): lists carry their review count and average, places their totals (`attraction_review_totals`), kept by triggers on `reviews`; the "top" sort reads an index and `list_walklists` always gets a custom plan — at 20k lists in a city, the previews take 0.5 ms instead of 85–210 ms, and the city cards' ratings 0.12 ms instead of 16.5 ms at 60k reviews (new migration).
+  - **Walk chat** (D-056): after the first read, re-reads ask only for new messages (`list_walk_messages(p_after)`, new migration); the participant list is re-read every 30 s instead of 10 s.
+  - **Trip pages** load in one request (D-057): the owner's page embeds its stops' places, and `shared_trip` returns them (`stops`, new migration).
+  - **Web bundle** (D-058): zod's unused locales are no longer bundled (2,752 → 2,468 KiB, −39 KiB gzipped).
+  - **Web fonts** (D-059): Inter loads as WOFF2 and the icons from a 3.9 KiB cut of Material Symbols (`scripts/build-web-fonts.py`), so a cold start downloads 460 KiB of fonts instead of 2.28 MB (~1.06 MiB gzipped); without expo-symbols on the web the entry bundle is 2,383 KiB.
+  - **Exact walking order** (Held-Karp, D-030) runs ~1.5–1.7× faster on engines without a JIT (Hermes), with the same results (checked against the textbook programme): "Suggest a split" of 20 stops ~1.2 → ~0.7 s median interpreter-only.
+  - **Data pipeline** (D-060): `ingest --all --jobs N` ingests N cities at once, each API keeping its own rate limit, and runs prettier once; the monthly refresh uses `--jobs 3`.
 
 - Walk list participation (D-044): **I'm going** (PT: **Quero participar**) is on every public walk list — with or without a date and time, before or after its start — so any public list gathers people in its group chat; the chat lists its people ("3 people: Ana (organiser), You, Cid") and stays above the keyboard on phones; the organiser opens the chat from any public list's page.
 
@@ -84,6 +127,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 - Navigation: bottom tab bar on phones, side rail on desktop (≥ 1024 px). Modals open as page sheets on phones and centred dialogs on tablets/desktop.
 - Auth and onboarding: centred card layout with the brand mark; onboarding shows a progress bar.
 - Micro-interactions: press-in scale, hover states on web, keyboard focus rings, in-place button spinners.
+
+### Removed
+
+- Free-plan limits (D-065, replaces the enforcement part of D-047): every account creates as many walk lists as it wants, each with up to 20 places (the route limit, D-030), and deletes its own lists. New migration `20261006000100_plan_limits_lifted` drops the `trips_plan_list_limit` and `trip_stops_plan_item_limit` triggers, their functions and `plan_allows_deleting_lists`, makes the trips delete policy and `delete_trip` owner-only (no `WF003`), and sets the Free plan's limits to unlimited. The app's plan-limit notices are removed.
 
 ### Data
 

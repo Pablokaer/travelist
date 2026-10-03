@@ -1,12 +1,7 @@
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
 import type { TextStyle } from 'react-native';
 
-export const fontAssets = { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold };
+// The TTF files on iOS/Android, WOFF2 and the icon font on the web (font-assets.web.ts, D-059).
+export { fontAssets } from './font-assets';
 
 /**
  * Custom fonts ship one family per weight, so a `fontWeight` is mapped to the matching Inter

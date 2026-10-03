@@ -7,13 +7,6 @@ import { CityHeader } from '@/features/destinations/city-header';
 import '@/lib/i18n';
 import { fakeCity } from '@/testing/fixtures';
 
-jest.mock('@/features/subscription/api', () => ({
-  ...jest.requireActual('@/features/subscription/api'),
-  useMySubscription: () => ({
-    data: jest.requireActual('@/testing/subscription').freeSubscription(),
-  }),
-}));
-
 const GUTTER = 32;
 const container = { paddingHorizontal: GUTTER };
 const amsterdam = fakeCity();
@@ -70,9 +63,9 @@ describe('CityHeader', () => {
     expect(screen.getByRole('checkbox', { name: 'All' })).toBeChecked();
   });
 
-  test('offers "Upgrade" in the top bar to Free users (D-047)', () => {
+  test('has no "Upgrade" while paid plans are hidden (D-065)', () => {
     renderCityHeader();
-    expect(screen.getByRole('button', { name: 'Upgrade' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Upgrade' })).toBeNull();
   });
 
   test('shows the rating tabs after the category tabs', () => {

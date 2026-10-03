@@ -6,7 +6,13 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 
 import type { AttractionSummary } from '@/features/destinations/api';
 import type { RatingSummary } from '@/features/reviews/api';
-import { fetchTripStops, tripDetailFromRow, tripKeys, type TripDetail } from '@/features/trips/api';
+import {
+  fetchTripStops,
+  placeFromDetailRow,
+  tripDetailFromRow,
+  tripKeys,
+  type TripDetail,
+} from '@/features/trips/api';
 import { check, supabase } from '@/lib/supabase';
 
 export type SharedTripDetail = TripDetail & {
@@ -47,7 +53,10 @@ async function fetchSharedTrip(id: string, password: string | null): Promise<Sha
   if (error) throw new Error(error.message);
   const result = sharedTripResultSchema.parse(data);
   if (result.status !== 'ok') return { status: result.status };
-  const stops = await fetchTripStops(result.trip.stop_ids);
+  // shared_trip brings the stops' places (D-057); a backend without them is asked separately.
+  const stops = result.trip.stops
+    ? result.trip.stops.map(placeFromDetailRow)
+    : await fetchTripStops(result.trip.stop_ids);
   return { status: 'ok', trip: sharedTripDetail(result.trip, stops) };
 }
 

@@ -3,7 +3,7 @@ import '@/lib/i18n';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { DEFAULT_THEME } from '@wayfarer/shared';
-import { Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { AppMenuButton } from '@/components/app-menu';
 import { LoadingState } from '@/components/states';
 import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
+import { useWelcomeEmail } from '@/features/auth/welcome-email';
 import { useProfile } from '@/features/profile/api';
 import { UpgradeButton } from '@/features/subscription/upgrade-button';
 import { createQueryClient } from '@/lib/query-client';
@@ -22,6 +23,8 @@ import { ColorSchemeContext, useTheme } from '@/theme/use-theme';
 
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
+const RESET_PASSWORD_PATH = '/auth/reset-password';
+
 function RootNavigator() {
   const { t, i18n } = useTranslation();
   const { session, isLoading } = useAuth();
@@ -30,6 +33,8 @@ function RootNavigator() {
   const signedIn = !!session;
   const onboarded = !!profile.data?.onboardedAt;
 
+  useWelcomeEmail(signedIn ? profile.data : undefined);
+
   // The profile's language wins over the device language once known.
   const profileLanguage = profile.data?.language;
   useEffect(() => {
@@ -37,7 +42,10 @@ function RootNavigator() {
       void i18n.changeLanguage(profileLanguage);
   }, [profileLanguage, i18n]);
 
-  if (isLoading || (signedIn && profile.isPending)) return <LoadingState />;
+  // The reset link signs the user in on the reset page itself (D-066). Swapping the navigator for
+  // the loading state there would remount it on the app's first screen, skipping the new password.
+  const onResetPage = usePathname() === RESET_PASSWORD_PATH;
+  if (isLoading || (signedIn && profile.isPending && !onResetPage)) return <LoadingState />;
 
   return (
     <Stack
@@ -78,6 +86,9 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+      {/* Password reset link (D-066): reachable signed in or out, so the session the link creates
+          lands here to set the password instead of being sent into the app. */}
+      <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
       {/* Shared walk lists open for anyone with the link, signed in or not (D-031). */}
       <Stack.Screen name="shared" options={{ title: t('sharing.sharedTitle') }} />
       <Stack.Screen name="about" options={{ title: t('about.title') }} />

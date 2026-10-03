@@ -61,6 +61,17 @@ WHERE {{
 GROUP BY ?item
 """
 
+# Same article pattern as DETAILS' ?enwiki/?ptwiki (schema:name included), so an item passes this
+# check exactly when DETAILS would give it a wikipedia_en or wikipedia_pt (D-064).
+EN_PT_ARTICLE = """
+SELECT DISTINCT ?item WHERE {{
+  VALUES ?item {{ {items} }}
+  VALUES ?wiki {{ <https://en.wikipedia.org/> <https://pt.wikipedia.org/> }}
+  ?article schema:about ?item; schema:isPartOf ?wiki; schema:name ?title.
+}}
+"""
+ARTICLE_CHECK_BATCH = 500
+
 FALLBACK_LABELS = """
 SELECT ?item ?label (lang(?label) AS ?lang) WHERE {{
   VALUES ?item {{ {items} }}
@@ -137,6 +148,22 @@ def commons_filename(value: str | None) -> str | None:
         return None
     name = unquote(value.rsplit("/", 1)[-1]).replace("_", " ").strip()
     return name or None
+
+
+def with_en_pt_article(client: HttpClient, qids: list[str]) -> set[str]:
+    """The items of ``qids`` that have an English or Portuguese Wikipedia article.
+
+    A cheap stand-in for DETAILS when only notability is in question: ~500 items per query
+    instead of 100 with a dozen OPTIONALs.
+
+    >>> with_en_pt_article(client, ["Q215003", "Q123"])  # doctest: +SKIP
+    {'Q215003'}
+    """
+    found: set[str] = set()
+    for chunk in sparql.chunks(sorted(qids), ARTICLE_CHECK_BATCH):
+        rows = sparql.run(client, EN_PT_ARTICLE.format(items=sparql.values(chunk)))
+        found.update(r["item"] for r in rows)
+    return found
 
 
 def fetch_details(client: HttpClient, qids: list[str]) -> dict[str, dict[str, Any]]:

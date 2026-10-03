@@ -1,19 +1,12 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
-import PlansScreen from '@/app/plans';
-import type { AttractionSummary } from '@/features/destinations/api';
-import { useRouteStore } from '@/features/route/store';
-import {
-  planFromRow,
-  PlanLimitError,
-  startCheckout,
-  type Subscription,
-} from '@/features/subscription/api';
-import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
+import PlansRoute from '@/app/plans';
+import { planFromRow, startCheckout, type Subscription } from '@/features/subscription/api';
 import { SubscriptionSection } from '@/features/subscription/subscription-section';
 import { UpgradeButton } from '@/features/subscription/upgrade-button';
 import '@/lib/i18n';
+import { featuresWrapper } from '@/testing/features';
 import {
   freePlanRow,
   freeSubscription as freeFixture,
@@ -21,13 +14,20 @@ import {
   premiumSubscription as premiumFixture,
 } from '@/testing/subscription';
 
-/** Plans as the `plans` table returns them, and the caller's subscription. */
+/** Plans as the `plans` table returns them, the caller's subscription, and how often it was read. */
 class MockPlansServer {
   static planRows = [freePlanRow, premiumPlanRow];
   static subscription: Subscription;
+  static subscriptionReads = 0;
 }
 
-jest.mock('expo-router', () => ({ Stack: { Screen: () => null }, router: { push: jest.fn() } }));
+jest.mock('expo-router', () => {
+  const { Text: MockText } = jest.requireActual('react-native');
+  const MockRedirect = ({ href }: { href: unknown }) => (
+    <MockText testID="redirect">{JSON.stringify(href)}</MockText>
+  );
+  return { Stack: { Screen: () => null }, router: { push: jest.fn() }, Redirect: MockRedirect };
+});
 jest.mock('@/features/subscription/api', () => ({
   ...jest.requireActual('@/features/subscription/api'),
   usePlans: () => ({
@@ -37,12 +37,14 @@ jest.mock('@/features/subscription/api', () => ({
       jest.requireActual('@/features/subscription/api').planFromRow,
     ),
   }),
-  useMySubscription: () => ({
-    isPending: false,
-    isError: false,
-    data: MockPlansServer.subscription,
-  }),
+  useMySubscription: () => {
+    MockPlansServer.subscriptionReads += 1;
+    return { isPending: false, isError: false, data: MockPlansServer.subscription };
+  },
 }));
+
+/** Paid plans are hidden for now (D-065); these tests describe them turned on. */
+const withPaidPlans = { wrapper: featuresWrapper({ paidPlans: true }) };
 
 const plans = MockPlansServer.planRows.map(planFromRow);
 const freePlan = plans[0]!;
@@ -51,34 +53,20 @@ const premiumPlan = plans[1]!;
 const freeSubscription = () => freeFixture(2);
 const premiumSubscription = () => premiumFixture(9);
 
-const place = (id: string): AttractionSummary => ({
-  id,
-  citySlug: 'lisbon',
-  nameEn: id,
-  namePt: null,
-  category: 'museum',
-  lat: 38.7,
-  lng: -9.2,
-  popularity: 1,
-  avgVisitMinutes: 30,
-  imageUrl: null,
-  isUnesco: false,
-});
-
 beforeEach(() => {
   MockPlansServer.subscription = freeSubscription();
+  MockPlansServer.subscriptionReads = 0;
   jest.mocked(router.push).mockClear();
-  useRouteStore.getState().clear();
 });
 
 describe('plans and subscriptions (D-047)', () => {
-  test('plans come from the database with their limits; null means unlimited', () => {
+  test('plans come from the database; Free has no limits any more (D-065)', () => {
     expect(freePlan).toEqual({
       id: 'free',
       priceCents: 0,
       currency: 'EUR',
       billingInterval: null,
-      rules: { maxLists: 5, maxItemsPerList: 5, canDeleteLists: false },
+      rules: { maxLists: null, maxItemsPerList: null, canDeleteLists: true },
     });
     expect(premiumPlan.rules).toEqual({
       maxLists: null,
@@ -95,38 +83,37 @@ describe('plans and subscriptions (D-047)', () => {
     expect(s.listCount).toBe(2);
   });
 
-  test('a database plan-limit error becomes a PlanLimitError', () => {
-    expect(PlanLimitError.from({ code: 'WF001', message: 'plan limit' })?.limit).toBe('lists');
-    expect(PlanLimitError.from({ code: '23505', message: 'duplicate' })).toBeNull();
-  });
-
   test('checkout is not connected yet: it says so instead of charging', async () => {
     await expect(startCheckout('premium')).resolves.toEqual({ status: 'unavailable' });
   });
 });
 
-describe('the route tray holds as many places as the plan allows', () => {
-  test('Free: the sixth place is refused with the plan limit', () => {
-    const store = useRouteStore.getState();
-    for (const id of ['a', 'b', 'c', 'd', 'e']) expect(store.toggle(place(id), 5)).toBe('added');
-    expect(useRouteStore.getState().toggle(place('f'), 5)).toBe('planLimit');
-    expect(useRouteStore.getState().stops).toHaveLength(5);
+describe('while paid plans are hidden (D-065)', () => {
+  test('no "Upgrade" in the top bar, and the plan is not even read', () => {
+    render(<UpgradeButton />);
+    expect(screen.queryByRole('button', { name: 'Upgrade' })).toBeNull();
+    expect(MockPlansServer.subscriptionReads).toBe(0);
   });
 
-  test('Premium: only the technical route limit applies', () => {
-    const store = useRouteStore.getState();
-    for (const id of ['a', 'b', 'c', 'd', 'e', 'f'])
-      expect(store.toggle(place(id), 20)).toBe('added');
+  test('no Settings → Subscription', () => {
+    render(<SubscriptionSection />);
+    expect(screen.queryByText('Subscription')).toBeNull();
+    expect(screen.queryByText(/Current plan/)).toBeNull();
+  });
+
+  test('/plans sends the user home', () => {
+    render(<PlansRoute />);
+    expect(screen.getByTestId('redirect')).toHaveTextContent('"/"');
+    expect(screen.queryByTestId('plan-premium')).toBeNull();
   });
 });
 
 describe('PlansScreen', () => {
-  test('shows Free and a highlighted Premium with their prices and limits', () => {
-    render(<PlansScreen />);
+  test('shows Free and a highlighted Premium with their prices and what they include', () => {
+    render(<PlansRoute />, withPaidPlans);
     const free = screen.getByTestId('plan-free');
     expect(free).toHaveTextContent(/€0/);
-    expect(free).toHaveTextContent(/Up to 5 lists/);
-    expect(free).toHaveTextContent(/Up to 5 places per list/);
+    expect(free).toHaveTextContent(/Unlimited lists/);
     const premium = screen.getByTestId('plan-premium');
     expect(premium).toHaveTextContent(/€5\.00 \/ month/);
     expect(premium).toHaveTextContent(/Unlimited lists/);
@@ -137,14 +124,14 @@ describe('PlansScreen', () => {
   });
 
   test('"Upgrade to Premium" does not charge anything yet', async () => {
-    render(<PlansScreen />);
+    render(<PlansRoute />, withPaidPlans);
     await userEvent.press(screen.getByRole('button', { name: 'Upgrade to Premium' }));
     expect(await screen.findByText(/Payments are coming soon/)).toBeOnTheScreen();
   });
 
   test('a Premium user sees Premium as the current plan and no upgrade', () => {
     MockPlansServer.subscription = premiumSubscription();
-    render(<PlansScreen />);
+    render(<PlansRoute />, withPaidPlans);
     expect(screen.getByTestId('plan-premium')).toHaveTextContent(/Current plan/);
     expect(screen.queryByRole('button', { name: 'Upgrade to Premium' })).toBeNull();
   });
@@ -152,7 +139,7 @@ describe('PlansScreen', () => {
 
 describe('Settings → Subscription', () => {
   test('Free: the current plan', () => {
-    render(<SubscriptionSection />);
+    render(<SubscriptionSection />, withPaidPlans);
     expect(screen.getByText('Subscription')).toBeOnTheScreen();
     expect(screen.getByText('Current plan: Free')).toBeOnTheScreen();
     expect(screen.queryByText(/Valid until/)).toBeNull();
@@ -160,7 +147,7 @@ describe('Settings → Subscription', () => {
 
   test('Premium: the plan, price, validity and Manage subscription', async () => {
     MockPlansServer.subscription = premiumSubscription();
-    render(<SubscriptionSection />);
+    render(<SubscriptionSection />, withPaidPlans);
     expect(screen.getByText('Current plan: Premium')).toBeOnTheScreen();
     expect(screen.getByText('€5.00 / month')).toBeOnTheScreen();
     expect(screen.getByText(/^Valid until: /)).toHaveTextContent(/31/);
@@ -171,27 +158,14 @@ describe('Settings → Subscription', () => {
 
 describe('Upgrade in the top bar', () => {
   test('Free users get "Upgrade", which opens the plans', async () => {
-    render(<UpgradeButton />);
+    render(<UpgradeButton />, withPaidPlans);
     await userEvent.press(screen.getByRole('button', { name: 'Upgrade' }));
     expect(router.push).toHaveBeenCalledWith('/plans');
   });
 
   test('Premium users do not', () => {
     MockPlansServer.subscription = premiumSubscription();
-    render(<UpgradeButton />);
+    render(<UpgradeButton />, withPaidPlans);
     expect(screen.queryByRole('button', { name: 'Upgrade' })).toBeNull();
-  });
-});
-
-describe('PlanLimitNotice', () => {
-  test('explains each limit from the plan and offers Premium', async () => {
-    const { rerender } = render(<PlanLimitNotice limit="lists" />);
-    expect(screen.getByText("You've reached the Free plan limit of 5 lists.")).toBeOnTheScreen();
-    rerender(<PlanLimitNotice limit="items" />);
-    expect(screen.getByText('Free accounts can add up to 5 places per list.')).toBeOnTheScreen();
-    rerender(<PlanLimitNotice limit="delete" />);
-    expect(screen.getByText('Deleting lists is a Premium feature.')).toBeOnTheScreen();
-    await userEvent.press(screen.getByRole('button', { name: 'Upgrade to Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/plans');
   });
 });

@@ -2,7 +2,7 @@ import { focusManager, QueryClient } from '@tanstack/react-query';
 import { AppState, Platform } from 'react-native';
 
 /** What we need of React Native's AppState, so tests can pass a fake. */
-type AppStateLike = {
+export type AppStateLike = {
   addEventListener: (event: 'change', listener: (state: string) => void) => { remove: () => void };
 };
 

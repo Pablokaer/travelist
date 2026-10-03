@@ -5,7 +5,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppMenuButton } from '@/components/app-menu';
 import type { AttractionSummary } from '@/features/destinations/api';
 import { AttractionSearch } from '@/features/destinations/attraction-search';
-import { normalizeSearch, searchAttractions } from '@/features/destinations/search';
+import {
+  buildSearchIndex,
+  normalizeSearch,
+  searchAttractions,
+  searchIndex,
+} from '@/features/destinations/search';
 import '@/lib/i18n';
 
 /** Builds a minimal attraction for search tests. */
@@ -53,6 +58,42 @@ describe('searchAttractions', () => {
 
   test('an empty query matches nothing', () => {
     expect(searchAttractions(lisbon, '   ', 'en')).toEqual([]);
+  });
+});
+
+describe('buildSearchIndex / searchIndex', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  test('holds every name normalised once, with its words', () => {
+    const [tower] = buildSearchIndex(lisbon);
+    expect(tower!.item.id).toBe('tower');
+    expect(tower!.names).toEqual([
+      { text: 'belem tower', words: ['belem', 'tower'] },
+      { text: 'torre de belem', words: ['torre', 'de', 'belem'] },
+    ]);
+  });
+
+  test('ranks exactly like searchAttractions', () => {
+    const index = buildSearchIndex(lisbon);
+    for (const [query, lang, limit] of [
+      ['bel', 'en', Infinity],
+      ['arch', 'en', Infinity],
+      ['mosteiro', 'pt', Infinity],
+      ['e', 'en', 2],
+      ['e', 'pt', Infinity],
+      ['  ', 'en', Infinity],
+    ] as const) {
+      expect(ids(searchIndex(index, query, lang, limit))).toEqual(
+        ids(searchAttractions(lisbon, query, lang, limit)),
+      );
+    }
+  });
+
+  test('a keystroke normalises only the query, not every name again', () => {
+    const index = buildSearchIndex(lisbon);
+    const normalize = jest.spyOn(String.prototype, 'normalize');
+    searchIndex(index, 'bel', 'en');
+    expect(normalize).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -19,6 +19,7 @@ Milestones from the MVP brief. Each milestone ends with lint, typecheck and all 
 - `supabase/`: CLI config (redirect URLs for web + `wayfarer://`), migration enabling PostGIS + `set_updated_at()`, pgTAP smoke tests (incl. "RLS enabled on every public table"), `health` Edge Function with Deno tests.
 - `data-pipeline/`: Python package, validated `cities.yaml` with all 12 launch cities (ids/centres/bboxes from Wikidata + Nominatim), CLI (`validate-config`, `ingest` stub), pytest + ruff.
 - CI: app (format, lint, typecheck, unit, web export, Playwright), database (migrations, pgTAP, `db lint`), functions (deno lint/fmt/test), pipeline (ruff, pytest).
+- Security CI (D-049): CodeQL (TS/JS, Python), dependency review, gitleaks, pnpm audit + pip-audit, actionlint — on every PR, on `main` and weekly.
 - Docs: README, ARCHITECTURE, DECISIONS (D-001…D-010), DATA_SOURCES.
 
 **Verified locally (cloud dev container):** `pnpm check` green (Jest 5 tests, Vitest 6 tests), `expo export -p web` OK, Playwright 4/4 (desktop + mobile viewport), `supabase start` + `supabase test db` 4/4, `health` function responds via the local gateway, `supabase db lint` clean, pytest 8/8, deno test 2/2.
@@ -127,6 +128,27 @@ Straight-line routes reproduced (ORS optimisation over quota: 403) and fixed wit
 - **Tests:** pgTAP 19 new, shared 4 new, app 13 new or updated (325 in all).
 - **Verified on web:** Lucía signed in as `Lucia` and Emma as `emma`; each sees their own messages as `@nickname` and the other's replies with that person's nickname.
 
+## 2026-10-03 — Performance audit and fixes (D-050 – D-060)
+
+- **Measured first** (production web build, local stack, rolled-back load tests in Postgres), then fixed with tests: photos at the width they are shown (Home 11.1 → 1.35 MiB before scrolling), category filters on the device, Edge Function tokens verified locally plus a memory cache and parallel reads (warm checklist 30 → 6.8 ms), rating totals kept by triggers (walk list previews 85–210 → 0.5 ms at 20k lists), incremental chat re-reads, trip pages in one request, zod locales and fonts out of the web start (bundle 2,752 → 2,383 KiB, fonts 2.28 MB → 460 KiB), a faster exact walking order with identical results, and cities ingested side by side.
+- **Corrected:** the audit's map finding did not hold once measured with GPU rendering and warm tiles (300 photo markers pan at 60 fps); the 60-marker cap was reverted and only memoised markers kept (D-051).
+- **Tests:** pgTAP 18 files (335), app 50 suites (359), shared 117, Edge Functions 65, pipeline 130.
+- **Next:** profile iOS/Android (Hermes, MapLibre native markers) on devices; "Suggest a split" still blocks the JS thread for up to ~1.7 s at 20 stops; switch the hosted project to asymmetric JWT keys so tokens are verified locally there too.
+
+## 2026-10-03 — Performance audit, second pass (D-061 – D-064)
+
+- **Database:** walk list pages, sorts, saved lists, reviews and rating summaries read only what they show (offset 1000 ~100 → ~2 ms, saved 36 → 0.5 ms, a list's reviews 9 → 0.2 ms), with identical results; the chat's people update on join/leave instead of a 30 s poll.
+- **App:** 60 px marker photos (~2.5 → ~1.0 MiB per city), search indexed once per city, attraction header from cache, city places preloaded, one card re-render per stop toggle, one minute clock for countdowns, MapLibre CSS only with the map.
+- **Edge Functions:** cache writes after the response, a circuit breaker for ORS and failing slow sources, one forecast call per place and day.
+- **Pipeline:** ~47% fewer Wikidata queries per full run (same output), 90 s Wikidata timeout, 2 parallel queries, class cache kept in CI.
+- **Next:** check the chat's live join/leave announcements in a browser and on devices; decide on removing reanimated / worklets / gesture-handler with a native build (D-062).
+
+## 2026-10-03 — Chat and paid plans hidden, limits lifted, email service (D-065, D-066)
+
+- **Product (D-065):** walk group chat and paid plans UI hidden behind `EXPO_PUBLIC_FEATURE_*` flags (code and backend kept); Free-plan limits lifted in the database and the app — unlimited lists, 20 places per list, owners delete their lists.
+- **Email (D-066):** welcome email in the user's language after onboarding; password recovery end to end (**Forgot password?** → email with link → new password → signed in); every auth email goes through our `auth-email` function (Send Email Hook) to Resend (production) or Mailpit (local). Verified locally with Playwright and Mailpit (PT welcome, EN reset, magic link with code).
+- **Next:** Resend account + verified domain and the hosted Send Email Hook (LAUNCH_CHECKLIST #8); universal links so `wayfarer://` email links are clickable on iOS/Android.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
@@ -134,9 +156,9 @@ Straight-line routes reproduced (ORS optimisation over quota: 403) and fixed wit
 - Map: clustering for dense areas; check photo markers and the card popup on iOS/Android (D-029).
 - Walk list sharing: limit password attempts; revoke a link without going private; check the native share sheet on iOS/Android (D-031).
 - Reviews: "load more" beyond the 50 newest, reporting / moderation (D-028); city and walk list reviews share the same gap (D-034).
-- Plans: payment provider (checkout, webhooks writing `subscriptions`, renewal, cancellation, billing portal) (D-047).
+- Plans: payment provider (checkout, webhooks writing `subscriptions`, renewal, cancellation, billing portal) (D-047); decide the plan limits before turning `EXPO_PUBLIC_FEATURE_PAID_PLANS` back on (D-065).
 - Routes: rebuild trips saved earlier as straight-line estimates; a higher ORS quota for launch (D-046).
-- Meetups: reminders/notifications and a time picker (D-041); chat push notifications, message reporting/moderation and older-message paging (D-043).
+- Meetups: reminders/notifications and a time picker (D-041); chat push notifications, message reporting/moderation and older-message paging (D-043); turn the walk chat back on (`EXPO_PUBLIC_FEATURE_WALK_CHAT`, D-065).
 - Walk lists: an admin screen for moderators (today: SQL), a count of lists on the city page, and a check of the city page on iOS/Android (D-033, D-035).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
 - Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).

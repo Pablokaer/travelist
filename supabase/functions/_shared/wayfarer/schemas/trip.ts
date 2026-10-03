@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-import { TRIP_PASSWORD_MAX, TRIP_PASSWORD_MIN, TRIP_VISIBILITIES } from '../constants/index.ts';
+import {
+  ATTRACTION_CATEGORIES,
+  TRIP_PASSWORD_MAX,
+  TRIP_PASSWORD_MIN,
+  TRIP_VISIBILITIES,
+} from '../constants/index.ts';
 import { isoDateSchema } from './common.ts';
 
 export const tripVisibilitySchema = z.enum(TRIP_VISIBILITIES);
@@ -28,9 +33,24 @@ export function tripVisibilityFormSchema(hasPassword: boolean) {
 }
 export type TripVisibilityForm = z.infer<ReturnType<typeof tripVisibilityFormSchema>>;
 
+/** A stop's place in a `shared_trip` answer: the `attraction_details` columns a card shows. */
+export const tripStopPlaceSchema = z.object({
+  id: z.string(),
+  city_slug: z.string(),
+  name_en: z.string(),
+  name_pt: z.string().nullable(),
+  category: z.enum(ATTRACTION_CATEGORIES),
+  lat: z.number(),
+  lng: z.number(),
+  popularity: z.number(),
+  avg_visit_minutes: z.number(),
+  image_url: z.string().nullable(),
+  is_unesco: z.boolean(),
+});
+
 /**
- * The `trip` of a `shared_trip` answer: the trip's columns, its stop ids in order, is_owner, and
- * the author, official badge, rating and saved state (D-035).
+ * The `trip` of a `shared_trip` answer: the trip's columns, its stop ids in order (and their
+ * places, D-057), is_owner, and the author, official badge, rating and saved state (D-035).
  */
 export const sharedTripSchema = z.object({
   id: z.string(),
@@ -58,8 +78,11 @@ export const sharedTripSchema = z.object({
   attendee_count: z.number().int(),
   is_attending: z.boolean(),
   stop_ids: z.array(z.string()),
+  /** The stops' places in order, so the page needs no second request; absent before D-057. */
+  stops: z.array(tripStopPlaceSchema).optional(),
 });
 export type SharedTrip = z.infer<typeof sharedTripSchema>;
+export type TripStopPlace = z.infer<typeof tripStopPlaceSchema>;
 
 /**
  * What `shared_trip(id, password)` returns: the trip, or why it cannot be shown. Private and

@@ -20,7 +20,7 @@ Every dataset Wayfarer uses, what we take from it, its licence and the attributi
 ## Usage policies we follow
 
 - **User-Agent:** every pipeline request sends `wayfarer-pipeline/<version> (<PIPELINE_CONTACT_EMAIL>)`.
-- **Rate limits:** Wikidata SPARQL (≤ 1 concurrent query, back off on 429), Overpass (≤ 1 request at a time, honour `Retry-After`), Nominatim (≤ 1 request/second, never from the app), Wikimedia REST (≤ 100 req/s, we stay far below).
+- **Rate limits:** Wikidata SPARQL (≤ 2 concurrent queries — WDQS allows 5 per client, we stay low on shared CI IPs — one query start per second, back off on 429 / `Retry-After`), Overpass (≤ 1 request at a time, honour `Retry-After`), Nominatim (≤ 1 request/second, never from the app), Wikimedia REST (≤ 100 req/s, we stay far below).
 - **Caching:** raw responses cached under `data-pipeline/.cache/` during development (git-ignored).
 - **No invented data:** missing fields stay `null` and the UI handles them.
 

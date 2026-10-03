@@ -1,6 +1,7 @@
 import { expect, test, type Browser } from '@playwright/test';
 
 import {
+  builtWith,
   byTestIdOn,
   chooseVisibility,
   roleOn,
@@ -17,6 +18,12 @@ import {
  *   pnpm db:start && pnpm build:web && E2E_BACKEND=1 pnpm e2e walk-chat
  */
 test.skip(!process.env.E2E_BACKEND, 'needs the local Supabase stack (set E2E_BACKEND=1)');
+// The walk chat is hidden for now (D-065); see `builtWith` for running these against a build
+// that turns it on. Its hidden state is covered in city-page.spec.ts.
+test.skip(
+  !builtWith.walkChat,
+  'walk chat hidden (D-065): build with EXPO_PUBLIC_FEATURE_WALK_CHAT=true',
+);
 
 const unique = () => `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
 

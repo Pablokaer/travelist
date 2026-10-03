@@ -11,7 +11,7 @@ import json
 import os
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -34,17 +34,28 @@ def user_agent() -> str:
 
 @dataclass(frozen=True)
 class HostPolicy:
-    """Minimum seconds between request starts and max concurrent requests for a host."""
+    """How politely, and how patiently, to talk to one host.
+
+    ``min_interval``: minimum seconds between request starts; ``concurrency``: max requests in
+    flight; ``timeout``: requests' per-socket-read timeout; ``deadline``: wall-clock bound on the
+    whole request (see ``HttpClient._send``)."""
 
     min_interval: float
     concurrency: int = 1
+    timeout: float = 60.0
+    deadline: float = 120.0
 
 
-# Wikidata SPARQL and Overpass: one request at a time. Wikimedia REST ≤ 10 req/s (the
-# pageviews API answered 429 at 20 req/s), Commons ≤ 10 req/s.
+# Wikidata SPARQL: WDQS allows 5 parallel queries per client, but the monthly refresh runs on
+# shared GitHub runner IPs (other tenants count against the same limit), so we stay at 2 and keep
+# one query start per second; 429s are absorbed by Retry-After/backoff. WDQS kills a query at 60 s
+# server side, so a response still pending at ~75 s is a hung connection, not a slow query:
+# giving up at 90 s instead of 360 s keeps a hang from eating the CI timeout (7 attempts each).
+# Overpass: one request at a time, and its queries set [timeout:300], so it must wait longer.
+# Wikimedia REST ≤ 10 req/s (the pageviews API answered 429 at 20 req/s), Commons ≤ 10 req/s.
 POLICIES: dict[str, HostPolicy] = {
-    "query.wikidata.org": HostPolicy(min_interval=1.0, concurrency=1),
-    "overpass-api.de": HostPolicy(min_interval=5.0, concurrency=1),
+    "query.wikidata.org": HostPolicy(min_interval=1.0, concurrency=2, timeout=75.0, deadline=90.0),
+    "overpass-api.de": HostPolicy(min_interval=5.0, concurrency=1, timeout=300.0, deadline=360.0),
     "wikimedia.org": HostPolicy(min_interval=0.1, concurrency=4),
     "commons.wikimedia.org": HostPolicy(min_interval=0.1, concurrency=2),
     "raw.githubusercontent.com": HostPolicy(min_interval=0.5, concurrency=1),
@@ -101,16 +112,15 @@ class HttpClient:
         cache_dir: Path = CACHE_DIR,
         use_cache: bool = True,
         max_retries: int = 6,
-        timeout: float = 300.0,
-        deadline: float = 360.0,
+        policies: Mapping[str, HostPolicy] = POLICIES,
+        session_factory: Callable[[], requests.Session] = requests.Session,
     ):
         self.cache_dir = cache_dir
         self.use_cache = use_cache
         self.max_retries = max_retries
-        self.timeout = timeout
-        # requests' timeout is per socket read: a server trickling bytes can hold a request
-        # open forever (seen with WDQS). ``deadline`` bounds the whole request.
-        self.deadline = deadline
+        # Per-host rate limits and timeouts (HostPolicy); hosts not listed get DEFAULT_POLICY.
+        self.policies = policies
+        self.session_factory = session_factory
         self._local = threading.local()
         self._gates: dict[str, _HostGate] = {}
         self._gates_lock = threading.Lock()
@@ -120,29 +130,32 @@ class HttpClient:
     def _session(self) -> requests.Session:
         session = getattr(self._local, "session", None)
         if session is None:
-            session = requests.Session()
+            session = self.session_factory()
             session.headers["User-Agent"] = user_agent()
             self._local.session = session
         return session
 
-    def _send(self, method: str, url: str, **kwargs: Any) -> requests.Response:
+    def _send(self, policy: HostPolicy, method: str, url: str, **kwargs: Any) -> requests.Response:
         """``session.request`` with a wall-clock deadline. On expiry the (possibly stuck)
-        session is abandoned to its daemon thread and a fresh one is used next time."""
+        session is abandoned to its daemon thread and a fresh one is used next time.
+
+        requests' timeout is per socket read: a server trickling bytes can hold a request open
+        forever (seen with WDQS), so ``policy.deadline`` bounds the whole request."""
         session = self._session()
         box: dict[str, Any] = {}
 
         def run() -> None:
             try:
-                box["resp"] = session.request(method, url, timeout=self.timeout, **kwargs)
+                box["resp"] = session.request(method, url, timeout=policy.timeout, **kwargs)
             except BaseException as exc:  # noqa: BLE001 - re-raised in the caller's thread
                 box["error"] = exc
 
         worker = threading.Thread(target=run, daemon=True)
         worker.start()
-        worker.join(self.deadline)
+        worker.join(policy.deadline)
         if worker.is_alive():
             self._local.session = None
-            raise requests.Timeout(f"no complete response within {self.deadline:.0f}s")
+            raise requests.Timeout(f"no complete response within {policy.deadline:.0f}s")
         if "error" in box:
             raise box["error"]
         return box["resp"]
@@ -150,7 +163,7 @@ class HttpClient:
     def _gate(self, host: str) -> _HostGate:
         with self._gates_lock:
             if host not in self._gates:
-                self._gates[host] = _HostGate(POLICIES.get(host, DEFAULT_POLICY))
+                self._gates[host] = _HostGate(self.policies.get(host, DEFAULT_POLICY))
             return self._gates[host]
 
     def _cache_path(self, namespace: str, method: str, url: str, payload: Any) -> Path:
@@ -187,7 +200,9 @@ class HttpClient:
             with gate.sem:
                 gate.wait_turn()
                 try:
-                    resp = self._send(method, url, params=params, data=data, headers=headers)
+                    resp = self._send(
+                        gate.policy, method, url, params=params, data=data, headers=headers
+                    )
                     error: Exception | None = None
                 except requests.RequestException as exc:
                     resp = None

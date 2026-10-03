@@ -9,6 +9,7 @@ import {
   checklistResponseSchema,
   checkPassportValidity,
   checkPower,
+  type VisaOption,
 } from '@wayfarer/shared';
 
 import {
@@ -107,6 +108,8 @@ type Context = {
   city: CityRow;
   dest: CountryRow;
   home: CountryRow | null;
+  /** Read alongside the city, not after it (D-054). */
+  visaOptions: Promise<VisaOption[]>;
 };
 
 async function settle<K extends keyof Sections>(
@@ -127,7 +130,7 @@ function buildSections(deps: ChecklistDeps, ctx: Context) {
   const { req, dest, home, city } = ctx;
 
   const visa = settle('visa', async () => {
-    const options = await deps.db.getVisaOptions(dest.code, req.nationalities);
+    const options = await ctx.visaOptions;
     const best = bestVisaOption(dest.code, req.nationalities, options) ??
       unavailable('no_visa_data');
     return {
@@ -258,11 +261,14 @@ export function createHandler(deps: ChecklistDeps): (req: Request) => Promise<Re
     try {
       const now = deps.now();
       const today = isoDay(now);
-      const city = await deps.db.getCity(input.city);
-      if (!city) return notFound('city_not_found', `unknown city "${input.city}"`);
-
       const homeCode = input.homeCountry ?? input.nationalities[0]!;
-      const countries = await deps.db.getCountries([...new Set([city.country_code, homeCode])]);
+      // Both reads start at once: the visa rules are looked up by city, so they need not wait.
+      const visaOptions = deps.db.getVisaOptions(input.city, input.nationalities);
+      visaOptions.catch(() => undefined); // a failure belongs to the visa section alone
+      const place = await deps.db.getPlace(input.city, homeCode);
+      if (!place) return notFound('city_not_found', `unknown city "${input.city}"`);
+
+      const { city, countries } = place;
       const dest = countries.find((c) => c.code === city.country_code);
       if (!dest) throw new Error(`country ${city.country_code} missing for city ${city.slug}`);
       const home = countries.find((c) => c.code === homeCode) ?? null;
@@ -274,6 +280,7 @@ export function createHandler(deps: ChecklistDeps): (req: Request) => Promise<Re
         city,
         dest,
         home,
+        visaOptions,
       };
       const s = buildSections(deps, ctx);
       const [visa, passport, power, weather, money, safety, practical] = await Promise.all([

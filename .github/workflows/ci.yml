@@ -54,6 +54,10 @@ jobs:
     name: Supabase migrations + pgTAP (RLS) tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # config.toml's Send Email Hook (D-066) needs a well-formed secret to load; this is the
+      # local-only value from .env.example, not a production secret.
+      SEND_EMAIL_HOOK_SECRET: v1,whsec_dHJhdmVsaXN0LWxvY2FsLW9ubHktaG9vay1zZWNyZXQ=
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1

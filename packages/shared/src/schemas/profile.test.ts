@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { nicknameSchema, profileFormSchema, signInSchema, signUpSchema } from './profile.ts';
+import {
+  newPasswordSchema,
+  nicknameSchema,
+  passwordResetRequestSchema,
+  profileFormSchema,
+  signInSchema,
+  signUpSchema,
+} from './profile.ts';
 
 describe('nickname (D-048)', () => {
   it('is stored trimmed and lowercase', () => {
@@ -35,5 +42,31 @@ describe('sign-in', () => {
     expect(signInSchema.parse({ login: ' nina_walks ', password: 'x' }).login).toBe('nina_walks');
     expect(signInSchema.parse({ login: 'n@x.io', password: 'x' }).login).toBe('n@x.io');
     expect(signInSchema.safeParse({ login: '  ', password: 'x' }).success).toBe(false);
+  });
+});
+
+describe('password recovery (D-066)', () => {
+  it('asks for a valid email to send the reset link to', () => {
+    expect(passwordResetRequestSchema.safeParse({ email: 'nina@example.com' }).success).toBe(true);
+    expect(passwordResetRequestSchema.safeParse({ email: 'nina' }).error?.issues[0]?.message).toBe(
+      'validation.email',
+    );
+  });
+
+  it('takes a new password of at least 8 characters, typed twice', () => {
+    expect(
+      newPasswordSchema.safeParse({ password: 'long-enough', confirm: 'long-enough' }).success,
+    ).toBe(true);
+    expect(
+      newPasswordSchema.safeParse({ password: 'short', confirm: 'short' }).error?.issues[0]
+        ?.message,
+    ).toBe('validation.passwordLength');
+  });
+
+  it('rejects a confirmation that differs, on the confirmation field', () => {
+    const issue = newPasswordSchema.safeParse({ password: 'long-enough', confirm: 'long-enougH' })
+      .error?.issues[0];
+    expect(issue?.message).toBe('validation.passwordMismatch');
+    expect(issue?.path).toEqual(['confirm']);
   });
 });

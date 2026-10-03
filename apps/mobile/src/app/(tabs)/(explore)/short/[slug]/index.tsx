@@ -12,6 +12,7 @@ import { cityName, useCities, type City } from '@/features/destinations/api';
 import { useCityAbout } from '@/features/destinations/city-about-api';
 import { CityHero } from '@/features/destinations/city-hero';
 import { CityNotFound } from '@/features/destinations/city-not-found';
+import { usePrefetchCityPlaces } from '@/features/destinations/use-prefetch-city-places';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { CityWalklistsSection } from '@/features/trips/city-walklists-section';
 import { UpcomingMeetupsSection } from '@/features/trips/upcoming-meetups-section';
@@ -24,7 +25,6 @@ import { spacing } from '@/theme/colors';
  * "Explore attractions" opens the Map / List page (`/city/[slug]`).
  */
 export default function CityHubScreen() {
-  const { t, i18n } = useTranslation();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const cities = useCities();
   const city = cities.data?.find((c) => c.slug === slug);
@@ -32,6 +32,13 @@ export default function CityHubScreen() {
   if (cities.isPending) return <LoadingState />;
   if (cities.isError) return <ErrorState onRetry={() => cities.refetch()} />;
   if (!city) return <CityNotFound />;
+  return <CityHub city={city} />;
+}
+
+function CityHub({ city }: { city: City }) {
+  const { t, i18n } = useTranslation();
+  // The Map / List page is one tap away: its places are loading while this page is read.
+  usePrefetchCityPlaces(city);
   const openAttractions = () =>
     router.push({ pathname: '/city/[slug]', params: { slug: city.slug } });
   return (

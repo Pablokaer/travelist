@@ -28,12 +28,15 @@ export type CityRow = {
   timezone: string | null;
 };
 
+/** A city with its country and the traveller's home country (one row each, in any order). */
+export type Place = { city: CityRow; countries: CountryRow[] };
+
 /** Reference-data lookups (Postgres in production, fakes in tests). */
 export interface ChecklistDb {
-  getCity(slug: string): Promise<CityRow | null>;
-  getCountries(codes: string[]): Promise<CountryRow[]>;
-  /** Visa rules for `destination` for each of the given passports. */
-  getVisaOptions(destination: string, passports: string[]): Promise<VisaOption[]>;
+  /** The city and its countries in one round trip; null for an unknown city. */
+  getPlace(citySlug: string, homeCountry: string): Promise<Place | null>;
+  /** Visa rules of the city's country for each of the given passports (by city: no wait). */
+  getVisaOptions(citySlug: string, passports: string[]): Promise<VisaOption[]>;
 }
 
 export type Climate = {

@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,12 +21,10 @@ import { AttractionSearch } from '@/features/destinations/attraction-search';
 import { AttractionCard } from '@/features/destinations/attraction-card';
 import { CityHeader } from '@/features/destinations/city-header';
 import { CityNotFound } from '@/features/destinations/city-not-found';
-import { searchAttractions } from '@/features/destinations/search';
+import { buildSearchIndex, searchIndex } from '@/features/destinations/search';
 import { useExploreStore } from '@/features/destinations/store';
 import { MapView } from '@/features/map/map-view';
 import { routeNotice } from '@/features/route/notice';
-import { useToggleStop } from '@/features/route/use-toggle-stop';
-import { PlanLimitNotice } from '@/features/subscription/plan-limit-notice';
 import { useCityRatings } from '@/features/reviews/api';
 import { withMinRating } from '@/features/reviews/rating-filter';
 import { useRouteStore } from '@/features/route/store';
@@ -48,9 +46,7 @@ export default function CityScreen() {
   const { categories, toggleCategory, clearCategories, view, setView, minRating, setMinRating } =
     useExploreStore();
   const routeStops = useRouteStore((s) => s.stops);
-  // Within the plan's places per list (D-047).
-  const toggleStop = useToggleStop();
-  const [planLimited, setPlanLimited] = useState(false);
+  const toggleStop = useRouteStore((s) => s.toggle);
   const [notice, setNotice] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   // The place whose card is open on the map; one at a time (D-029).
@@ -63,13 +59,18 @@ export default function CityScreen() {
   const attractions = useAttractions(city, categories);
   const ratings = useCityRatings(city?.slug);
   const lang = i18n.resolvedLanguage ?? 'en';
+  // Names normalised once per city (and category tabs), not on every keystroke.
+  const index = useMemo(() => buildSearchIndex(attractions.data ?? []), [attractions.data]);
+  // The grid and the map follow the query at low priority: typing (and the dropdown, which
+  // reads the live query) never waits for 300 cards or markers to re-render.
+  const gridQuery = useDeferredValue(query);
   // The grid and the map show every match of the search and the rating tabs; the dropdown
   // only the best few matches.
   const visible = useMemo(() => {
     const all = attractions.data ?? [];
-    const matches = query.trim() ? searchAttractions(all, query, lang) : all;
+    const matches = gridQuery.trim() ? searchIndex(index, gridQuery, lang) : all;
     return withMinRating(matches, ratings.data, minRating);
-  }, [attractions.data, query, lang, ratings.data, minRating]);
+  }, [attractions.data, index, gridQuery, lang, ratings.data, minRating]);
   const stopOrder = useMemo(() => new Map(routeStops.map((s, i) => [s.id, i + 1])), [routeStops]);
   // A filter or search that hides the selected place also closes its card.
   const selected = visible.find((a) => a.id === selectedId) ?? null;
@@ -87,19 +88,25 @@ export default function CityScreen() {
       })),
     [visible, stopOrder, selected?.id, lang],
   );
+  // Stable and taking the place, so a memoised card re-renders only when its own stop number
+  // or rating changes, not on every route change (D-062).
+  const openAttraction = useCallback(
+    (item: AttractionSummary) =>
+      router.push({ pathname: '/attraction/[id]', params: { id: item.id } }),
+    [],
+  );
+  const toggleWithNotice = useCallback(
+    (item: AttractionSummary) => {
+      setNotice(routeNotice(toggleStop(item), t));
+    },
+    [toggleStop, t],
+  );
 
   if (cities.isPending) return <LoadingState />;
   if (cities.isError) return <ErrorState onRetry={() => cities.refetch()} />;
   if (!city) return <CityNotFound />;
 
   const [south, west, north, east] = city.bbox;
-  const openAttraction = (id: string) =>
-    router.push({ pathname: '/attraction/[id]', params: { id } });
-  const toggleWithNotice = (item: AttractionSummary) => {
-    const outcome = toggleStop(item);
-    setPlanLimited(outcome === 'planLimit');
-    setNotice(routeNotice(outcome, t));
-  };
   const selectCity = (next: string) => {
     setQuery('');
     router.setParams({ slug: next });
@@ -129,7 +136,7 @@ export default function CityScreen() {
             onQueryChange={setQuery}
             routeOrder={stopOrder}
             onToggle={toggleWithNotice}
-            onOpen={(item) => openAttraction(item.id)}
+            onOpen={openAttraction}
           />
         }
         categories={categories}
@@ -164,8 +171,8 @@ export default function CityScreen() {
                     compact
                     item={selected}
                     order={stopOrder.get(selected.id)}
-                    onPress={() => openAttraction(selected.id)}
-                    onToggleRoute={() => toggleWithNotice(selected)}
+                    onPress={openAttraction}
+                    onToggleRoute={toggleWithNotice}
                     rating={ratings.data?.get(selected.id)}
                   />
                 ) : null
@@ -197,8 +204,8 @@ export default function CityScreen() {
               <AttractionCard
                 item={item}
                 order={stopOrder.get(item.id)}
-                onPress={() => openAttraction(item.id)}
-                onToggleRoute={() => toggleWithNotice(item)}
+                onPress={openAttraction}
+                onToggleRoute={toggleWithNotice}
                 rating={ratings.data?.get(item.id)}
               />
             )}
@@ -220,11 +227,6 @@ export default function CityScreen() {
               { value: 'list', label: t('explore.listView'), icon: 'grid' },
             ]}
           />
-          {planLimited ? (
-            <View style={styles.planLimit}>
-              <PlanLimitNotice limit="items" compact />
-            </View>
-          ) : null}
           {routeStops.length > 0 ? (
             <View
               style={[
@@ -291,7 +293,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md - 4,
   },
-  planLimit: { width: '100%', maxWidth: 560 },
   tray: {
     width: '100%',
     maxWidth: 560,

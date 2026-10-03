@@ -1,6 +1,7 @@
 // "Walk together" on a public walk list (D-041, D-044): when it starts in the city time,
 // the countdown, how many are going and — for signed-in travellers — "I'm going". Going (or
-// organising) opens the group chat (D-043); others can just save the list instead.
+// organising) opens the group chat (D-043); others can just save the list instead. While the
+// walk chat is hidden (D-065) the banner is attendance only: no chat button, no chat hint.
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import { isChatMember, walkChatHref } from '@/features/chat/membership';
 import { cityName, useCities } from '@/features/destinations/api';
 import { AttendButton } from '@/features/trips/attend-button';
 import { countdownLabel, FALLBACK_TIME_ZONE, meetupWhen } from '@/features/trips/meetup-time';
+import { useFeatures } from '@/lib/features';
 import { useNow } from '@/lib/use-now';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -62,14 +64,18 @@ function WhenAndWho({ trip }: { trip: MeetupTrip }) {
 /**
  * "Walk together" on every public walk list (D-044): when it starts (if it has a time), how many
  * are going, "I'm going" for other signed-in travellers — before or after the start — and, for
- * the organiser and everyone going, the group chat. Nothing on private or protected lists.
+ * the organiser and everyone going, the group chat (when the walk chat is on, D-065). Nothing
+ * on private or protected lists.
  * @example <MeetupBanner trip={shared} canJoin={signedIn} />
  */
 export function MeetupBanner({ trip, canJoin }: { trip: MeetupTrip; canJoin: boolean }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { walkChat } = useFeatures();
   if (trip.visibility !== 'public') return null;
   const member = isChatMember(trip);
+  const chatOpen = walkChat && canJoin && member;
+  const chatHint = walkChat && canJoin && !member;
   return (
     <Card testID="meetup-banner" style={styles.card}>
       <View style={styles.row}>
@@ -80,7 +86,7 @@ export function MeetupBanner({ trip, canJoin }: { trip: MeetupTrip; canJoin: boo
       {canJoin ? (
         <View style={styles.row}>
           <AttendButton trip={{ ...trip, isOwn: trip.isOwner }} />
-          {member ? (
+          {chatOpen ? (
             <Button
               compact
               variant="secondary"
@@ -91,7 +97,7 @@ export function MeetupBanner({ trip, canJoin }: { trip: MeetupTrip; canJoin: boo
           ) : null}
         </View>
       ) : null}
-      {canJoin && !member ? (
+      {chatHint ? (
         <Text variant="helper" secondary>
           {t('chat.joinHint')}
         </Text>

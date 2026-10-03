@@ -15,6 +15,7 @@ import { walkChatHref } from '@/features/chat/membership';
 import { cityName, useCities } from '@/features/destinations/api';
 import { useSetTripSchedule } from '@/features/trips/community-api';
 import { FALLBACK_TIME_ZONE } from '@/features/trips/meetup-time';
+import { useFeatures } from '@/lib/features';
 import { spacing } from '@/theme/colors';
 
 type ScheduledTrip = {
@@ -42,6 +43,7 @@ function scheduleFrom(date: string, time: string, timeZone: string): Errors | { 
  */
 export function ScheduleEditor({ trip }: { trip: ScheduledTrip }) {
   const { t, i18n } = useTranslation();
+  const { walkChat } = useFeatures();
   const city = useCities().data?.find((c) => c.slug === trip.citySlug);
   const timeZone = city?.timezone ?? FALLBACK_TIME_ZONE;
   const current = trip.startsAt ? localDateTime(trip.startsAt, timeZone) : null;
@@ -94,8 +96,9 @@ export function ScheduleEditor({ trip }: { trip: ScheduledTrip }) {
           loading={schedule.isPending}
           onPress={save}
         />
-        {trip.visibility === 'public' ? (
-          // The organiser is always in the group chat of a public list (D-043, D-044).
+        {walkChat && trip.visibility === 'public' ? (
+          // The organiser is always in the group chat of a public list (D-043, D-044); hidden
+          // while the walk chat is off (D-065).
           <Button
             variant="secondary"
             icon="mail"

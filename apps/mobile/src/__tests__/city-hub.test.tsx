@@ -194,6 +194,19 @@ test('Explore attractions leads to the existing Map / List page of the city', as
   expect(await screen.findByText('Rijksmuseum')).toBeOnTheScreen();
 });
 
+test("opening the city page already loads the city's places and their ratings", async () => {
+  renderRouter(routes, { initialUrl: '/short/amsterdam' });
+  await screen.findByTestId('city-hero');
+  // Prefetched with the Map / List page's own queries, so it opens without a spinner.
+  await waitFor(() =>
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'attractions_in_view',
+      expect.objectContaining({ max_results: 500 }),
+    ),
+  );
+  expect(supabase.from).toHaveBeenCalledWith('attraction_rating_summary');
+});
+
 test('community and official walk lists are previewed apart, best rated first', async () => {
   renderRouter(routes, { initialUrl: '/short/amsterdam' });
   const community = await screen.findByTestId('walklists-community');
@@ -241,7 +254,9 @@ test('View all walk lists opens the full list of the city, searchable by name', 
   const grid = screen.getByTestId('walklist-grid');
   await waitFor(() => expect(within(grid).queryByText('Historic Amsterdam')).toBeNull());
   expect(await within(grid).findByText('Canal walk')).toBeOnTheScreen();
-});
+  // Two screens plus the real 300 ms search debounce: under a full parallel run this took
+  // over Jest's default 5 s (it passes in ~1 s alone), so it gets more room.
+}, 15_000);
 
 test('the full list sorts by rating, lowest first on demand', async () => {
   renderRouter(routes, { initialUrl: '/short/amsterdam/walklists' });

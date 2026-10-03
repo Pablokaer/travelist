@@ -6,8 +6,12 @@ import datetime as dt
 import json
 import math
 import re
+import threading
 import unicodedata
 from collections import Counter
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
@@ -22,6 +26,8 @@ MAX_PER_CITY = 300
 PAGEVIEW_CANDIDATES = 350
 DEDUPE_METERS = 75.0
 DEDUPE_RATIO = 0.85
+# Below this many sitelinks an item is only notable with an en/pt Wikipedia article.
+NOTABLE_SITELINKS = 3
 # Query margin around the cities.yaml bbox (~200 m): Nominatim bboxes can clip landmarks on the
 # edge, e.g. Lisbon's Belém Tower (Q215003) lies 1 m south of the city bbox.
 BBOX_MARGIN_DEG = 0.002
@@ -153,7 +159,9 @@ def popularity_scores(items: list[dict[str, Any]]) -> dict[str, int]:
 
 
 def is_notable(item: dict[str, Any]) -> bool:
-    return item["sitelinks"] >= 3 or bool(item.get("wikipedia_en") or item.get("wikipedia_pt"))
+    return item["sitelinks"] >= NOTABLE_SITELINKS or bool(
+        item.get("wikipedia_en") or item.get("wikipedia_pt")
+    )
 
 
 def valid_name(name: str | None, qid: str) -> bool:
@@ -187,7 +195,87 @@ def _save_class_cache(cache: dict[str, list[str]], path: Path | None = None) -> 
     path.write_text(json.dumps(doc, sort_keys=True), encoding="utf-8")
 
 
-def ingest_city(client: HttpClient, city: City, today: dt.date | None = None) -> dict[str, Any]:
+def _type_roots(
+    client: HttpClient,
+    types: set[str],
+    class_cache: dict[str, list[str]] | None,
+    cache_lock: threading.Lock | None,
+) -> dict[str, list[str]]:
+    """Category roots of each class. Alone, a city reads and writes the cache file itself; cities
+    ingested together share one cache, updated and saved under their lock."""
+    if class_cache is None:
+        cache = _load_class_cache()
+        roots = wikidata.resolve_class_roots(client, types, cache)
+        _save_class_cache(cache)
+        return roots
+    with cache_lock or nullcontext():
+        roots = wikidata.resolve_class_roots(client, types, class_cache)
+        _save_class_cache(class_cache)
+    return roots
+
+
+DETAIL_FIELDS = (
+    "name_en",
+    "name_pt",
+    "description_en",
+    "description_pt",
+    "image_file",
+    "website",
+    "osm_id",
+    "wikipedia_en",
+    "wikipedia_pt",
+)
+
+
+def _build_item(qid: str, c: dict[str, Any], d: dict[str, Any]) -> dict[str, Any]:
+    """An attraction from its candidate row ``c`` (bbox query + category) and details ``d``."""
+    return {
+        "wikidata_id": qid,
+        "sitelinks": c["sitelinks"],
+        "category": c["category"],
+        "lat": round(c["lat"], 7),
+        "lng": round(c["lng"], 7),
+        **{k: d.get(k) for k in DETAIL_FIELDS},
+        "is_unesco": bool(d.get("is_unesco")),
+    }
+
+
+def _detail_candidates(client: HttpClient, classified: dict[str, dict[str, Any]]) -> list[str]:
+    """The items that can still pass ``is_notable``: ≥ 3 sitelinks, or an en/pt article.
+
+    Most candidates have 1–2 sitelinks and no article (measured on the cache: ~52k of 75.7k), so
+    checking articles first spares ~80% of the expensive details queries (D-064)."""
+    few = [q for q, c in classified.items() if c["sitelinks"] < NOTABLE_SITELINKS]
+    with_article = wikidata.with_en_pt_article(client, few)
+    return sorted(
+        q for q, c in classified.items() if c["sitelinks"] >= NOTABLE_SITELINKS or q in with_article
+    )
+
+
+def _notable_items(
+    client: HttpClient, classified: dict[str, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Notable, named attractions with their Wikidata details, in ``classified`` order.
+
+    Items left out by ``_detail_candidates`` get no details and so fail ``is_notable`` exactly as
+    they did when every item's details were fetched."""
+    details = wikidata.fetch_details(client, _detail_candidates(client, classified))
+    items = []
+    for qid, c in classified.items():
+        item = _build_item(qid, c, details.get(qid, {}))
+        if is_notable(item) and valid_name(item["name_en"], qid):
+            items.append(item)
+    return items
+
+
+def ingest_city(
+    client: HttpClient,
+    city: City,
+    today: dt.date | None = None,
+    *,
+    class_cache: dict[str, list[str]] | None = None,
+    cache_lock: threading.Lock | None = None,
+) -> dict[str, Any]:
     today = today or dt.date.today()
     s, w, n, e = city.bbox
     m = BBOX_MARGIN_DEG
@@ -197,10 +285,8 @@ def ingest_city(client: HttpClient, city: City, today: dt.date | None = None) ->
     candidates = wikidata.fetch_candidates(client, bbox)
     log(f"wikidata candidates in bbox: {len(candidates)}")
 
-    class_cache = _load_class_cache()
     all_types = set().union(*(c["types"] for c in candidates.values())) if candidates else set()
-    type_roots = wikidata.resolve_class_roots(client, all_types, class_cache)
-    _save_class_cache(class_cache)
+    type_roots = _type_roots(client, all_types, class_cache, cache_lock)
 
     classified = {}
     for qid, c in candidates.items():
@@ -209,34 +295,7 @@ def ingest_city(client: HttpClient, city: City, today: dt.date | None = None) ->
             classified[qid] = {**c, "category": category}
     log(f"in attraction categories: {len(classified)}")
 
-    details = wikidata.fetch_details(client, sorted(classified))
-    items: list[dict[str, Any]] = []
-    for qid, c in classified.items():
-        d = details.get(qid, {})
-        item = {
-            "wikidata_id": qid,
-            "sitelinks": c["sitelinks"],
-            "category": c["category"],
-            "lat": round(c["lat"], 7),
-            "lng": round(c["lng"], 7),
-            **{
-                k: d.get(k)
-                for k in (
-                    "name_en",
-                    "name_pt",
-                    "description_en",
-                    "description_pt",
-                    "image_file",
-                    "website",
-                    "osm_id",
-                    "wikipedia_en",
-                    "wikipedia_pt",
-                )
-            },
-            "is_unesco": bool(d.get("is_unesco")),
-        }
-        if is_notable(item) and valid_name(item["name_en"], qid):
-            items.append(item)
+    items = _notable_items(client, classified)
     log(f"notable with a name: {len(items)}")
 
     osm = overpass.index_by_wikidata(overpass.fetch(client, bbox))
@@ -293,12 +352,43 @@ def city_path(slug: str) -> Path:
     return ATTRACTIONS_DIR / f"{slug}.json"
 
 
-def save_city(doc: dict[str, Any]) -> Path:
+def write_city(doc: dict[str, Any]) -> Path:
+    """Writes a city's attractions file (formatted later, with every file written in the run)."""
     path = city_path(doc["city"])
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    prettier(path)
     return path
+
+
+def ingest_cities(
+    client: HttpClient,
+    cities: list[City],
+    jobs: int = 1,
+    *,
+    ingest: Callable[..., dict[str, Any]] = ingest_city,
+    write: Callable[[dict[str, Any]], Path] = write_city,
+    formatter: Callable[..., None] = prettier,
+    class_cache: dict[str, list[str]] | None = None,
+) -> list[tuple[dict[str, Any], Path]]:
+    """Ingests and writes `cities`, `jobs` at a time (D-060), in their config order.
+
+    Running cities side by side overlaps their waits on different APIs; each API keeps its own
+    rate limit, as the HTTP client's per-host gates are shared. Each city is written as soon as it
+    is done (an interrupted run keeps them), and prettier runs once, over every file.
+
+    >>> ingest_cities(HttpClient(), config.cities, jobs=3)  # doctest: +SKIP
+    """
+    cache = _load_class_cache() if class_cache is None else class_cache
+    lock = threading.Lock()
+
+    def one(city: City) -> tuple[dict[str, Any], Path]:
+        doc = ingest(client, city, class_cache=cache, cache_lock=lock)
+        return doc, write(doc)
+
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
+        results = list(pool.map(one, cities))
+    formatter(*(path for _, path in results))
+    return results
 
 
 def load_all(directory: Path = ATTRACTIONS_DIR) -> dict[str, dict[str, Any]]:

@@ -1,6 +1,8 @@
 // A walk list's group chat (D-043), /walk-chat?id=<trip id>: for its organiser and everyone
 // going. Others are invited to say they are going; private or missing lists have no chat.
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+// While the walk chat is hidden (D-065) the address leads back to the walk list itself, so an
+// old link or bookmark lands somewhere useful and no chat is read or followed.
+import { Redirect, router, Stack, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,11 +14,22 @@ import { isChatMember } from '@/features/chat/membership';
 import { ChatParticipants } from '@/features/chat/participants';
 import { WalkChat } from '@/features/chat/walk-chat';
 import { useSharedTrip } from '@/features/trips/sharing-api';
+import { useFeatures } from '@/lib/features';
 import { layout, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
-export default function WalkChatScreen() {
+/**
+ * The route: the chat when the walk chat is on, otherwise the walk list (D-065).
+ * @example router.push(walkChatHref(trip.id))
+ */
+export default function WalkChatRoute() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { walkChat } = useFeatures();
+  if (!walkChat) return <Redirect href={{ pathname: '/shared', params: { id: id ?? '' } }} />;
+  return <WalkChatScreen id={id} />;
+}
+
+function WalkChatScreen({ id }: { id: string | undefined }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const gutter = useGutter();

@@ -59,6 +59,7 @@ const profile = (avatarPath: string | null): Profile => ({
   onboardedAt: '2026-06-02T09:14:00Z',
   nationalities: ['GB'],
   avatarPath,
+  welcomeEmailSent: true,
 });
 
 beforeEach(() => MockProfilePhotoServer.reset());

@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react-native';
+import { render, screen, userEvent, within } from '@testing-library/react-native';
 
 import AttractionScreen from '@/app/attraction/[id]';
 import type { AttractionDetail } from '@/features/destinations/api';
+import { useRouteStore } from '@/features/route/store';
 import '@/lib/i18n';
 
 /** Server data for one attraction with 128 reviews averaging 4.56. */
@@ -39,12 +40,10 @@ jest.mock('expo-router', () => ({
 }));
 jest.mock('@/features/destinations/api', () => ({
   ...jest.requireActual('@/features/destinations/api'),
-  useAttraction: () => ({ isPending: false, isError: false, data: MockAttractionServer.detail }),
-}));
-jest.mock('@/features/subscription/api', () => ({
-  ...jest.requireActual('@/features/subscription/api'),
-  useMySubscription: () => ({
-    data: jest.requireActual('@/testing/subscription').freeSubscription(),
+  useAttraction: () => ({
+    isPending: false,
+    isError: false,
+    data: { summary: MockAttractionServer.detail, detail: MockAttractionServer.detail },
   }),
 }));
 jest.mock('@/features/reviews/api', () => {
@@ -64,4 +63,15 @@ test('the average rating sits with the title, and the reviews section is on the 
   expect(within(title).getByTestId('rating-summary')).toHaveTextContent('4.6 ★ · 128 reviews');
   expect(screen.getByText('Reviews')).toBeTruthy();
   expect(screen.getByTestId('review-form')).toBeTruthy();
+});
+
+test('the page adds a sixth place to the route: no plan limit (D-065)', async () => {
+  useRouteStore.getState().clear();
+  for (const id of ['b', 'c', 'd', 'e', 'f'])
+    useRouteStore.getState().add({ ...MockAttractionServer.detail, id, lng: -9.2 });
+  render(<AttractionScreen />);
+  await userEvent.press(screen.getByTestId('toggle-route'));
+  expect(useRouteStore.getState().stops).toHaveLength(6);
+  expect(screen.queryByText(/places per list/)).toBeNull();
+  expect(screen.getByRole('button', { name: 'Remove from route' })).toBeOnTheScreen();
 });

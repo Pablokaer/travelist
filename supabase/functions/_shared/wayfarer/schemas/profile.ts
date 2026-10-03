@@ -35,6 +35,15 @@ export const signUpSchema = z.object({
   password: passwordSchema,
 });
 export const magicLinkSchema = z.object({ email: emailSchema });
+/** "Forgot password?": the address the reset link goes to (D-066). */
+export const passwordResetRequestSchema = z.object({ email: emailSchema });
+/** The new password after a reset link, typed twice; same length rule as sign-up. */
+export const newPasswordSchema = z
+  .object({ password: passwordSchema, confirm: z.string() })
+  .refine((form) => form.password === form.confirm, {
+    message: 'validation.passwordMismatch',
+    path: ['confirm'],
+  });
 export const otpSchema = z.object({
   code: z.string().regex(/^\d{6}$/, { message: 'validation.otp' }),
 });
