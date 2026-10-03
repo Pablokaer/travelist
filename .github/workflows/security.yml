@@ -55,6 +55,9 @@ jobs:
       - uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
+          # Same advisory as auditConfig.ignoreGhsas in pnpm-workspace.yaml: braces via dev/build tools
+          # only, no patched version yet. Drop it once one ships.
+          allow-ghsas: GHSA-vfj7-8cjw-p6xm
           comment-summary-in-pr: never
 
   secrets:

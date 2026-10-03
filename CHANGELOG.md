@@ -57,6 +57,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Security CI: the new `braces` advisory GHSA-vfj7-8cjw-p6xm (stack exhaustion on deeply nested patterns; no patched version) failed `pnpm audit` and dependency review. It only reaches dev and build tools (jest, metro, `@expo/cli`), so it is ignored in `pnpm-workspace.yaml` and allowed in `security.yml`, like the node-forge advisory (D-049); drop both once a fixed `braces` ships.
 - Tests: the city page's "View all walk lists" test could exceed Jest's 5 s timeout under a full parallel run (it waits on the real 300 ms search debounce); it now has 15 s.
 - route-optimize during an OpenRouteService outage (D-063): after a 429, 5xx or timeout that ORS service is skipped for 60 s and requests get the straight-line fallback at once, instead of each waiting up to 8 s for the optimiser and 8 s more for the directions.
 - Checklist when a slow source is down (D-063): after a failed background refresh the stale value (e.g. the Canada travel advisories) is served from memory for 5 minutes, without re-reading `api_cache` or starting another 20 s refresh on every request.
