@@ -57,6 +57,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Pipeline: a Commons image-credit request for 50 long non-Latin file names (Belgrade's Cyrillic ones) went over Wikimedia's URL limit (HTTP 414) and stopped the city's ingestion; batches whose URL would pass 6,000 characters are now halved, and batches that fit keep their shape (and their cache).
+
 - Security CI: the new `braces` advisory GHSA-vfj7-8cjw-p6xm (stack exhaustion on deeply nested patterns; no patched version) failed `pnpm audit` and dependency review. It only reaches dev and build tools (jest, metro, `@expo/cli`), so it is ignored in `pnpm-workspace.yaml` and allowed in `security.yml`, like the node-forge advisory (D-049); drop both once a fixed `braces` ships.
 - Tests: the city page's "View all walk lists" test could exceed Jest's 5 s timeout under a full parallel run (it waits on the real 300 ms search debounce); it now has 15 s.
 - route-optimize during an OpenRouteService outage (D-063): after a 429, 5xx or timeout that ORS service is skipped for 60 s and requests get the straight-line fallback at once, instead of each waiting up to 8 s for the optimiser and 8 s more for the directions.
@@ -134,6 +136,9 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 - Free-plan limits (D-065, replaces the enforcement part of D-047): every account creates as many walk lists as it wants, each with up to 20 places (the route limit, D-030), and deletes its own lists. New migration `20261006000100_plan_limits_lifted` drops the `trips_plan_list_limit` and `trip_stops_plan_item_limit` triggers, their functions and `plan_allows_deleting_lists`, makes the trips delete policy and `delete_trip` owner-only (no `WF003`), and sets the Free plan's limits to unlimited. The app's plan-limit notices are removed.
 
 ### Data
+
+- 7 more cities (107 total in 39 countries, 17,358 attractions): Monaco 28, Andorra la Vella 17, Kyiv 300, Lviv 137, Moscow 300, Saint Petersburg 300, Minsk 115 (1,197 attractions, 1,159 with a photo). Monaco, Andorra, Ukraine, Russia and Belarus are new countries; the checklist shows their travel advisories ("Avoid all travel" for Russia, Ukraine and Belarus). Moscow uses a centre-based bbox (inside the MKAD ring) and Monaco a land-only one.
+- 20 more cities (100 total in 34 countries, 16,161 attractions): Belgrade 211, Sarajevo 121, Thessaloniki 100, Strasbourg 93, Toulouse 72, San Sebastián 63, Toledo 87, Santiago de Compostela 48, Siena 135, Genoa 203, Palermo 187, Coimbra 60, Heidelberg 60, Nuremberg 107, Lucerne 31, Bern 75, Bath 66, Oxford 119, Brașov 43, Utrecht 58 (1,939 attractions, 1,859 with a photo). Serbia and Bosnia and Herzegovina are new countries. Each city has its English and Portuguese Wikipedia lead on its city page.
 
 - City descriptions (D-036): the English and Portuguese Wikipedia leads of all 80 cities (`data-pipeline/data/city_summaries.json`, new `city-summaries` pipeline command) in `cities.summary_en/pt` and `wikipedia_en/pt` (new migration); 80 cities, attraction totals unchanged.
 

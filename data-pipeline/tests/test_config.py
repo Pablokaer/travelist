@@ -91,6 +91,36 @@ LAUNCH_CITIES = {
     "ghent",
     "bergen",
     "gothenburg",
+    # batch 6, 2026-10-03: Balkan capitals (Serbia and Bosnia are new countries) and
+    # well-known secondary cities in covered countries
+    "belgrade",
+    "sarajevo",
+    "thessaloniki",
+    "strasbourg",
+    "toulouse",
+    "san-sebastian",
+    "toledo",
+    "santiago-de-compostela",
+    "siena",
+    "genoa",
+    "palermo",
+    "coimbra",
+    "heidelberg",
+    "nuremberg",
+    "lucerne",
+    "bern",
+    "bath",
+    "oxford",
+    "brasov",
+    "utrecht",
+    # batch 7, 2026-10-03: microstates and Eastern Europe (all five countries are new)
+    "monaco",
+    "andorra-la-vella",
+    "kyiv",
+    "lviv",
+    "moscow",
+    "saint-petersburg",
+    "minsk",
 }
 
 

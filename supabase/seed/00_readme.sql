@@ -3,7 +3,7 @@
 -- pipeline from committed snapshots in data-pipeline/data (regenerate offline with
 -- `python -m wayfarer_pipeline seed`):
 --   10_countries.sql    countries (Wikidata + IANA zone.tab + curated overrides)
---   20_cities.sql       launch cities (data-pipeline/cities.yaml)
+--   20_cities.sql       launch cities (data-pipeline/cities.yaml + Wikipedia summaries)
 --   30_visa.sql         visa_requirements (passport-index-dataset, MIT)
 --   40_attractions.sql  attractions (Wikidata, OpenStreetMap, Wikipedia pageviews, Commons)
 select 1;
