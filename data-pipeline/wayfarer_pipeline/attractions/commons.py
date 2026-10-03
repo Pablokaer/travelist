@@ -6,12 +6,17 @@ import html
 import json
 import re
 from typing import Any
+from urllib.parse import urlencode
 
 from .. import sparql
 from ..http import HttpClient
 
 API = "https://commons.wikimedia.org/w/api.php"
 BATCH = 50
+# Wikimedia answers HTTP 414 above ~8 kB of URL. 50 long non-Latin file names (Belgrade's
+# Cyrillic ones, percent-encoded at ~6 bytes per letter) went over it, so a batch that does not
+# fit is halved; batches that fit keep their shape, and so their cached responses.
+MAX_URL_LENGTH = 6000
 MAX_AUTHOR_CHARS = 300
 
 
@@ -63,19 +68,35 @@ def parse_response(doc: dict[str, Any]) -> dict[str, dict[str, Any] | None]:
     return out
 
 
+def _params(chunk: list[str]) -> dict[str, str]:
+    return {
+        "action": "query",
+        "format": "json",
+        "formatversion": "2",
+        "prop": "imageinfo",
+        "iiprop": "url|extmetadata",
+        "iiurlwidth": "800",
+        "iiextmetadatafilter": "Artist|LicenseShortName|LicenseUrl|NonFree",
+        "titles": "|".join(f"File:{f}" for f in chunk),
+    }
+
+
+def _fitting(chunk: list[str]) -> list[list[str]]:
+    """``chunk`` itself when its request URL fits ``MAX_URL_LENGTH``, else its halves, recursively.
+
+    >>> _fitting(["a.jpg", "b.jpg"])
+    [['a.jpg', 'b.jpg']]
+    """
+    if len(chunk) == 1 or len(API) + 1 + len(urlencode(_params(chunk))) <= MAX_URL_LENGTH:
+        return [chunk]
+    half = len(chunk) // 2
+    return _fitting(chunk[:half]) + _fitting(chunk[half:])
+
+
 def fetch(client: HttpClient, filenames: list[str]) -> dict[str, dict[str, Any] | None]:
     out: dict[str, dict[str, Any] | None] = {}
-    for chunk in sparql.chunks(sorted(set(filenames)), BATCH):
-        params = {
-            "action": "query",
-            "format": "json",
-            "formatversion": "2",
-            "prop": "imageinfo",
-            "iiprop": "url|extmetadata",
-            "iiurlwidth": "800",
-            "iiextmetadatafilter": "Artist|LicenseShortName|LicenseUrl|NonFree",
-            "titles": "|".join(f"File:{f}" for f in chunk),
-        }
-        _, text = client.request("GET", API, namespace="commons", params=params)
-        out.update(parse_response(json.loads(text)))
+    for batch in sparql.chunks(sorted(set(filenames)), BATCH):
+        for chunk in _fitting(batch):
+            _, text = client.request("GET", API, namespace="commons", params=_params(chunk))
+            out.update(parse_response(json.loads(text)))
     return out

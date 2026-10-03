@@ -5,6 +5,12 @@
     "wikipedia_pt": "Amesterdão",
     "summary_pt": "Amesterdão (português europeu) ou Amsterdã (português brasileiro) ) é a capital e a cidade mais populosa do Reino dos Países Baixos. O seu estatuto de capital holandesa é garantido pela Constituição dos Países Baixos, embora não seja a sede do governo holandês, que fica em Haia. Amesterdão tinha em setembro de 2023, uma população de 930 205 habitantes na cidade propriamente dita, 1 470 595 habitantes em sua área urbana e 2 480 394 habitantes na área metropolitana. A cidade está localizada na província da Holanda do Norte, no oeste do país. É composta por grande parte da parte norte da Randstad, uma das maiores aglomerações urbanas da Europa, com uma população de aproximadamente 7 milhões de habitantes."
   },
+  "andorra-la-vella": {
+    "wikipedia_en": "Andorra la Vella",
+    "summary_en": "Andorra la Vella is the capital and largest city of Andorra. It is located high in the east Pyrenees, between France and Spain. It is also the name of the Andorran parish that surrounds the capital.",
+    "wikipedia_pt": "Andorra-a-Velha",
+    "summary_pt": "Andorra-a-Velha, é a capital e a mais populosa cidade do Principado de Andorra, pequeno país europeu situado entre a França e a Espanha. Com uma população de 19 383 habitantes, recebe mais de 10 milhões de turistas anualmente. Situada a 1 023 metros de altitude, é um importante destino turístico nos Pirenéus e a capital mais alta da Europa."
+  },
   "antalya": {
     "wikipedia_en": "Antalya",
     "summary_en": "Antalya is one of the largest cities in Turkey and the capital of Antalya Province, the fifth-most populous province. Recognized as the \"capital of tourism\" in Turkey and a pivotal part of the Turkish Riviera, Antalya sits on Anatolia's southwest coast, flanked by the Taurus Mountains. The urban population of the city is around 1.5 million, with a provincial population of 2,722,103.",
@@ -29,11 +35,23 @@
     "wikipedia_pt": "Barcelona",
     "summary_pt": "Barcelona é a capital da comunidade autônoma da Catalunha, Espanha, bem como o segundo município mais populoso do país, com uma população de 1,6 milhão dentro dos limites da cidade. A sua área urbana se estende para além dos limites administrativos da cidade com uma população de cerca de 4,7 milhões de pessoas, sendo a sexta área urbana mais populosa da União Europeia, depois de Paris, Londres, Madri, Vale do Ruhr e Milão. É a maior metrópole do Mar Mediterrâneo, localizada na costa entre as foz dos rios Llobregat e Besòs, e limitada ao oeste pela Serra de Collserola, cujo pico mais alto é de 512 metros de altura."
   },
+  "bath": {
+    "wikipedia_en": "Bath, Somerset",
+    "summary_en": "Bath is a city in Somerset, England, known for and named after its Roman-built baths. The city became a UNESCO World Heritage Site in 1987, and was later listed as one of the \"Great Spa Towns of Europe\". Bath is in the valley of the River Avon, 97 miles west of London and 11 miles southeast of Bristol, and is the largest city and urban settlement in Somerset.",
+    "wikipedia_pt": "Bath",
+    "summary_pt": "Bath é uma cidade do sudoeste de Inglaterra, localizada no Condado de Somerset. É muito conhecida pelas suas termas que provêm de três nascentes."
+  },
   "belfast": {
     "wikipedia_en": "Belfast",
     "summary_en": "Belfast is the capital, largest city and main port of Northern Ireland. It stands on the banks of the river Lagan, and is connected to the open sea through Belfast Lough and the North Channel. The city is the most populous in Northern Ireland and the second-largest, after Dublin, on the island of Ireland, with a recorded population in 2021 of 345,418 and of 704,406 for the greater metropolitan area.",
     "wikipedia_pt": "Belfast",
     "summary_pt": "Belfast, Belfástia ou Belfaste é a capital da Irlanda do Norte e da província do Ulster, sendo a segunda maior cidade na ilha da Irlanda. Enquanto a população dentro dos limites da cidade é de cerca de 352 390 pessoas, cerca de 652 000 pessoas vivem na área da Grande Belfast. Situa-se próxima à foz do rio Lagan. É flanqueada por trechos de montanha nos dois lados."
+  },
+  "belgrade": {
+    "wikipedia_en": "Belgrade",
+    "summary_en": "Belgrade is the capital and largest city of Serbia. It is located at the confluence of the Sava and Danube rivers and at the crossroads of the Pannonian Plain and the Balkan Peninsula. According to the 2022 census, the population of Belgrade city proper stands at 1,197,114, its contiguous urban area has 1,298,661 inhabitants, while the population of the city's administrative area totals 1,682,720 people. It is one of the major cities of Southeast Europe and the third-most populous city on the river Danube.",
+    "wikipedia_pt": "Belgrado",
+    "summary_pt": "Belgrado ) é a capital e maior cidade da Sérvia, e está localizada entre dois cursos de água internacionais, na confluência dos rios Danúbio e Sava, no norte da Sérvia, onde a planície da Panônia se limita com a região da península balcânica. Com uma população de 1 710 000 habitantes (2007), Belgrado é a maior cidade no território da ex-Iugoslávia, a segunda maior cidade sobre o rio Danúbio, bem como a quarta maior do Sudeste da Europa, após Istambul, Atenas e Bucareste."
   },
   "bergen": {
     "wikipedia_en": "Bergen",
@@ -46,6 +64,12 @@
     "summary_en": "Berlin is the capital and largest city of Germany. With 3.7 million inhabitants, it has the highest population within its city limits of any city in the European Union (EU). The metropolis is also one of the states of Germany, being the third-smallest state in the country by area. Berlin is surrounded by the state of Brandenburg, bordering Brandenburg's capital Potsdam to the southwest. The urban area of Berlin has a population of 4.5 million, making it the second most populous in Germany after the Ruhr. The Berlin-Brandenburg capital region has around 6.2 million inhabitants and is Germany's second-largest metropolitan region after the Rhine-Ruhr region, as well as the fifth-biggest metropolitan region by GDP in the EU. Berlin is a global city of culture, politics, media and science.",
     "wikipedia_pt": "Berlim",
     "summary_pt": "Berlim é a capital e um dos dezesseis estados da Alemanha. Com uma população de 3,5 milhões dentro de limites da cidade, é a maior cidade do país, e a sétima área urbana mais povoada da União Europeia. Situada no nordeste da Alemanha, é o centro da área metropolitana de Berlim-Brandemburgo, que inclui 5 milhões de pessoas de mais de 190 nações. Localizada na grande planície europeia, Berlim é influenciada por um clima temperado sazonal. Cerca de um terço da área da cidade é composta por florestas, parques, jardins, rios e lagos."
+  },
+  "bern": {
+    "wikipedia_en": "Bern",
+    "summary_en": "Bern, or Berne, is the de facto capital of Switzerland, referred to as the \"federal city\". With a population of about 146,000, Bern is the fifth-most populous city in Switzerland, behind Zurich, Geneva, Basel and Lausanne. The Bern agglomeration, which includes 36 municipalities, had a population of 406,900 in 2014. The metropolitan area had a population of 660,000 in 2000.",
+    "wikipedia_pt": "Berna",
+    "summary_pt": "Berna ; em francês: Berne [bɛʁn]; em italiano: Berna [ˈbɛrna]; em romanche: Berna [ˈbɛrnə]) é a capital de facto da Suíça. Berna é uma cidade predominantemente germanófona, capital do cantão homônimo e também uma comuna."
   },
   "bilbao": {
     "wikipedia_en": "Bilbao",
@@ -64,6 +88,12 @@
     "summary_en": "Bordeaux is a city on the river Garonne in the Gironde department, southwestern France. A port city, it is the capital of the Nouvelle-Aquitaine region, as well as the prefecture of the Gironde department. Its inhabitants are called \"Bordelais\" (masculine) or \"Bordelaises\" (feminine). The term \"Bordelais\" may also refer to the city and its surrounding region.",
     "wikipedia_pt": "Bordéus",
     "summary_pt": "Bordéus ou Bordeaux é a capital e a maior cidade do departamento da Gironda e da região Nova Aquitânia, no sudoeste da França. Designou-se Burdígala na Antiguidade."
+  },
+  "brasov": {
+    "wikipedia_en": "Brașov",
+    "summary_en": "Brașov is a city in Transylvania, Romania and the county seat of Brașov County.",
+    "wikipedia_pt": "Brașov",
+    "summary_pt": "Brașov é um município e cidade da região histórica da Transilvânia, Roménia. É a capital do distrito (județ) homónimo e a 6.ª maior cidade do país em população. Tem 267,3 km² de área e em 2021 tinha 290 743 habitantes(densidade: 1 087,7 hab./km²). A área metropolitana de Brașov tem 1 368,5 km² de área e em 2021 tinha 371 802 habitantes."
   },
   "bratislava": {
     "wikipedia_en": "Bratislava",
@@ -100,6 +130,12 @@
     "summary_en": "Cardiff is the capital and largest city of Wales. Cardiff had a population of 383,919 in 2024 and forms a principal area officially known as the City and County of Cardiff. The city is the eleventh largest in the United Kingdom. Located in the southeast of Wales, the city sits within the Cardiff Capital Region, which consists of 1.5 million people, accounting for roughly half the nation's total population. Cardiff is the county town of the historic county of Glamorgan and from 1974 to 1996 of South Glamorgan. It belongs to the Eurocities network of the largest European cities. A small town until the early 19th century, its prominence as a port for coal when mining began in the region helped its expansion. In 1905, it was ranked as a city and in 1955 proclaimed capital of Wales. The Cardiff urban area covers a larger area outside the county boundary, including the towns of Dinas Powys and Penarth.",
     "wikipedia_pt": "Cardiff",
     "summary_pt": "Cardiff ou, nas suas formas portuguesas, Cardife ou, mais raramente, Cardívio é a capital e uma subdivisão administrativa autônoma, Principal Area, do País de Gales."
+  },
+  "coimbra": {
+    "wikipedia_en": "Coimbra",
+    "summary_en": "Coimbra, officially the City of Coimbra, is a city and a municipality in Portugal. The population of the municipality at the 2021 census was 140,796, in an area of around 319.40 square kilometres (123.3 sq mi).\nIt is the fourth-largest metropolitan area in Portugal after Lisbon, Porto, and Braga, and it is the largest city of the district of Coimbra and the Central Region, and about 460,000 people live in its intermunicipal community.",
+    "wikipedia_pt": "Coimbra",
+    "summary_pt": "Coimbra é a cidade capital do Distrito de Coimbra, contando com 156 000 habitantes (2021) no seu perímetro urbano. Coimbra está inserida na sub-região Região de Coimbra e na Região do Centro."
   },
   "cologne": {
     "wikipedia_en": "Cologne",
@@ -167,6 +203,12 @@
     "wikipedia_pt": "Genebra",
     "summary_pt": "Genebra — o pagus Genevensis — é uma cidade da Suíça, localizada no Cantão de Genebra, no oeste do país, figurando como a segunda mais populosa cidade suíça, depois de Zurique — e a mais populosa da região da Romandia, a parte francófona da Suíça. Situada onde o rio Ródano deixa o Lago Lemano, no chamado Pequeno Lago ou Lago de Genèbra, é a capital do Cantão de Genebra. O gentílico de Genebra é genebrino/a."
   },
+  "genoa": {
+    "wikipedia_en": "Genoa",
+    "summary_en": "Genoa is the sixth-largest city in Italy and the capital of the region of Liguria in northern Italy. As of 2026, 566,247 people live within the city's administrative limits. While its metropolitan city has 820,691 inhabitants, more than 1.5 million people live in the wider metropolitan area stretching along the Italian Riviera.",
+    "wikipedia_pt": "Génova",
+    "summary_pt": "GénovaPE ou GênovaPB é uma cidade e condados históricos da Itália, na região de Ligúria, cidade metropolitana de Génova, com cerca de 639 560 habitantes. Estende-se por uma área de 243 km², tendo uma densidade populacional de 2 484 hab/km². É limitada com Arenzano, Bargagli, Bogliasco, Bosio (AL), Campomorone, Ceranesi, Davagna, Masone, Mele, Mignanego, Montoggio, Sant'Olcese, Sassello (SV), Serra Riccò, Sori, Tiglieto, Urbe (SV)."
+  },
   "ghent": {
     "wikipedia_en": "Ghent",
     "summary_en": "Ghent is a city and a municipality in the East Flanders province of the Flemish Region of Belgium. It is the capital and largest city of the province and the third largest in the country, after Brussels and Antwerp. It is a port and university city.",
@@ -197,6 +239,12 @@
     "wikipedia_pt": "Hamburgo",
     "summary_pt": "Hamburgo, oficialmente Cidade Livre e Hanseática de Hamburgo é a segunda maior cidade da Alemanha, com uma população de aproximadamente 1,8 milhão de pessoas. A cidade possui uma região associada mais ampla."
   },
+  "heidelberg": {
+    "wikipedia_en": "Heidelberg",
+    "summary_en": "Heidelberg is the fifth-largest city in the German state of Baden-Württemberg, and with a population of about 163,000, of which roughly a quarter consists of students, it is Germany's 51st-largest city. Located about 78 km (48 mi) south of Frankfurt, Heidelberg is part of the densely populated Rhine-Neckar Metropolitan Region which has its centre in Mannheim.",
+    "wikipedia_pt": "Heidelberg",
+    "summary_pt": "Heidelberg, Heidelberga ou Edelberga é uma cidade da Alemanha, situada no vale do rio Neckar, no noroeste do Baden-Württemberg. É a quinta maior cidade deste Land, contando com 159 245 habitantes em 2021."
+  },
   "helsinki": {
     "wikipedia_en": "Helsinki",
     "summary_en": "Helsinki, until about 1930 known in English by its Swedish name of Helsingfors, is the capital and most populous city in Finland. It is on the shore of the Gulf of Finland and is the seat of southern Finland's Uusimaa region. About 694,000 people live in the municipality, with 1.3 million in the capital region and 1.6 million in the metropolitan area. As the most populous urban area in Finland, it is the country's most significant centre for politics, education, finance, culture, and research. Helsinki is 80 kilometres (50 mi) north of Tallinn, Estonia, 400 kilometres (250 mi) east of Stockholm, Sweden, and 300 kilometres (190 mi) west of Saint Petersburg, Russia. Helsinki is a bilingual municipality with Finnish and Swedish as its official languages.",
@@ -220,6 +268,12 @@
     "summary_en": "Kraków, officially the Royal Capital City of Kraków, is the second-largest and one of the oldest cities in Poland. Situated on the Vistula River in Lesser Poland Voivodeship, the city has a population of 816,614 (2025), with 1,428,363 people living in the Kraków metropolitan area. Kraków was the official capital of Poland until 1596 and has traditionally been one of the leading centres of Polish economic, academic, cultural, and artistic life. Its Old Town was declared a UNESCO World Heritage Site in 1978, one of the world's first sites granted the status.",
     "wikipedia_pt": "Cracóvia",
     "summary_pt": "Cracóvia é uma cidade no sul da Polônia, na voivodia da Pequena Polônia. Estende-se por uma área de 326,85 km², com 774 839 habitantes, segundo os censo de 2019, com a densidade: 2 370,6 hab./km². Localiza-se no sul do país, nas margens do rio Vístula. É uma das cidades mais antigas da Polônia e a segunda maior cidade do país. A capital da Polônia em 1039-1079, 1138-1290 e 1296-1596, a principal cidade da coroação dos reis da Polônia e até 1609-1611 a cidade residencial dos reis da Polônia."
+  },
+  "kyiv": {
+    "wikipedia_en": "Kyiv",
+    "summary_en": "Kyiv, also spelt Kiev, is the capital and most populous city of Ukraine. Located in the north-central part of the country, it straddles both banks of the Dnieper River. As of January 2022, the population of Kyiv was 2,952,301, making it the seventh-most populous city in Europe. Kyiv is an important industrial, scientific, educational, and cultural center. It is home to high-tech industries, higher education institutions, and historical landmarks. The city has an extensive public transport system, which includes the Kyiv Metro.",
+    "wikipedia_pt": "Kiev",
+    "summary_pt": "Kiev ou Kyiv, também conhecida como Quieve, ) é a capital e a cidade mais populosa da Ucrânia. Fica no centro-norte do país, ao longo do rio Dnieper. Em 1.º de janeiro de 2021, sua população era de 2 962 180 habitantes, tornando Kiev a sétima cidade mais populosa da Europa."
   },
   "lisbon": {
     "wikipedia_en": "Lisbon",
@@ -245,11 +299,23 @@
     "wikipedia_pt": "Londres",
     "summary_pt": "Londres é a capital da Inglaterra e do Reino Unido. Por dois milénios, foi um grande povoado e sua história remonta à sua fundação pelos romanos, quando foi nomeada Londínio. O centro de Londres, antiga City of London, também conhecida como The Square Mile ou The City, mantém as suas fronteiras medievais. Pelo menos desde o século XIX, o nome \"Londres\" refere-se à metrópole desenvolvida em torno desse núcleo. Hoje, a maior parte dessa conurbação constitui a região da Grande Londres, cuja área administrativa tem seu próprio prefeito eleito e assembleia. A cidade abriga a sede da Comunidade das Nações."
   },
+  "lucerne": {
+    "wikipedia_en": "Lucerne",
+    "summary_en": "Lucerne or Luzern is a city and a municipality in central Switzerland, in the German-speaking portion of the country. Lucerne is the capital of the canton of Lucerne and part of the district of the same name. With a population of approximately 86,700 people, Lucerne is the most populous city in Central Switzerland, and a nexus of economics, transport, culture, and media in the region. The city's urban area consists of 19 municipalities and towns with an overall population of about 247,400 people.",
+    "wikipedia_pt": "Lucerna",
+    "summary_pt": "Lucerna é uma cidade da Suíça que dá nome ao cantão no qual está inserida; um dos 13 cantões que determinam a organização territorial de referência no país. Tem uma população de 82.257 habitantes (2019). Estende-se por uma área de 24,15 km², de densidade populacional de 3.406 hab/km². Confina com as seguintes comunas: Adligenswil, Ebikon, Emmen, Horw, Kriens e Meggen."
+  },
   "luxembourg": {
     "wikipedia_en": "Luxembourg City",
     "summary_en": "Luxembourg, also known as Luxembourg City, is the capital city of Luxembourg and the country's most populous commune. Standing at the confluence of the Alzette and Pétrusse rivers in southern Luxembourg, the city lies in the center of Western Europe, situated 213 km (132 mi) by road from Brussels and 209 km (130 mi) from Cologne.",
     "wikipedia_pt": "Luxemburgo (cidade)",
     "summary_pt": "Luxemburgo é uma comuna do Luxemburgo com estatuto de cidade, pertencente ao distrito do Luxemburgo e ao cantão do Luxemburgo, e a capital do país. Luxemburgo é uma cidade muito desenvolvida em seu comércio e nas indústrias."
+  },
+  "lviv": {
+    "wikipedia_en": "Lviv",
+    "summary_en": "Lviv is the fifth-largest city in Ukraine, as well as the largest city in the western part of the country, with a population of 723,403. It serves as the administrative center of Lviv Oblast and Lviv Raion, and is one of the main cultural centers of Ukraine. The city also hosts the administration of Lviv urban hromada. Lviv was named after Leo I of Galicia, the eldest son of Daniel, King of Ruthenia. During its history the city has had several names.",
+    "wikipedia_pt": "Lviv",
+    "summary_pt": "Levive, ou Lviv, também conhecida como Leópolis ou Lemberga, é uma cidade do oeste da Ucrânia. Localiza-se no oeste do país, perto da fronteira com a Polónia. Tem cerca de 800 mil habitantes. Foi fundada em 1256 pelo duque da Ruténia. Passou para soberania polaca em 1340, austríaca em 1772, de novo polaca em 1919 e ucraniana em 1939."
   },
   "lyon": {
     "wikipedia_en": "Lyon",
@@ -287,6 +353,24 @@
     "wikipedia_pt": "Milão",
     "summary_pt": "Milão é uma comuna italiana, capital da região da Lombardia, província de Milão, com cerca de 1 404 239 habitantes. A área urbana de Milão é a quinta maior da União Europeia, com uma população estimada em 4 300 000 habitantes. A Região metropolitana de Milão é a maior e mais populosa da Itália, com uma população estimada em 7 400 000 habitantes de acordo com as estimativas da OCDE. Em termos europeus, a área metropolitana de Milão cobre uma área territorial equivalente à de Paris com uma população de mais de sete milhões de habitantes. Esta área encontra-se com os critérios das áreas estatísticas combinadas (CSAs) dos Estados Unidos. Pela população, Milão é a segunda maior cidade italiana e a terceira maior área metropolitana da União Europeia. Seus habitantes são referidos como \"milanesi\", ou, informalmente, como meneghini ou ambrosiani."
   },
+  "minsk": {
+    "wikipedia_en": "Minsk",
+    "summary_en": "Minsk is the capital and largest city of Belarus, located on the Svislach and the now subterranean Nyamiha rivers. As the capital, Minsk has a special administrative status in Belarus and is the administrative centre of Minsk region and Minsk district. As of 2026, it has a population of about two million, making Minsk the 11th-most populous city in Europe. Minsk is one of the administrative capitals of the Commonwealth of Independent States (CIS) and the Eurasian Economic Union (EAEU).",
+    "wikipedia_pt": "Minsk",
+    "summary_pt": "Minsk ou, na sua forma aportuguesada, Minsque é uma cidade da Bielorrússia, capital e maior cidade do país e sede da Comunidade de Estados Independentes (CEI). Como capital, Minsk tem estatuto administrativo especial, além de ser também a capital do voblast (província) de Minsk. A cidade está situada junto aos rios Svislach e Niamiha, a 53°55′ N 27°33′ E. Sua população é de cerca de 2 milhões de habitantes (2018)."
+  },
+  "monaco": {
+    "wikipedia_en": "Monaco",
+    "summary_en": "Monaco, officially the Principality of Monaco, is a sovereign city-state and microstate in Western Europe. Situated on the French Riviera, it is a semi-enclave bordered by France to the north, east, and west, with the Mediterranean Sea to the south; the Italian region of Liguria is about 15 km (9.3 mi) east. With a population of 38,423 living in an area of 2.08 km2 (0.80 sq mi), Monaco is the second smallest sovereign state in the world, after Vatican City, as well as the most densely populated. It also has the world's shortest national coastline of any non-landlocked nation, at 3.83 km (2.38 mi). Fewer than 10,000 of its residents are Monégasque nationals. Although French is the official language of Monaco, Italian and Monégasque are also widely spoken and understood.",
+    "wikipedia_pt": "Mónaco",
+    "summary_pt": "Mónaco, oficialmente Principado do Mónaco (português europeu) ou Principado de Mônaco (português brasileiro), é uma cidade-estado soberana, e, portanto, um microestado, situado ao sul da França. Fazendo costa com o mar Mediterrâneo, o principado, fundado em 1297 pela Casa de Grimaldi — até hoje sua soberana —, fica a menos de 20 km a leste da cidade de Nice e 20 km a oeste da cidade de Ventimiglia. Possui aproximadamente uma área de 202 ha, sendo o segundo menor Estado do mundo, atrás apenas do Vaticano, com 44 hectares de área, e é o estado com a densidade populacional mais alta do mundo. Tem como forma de governo a monarquia constitucional, em que o monarca é Sua Alteza Sereníssima, o Príncipe Alberto II do Mónaco."
+  },
+  "moscow": {
+    "wikipedia_en": "Moscow",
+    "summary_en": "Moscow is the capital and largest city of Russia, situated on the Moskva River in Central Russia. The city has a population estimated at more than 13 million residents within city limits, more than 19.1 million residents in the urban area, and more than 21.5 million residents in the metropolitan area. The city covers an area of 2,511 square kilometers (970 sq mi); the urban area covers 5,891 square kilometers (2,275 sq mi); and the metropolitan area covers more than 26,000 square kilometers (10,000 sq mi). Moscow is among the world's largest cities: the most populous city entirely in Europe, the largest urban and metropolitan areas in Europe, and the largest city by land area on the European continent.",
+    "wikipedia_pt": "Moscovo",
+    "summary_pt": "Moscovo (português europeu) ou Moscou (português brasileiro) ) é a capital e maior cidade da Rússia. Fica às margens do rio Moscou na região central do país, com uma população estimada em 12,4 milhões de habitantes dentro dos limites da cidade, mais de 17 milhões de habitantes na área urbana e mais de 20 milhões de habitantes na área metropolitana. A cidade cobre uma área de 2 511 km², enquanto a área urbana cobre 5 891 km² e a área metropolitana cobre mais 26 mil km². Moscou está entre as maiores cidades do mundo, além de ser a maior área urbana e metropolitana da Europa e a maior cidade por área terrestre do continente europeu."
+  },
   "munich": {
     "wikipedia_en": "Munich",
     "summary_en": "Munich is the capital and most populous city of the German state of Bavaria. As of 30 November 2024, its population was 1,604,384, making it the third most-populous city in Germany after Berlin and Hamburg. Munich is the largest city in Germany that is not a state of its own, and it ranks as the 11th-largest city in the European Union (EU). The metropolitan area has around 3 million inhabitants, and the broader Munich Metropolitan Region is home to about 6.2 million people. It is the third largest metropolitan region by GDP in the EU. Munich is located on the river Isar north of the Alps. It is the seat of the Upper Bavarian administrative region. With 4,800 people per km2, Munich is Germany's most densely populated municipality. It is also the second-largest city in the Bavarian dialect area after Vienna.",
@@ -311,11 +395,29 @@
     "wikipedia_pt": "Nicósia",
     "summary_pt": "Nicósia, é a capital e maior cidade de Chipre. À margem do rio Pedieos e quase no centro da ilha, Nicósia é a sede do governo bem como o principal centro de negócios. É a capital do distrito homónimo."
   },
+  "nuremberg": {
+    "wikipedia_en": "Nuremberg",
+    "summary_en": "Nuremberg is the second-largest city in the German state of Bavaria and the largest city in the cultural region of Franconia. Its 546,397 (2024) inhabitants make it the 13th-largest city in Germany. Situated on the Pegnitz, the city forms a continuous conurbation with the neighbouring cities of Fürth, Erlangen and Schwabach, with the built-up area comprising around 1.4 million inhabitants, while the larger Nuremberg Metropolitan Region has a population of approximately 3.6 million.",
+    "wikipedia_pt": "Nuremberga",
+    "summary_pt": "Nuremberga (português europeu) ou Nurembergue (português brasileiro) é uma cidade independente alemã, situada ao norte do estado da Baviera na região administrativa (Regierungsbezirk) da Média Francónia. Nuremberga é a maior cidade da região histórica Francônia com aproximadamente meio milhão de habitantes, tendo sua área metropolitana cerca de 1 milhão e 17 mil habitantes."
+  },
   "oslo": {
     "wikipedia_en": "Oslo",
     "summary_en": "Oslo is the capital and most populous city of Norway. It constitutes both a county and a municipality. The municipality of Oslo had a population of 724,290 in 2025, while the city's greater urban area had a population of 1,110,887 in 2025, and the metropolitan area had an estimated population of 1,546,706 in 2021.",
     "wikipedia_pt": "Oslo",
     "summary_pt": "Oslo ou mais raramente: [ˈusˈlu, ˈuʂlu]) é a capital da Noruega e a maior cidade do país. Anteriormente, entre 1624 e 1925, chamou-se Christiania, com a grafia alternativa Kristiania, adotada entre 1877 e 1897."
+  },
+  "oxford": {
+    "wikipedia_en": "Oxford",
+    "summary_en": "Oxford is a cathedral city and non-metropolitan district in Oxfordshire, England, of which it is the county town.",
+    "wikipedia_pt": "Oxford",
+    "summary_pt": "Oxford, em português chamada Oxónia (português europeu) ou Oxônia (português brasileiro) ou Oxforde, é uma cidade e distrito de governo local do condado de Oxfordshire, Inglaterra, Reino Unido, com uma população de 134 248 habitantes. A Carfax Tower é normalmente considerada o centro da cidade. Está situada às margens do rio Tâmisa, que aí é chamado de rio Ísis."
+  },
+  "palermo": {
+    "wikipedia_en": "Palermo",
+    "summary_en": "Palermo is the capital and largest city of the autonomous island region of Sicily in southern Italy, located on the eponymous gulf facing the Tyrrhenian Sea. A 2,700-year-old city, it is noted for its history, culture, architecture and gastronomy, playing an important role throughout much of its existence.",
+    "wikipedia_pt": "Palermo",
+    "summary_pt": "Palermo é uma comuna italiana, capital da cidade metropolitana de Palermo e da Região Siciliana, sendo a maior cidade da ilha da Sicília. Está localizada na costa norte da ilha, estendendo-se por uma área de 158 quilômetros quadrados."
   },
   "palma": {
     "wikipedia_en": "Palma de Mallorca",
@@ -371,17 +473,47 @@
     "wikipedia_pt": "Roterdão",
     "summary_pt": "Roterdão (português europeu) ou Roterdã (português brasileiro) é a segunda maior e mais importante cidade dos Países Baixos, ficando atrás somente da capital, Amsterdã. Sede do maior porto marítimo da Europa, possui cerca de 617 347 habitantes. Está situada às margens do rio Nieuwe Maas na província da Holanda do Sul. Parte da cidade está na ilha IJsselmonde."
   },
+  "saint-petersburg": {
+    "wikipedia_en": "Saint Petersburg",
+    "summary_en": "Saint Petersburg, formerly known as Petrograd (Петроград), and later Leningrad (Ленинград), is the second-largest city in Russia, after Moscow, the nation's capital. Situated on the Neva River at the head of the Gulf of Finland on the Baltic Sea, its area of 1,439 square kilometers (556 sq mi) makes it the smallest administrative division of Russia by area. The city had a population of 5,601,911 residents as of 2021, with more than 6.4 million people living in the metropolitan area. Saint Petersburg is the fourth-most populous city in Europe, the most populous city on the Baltic Sea, and the world's northernmost city of more than 1 million residents. As the former capital of the Russian Empire, and a historically strategic Baltic port, it is governed as a federal city.",
+    "wikipedia_pt": "São Petersburgo",
+    "summary_pt": "São Petersburgo ou Sampetersburgo é a segunda maior cidade da Rússia, politicamente incorporada como uma cidade autônoma. Ela está localizada ao longo do rio Neva, na entrada do Golfo da Finlândia, no Mar Báltico. Em 1914, o nome da cidade foi mudado para Petrogrado e, em 1924, para Leningrado. Em 1991, após o colapso da União Soviética, a cidade voltou ao seu nome original. É frequentemente chamada apenas de Petersburgo e informalmente conhecida como Peter."
+  },
   "salzburg": {
     "wikipedia_en": "Salzburg",
     "summary_en": "Salzburg is the fourth-largest city in Austria. In 2026 its population was 157,994. The city lies on the Salzach River, near the border with Germany and at the foot of the Alps mountains.",
     "wikipedia_pt": "Salzburgo",
     "summary_pt": "Salzburgo ou Salisburgo é uma cidade da Áustria localizada às margens do Rio Salzach, no centro-oeste do país, próximo à fronteira com o estado alemão da Baviera. É a capital do estado homônimo e conta com 146 631 habitantes (2014), sendo a quarta maior cidade da Áustria, após Viena, Graz e Linz. Salzburgo é uma cidade estatutária (Statutarstadt), ou seja, possui estatuto de distrito e se estende por cerca de 66 km². O centro histórico de Salzburgo é Patrimônio Mundial da UNESCO desde 1996."
   },
+  "san-sebastian": {
+    "wikipedia_en": "San Sebastián",
+    "summary_en": "San Sebastián or Donostia, officially known by the bilingual name Donostia / San Sebastián, is a city and municipality located in the Basque Autonomous Community in Spain. It lies on the coast of the Bay of Biscay, 20 km from the Spain–France border. The capital city of the province of Gipuzkoa, it has a population of 188,487 as of 2024, with its metropolitan area being 436,500 in 2010. Locals call themselves donostiarra (singular) in Basque, also using this term when speaking in Spanish. It is also a part of Basque Eurocity Bayonne-San Sebastián.",
+    "wikipedia_pt": "São Sebastião (País Basco)",
+    "summary_pt": "São Sebastião, oficialmente Donostia/San Sebastián, é uma cidade espanhola localizada no País Basco espanhol, capital da província de Guipúscoa. Rodeada pela Baía da Concha, à beira do golfo da Biscaia, a cidade tem cerca de 183 000 habitantes, enquanto sua periferia possui aproximadamente 400 mil residentes."
+  },
+  "santiago-de-compostela": {
+    "wikipedia_en": "Santiago de Compostela",
+    "summary_en": "Santiago de Compostela, alternatively abbreviated to Santiago or Compostela, is the capital of the autonomous community of Galicia, Spain. It is located in the province of A Coruña, in the northwest of the Iberian Peninsula. The city has its origin in the shrine of Saint James the Great, now the Cathedral of Santiago de Compostela, as the destination of the Way of St. James, a leading Catholic pilgrimage route since the 9th century. In 1985, the city's Old Town was designated a UNESCO World Heritage Site.",
+    "wikipedia_pt": "Santiago de Compostela",
+    "summary_pt": "Santiago de Compostela é uma cidade e município no noroeste de Espanha. É capital da comunidade autónoma da Galiza e faz parte da província da Corunha e da comarca de Santiago. O município tem 220 km² de área e em 2021 tinha 97 858 habitantes."
+  },
+  "sarajevo": {
+    "wikipedia_en": "Sarajevo",
+    "summary_en": "Sarajevo is the capital and largest city of Bosnia and Herzegovina, with a population of 275,524 in its administrative limits. The Sarajevo Canton, containing the city of Sarajevo and nearby municipalities, is home to 413,593 inhabitants. Located within the greater Sarajevo valley of Bosnia, it is surrounded by the Dinaric Alps and situated along the Miljacka River in the heart of the Balkans, a region of Southeastern Europe.",
+    "wikipedia_pt": "Sarajevo",
+    "summary_pt": "Saraievo, Sarajevo ou, na sua forma antiga, hoje em desuso, Serajevo, é a capital e a maior cidade da Bósnia e Herzegovina. O censo de 2013 indicou uma população de 405 930 habitantes, o que indica um pequeno crescimento nas mais de duas décadas desde o censo de 1991, que apontava uma população de 329 672 habitantes."
+  },
   "seville": {
     "wikipedia_en": "Seville",
     "summary_en": "Seville is the capital and largest city of the Spanish autonomous community of Andalusia and the province of Seville. It is situated on the lower reaches of the River Guadalquivir, in the southwest of the Iberian Peninsula.",
     "wikipedia_pt": "Sevilha",
     "summary_pt": "Sevilha é uma cidade espanhola situada a sudoeste da Península Ibérica, na comunidade autónoma da Andaluzia. É capital da província homónima. Segundo censo de 2019, havia 1 228 479 de habitantes. Sevilha tem a terceira maior catedral no mundo. Uma das pessoas lá enterradas é Cristóvão Colombo."
+  },
+  "siena": {
+    "wikipedia_en": "Siena",
+    "summary_en": "Siena is a city in the region of Tuscany in central Italy, and the capital of the province of Siena. With a population of 53,180, it is the 12th-largest city in the region.",
+    "wikipedia_pt": "Siena",
+    "summary_pt": "Siena é uma cidade e sede de comuna italiana na província de mesmo nome, na região da Toscana, com cerca de 52 775 habitantes. Estende-se por uma área de 118 km², tendo uma densidade populacional de 447 hab/km². Faz fronteira com Asciano, Castelnuovo Berardenga, Monteriggioni, Monteroni d'Arbia e Sovicille."
   },
   "sofia": {
     "wikipedia_en": "Sofia",
@@ -401,17 +533,47 @@
     "wikipedia_pt": "Estocolmo",
     "summary_pt": "Estocolmo é a capital e a maior cidade da Suécia.\nSua localização, centrada em 19 ilhas e ilhotas, juntamente com a área continental circundante, tem sido historicamente importante."
   },
+  "strasbourg": {
+    "wikipedia_en": "Strasbourg",
+    "summary_en": "Strasbourg is a prefecture and commune, and the largest city of the Grand Est region of northeastern France, in the historic region of Alsace. It is the prefecture of the Bas-Rhin department and the official seat of the European Parliament.",
+    "wikipedia_pt": "Estrasburgo",
+    "summary_pt": "Estrasburgo é uma comuna situada no leste da França, na margem esquerda do Rio Reno. É a capital da região administrativa de Grande Leste e do departamento do Baixo Reno."
+  },
   "tallinn": {
     "wikipedia_en": "Tallinn",
     "summary_en": "Tallinn is the capital and largest city of Estonia. Located on a bay in northern Estonia, on the shore of the Gulf of Finland of the Baltic Sea, it has a population of 452,563 as of 2026, making it the third most-populous city in the Baltics. As of 2024, the population of the Tallinn metropolitan area is estimated at 646,315. Tallinn is the main governmental, financial, industrial, and cultural centre of Estonia. It is located 187 kilometres (116 mi) northwest of the country's second largest city, Tartu, however, only 80 kilometres (50 mi) south of Helsinki, the capital city of Finland. It is also 320 kilometres (200 mi) west of Saint Petersburg, Russia, 300 kilometres (190 mi) north of Riga, Latvia, and 380 kilometres (240 mi) east of Stockholm, Sweden. From the 13th century until the first half of the 20th century, Tallinn was known in most of the world by variants of its other historical name, Reval.",
     "wikipedia_pt": "Tallinn",
     "summary_pt": "Tallinn, Talim, Taline ou Talin é a capital, centro financeiro e maior cidade da Estónia, localizada no golfo da Finlândia, na costa norte do país junto ao mar Báltico, a 80 quilómetros a sul de Helsínquia. Tem cerca de 400 000 habitantes, aproximadamente um terço da população total do país."
   },
+  "thessaloniki": {
+    "wikipedia_en": "Thessaloniki",
+    "summary_en": "Thessaloniki is the capital and largest city of the administrative region of Central Macedonia, and the second-largest city in Greece. It is the largest city of Northern Greece, with over 300,000 in the city proper and slightly over one million inhabitants in its metropolitan area, the capital of the geographic region of Macedonia, and the Decentralized Administration of Macedonia and Thrace. It is also known in Greek as i Symprotévousa, literally \"the co-capital\", a reference to its historical status as the \"co-reigning\" city of the Byzantine Empire alongside Constantinople.",
+    "wikipedia_pt": "Salonica",
+    "summary_pt": "Salonica, também conhecida como Tessalónica (português europeu) ou Tessalônica (português brasileiro) é a segunda maior cidade da Grécia e a principal cidade da região grega da Macedônia. Em 2011, a população da região metropolitana era de 1 104 460, dos quais 788 952 na cidade propriamente dita e 325 182 no município."
+  },
+  "toledo": {
+    "wikipedia_en": "Toledo, Spain",
+    "summary_en": "Toledo is a city and municipality in Spain. It is the capital of the province of Toledo and the de jure seat of the government and parliament of the autonomous community of Castilla–La Mancha.",
+    "wikipedia_pt": "Toledo",
+    "summary_pt": "Toledo é um município da Espanha na província de Toledo, comunidade autónoma de Castela-Mancha. Tem 232,1 quilómetros quadrados de área e em 2021 tinha 85 449 habitantes."
+  },
+  "toulouse": {
+    "wikipedia_en": "Toulouse",
+    "summary_en": "Toulouse is a city in Southern France, the prefecture of the Haute-Garonne department and of the Occitania region. The city is on the banks of the River Garonne, 150 kilometres from the Mediterranean Sea, 230 km (143 mi) from the Atlantic Ocean and 680 km (420 mi) from Paris. It is the fourth-largest city in France after Paris, Marseille, and Lyon, with 514,819 inhabitants within its municipal boundaries (2023); its metropolitan area has a population of 1,529,112 inhabitants (2023). Toulouse is the central city of one of the 22 metropolitan councils of France. Between the 2014 and 2020 censuses, its metropolitan area was the third fastest growing among metropolitan areas larger than 500,000 inhabitants in France.",
+    "wikipedia_pt": "Toulouse",
+    "summary_pt": "Toulouse ou Tolosa é a capital do departamento francês da Alta Garona e da região de Occitânia. A cidade fica nas margens do rio Garona, a 150 km do mar Mediterrâneo, a 230 km do Atlântico e a 680 km de Paris. É a quarta maior cidade da França, com 504 078 habitantes em 2021. A área metropolitana de Toulouse, com 1 490 640 habitantes em 2021, é a quarta maior região metropolitana do país, depois de Paris, Lyon e Marselha, e à frente de Lille e Bordéus."
+  },
   "turin": {
     "wikipedia_en": "Turin",
     "summary_en": "Turin is a city and a business and cultural centre in northern Italy. It is the capital and largest city of Piedmont and of the Metropolitan City of Turin. From 1861 to 1865, it was the first capital of the Kingdom of Italy. The city is mainly on the western bank of the River Po, below its Susa Valley, and is surrounded by the western Alpine arch and Superga hill. The population of the city proper is 855,654 as of 2026, while the population of the urban area is estimated by Eurostat to be 1.7 million inhabitants. The Turin metropolitan area is estimated by the OECD to have a population of 2.2 million.",
     "wikipedia_pt": "Turim",
     "summary_pt": "Turim é uma comuna italiana, capital e maior cidade da região do Piemonte, e efetivamente a quarta maior cidade do país, com uma população de 910 188 habitantes (2009), estando atrás apenas de Roma, Milão e Nápoles. Estende-se por uma área de 130 km², tendo uma densidade populacional de 6 596 hab/km². Faz fronteira com Venaria Reale, Settimo Torinese, Borgaro Torinese, San Mauro Torinese, Collegno, Rivoli, Baldissero Torinese, Grugliasco, Pino Torinese, Orbassano, Pecetto Torinese, Beinasco, Moncalieri e Nichelino."
+  },
+  "utrecht": {
+    "wikipedia_en": "Utrecht",
+    "summary_en": "Utrecht is the fourth-largest city of the Netherlands, as well as the capital and the most populous city of the province of Utrecht. The municipality of Utrecht is located in the eastern part of the Randstad conurbation, in the very centre of mainland Netherlands, and includes Haarzuilens, Vleuten and De Meern. It has a population of 378,140 as of January 2026.",
+    "wikipedia_pt": "Utreque",
+    "summary_pt": "Utreque é a capital e a cidade mais populosa da província homónima, nos Países Baixos. Com mais de 335 000 habitantes é a quarta mais populosa cidade do país, atrás de Amesterdão, Haia e Roterdão. Situa-se no centro do país, próximo de um ramal do rio Reno. Por causa da sua locação central no país, a cidade é um nó importante de tráfego, tanto o rodoviário como o ferroviário."
   },
   "valencia": {
     "wikipedia_en": "Valencia",

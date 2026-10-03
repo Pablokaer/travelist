@@ -4,7 +4,7 @@
      data-pipeline/cities.yaml and data-pipeline/data/attractions. Do not edit by hand:
      `ingest` and `seed` rewrite it, and CI fails when it is stale. -->
 
-**80 cities** in **32 countries**, **80** live on the map, **14,222 attractions** in total.
+**107 cities** in **39 countries**, **107** live on the map, **17,358 attractions** in total.
 
 Cities are listed in the order they were added to `cities.yaml`. When a city is added,
 also record it in [CHANGELOG.md](../CHANGELOG.md). How to add one: see
@@ -95,3 +95,30 @@ number of UNESCO sites; date the data was retrieved.
 | 78 | Ghent | Gante | Belgium (BE) | `ghent` | 60 | 98% | 10% | 18% | 2 | 2026-09-28 | active |
 | 79 | Bergen | Bergen | Norway (NO) | `bergen` | 102 | 92% | 12% | 17% | 0 | 2026-09-28 | active |
 | 80 | Gothenburg | Gotemburgo | Sweden (SE) | `gothenburg` | 125 | 94% | 49% | 14% | 0 | 2026-09-28 | active |
+| 81 | Belgrade | Belgrado | Serbia (RS) | `belgrade` | 211 | 95% | 6% | 11% | 0 | 2026-10-03 | active |
+| 82 | Sarajevo | Sarajevo | Bosnia and Herzegovina (BA) | `sarajevo` | 121 | 93% | 5% | 9% | 0 | 2026-10-03 | active |
+| 83 | Thessaloniki | Salonica | Greece (GR) | `thessaloniki` | 100 | 85% | 15% | 13% | 15 | 2026-10-03 | active |
+| 84 | Strasbourg | Estrasburgo | France (FR) | `strasbourg` | 93 | 96% | 10% | 19% | 0 | 2026-10-03 | active |
+| 85 | Toulouse | Toulouse | France (FR) | `toulouse` | 72 | 96% | 14% | 24% | 1 | 2026-10-03 | active |
+| 86 | San Sebastián | San Sebastián | Spain (ES) | `san-sebastian` | 63 | 100% | 5% | 3% | 10 | 2026-10-03 | active |
+| 87 | Toledo | Toledo | Spain (ES) | `toledo` | 87 | 100% | 30% | 8% | 0 | 2026-10-03 | active |
+| 88 | Santiago de Compostela | Santiago de Compostela | Spain (ES) | `santiago-de-compostela` | 48 | 98% | 85% | 10% | 28 | 2026-10-03 | active |
+| 89 | Siena | Siena | Italy (IT) | `siena` | 135 | 96% | 12% | 6% | 4 | 2026-10-03 | active |
+| 90 | Genoa | Génova | Italy (IT) | `genoa` | 203 | 100% | 11% | 6% | 32 | 2026-10-03 | active |
+| 91 | Palermo | Palermo | Italy (IT) | `palermo` | 187 | 99% | 12% | 10% | 7 | 2026-10-03 | active |
+| 92 | Coimbra | Coimbra | Portugal (PT) | `coimbra` | 60 | 90% | 100% | 5% | 0 | 2026-10-03 | active |
+| 93 | Heidelberg | Heidelberg | Germany (DE) | `heidelberg` | 60 | 98% | 12% | 28% | 0 | 2026-10-03 | active |
+| 94 | Nuremberg | Nuremberga | Germany (DE) | `nuremberg` | 107 | 92% | 15% | 20% | 0 | 2026-10-03 | active |
+| 95 | Lucerne | Lucerna | Switzerland (CH) | `lucerne` | 31 | 94% | 10% | 29% | 0 | 2026-10-03 | active |
+| 96 | Bern | Berna | Switzerland (CH) | `bern` | 75 | 96% | 8% | 16% | 0 | 2026-10-03 | active |
+| 97 | Bath | Bath | United Kingdom (GB) | `bath` | 66 | 100% | 6% | 14% | 0 | 2026-10-03 | active |
+| 98 | Oxford | Oxford | United Kingdom (GB) | `oxford` | 119 | 94% | 6% | 15% | 0 | 2026-10-03 | active |
+| 99 | Brașov | Brașov | Romania (RO) | `brasov` | 43 | 98% | 5% | 9% | 0 | 2026-10-03 | active |
+| 100 | Utrecht | Utreque | Netherlands (NL) | `utrecht` | 58 | 97% | 12% | 12% | 3 | 2026-10-03 | active |
+| 101 | Monaco | Mónaco | Monaco (MC) | `monaco` | 28 | 89% | 25% | 29% | 0 | 2026-10-03 | active |
+| 102 | Andorra la Vella | Andorra-a-Velha | Andorra (AD) | `andorra-la-vella` | 17 | 94% | 12% | 6% | 0 | 2026-10-03 | active |
+| 103 | Kyiv | Kiev | Ukraine (UA) | `kyiv` | 300 | 93% | 9% | 13% | 2 | 2026-10-03 | active |
+| 104 | Lviv | Lviv | Ukraine (UA) | `lviv` | 137 | 96% | 3% | 9% | 0 | 2026-10-03 | active |
+| 105 | Moscow | Moscovo | Russia (RU) | `moscow` | 300 | 99% | 47% | 17% | 3 | 2026-10-03 | active |
+| 106 | Saint Petersburg | São Petersburgo | Russia (RU) | `saint-petersburg` | 300 | 99% | 31% | 17% | 9 | 2026-10-03 | active |
+| 107 | Minsk | Minsk | Belarus (BY) | `minsk` | 115 | 99% | 7% | 12% | 0 | 2026-10-03 | active |
