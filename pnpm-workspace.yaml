@@ -20,3 +20,6 @@ auditConfig:
   ignoreGhsas:
     # node-forge RSA signature check, via expo > @expo/cli (dev server only); no patched version.
     - GHSA-86w9-cpqp-85rv
+    # braces stack exhaustion on deeply nested patterns (published 2026-09-18), via jest, metro and
+    # @expo/cli (dev and build tools only; patterns come from our own config); no patched version.
+    - GHSA-vfj7-8cjw-p6xm
