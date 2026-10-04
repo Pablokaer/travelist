@@ -84,6 +84,7 @@ export const categoryColors: Record<string, string> = {
   viewpoint: '#15803D',
   landmark: '#1D4ED8',
   park: '#4D7C0F',
+  nature: '#0F766E',
   palace: '#C2410C',
   other: '#475569',
 };

@@ -1101,3 +1101,917 @@ cities:
     bbox: [53.793847, 27.3740176, 53.9717897, 28.0799469]
     timezone: Europe/Minsk
     is_active: true
+
+  # batch 8, 2026-10-03 (Wikidata + Nominatim): Morocco, Southeast and East Asia
+
+  - slug: marrakesh
+    name: { en: Marrakech, pt: Marraquexe }
+    country_code: MA
+    wikidata_id: Q101625
+    osm_relation_id: 2799538
+    center: [31.62947, -7.98108]
+    bbox: [31.5441986, -8.0893315, 31.7104265, -7.8847385]
+    timezone: Africa/Casablanca
+    is_active: true
+
+  - slug: fez
+    name: { en: Fez, pt: Fez }
+    country_code: MA
+    wikidata_id: Q80985
+    osm_relation_id: 2799557
+    center: [34.043333, -5.003333]
+    bbox: [33.9764285, -5.0781791, 34.0755055, -4.9377101]
+    timezone: Africa/Casablanca
+    is_active: true
+
+  - slug: casablanca
+    name: { en: Casablanca, pt: Casablanca }
+    country_code: MA
+    wikidata_id: Q7903
+    osm_relation_id: 4072985
+    center: [33.599167, -7.62]
+    bbox: [33.493342, -7.751238, 33.6409103, -7.4574165]
+    timezone: Africa/Casablanca
+    is_active: true
+
+  - slug: rabat
+    name: { en: Rabat, pt: Rabat }
+    country_code: MA
+    wikidata_id: Q3551
+    osm_relation_id: 2799215
+    center: [34.021111, -6.841389]
+    bbox: [33.8964011, -6.9305776, 34.0378472, -6.7614635]
+    timezone: Africa/Casablanca
+    is_active: true
+
+  - slug: tangier
+    name: { en: Tangier, pt: Tânger }
+    country_code: MA
+    wikidata_id: Q126148
+    osm_relation_id: 2758781
+    center: [35.769491, -5.804468]
+    bbox: [35.6995621, -5.9484121, 35.8259979, -5.7135397]
+    timezone: Africa/Casablanca
+    is_active: true
+
+  - slug: yangon
+    name: { en: Yangon, pt: Rangum }
+    country_code: MM
+    wikidata_id: Q37995
+    osm_relation_id: 6004094
+    center: [16.795, 96.16]
+    bbox: [16.5919743, 95.9947586, 17.0907467, 96.3688068]
+    timezone: Asia/Yangon
+    is_active: true
+
+  - slug: mandalay
+    name: { en: Mandalay, pt: Mandalay }
+    country_code: MM
+    wikidata_id: Q185518
+    osm_relation_id: null # centre-based bbox: no OSM relation on Wikidata; covers Mandalay Hill, the palace and U Bein Bridge
+    center: [21.97473, 96.08359]
+    bbox: [21.88, 96.02, 22.06, 96.15]
+    timezone: Asia/Yangon
+    is_active: true
+
+  - slug: bangkok
+    name: { en: Bangkok, pt: Banguecoque }
+    country_code: TH
+    wikidata_id: Q1861
+    osm_relation_id: null # centre-based bbox: the 1,569 km² province reaches far into rice fields
+    center: [13.75, 100.516667]
+    bbox: [13.65, 100.4, 13.9, 100.65]
+    timezone: Asia/Bangkok
+    is_active: true
+
+  - slug: chiang-mai
+    name: { en: Chiang Mai, pt: Chiang Mai }
+    country_code: TH
+    wikidata_id: Q52028
+    osm_relation_id: null # centre-based bbox: covers the old city and Wat Phra That Doi Suthep
+    center: [18.788889, 98.983333]
+    bbox: [18.74, 98.9, 18.84, 99.05]
+    timezone: Asia/Bangkok
+    is_active: true
+
+  - slug: phuket
+    name: { en: Phuket, pt: Phuket }
+    country_code: TH
+    wikidata_id: Q844430
+    osm_relation_id: null # centre-based bbox: Phuket Town is 12 km²; covers the town, Patong and the Big Buddha
+    center: [7.888056, 98.3975]
+    bbox: [7.78, 98.27, 7.98, 98.42]
+    timezone: Asia/Bangkok
+    is_active: true
+
+  - slug: ayutthaya
+    name: { en: Phra Nakhon Si Ayutthaya, pt: Ayutthaya }
+    country_code: TH
+    wikidata_id: Q203370
+    osm_relation_id: null # centre-based bbox: covers the historical park (UNESCO) on the river island
+    center: [14.359359, 100.576145]
+    bbox: [14.3, 100.5, 14.4, 100.62]
+    timezone: Asia/Bangkok
+    is_active: true
+
+  - slug: phnom-penh
+    name: { en: Phnom Penh, pt: Phnom Penh }
+    country_code: KH
+    wikidata_id: Q1850
+    osm_relation_id: 2199033
+    center: [11.569583, 104.921028]
+    bbox: [11.4200852, 104.7204046, 11.7349524, 105.0373762]
+    timezone: Asia/Phnom_Penh
+    is_active: true
+
+  - slug: siem-reap
+    name: { en: Siem Reap, pt: Siem Reap }
+    country_code: KH
+    wikidata_id: Q11711
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers the town and the Angkor temples (Angkor Wat, Bayon, Ta Prohm)
+    center: [13.362222, 103.859722]
+    bbox: [13.3, 103.78, 13.48, 103.95]
+    timezone: Asia/Phnom_Penh
+    is_active: true
+
+  - slug: hanoi
+    name: { en: Hanoi, pt: Hanói }
+    country_code: VN
+    wikidata_id: Q1858
+    osm_relation_id: null # centre-based bbox: the 3,360 km² city is mostly rural
+    center: [21.0245, 105.84117]
+    bbox: [20.95, 105.75, 21.1, 105.9]
+    timezone: Asia/Ho_Chi_Minh
+    is_active: true
+
+  - slug: ho-chi-minh-city
+    name: { en: Ho Chi Minh City, pt: Cidade de Ho Chi Minh }
+    country_code: VN
+    wikidata_id: Q1854
+    osm_relation_id: null # centre-based bbox: the 6,773 km² city reaches the coast
+    center: [10.775556, 106.701944]
+    bbox: [10.7, 106.6, 10.85, 106.77]
+    timezone: Asia/Ho_Chi_Minh
+    is_active: true
+
+  - slug: hue
+    name: { en: Huế, pt: Huế }
+    country_code: VN
+    wikidata_id: Q36167
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers the citadel and the imperial tombs
+    center: [16.456111, 107.576389]
+    bbox: [16.38, 107.5, 16.53, 107.65]
+    timezone: Asia/Ho_Chi_Minh
+    is_active: true
+
+  - slug: hoi-an
+    name: { en: Hội An, pt: Hội An }
+    country_code: VN
+    wikidata_id: Q36160
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers the ancient town
+    center: [15.877669, 108.33265]
+    bbox: [15.84, 108.28, 15.92, 108.38]
+    timezone: Asia/Ho_Chi_Minh
+    is_active: true
+
+  - slug: da-nang
+    name: { en: Da Nang, pt: Da Nang }
+    country_code: VN
+    wikidata_id: Q25282
+    osm_relation_id: null # centre-based bbox: the official area includes the Paracel Islands; covers the city, Marble Mountains and Ba Na Hills
+    center: [16.069444, 108.209722]
+    bbox: [15.95, 107.98, 16.15, 108.32]
+    timezone: Asia/Ho_Chi_Minh
+    is_active: true
+
+  - slug: vientiane
+    name: { en: Vientiane, pt: Vienciana }
+    country_code: LA
+    wikidata_id: Q9326
+    osm_relation_id: null # centre-based bbox: the 3,920 km² prefecture; covers the city and Buddha Park
+    center: [17.98, 102.63]
+    bbox: [17.88, 102.52, 18.03, 102.78]
+    timezone: Asia/Vientiane
+    is_active: true
+
+  - slug: luang-prabang
+    name: { en: Luang Prabang, pt: Luang Prabang }
+    country_code: LA
+    wikidata_id: Q190165
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers the town (UNESCO)
+    center: [19.89, 102.134722]
+    bbox: [19.84, 102.1, 19.94, 102.19]
+    timezone: Asia/Vientiane
+    is_active: true
+
+  - slug: kuala-lumpur
+    name: { en: Kuala Lumpur, pt: Kuala Lumpur }
+    country_code: MY
+    wikidata_id: Q1865
+    osm_relation_id: 2939672
+    center: [3.147778, 101.695278]
+    bbox: [3.0333979, 101.615139, 3.2445538, 101.7584948]
+    timezone: Asia/Kuala_Lumpur
+    is_active: true
+
+  - slug: george-town
+    name: { en: George Town, pt: George Town }
+    country_code: MY
+    wikidata_id: Q61092
+    osm_relation_id: null # centre-based bbox: covers the historic centre (UNESCO) and Kek Lok Si
+    center: [5.4145, 100.3292]
+    bbox: [5.38, 100.28, 5.47, 100.35]
+    timezone: Asia/Kuala_Lumpur
+    is_active: true
+
+  - slug: malacca
+    name: { en: Malacca, pt: Malaca }
+    country_code: MY
+    wikidata_id: Q61089
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers the historic centre (UNESCO)
+    center: [2.188889, 102.251111]
+    bbox: [2.15, 102.2, 2.25, 102.3]
+    timezone: Asia/Kuala_Lumpur
+    is_active: true
+
+  - slug: jakarta
+    name: { en: Jakarta, pt: Jacarta }
+    country_code: ID
+    wikidata_id: Q3630
+    osm_relation_id: null # centre-based bbox: the province includes the Thousand Islands
+    center: [-6.175278, 106.826944]
+    bbox: [-6.37, 106.7, -6.08, 106.98]
+    timezone: Asia/Jakarta
+    is_active: true
+
+  - slug: yogyakarta
+    name: { en: Yogyakarta, pt: Joguejacarta }
+    country_code: ID
+    wikidata_id: Q7568
+    osm_relation_id: null # centre-based bbox: the 32 km² city; extended east to Prambanan, 10 km away
+    center: [-7.800457, 110.39128]
+    bbox: [-7.85, 110.33, -7.73, 110.5]
+    timezone: Asia/Jakarta
+    is_active: true
+
+  - slug: ubud
+    name: { en: Ubud, pt: Ubud }
+    country_code: ID
+    wikidata_id: Q210654
+    osm_relation_id: null # centre-based bbox: no OSM relation; covers Ubud and its temples
+    center: [-8.507, 115.262]
+    bbox: [-8.56, 115.22, -8.45, 115.31]
+    timezone: Asia/Makassar
+    is_active: true
+
+  - slug: manila
+    name: { en: Manila, pt: Manila }
+    country_code: PH
+    wikidata_id: Q1461
+    osm_relation_id: 103703
+    center: [14.595833, 120.977222]
+    bbox: [14.5508249, 120.7917034, 14.6395473, 121.0261685]
+    timezone: Asia/Manila
+    is_active: true
+
+  - slug: cebu-city
+    name: { en: Cebu City, pt: Cidade de Cebu }
+    country_code: PH
+    wikidata_id: Q1467
+    osm_relation_id: null # centre-based bbox: the 315 km² city is mostly mountains
+    center: [10.293, 123.902]
+    bbox: [10.26, 123.84, 10.36, 123.95]
+    timezone: Asia/Manila
+    is_active: true
+
+  - slug: beijing
+    name: { en: Beijing, pt: Pequim }
+    country_code: CN
+    wikidata_id: Q956
+    osm_relation_id: null # centre-based bbox: the 16,411 km² municipality; covers the centre, the Summer Palace, the Ming Tombs and the Great Wall at Badaling and Mutianyu
+    center: [39.90403, 116.407526]
+    bbox: [39.75, 116.0, 40.45, 116.65]
+    timezone: Asia/Shanghai
+    is_active: true
+
+  - slug: shanghai
+    name: { en: Shanghai, pt: Xangai }
+    country_code: CN
+    wikidata_id: Q8686
+    osm_relation_id: null # centre-based bbox: the 6,341 km² municipality
+    center: [31.2325, 121.469167]
+    bbox: [31.1, 121.35, 31.35, 121.6]
+    timezone: Asia/Shanghai
+    is_active: true
+
+  - slug: xian
+    name: { en: "Xi'an", pt: "Xi'an" }
+    country_code: CN
+    wikidata_id: Q5826
+    osm_relation_id: null # centre-based bbox: the 10,097 km² city; covers the walled centre and the Terracotta Army
+    center: [34.261111, 108.942222]
+    bbox: [34.15, 108.8, 34.42, 109.3]
+    timezone: Asia/Shanghai
+    is_active: true
+
+  - slug: hangzhou
+    name: { en: Hangzhou, pt: Hangzhou }
+    country_code: CN
+    wikidata_id: Q4970
+    osm_relation_id: null # centre-based bbox: the 16,854 km² city; covers West Lake and Lingyin Temple
+    center: [30.25, 120.1675]
+    bbox: [30.15, 120.05, 30.35, 120.25]
+    timezone: Asia/Shanghai
+    is_active: true
+
+  - slug: chengdu
+    name: { en: Chengdu, pt: Chengdu }
+    country_code: CN
+    wikidata_id: Q30002
+    osm_relation_id: null # centre-based bbox: the 14,378 km² city; covers the centre and the panda base
+    center: [30.66, 104.063333]
+    bbox: [30.55, 103.95, 30.78, 104.2]
+    timezone: Asia/Shanghai
+    is_active: true
+
+  - slug: taipei
+    name: { en: Taipei, pt: Taipé }
+    country_code: TW
+    wikidata_id: Q1867
+    osm_relation_id: 1293250
+    center: [25.0375, 121.5625]
+    bbox: [24.9605158, 121.4571436, 25.2102648, 121.6659425]
+    timezone: Asia/Taipei
+    is_active: true
+
+  - slug: tainan
+    name: { en: Tainan, pt: Tainan }
+    country_code: TW
+    wikidata_id: Q140631
+    osm_relation_id: null # centre-based bbox: the 2,192 km² city; covers the old capital and Anping
+    center: [22.99, 120.185]
+    bbox: [22.93, 120.13, 23.05, 120.25]
+    timezone: Asia/Taipei
+    is_active: true
+
+  - slug: tokyo
+    name: { en: Tokyo, pt: Tóquio }
+    country_code: JP
+    wikidata_id: Q1490
+    osm_relation_id: null # centre-based bbox: the metropolis includes islands 1,000 km away; covers the 23 wards
+    center: [35.689444, 139.691667]
+    bbox: [35.52, 139.55, 35.82, 139.92]
+    timezone: Asia/Tokyo
+    is_active: true
+
+  - slug: kyoto
+    name: { en: Kyoto, pt: Quioto }
+    country_code: JP
+    wikidata_id: Q34600
+    osm_relation_id: null # centre-based bbox: the city reaches far north into the mountains
+    center: [35.011611, 135.768111]
+    bbox: [34.92, 135.65, 35.09, 135.84]
+    timezone: Asia/Tokyo
+    is_active: true
+
+  - slug: osaka
+    name: { en: Osaka, pt: Osaka }
+    country_code: JP
+    wikidata_id: Q35765
+    osm_relation_id: 358674
+    center: [34.69375, 135.502111]
+    bbox: [34.586154, 135.3099784, 34.768849, 135.5991702]
+    timezone: Asia/Tokyo
+    is_active: true
+
+  - slug: nara
+    name: { en: Nara, pt: Nara }
+    country_code: JP
+    wikidata_id: Q169134
+    osm_relation_id: 3227707
+    center: [34.685, 135.804778]
+    bbox: [34.558047, 135.713127, 34.757739, 136.071079]
+    timezone: Asia/Tokyo
+    is_active: true
+
+  - slug: hiroshima
+    name: { en: Hiroshima, pt: Hiroshima }
+    country_code: JP
+    wikidata_id: Q34664
+    osm_relation_id: null # centre-based bbox: the 905 km² city is mostly mountains
+    center: [34.38525, 132.455306]
+    bbox: [34.33, 132.38, 34.45, 132.52]
+    timezone: Asia/Tokyo
+    is_active: true
+
+  # batch 9, 2026-10-03 (Wikidata + Nominatim): Brazil's most visited cities and Petrolina
+
+  - slug: rio-de-janeiro
+    name: { en: Rio de Janeiro, pt: Rio de Janeiro }
+    country_code: BR
+    wikidata_id: Q8678
+    osm_relation_id: 2697338
+    center: [-22.911111, -43.205556]
+    bbox: [-23.0827051, -43.796252, -22.7460878, -43.0990811]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: sao-paulo
+    name: { en: São Paulo, pt: São Paulo }
+    country_code: BR
+    wikidata_id: Q174
+    osm_relation_id: null # centre-based bbox: the 1,523 km² city reaches far south into the Atlantic Forest
+    center: [-23.550394, -46.633947]
+    bbox: [-23.7, -46.8, -23.45, -46.5]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: foz-do-iguacu
+    name: { en: Foz do Iguaçu, pt: Foz do Iguaçu }
+    country_code: BR
+    wikidata_id: Q202316
+    osm_relation_id: 297473
+    center: [-25.54, -54.5875]
+    bbox: [-25.6975601, -54.619855, -25.211494, -54.2940195]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: salvador
+    name: { en: Salvador, pt: Salvador }
+    country_code: BR
+    wikidata_id: Q36947
+    osm_relation_id: 362362
+    center: [-12.983056, -38.492778]
+    bbox: [-13.0173949, -38.6994346, -12.7335624, -38.3034141]
+    timezone: America/Bahia
+    is_active: true
+
+  - slug: florianopolis
+    name: { en: Florianópolis, pt: Florianópolis }
+    country_code: BR
+    wikidata_id: Q132997
+    osm_relation_id: 296561
+    center: [-27.593281, -48.553047]
+    bbox: [-27.844006, -48.6134674, -27.3782829, -48.3585929]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: buzios
+    name: { en: Armação dos Búzios, pt: Armação dos Búzios }
+    country_code: BR
+    wikidata_id: Q680119
+    osm_relation_id: 2215538
+    center: [-22.746944, -41.881944]
+    bbox: [-22.822841, -42.0099333, -22.7215414, -41.7840841]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: recife
+    name: { en: Recife, pt: Recife }
+    country_code: BR
+    wikidata_id: Q48344
+    osm_relation_id: 303585
+    center: [-8.053889, -34.880833]
+    bbox: [-8.1551869, -35.0186478, -7.928967, -34.8515401]
+    timezone: America/Recife
+    is_active: true
+
+  - slug: fortaleza
+    name: { en: Fortaleza, pt: Fortaleza }
+    country_code: BR
+    wikidata_id: Q43463
+    osm_relation_id: 302588
+    center: [-3.7275, -38.5275]
+    bbox: [-3.8945441, -38.6379078, -3.6921047, -38.4013259]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: natal
+    name: { en: Natal, pt: Natal }
+    country_code: BR
+    wikidata_id: Q131620
+    osm_relation_id: 301091
+    center: [-5.795, -35.208889]
+    bbox: [-5.9002112, -35.2912366, -5.7027379, -35.1531034]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: porto-alegre
+    name: { en: Porto Alegre, pt: Porto Alegre }
+    country_code: BR
+    wikidata_id: Q40269
+    osm_relation_id: 242397
+    center: [-30.032778, -51.23]
+    bbox: [-30.2694499, -51.3034404, -29.9324744, -51.0188522]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: brasilia
+    name: { en: Brasília, pt: Brasília }
+    country_code: BR
+    wikidata_id: Q2844
+    osm_relation_id: null # centre-based bbox: the Federal District is 5,802 km²; covers the Plano Piloto (UNESCO) and Lake Paranoá
+    center: [-15.793889, -47.882778]
+    bbox: [-15.9, -48.02, -15.7, -47.78]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: belo-horizonte
+    name: { en: Belo Horizonte, pt: Belo Horizonte }
+    country_code: BR
+    wikidata_id: Q42800
+    osm_relation_id: 368782
+    center: [-19.928056, -43.941944]
+    bbox: [-20.0594646, -44.0632916, -19.7765437, -43.8572199]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: curitiba
+    name: { en: Curitiba, pt: Curitiba }
+    country_code: BR
+    wikidata_id: Q4361
+    osm_relation_id: 297514
+    center: [-25.429722, -49.271944]
+    bbox: [-25.6435043, -49.38914, -25.3450768, -49.1843182]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: manaus
+    name: { en: Manaus, pt: Manaus }
+    country_code: BR
+    wikidata_id: Q40236
+    osm_relation_id: null # centre-based bbox: the 11,401 km² municipality is mostly rainforest; covers the centre, Ponta Negra and the Meeting of Waters
+    center: [-3.118889, -60.021667]
+    bbox: [-3.2, -60.1, -2.95, -59.85]
+    timezone: America/Manaus
+    is_active: true
+
+  - slug: maceio
+    name: { en: Maceió, pt: Maceió }
+    country_code: BR
+    wikidata_id: Q168888
+    osm_relation_id: 303815
+    center: [-9.665833, -35.735]
+    bbox: [-9.7131396, -35.814353, -9.371, -35.5583254]
+    timezone: America/Maceio
+    is_active: true
+
+  - slug: porto-seguro
+    name: { en: Porto Seguro, pt: Porto Seguro }
+    country_code: BR
+    wikidata_id: Q499922
+    osm_relation_id: 362341
+    center: [-16.45, -39.065]
+    bbox: [-16.929, -39.519095, -16.3431345, -39.0073781]
+    timezone: America/Bahia
+    is_active: true
+
+  - slug: ipojuca
+    name: { en: Ipojuca, pt: Ipojuca }
+    country_code: BR
+    wikidata_id: Q1796462
+    osm_relation_id: 303577
+    center: [-8.4, -35.0625]
+    bbox: [-8.6077602, -35.2380528, -8.3099329, -34.9464072]
+    timezone: America/Recife
+    is_active: true
+
+  - slug: balneario-camboriu
+    name: { en: Balneário Camboriú, pt: Balneário Camboriú }
+    country_code: BR
+    wikidata_id: Q598016
+    osm_relation_id: 296508
+    center: [-26.990833, -48.635]
+    bbox: [-27.0609793, -48.6829398, -26.9541511, -48.5689884]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: gramado
+    name: { en: Gramado, pt: Gramado }
+    country_code: BR
+    wikidata_id: Q694833
+    osm_relation_id: 242571
+    center: [-29.378889, -50.873889]
+    bbox: [-29.5016465, -50.9882711, -29.2832639, -50.8009236]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: canela
+    name: { en: Canela, pt: Canela }
+    country_code: BR
+    wikidata_id: Q995318
+    osm_relation_id: 242467
+    center: [-29.365833, -50.815833]
+    bbox: [-29.442, -50.8901771, -29.2475181, -50.642]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: campos-do-jordao
+    name: { en: Campos do Jordão, pt: Campos do Jordão }
+    country_code: BR
+    wikidata_id: Q851253
+    osm_relation_id: 298038
+    center: [-22.739444, -45.591389]
+    bbox: [-22.7971684, -45.6763136, -22.589536, -45.3994351]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: ouro-preto
+    name: { en: Ouro Preto, pt: Ouro Preto }
+    country_code: BR
+    wikidata_id: Q188905
+    osm_relation_id: 314853
+    center: [-20.385278, -43.503611]
+    bbox: [-20.632283, -43.932038, -20.161, -43.403055]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: paraty
+    name: { en: Paraty, pt: Paraty }
+    country_code: BR
+    wikidata_id: Q926729
+    osm_relation_id: 1277591
+    center: [-23.219444, -44.714722]
+    bbox: [-23.3689073, -44.8893206, -22.9141538, -44.5024367]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: bonito
+    name: { en: Bonito, pt: Bonito }
+    country_code: BR
+    wikidata_id: Q768535
+    osm_relation_id: 334027
+    center: [-21.133333, -56.483333]
+    bbox: [-21.4477131, -56.8805055, -20.4838951, -56.0839726]
+    timezone: America/Campo_Grande
+    is_active: true
+
+  - slug: joao-pessoa
+    name: { en: João Pessoa, pt: João Pessoa }
+    country_code: BR
+    wikidata_id: Q167436
+    osm_relation_id: 301405
+    center: [-7.12, -34.88]
+    bbox: [-7.2477433, -34.9740106, -7.0559654, -34.7930182]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: aracaju
+    name: { en: Aracaju, pt: Aracaju }
+    country_code: BR
+    wikidata_id: Q170578
+    osm_relation_id: 303928
+    center: [-10.9167, -37.05]
+    bbox: [-11.1616028, -37.1736913, -10.8625026, -37.0334708]
+    timezone: America/Maceio
+    is_active: true
+
+  - slug: sao-luis
+    name: { en: São Luís, pt: São Luís }
+    country_code: BR
+    wikidata_id: Q28441
+    osm_relation_id: 332923
+    center: [-2.53, -44.302778]
+    bbox: [-2.8004242, -44.4110534, -2.4732874, -44.1616857]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: belem
+    name: { en: Belém, pt: Belém }
+    country_code: BR
+    wikidata_id: Q12829733
+    osm_relation_id: 185567
+    center: [-1.455833, -48.503889]
+    bbox: [-1.5265847, -48.6244082, -1.0194267, -48.2961242]
+    timezone: America/Belem
+    is_active: true
+
+  - slug: fernando-de-noronha
+    name: { en: Fernando de Noronha, pt: Fernando de Noronha }
+    country_code: BR
+    wikidata_id: Q175057
+    osm_relation_id: 303650
+    center: [-3.855, -32.425]
+    bbox: [-3.8813612, -32.4761573, -3.8047627, -32.3778839]
+    timezone: America/Noronha
+    is_active: true
+
+  - slug: jericoacoara
+    name: { en: Jijoca de Jericoacoara, pt: Jijoca de Jericoacoara }
+    country_code: BR
+    wikidata_id: Q1367980
+    osm_relation_id: 302593
+    center: [-2.793889, -40.512778]
+    bbox: [-2.9662687, -40.5939782, -2.7843475, -40.4094391]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: angra-dos-reis
+    name: { en: Angra dos Reis, pt: Angra dos Reis }
+    country_code: BR
+    wikidata_id: Q542829
+    osm_relation_id: 2217370
+    center: [-23.006944, -44.317778]
+    bbox: [-23.2275796, -44.6403406, -22.8377612, -44.0908659]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: arraial-do-cabo
+    name: { en: Arraial do Cabo, pt: Arraial do Cabo }
+    country_code: BR
+    wikidata_id: Q1750235
+    osm_relation_id: 2215539
+    center: [-22.965833, -42.027778]
+    bbox: [-23.0165816, -42.2829808, -22.8635318, -41.9736602]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: cabo-frio
+    name: { en: Cabo Frio, pt: Cabo Frio }
+    country_code: BR
+    wikidata_id: Q735025
+    osm_relation_id: 2215541
+    center: [-22.878889, -42.018889]
+    bbox: [-22.9331308, -42.1824031, -22.5401258, -41.8890111]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: petropolis
+    name: { en: Petrópolis, pt: Petrópolis }
+    country_code: BR
+    wikidata_id: Q189043
+    osm_relation_id: 2219094
+    center: [-22.505, -43.178889]
+    bbox: [-22.5733326, -43.3773012, -22.2025201, -42.9779814]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: ilhabela
+    name: { en: Ilhabela, pt: Ilhabela }
+    country_code: BR
+    wikidata_id: Q945061
+    osm_relation_id: 298379
+    center: [-23.815, -45.370556]
+    bbox: [-23.9680729, -45.4620507, -23.7223327, -45.007024]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: ubatuba
+    name: { en: Ubatuba, pt: Ubatuba }
+    country_code: BR
+    wikidata_id: Q596931
+    osm_relation_id: 298203
+    center: [-23.433889, -45.070833]
+    bbox: [-23.5968918, -45.2801133, -23.1985705, -44.7237025]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: santos
+    name: { en: Santos, pt: Santos }
+    country_code: BR
+    wikidata_id: Q81882
+    osm_relation_id: 298442
+    center: [-23.933599, -46.32864]
+    bbox: [-23.9932201, -46.4031142, -23.7353847, -46.1769809]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: tiradentes
+    name: { en: Tiradentes, pt: Tiradentes }
+    country_code: BR
+    wikidata_id: Q1003423
+    osm_relation_id: 314628
+    center: [-21.11, -44.177778]
+    bbox: [-21.1790624, -44.22432, -21.0524427, -44.092]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: olinda
+    name: { en: Olinda, pt: Olinda }
+    country_code: BR
+    wikidata_id: Q28301
+    osm_relation_id: 2185940
+    center: [-8.008889, -34.855]
+    bbox: [-8.0508811, -34.916997, -7.9546819, -34.8266378]
+    timezone: America/Recife
+    is_active: true
+
+  - slug: ilheus
+    name: { en: Ilhéus, pt: Ilhéus }
+    country_code: BR
+    wikidata_id: Q373705
+    osm_relation_id: 362159
+    center: [-14.788889, -39.048889]
+    bbox: [-15.1122917, -39.5505925, -14.4196422, -38.9960756]
+    timezone: America/Bahia
+    is_active: true
+
+  - slug: maragogi
+    name: { en: Maragogi, pt: Maragogi }
+    country_code: BR
+    wikidata_id: Q971736
+    osm_relation_id: 303809
+    center: [-9.012222, -35.2225]
+    bbox: [-9.073329, -35.372073, -8.8607129, -35.1519313]
+    timezone: America/Maceio
+    is_active: false # hidden: no Wikidata item in its box is an attraction yet (2026-10-03); shown again once one is
+
+  - slug: caldas-novas
+    name: { en: Caldas Novas, pt: Caldas Novas }
+    country_code: BR
+    wikidata_id: Q120708
+    osm_relation_id: 334452
+    center: [-17.743889, -48.625833]
+    bbox: [-18.0672965, -48.9285383, -17.4747354, -48.4509349]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: pirenopolis
+    name: { en: Pirenópolis, pt: Pirenópolis }
+    country_code: BR
+    wikidata_id: Q988797
+    osm_relation_id: 334551
+    center: [-15.852643, -48.958915]
+    bbox: [-16.146, -49.2172998, -15.505, -48.792]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: bento-goncalves
+    name: { en: Bento Gonçalves, pt: Bento Gonçalves }
+    country_code: BR
+    wikidata_id: Q548652
+    osm_relation_id: 242504
+    center: [-29.170833, -51.518889]
+    bbox: [-29.1992666, -51.6817906, -29.0131477, -51.388]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: lencois
+    name: { en: Lençóis, pt: Lençóis }
+    country_code: BR
+    wikidata_id: Q1762223
+    osm_relation_id: 362510
+    center: [-12.562778, -41.39]
+    bbox: [-12.7122059, -41.4876849, -12.1489012, -41.1441126]
+    timezone: America/Bahia
+    is_active: true
+
+  - slug: barreirinhas
+    name: { en: Barreirinhas, pt: Barreirinhas }
+    country_code: BR
+    wikidata_id: Q2040600
+    osm_relation_id: 332880
+    center: [-2.746944, -42.825833]
+    bbox: [-3.2161294, -43.2427527, -2.4566666, -42.6415021]
+    timezone: America/Fortaleza
+    is_active: true
+
+  - slug: aparecida
+    name: { en: Aparecida, pt: Aparecida }
+    country_code: BR
+    wikidata_id: Q617702
+    osm_relation_id: 298160
+    center: [-22.85155, -45.23409]
+    bbox: [-23.0080006, -45.2816762, -22.81, -45.188]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: vitoria
+    name: { en: Vitória, pt: Vitória }
+    country_code: BR
+    wikidata_id: Q168376
+    osm_relation_id: null # centre-based bbox: the municipality includes the Trindade and Martim Vaz islands, 1,100 km offshore
+    center: [-20.310556, -40.297222]
+    bbox: [-20.35, -40.36, -20.22, -40.26]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: mata-de-sao-joao
+    name: { en: Mata de São João, pt: Mata de São João }
+    country_code: BR
+    wikidata_id: Q648152
+    osm_relation_id: 362286
+    center: [-12.53, -38.298889]
+    bbox: [-12.6091878, -38.3848359, -12.3715574, -37.8916879]
+    timezone: America/Bahia
+    is_active: true
+
+  - slug: alto-paraiso-de-goias
+    name: { en: Alto Paraíso de Goiás, pt: Alto Paraíso de Goiás }
+    country_code: BR
+    wikidata_id: Q22060523
+    osm_relation_id: 334545
+    center: [-14.132778, -47.51]
+    bbox: [-14.4652667, -47.932, -13.8585647, -47.1140847]
+    timezone: America/Sao_Paulo
+    is_active: true
+
+  - slug: petrolina
+    name: { en: Petrolina, pt: Petrolina }
+    country_code: BR
+    wikidata_id: Q842143
+    osm_relation_id: null # centre-based bbox: the 4,562 km² municipality is mostly caatinga; covers the city on the São Francisco river
+    center: [-9.392778, -40.507778]
+    bbox: [-9.45, -40.6, -9.33, -40.45]
+    timezone: America/Recife
+    is_active: true

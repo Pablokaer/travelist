@@ -651,7 +651,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "attraction_category": "museum"|"monument"|"church"|"castle"|"viewpoint"|"landmark"|"park"|"palace"|"other","visa_requirement": "freedom_of_movement"|"visa_free"|"visa_on_arrival"|"eta"|"e_visa"|"visa_required"|"no_admission"
+            "attraction_category": "museum"|"monument"|"church"|"castle"|"viewpoint"|"landmark"|"park"|"nature"|"palace"|"other","visa_requirement": "freedom_of_movement"|"visa_free"|"visa_on_arrival"|"eta"|"e_visa"|"visa_required"|"no_admission"
           }
           CompositeTypes: {
             "review_delta": {
@@ -771,7 +771,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "attraction_category": ["museum", "monument", "church", "castle", "viewpoint", "landmark", "park", "palace", "other"],"visa_requirement": ["freedom_of_movement", "visa_free", "visa_on_arrival", "eta", "e_visa", "visa_required", "no_admission"]
+            "attraction_category": ["museum", "monument", "church", "castle", "viewpoint", "landmark", "park", "nature", "palace", "other"],"visa_requirement": ["freedom_of_movement", "visa_free", "visa_on_arrival", "eta", "e_visa", "visa_required", "no_admission"]
           }
         }
 } as const

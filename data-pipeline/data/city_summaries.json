@@ -1,4 +1,10 @@
 {
+  "alto-paraiso-de-goias": {
+    "wikipedia_en": "Alto Paraíso de Goiás",
+    "summary_en": "Alto Paraíso de Goiás, usually referred to as Alto Paraíso, is a municipality located in the northeastern region of the state of Goiás, Brazil. The city is located in the Chapada dos Veadeiros and, since 2001, in the environmental protection area (APA) of Pouso Alto. Alto Paraíso is about 220 km from Brasília and 412 km from Goiânia. Alto Paraíso is located in the central Brazilian Highlands, a region characterized by the cerrado biome, also known as the Brazilian savannah. The region offers many natural and cultural attractions related to the ecotourism.",
+    "wikipedia_pt": "Alto Paraíso de Goiás",
+    "summary_pt": "Alto Paraíso de Goiás é um município brasileiro localizado no nordeste do estado de Goiás. A cidade está situada na Chapada dos Veadeiros e, desde 2001, na Área de Proteção Ambiental - APA de Pouso Alto. Localiza-se a 230 km de Brasília e a 412 km de Goiânia. Localizada no Planalto Central do Brasil, em região caracterizada pelo bioma do cerrado, oferece diversas atrações naturais relacionadas ao ecoturismo."
+  },
   "amsterdam": {
     "wikipedia_en": "Amsterdam",
     "summary_en": "Amsterdam is the capital and largest city of the Netherlands. As of 1 January 2026, it had a population of 941,873 within the city proper, 1,457,018 in the urban area and 2,480,394 in the metropolitan area. Located in the Dutch province of North Holland, Amsterdam is colloquially referred to as the \"Venice of the North\", for its large number of canals, now a UNESCO World Heritage Site.",
@@ -10,6 +16,12 @@
     "summary_en": "Andorra la Vella is the capital and largest city of Andorra. It is located high in the east Pyrenees, between France and Spain. It is also the name of the Andorran parish that surrounds the capital.",
     "wikipedia_pt": "Andorra-a-Velha",
     "summary_pt": "Andorra-a-Velha, é a capital e a mais populosa cidade do Principado de Andorra, pequeno país europeu situado entre a França e a Espanha. Com uma população de 19 383 habitantes, recebe mais de 10 milhões de turistas anualmente. Situada a 1 023 metros de altitude, é um importante destino turístico nos Pirenéus e a capital mais alta da Europa."
+  },
+  "angra-dos-reis": {
+    "wikipedia_en": "Angra dos Reis",
+    "summary_en": "Angra dos Reis is a municipality located in the southern part of the Brazilian state of Rio de Janeiro. The city is located by the sea and includes in its territory many offshore islands, the largest being Ilha Grande.",
+    "wikipedia_pt": "Angra dos Reis",
+    "summary_pt": "Angra dos Reis é um município brasileiro situado no sul do estado do Rio de Janeiro. Localiza-se a beira do mar e possui, em seu litoral, 365 ilhas. Possui uma área de 816,3 km² e sua população, conforme estimativas do IBGE de 2024, era de 179 120 habitantes. Os municípios limítrofes são Paraty, Rio Claro e Mangaratiba, no território fluminense e Bananal e São José do Barreiro, no lado paulista."
   },
   "antalya": {
     "wikipedia_en": "Antalya",
@@ -23,11 +35,47 @@
     "wikipedia_pt": "Antuérpia",
     "summary_pt": "Antuérpia é a maior cidade da região da Flandres na Bélgica, com uma população total de 1.061.089. É conhecida como centro mundial de lapidação de diamantes e por seu porto, um dos maiores do mundo, localizado nas margens do rio Escalda. Sua área total é de 204,51 km², dando uma densidade populacional de 5.188 habitantes por km². A área metropolitana, incluindo a zona exterior suburbana, cobre uma área de 1 449 km² e uma população acima dos 1,2 milhão de habitantes em 2024. Os habitantes de Antuérpia são localmente apelidado Sinjoren, após o título honorífico espanhol señor. Refere-se aos nobres líderes espanhóis que governaram a cidade durante o século XVII."
   },
+  "aparecida": {
+    "wikipedia_en": "Aparecida",
+    "summary_en": "Aparecida is a Brazilian municipality in the state of São Paulo. It is located in the fertile valley of the River Paraíba do Sul on the southern (right) bank. It is part of the Metropolitan Region of Vale do Paraíba e Litoral Norte. The population is 36,185 in an area of 121.08 km2 (46.75 sq mi). The municipality is sometimes referred as Aparecida do Norte.",
+    "wikipedia_pt": "Aparecida (São Paulo)",
+    "summary_pt": "Aparecida é um município brasileiro no interior do estado de São Paulo, Região Sudeste do país. Localiza-se no Vale do Paraíba Paulista, estando situado a cerca de 180 km a nordeste da capital estadual. Ocupa uma área de aproximadamente 120 km², sendo que 6 km² estão em área urbana, e sua população foi estimada em 33 141 habitantes em 2025. A cidade é popularmente denominada Aparecida do Norte em razão da construção da Estrada de Ferro do Norte na segunda metade do século XIX."
+  },
+  "aracaju": {
+    "wikipedia_en": "Aracaju",
+    "summary_en": "Aracaju is the capital of the state of Sergipe, in northeastern Brazil, about 350 km (217 mi) north of Salvador. According to the 2020 estimate, the city has 664,908 inhabitants, which represents approximately 33% of the state population. Adding to the populations of the municipalities forming the Metropolitan area: Barra dos Coqueiros, Nossa Senhora do Socorro and São Cristóvão. Its Metropolitan Cathedral Nossa Senhora da Conceiçao, dedicated to Our Lady of Immaculate Conception, is the archiepiscopal see of the Roman Catholic Archdiocese of Aracaju.",
+    "wikipedia_pt": "Aracaju",
+    "summary_pt": "Aracaju é um município brasileiro, capital do estado de Sergipe. Localiza-se no leste do estado, sendo cortada por rios como o Sergipe e o Poxim. De acordo com o último censo de 2022, sua população é de 602 757 habitantes, a menos populosa das capitais nordestinas. Somando-se as populações dos municípios que formam a Grande Aracaju, Barra dos Coqueiros, Nossa Senhora do Socorro e São Cristóvão, o número passa para 932 210 habitantes."
+  },
+  "arraial-do-cabo": {
+    "wikipedia_en": "Arraial do Cabo",
+    "summary_en": "Arraial do Cabo is a municipality located in the Brazilian state of Rio de Janeiro. Its population was 30,593 as of 2020 census and its total area is 160 square kilometres (62 sq mi).",
+    "wikipedia_pt": "Arraial do Cabo",
+    "summary_pt": "Arraial do Cabo é um município brasileiro situado na Região dos Lagos do estado do Rio de Janeiro. Trata-se de uma cidade costeira, possuindo uma altitude média de apenas oito metros. Fundada em 1503 pelo conquistador Américo Vespúcio, foi elevada à categoria de município apenas em 1985, após sua emancipação do município vizinho de Cabo Frio. Em 2014 tinha uma população de 28 866 habitantes segundo o IBGE. As rodovias que servem o município são a RJ-140/BR-120 e a RJ-102."
+  },
   "athens": {
     "wikipedia_en": "Athens",
     "summary_en": "Athens is the capital and largest city of Greece. A significant coastal urban area in the Mediterranean, Athens is also the capital of the Attica region and is the southernmost capital on the European mainland. With its urban area's population numbering over 3.6 million, it is the eighth-largest urban area in the European Union (EU). The Municipality of Athens, which constitutes a small administrative unit of the entire urban area, had a population of 643,452 in 2021, within its official limits, and a land area of 38.96 square kilometres. Athens joined the UNESCO Global Network of Learning Cities in 2016.",
     "wikipedia_pt": "Atenas",
     "summary_pt": "Atenas ; em grego antigo: Ἀθῆναι, transl.: Athēnai) é a capital e a maior cidade da Grécia. A cidade domina a região da Ática e é uma das cidades mais antigas do mundo, sendo que seu território está continuamente habitado há 3 400 anos. A Atenas Clássica, do período da Grécia Antiga, foi uma poderosa pólis (cidade-Estado) que surgiu em conjunto com o desenvolvimento do porto de Pireu. Um centro artístico, estudantil e filosófico desde a Antiguidade, a cidade sediou a Academia de Platão e o Liceu de Aristóteles, além de ser amplamente considerada como o berço da civilização ocidental e da democracia, em grande parte devido ao impacto de suas realizações culturais e políticas durante os séculos IV e V a.C. no resto do continente europeu. Atualmente, é uma metrópole cosmopolita e o centro econômico, financeiro, industrial, político e cultural da Grécia. Em 2012, Atenas foi classificada como a 39ª cidade mais rica do mundo por paridade do poder de compra (PPC) e a 77ª mais cara em um estudo do UBS AG."
+  },
+  "ayutthaya": {
+    "wikipedia_en": "Phra Nakhon Si Ayutthaya (city)",
+    "summary_en": "Phra Nakhon Si Ayutthaya, commonly known locally as Ayutthaya, is the capital of Phra Nakhon Si Ayutthaya province in Thailand. It lies on an island at the confluence of the Chao Phraya and Pa Sak rivers. Ayutthaya was the capital of the Ayutthaya Kingdom and, between the 14th and 18th centuries, grew into one of the world's largest cities and a major hub of diplomacy and commerce, before its destruction during the Burmese invasion of 1767.",
+    "wikipedia_pt": "Aiutaia",
+    "summary_pt": "Aiutaia ou Ayutthaya é a capital da província tailandesa de Aiutaia. Foi fundada em 1350 pelo rei U-Tongue, que transformou-a na capital do Reino de Aiutaia ou Sião, uma posição que manteve até 1767."
+  },
+  "balneario-camboriu": {
+    "wikipedia_en": "Balneário Camboriú",
+    "summary_en": "Balneário Camboriú is a coastal city in the southern Brazilian state of Santa Catarina. The city is built on steep hills which drop down to the sea. It is a popular tourist destination for South Americans, who are drawn to its main ocean boulevard Avenida Atlântica, and who swell the city's population from 139,155 to over one million in the summer. The city is famous for its unique beach-to-beach cable car which links its central beach with the beach of Laranjeiras. Balneário Camboriú is located 10 km (6.2 mi) south of the city of Itajaí, 96 km (60 mi) south of the city of Joinville, and 80 km (50 mi) north of the state capital, Florianópolis.",
+    "wikipedia_pt": "Balneário Camboriú",
+    "summary_pt": "Balneário Camboriú é um município brasileiro localizado no litoral norte do estado de Santa Catarina, Região Sul do país. Pertence à Região Metropolitana da Foz do Rio Itajaí e encontra-se a cerca de 80 km da capital do estado, Florianópolis. Sua população, de acordo com o Censo de 2022, é de 139.155 habitantes, porém pode chegar a mais de um milhão durante o verão."
+  },
+  "bangkok": {
+    "wikipedia_en": "Bangkok",
+    "summary_en": "Bangkok, known in Thai as Krung Thep Maha Nakhon and colloquially as Krung Thep, is the capital and largest city of Thailand. The city occupies 1,568.7 square kilometres (605.7 sq mi) in the Chao Phraya River delta in central Thailand and has an estimated population of 9.1 million people as of 2024, 15.9% of the country's population. Over 17.4 million people live within the surrounding Bangkok Metropolitan Region as of the 2021 estimate, making Bangkok a megacity and an extreme primate city, dwarfing Thailand's other urban centres in both size and importance to the national economy.",
+    "wikipedia_pt": "Banguecoque",
+    "summary_pt": "Banguecoque, Bangkok, ou Bancoc é a capital e cidade mais populosa da Tailândia, além de principal centro financeiro, corporativo, mercantil, cultural e histórico do país. É a décima cidade mais populosa da Ásia e a vigésima quarta mais populosa do mundo. Situada na margem esquerda do rio Chao Phraya, nas proximidades do Golfo da Tailândia, a cidade possui cerca de 8 280 925 habitantes (2011), enquanto a Grande Bangkok reúne 14,6 milhões de habitantes, sendo que aproximadamente 12,6% da população do país vive na sua área metropolitana, ocupando o posto de 30.ª região metropolitana mais populosa do mundo. A cidade ocupa 1 568,7 quilômetros quadrados, no delta do rio Chao Phraya, e está localizada na região Central da Tailândia."
   },
   "barcelona": {
     "wikipedia_en": "Barcelona",
@@ -35,11 +83,29 @@
     "wikipedia_pt": "Barcelona",
     "summary_pt": "Barcelona é a capital da comunidade autônoma da Catalunha, Espanha, bem como o segundo município mais populoso do país, com uma população de 1,6 milhão dentro dos limites da cidade. A sua área urbana se estende para além dos limites administrativos da cidade com uma população de cerca de 4,7 milhões de pessoas, sendo a sexta área urbana mais populosa da União Europeia, depois de Paris, Londres, Madri, Vale do Ruhr e Milão. É a maior metrópole do Mar Mediterrâneo, localizada na costa entre as foz dos rios Llobregat e Besòs, e limitada ao oeste pela Serra de Collserola, cujo pico mais alto é de 512 metros de altura."
   },
+  "barreirinhas": {
+    "wikipedia_en": "Barreirinhas",
+    "summary_en": "Barreirinhas is a municipality in the state of Maranhão in the Northeast region of Brazil.",
+    "wikipedia_pt": "Barreirinhas",
+    "summary_pt": "Barreirinhas é um município brasileiro do estado do Maranhão. Localiza-se no Norte do estado, na região dos Lençóis Maranhenses. Sua população foi estimada em 63.991 habitantes, conforme dados do IBGE de 2021, sendo o vigésimo mais populoso do estado."
+  },
   "bath": {
     "wikipedia_en": "Bath, Somerset",
     "summary_en": "Bath is a city in Somerset, England, known for and named after its Roman-built baths. The city became a UNESCO World Heritage Site in 1987, and was later listed as one of the \"Great Spa Towns of Europe\". Bath is in the valley of the River Avon, 97 miles west of London and 11 miles southeast of Bristol, and is the largest city and urban settlement in Somerset.",
     "wikipedia_pt": "Bath",
     "summary_pt": "Bath é uma cidade do sudoeste de Inglaterra, localizada no Condado de Somerset. É muito conhecida pelas suas termas que provêm de três nascentes."
+  },
+  "beijing": {
+    "wikipedia_en": "Beijing",
+    "summary_en": "Beijing, previously romanized as Peking, is the capital city of China. With more than 21.8 million residents, it is the world's most populous national capital city, as well as China's second-largest city by urban area, after Shanghai. It is located in Northern China and is governed as a provincial-level direct-administered municipality with 16 municipal districts. Beijing is mostly surrounded by Hebei Province and neighbors Tianjin Municipality to the southeast; together, the three divisions form the Jing-Jin-Ji cluster.",
+    "wikipedia_pt": "Pequim",
+    "summary_pt": "Pequim é a capital da República Popular da China. É a capital nacional mais populosa do mundo, com mais de 21 milhões de habitantes em uma área administrativa de 16 410,5 km². Está localizada no norte da China e é governada como um município sob a administração direta do governo chinês, com 16 distritos urbanos, suburbanos e rurais. Pequim é cercada principalmente pela província de Hebei, com exceção da vizinha Tianjin, a sudeste; juntas, as três divisões formam a megalópole Jing-Jin-Ji e a região da capital nacional chinesa."
+  },
+  "belem": {
+    "wikipedia_en": "Belém",
+    "summary_en": "Belém, often called Belém of Pará, is the capital and largest city of the state of Pará in the North of Brazil. It is the gateway to the Amazon River with a busy port, airport, and bus/coach station. Belém lies approximately 100 km upriver from the Atlantic Ocean, on the Pará River, which is part of the greater Amazon River system, separated from the larger part of the Amazon delta by Ilha de Marajó. With an estimated population of 1,398,531 people — or 2,491,052, considering its metropolitan area — it is the 12th most populous city in Brazil, as well as the 16th by economic relevance. It is the second largest in the North Region, second only to Manaus, in the state of Amazonas.",
+    "wikipedia_pt": "Belém (Pará)",
+    "summary_pt": "Belém, também chamada de Belém do Pará, é um município brasileiro e capital do estado do Pará. Localizada na Região Norte do país, às margens da baía do Guajará e a cerca de 2 120 quilômetros de Brasília, sua população é de 1 303 403 habitantes, segundo o Censo 2022, sendo o município mais populoso do estado, o segundo da Região Norte e o décimo segundo do país. Com uma área total de 1 059,458 quilômetros quadrados, a cidade abrange quarenta e duas ilhas que representam 65% de seu território, e apresenta clima equatorial quente e úmido, sendo a capital mais chuvosa do Brasil. Classificada entre os municípios com melhor qualidade de vida da Região Norte, possui um Índice de Desenvolvimento Humano (IDH) de 0,746 (alto), ocupando a 22.ª posição entre as capitais brasileiras."
   },
   "belfast": {
     "wikipedia_en": "Belfast",
@@ -52,6 +118,18 @@
     "summary_en": "Belgrade is the capital and largest city of Serbia. It is located at the confluence of the Sava and Danube rivers and at the crossroads of the Pannonian Plain and the Balkan Peninsula. According to the 2022 census, the population of Belgrade city proper stands at 1,197,114, its contiguous urban area has 1,298,661 inhabitants, while the population of the city's administrative area totals 1,682,720 people. It is one of the major cities of Southeast Europe and the third-most populous city on the river Danube.",
     "wikipedia_pt": "Belgrado",
     "summary_pt": "Belgrado ) é a capital e maior cidade da Sérvia, e está localizada entre dois cursos de água internacionais, na confluência dos rios Danúbio e Sava, no norte da Sérvia, onde a planície da Panônia se limita com a região da península balcânica. Com uma população de 1 710 000 habitantes (2007), Belgrado é a maior cidade no território da ex-Iugoslávia, a segunda maior cidade sobre o rio Danúbio, bem como a quarta maior do Sudeste da Europa, após Istambul, Atenas e Bucareste."
+  },
+  "belo-horizonte": {
+    "wikipedia_en": "Belo Horizonte",
+    "summary_en": "Belo Horizonte is the sixth-largest city in Brazil, with a population of around 2.4 million, and the third largest metropolitan area, containing a population of 6 million. It is the 13th-largest city in South America and the 18th-largest in the Americas. The metropolis is anchor to the Belo Horizonte metropolitan area, ranked as the third most populous metropolitan area in Brazil and the 17th most populous in the Americas. Belo Horizonte is the capital of the state of Minas Gerais, Brazil's second-most populous state. It is the first planned modern city in Brazil.",
+    "wikipedia_pt": "Belo Horizonte",
+    "summary_pt": "Belo Horizonte é a capital do estado brasileiro de Minas Gerais. Sua população é de 2 315 560 habitantes, segundo o censo de 2022, sendo o sexto município mais populoso do país, o terceiro da Região Sudeste e o primeiro de seu estado. Com uma área de aproximadamente 331 km², possui uma geografia diversificada, com morros e baixadas. Dista cerca de 716 km de Brasília, é a segunda capital estadual mais próxima da capital federal, depois de Goiânia."
+  },
+  "bento-goncalves": {
+    "wikipedia_en": "Bento Gonçalves, Rio Grande do Sul",
+    "summary_en": "Bento Gonçalves is a municipality located in the state of Rio Grande do Sul, Brazil. Created in 1875, it is one of the centers of the Italian immigration in Brazil. It is also known as the 'wine capital of Brazil' due to its vineyards and wine production. In 2022 Census, its estimated population was 123,151 inhabitants.",
+    "wikipedia_pt": "Bento Gonçalves (Rio Grande do Sul)",
+    "summary_pt": "Bento Gonçalves é um município do estado do Rio Grande do Sul, na Região Sul do Brasil. Ao longo de sua história, já foi conhecido como Cruzinha e Colônia Dona Isabel. A cidade foi erguida na sede da Colônia Dona Isabel, distrito da cidade de Montenegro até 1890. A área era percorrida por indígenas caingangues, os quais se fixavam em pequenos grupos, especialmente nas margens do Rio das Antas, mas estes foram desalojados progressivamente pelos chamados \"bugreiros\", abrindo espaço, no final do século XIX, para que o governo do Império do Brasil decidisse colonizar a região com uma população europeia. Desta forma, milhares de imigrantes, em sua maioria italianos da região do Vêneto, mas com alguns integrantes de outras origens como alemães, franceses, espanhóis e polacos, cruzaram o mar e subiram a Serra Gaúcha, desbravando uma área ainda quase inteiramente virgem."
   },
   "bergen": {
     "wikipedia_en": "Bergen",
@@ -83,11 +161,23 @@
     "wikipedia_pt": "Bolonha",
     "summary_pt": "Bolonha é uma comuna italiana, capital e a maior cidade da região da Emília-Romanha, província de Bolonha, mais especificamente, entre os rios Reno e o Savena. Bolonha é uma cidade universitária com cerca de 400 000 habitantes, sendo a sétima maior cidade em termos de população na Itália e é o coração de uma área metropolitana de cerca de 1 000 000 habitantes. Localiza-se no centro norte do país. Estende-se por uma área de 140 km², tendo uma densidade populacional de 2 643 hab/km²."
   },
+  "bonito": {
+    "wikipedia_en": "Bonito, Mato Grosso do Sul",
+    "summary_en": "Bonito is a municipality located in the Brazilian state of Mato Grosso do Sul. As of 2020 its population was 22,190, and it has an area of 4,934 square kilometres (1,905 sq mi).",
+    "wikipedia_pt": "Bonito (Mato Grosso do Sul)",
+    "summary_pt": "Bonito é um município brasileiro da região Centro-Oeste, situado no estado de Mato Grosso do Sul. O municipio de Bonito também é conhecido pelo seu Pólo do ecoturismo, suas principais atrações são as paisagens naturais, os mergulhos em rios de águas transparentes, cachoeiras, grutas, cavernas e dolinas. Juntamente com Jardim, Guia Lopes da Laguna e Bodoquena, é o principal município que integra o complexo turístico do Parque Nacional da Serra da Bodoquena, apresentando grande potencial turístico."
+  },
   "bordeaux": {
     "wikipedia_en": "Bordeaux",
     "summary_en": "Bordeaux is a city on the river Garonne in the Gironde department, southwestern France. A port city, it is the capital of the Nouvelle-Aquitaine region, as well as the prefecture of the Gironde department. Its inhabitants are called \"Bordelais\" (masculine) or \"Bordelaises\" (feminine). The term \"Bordelais\" may also refer to the city and its surrounding region.",
     "wikipedia_pt": "Bordéus",
     "summary_pt": "Bordéus ou Bordeaux é a capital e a maior cidade do departamento da Gironda e da região Nova Aquitânia, no sudoeste da França. Designou-se Burdígala na Antiguidade."
+  },
+  "brasilia": {
+    "wikipedia_en": "Brasília",
+    "summary_en": "Brasília is the capital city of Brazil and the Federal District. Located in the Brazilian Highlands in the country's Central-West region, it was founded by President Juscelino Kubitschek on 21 April 1960, to replace Rio de Janeiro as the national capital. Brasília is Brazil's third-most populous city after São Paulo and Rio de Janeiro, with a population of 2.8 million. Among major Latin American cities, it has the highest GDP per capita.",
+    "wikipedia_pt": "Brasília",
+    "summary_pt": "Brasília é a capital federal do Brasil e a sede de governo do Distrito Federal. A capital está localizada na região Centro-Oeste do país, ao longo da região geográfica conhecida como Planalto Central. Segundo o Censo do Instituto Brasileiro de Geografia e Estatística (IBGE)/2022, sua população é de 2 817 381 habitantes, sendo, então, a terceira cidade mais populosa do país, sem contar os da região metropolitana. Brasília é também a quarta concentração urbana mais populosa do Brasil. A capital brasileira é a maior cidade do mundo construída no século XX."
   },
   "brasov": {
     "wikipedia_en": "Brașov",
@@ -125,11 +215,65 @@
     "wikipedia_pt": "Budapeste",
     "summary_pt": "Budapeste é a capital, cidade mais populosa e principal centro financeiro, corporativo, mercantil e cultural da Hungria. É a nona maior cidade da União Europeia e recebeu a classificação de cidade global alpha, por parte do Globalization and World Cities Study Group & Network (GaWC). Localiza-se nas margens do rio Danúbio e possui 1 740 041 habitantes, de acordo com dados de 2012 do Centro de Estatísticas Húngaro. Sua região metropolitana, também chamada de Grande Budapeste, possui 3 271 110 habitantes. Budapeste foi fundada em 17 de novembro de 1873 com a fusão das cidades de Buda e Ôbuda, na margem direita do Danúbio, com Peste, na margem esquerda. Seus habitantes chamam-se budapestinos."
   },
+  "buzios": {
+    "wikipedia_en": "Armação dos Búzios",
+    "summary_en": "Armação dos Búzios, often referred to as just Búzios, is a municipality located in the state of Rio de Janeiro, Brazil. It is 173 km east of the city of Rio de Janeiro, and 24 km southwest of Cabo Frio. By 2020, its population consisted of 34,477 inhabitants and its area of 71 km2. Today, Búzios is a worldwide tourist site.",
+    "wikipedia_pt": "Armação dos Búzios",
+    "summary_pt": "Armação dos Búzios, ou apenas Búzios, como é popularmente conhecido, é um município brasileiro situado na Região dos Lagos do estado do Rio de Janeiro. Faz limite a oeste com Cabo Frio, município do qual se tornou autônomo em 1995. De acordo com o censo de 2022 possuía 40 006 habitantes. Localiza-se a cerca de 173 quilômetros do centro da capital do estado. O brasão de Armação dos Búzios foi idealizado por Luid Borges dos Santos - cirurgião-dentista, que foi o vencedor do concurso promovido pela Câmara de vereadores no ano de 1996."
+  },
+  "cabo-frio": {
+    "wikipedia_en": "Cabo Frio",
+    "summary_en": "Cabo Frio is a tourist destination located in the state of Rio de Janeiro.",
+    "wikipedia_pt": "Cabo Frio",
+    "summary_pt": "Cabo Frio é um município brasileiro no litoral do estado do Rio de Janeiro, Região Sudeste do país. Localiza-se na Região dos Lagos, estando situado a cerca de 150 km da capital do estado. Ocupa uma área de aproximadamente 410 km², sendo que 61 km² estão em área urbana, e sua população foi estimada em 238.438 pessoas em 2025, posicionando-se assim como o 14º mais populoso do estado fluminense."
+  },
+  "caldas-novas": {
+    "wikipedia_en": "Caldas Novas",
+    "summary_en": "Caldas Novas is a Brazilian municipality in the state of Goiás. It is the largest hydro-thermal resort in the world.",
+    "wikipedia_pt": "Caldas Novas",
+    "summary_pt": "Caldas Novas é um município brasileiro no estado de Goiás, Região Centro-Oeste do país. Localiza-se no sudeste goiano e sua população, conforme estimativas do IBGE de 2025, é de 106 820 habitantes."
+  },
+  "campos-do-jordao": {
+    "wikipedia_en": "Campos do Jordão",
+    "summary_en": "Campos do Jordão is a municipality in the state of São Paulo in southeastern Brazil. It is part of the Metropolitan Region of Vale do Paraíba e Litoral Norte. The population is 52,405 in an area of 290.52 square kilometres (112.17 mi2). The city is situated 1,628 metres (5,341 ft) above sea level and is the highest city in Brazil.",
+    "wikipedia_pt": "Campos do Jordão",
+    "summary_pt": "Campos do Jordão é um município brasileiro localizado no interior do estado de São Paulo mais precisamente na Serra da Mantiqueira. Faz parte da recém-criada Região Metropolitana do Vale do Paraíba e Litoral Norte, sub-região 2 de Taubaté."
+  },
+  "canela": {
+    "wikipedia_en": "Canela, Rio Grande do Sul",
+    "summary_en": "Canela, meaning Cinnamon in Portuguese, is a town located in the Serra Gaúcha of Rio Grande do Sul, Brazil. Both Canela and neighboring Gramado are important tourist locations and they both draw many visitors each year. Ecotourism is very popular in the area and there are many opportunities for hiking, rock climbing, horseback riding and river rafting.",
+    "wikipedia_pt": "Canela (Rio Grande do Sul)",
+    "summary_pt": "Canela é um município brasileiro do estado do Rio Grande do Sul. Localiza-se na Serra Gaúcha, mais precisamente na Região das Hortênsias, e faz divisa com as cidades de Gramado, São Francisco de Paula, Caxias do Sul e Três Coroas. A cidade é conhecida por atrações turísticas como a Cascata do Caracol, o Parque da Ferradura e a Catedral de Pedra."
+  },
   "cardiff": {
     "wikipedia_en": "Cardiff",
     "summary_en": "Cardiff is the capital and largest city of Wales. Cardiff had a population of 383,919 in 2024 and forms a principal area officially known as the City and County of Cardiff. The city is the eleventh largest in the United Kingdom. Located in the southeast of Wales, the city sits within the Cardiff Capital Region, which consists of 1.5 million people, accounting for roughly half the nation's total population. Cardiff is the county town of the historic county of Glamorgan and from 1974 to 1996 of South Glamorgan. It belongs to the Eurocities network of the largest European cities. A small town until the early 19th century, its prominence as a port for coal when mining began in the region helped its expansion. In 1905, it was ranked as a city and in 1955 proclaimed capital of Wales. The Cardiff urban area covers a larger area outside the county boundary, including the towns of Dinas Powys and Penarth.",
     "wikipedia_pt": "Cardiff",
     "summary_pt": "Cardiff ou, nas suas formas portuguesas, Cardife ou, mais raramente, Cardívio é a capital e uma subdivisão administrativa autônoma, Principal Area, do País de Gales."
+  },
+  "casablanca": {
+    "wikipedia_en": "Casablanca",
+    "summary_en": "Casablanca is the largest city in Morocco and the country's economic and business centre. Located on the Atlantic coast of the Chaouia plain in the central-western part of Morocco, the city has a population of about 3.22 million in the urban area, and over 4.27 million in Greater Casablanca, making it the most populous city in the Maghreb region, and the ninth-largest in the Arab world.",
+    "wikipedia_pt": "Casablanca",
+    "summary_pt": "Casablanca, Casabranca ou Casa Branca é a maior cidade de Marrocos, na costa atlântica do país, e uma das maiores do Norte de África. A população estimada em 2022 era de 3,84 milhões habitantes. É o maior porto e o maior centro industrial e comercial de Marrocos."
+  },
+  "cebu-city": {
+    "wikipedia_en": "Cebu City",
+    "summary_en": "Cebu City, officially the City of Cebu, is a highly urbanized city in the Central Visayas region of the Philippines. According to the 2024 census, it has a population of 965,332 people, making it the sixth-most populated city in the country and the most populous in the Central Visayas Region and in the whole Visayas.",
+    "wikipedia_pt": "Cebu (cidade)",
+    "summary_pt": "Cebu é uma cidade de primeira classe de renda da cidade na província Vissaias Centrais, nas Filipinas. De acordo com o censo de 1 julho de 2024 possui uma população de 965 332 pessoas e 238 317 domicílios."
+  },
+  "chengdu": {
+    "wikipedia_en": "Chengdu",
+    "summary_en": "Chengdu is the capital city of the Chinese province of Sichuan. With a population of 20,937,757 at the 2020 census, it is the country's fourth most populous city and the only city with a population of over 20 million apart from provincial-level municipalities. It is traditionally the hub of Western China.",
+    "wikipedia_pt": "Chengdu",
+    "summary_pt": "Chengdu ou Chengtu (成都) é uma cidade do sudoeste da China, capital da província de Sichuan. Tem cerca de 20,937,757 habitantes, segundo o censo de 2020. É um polo econômico e cultural. Chengdu é considerada uma cidade global \"Beta +\", de acordo com a Globalization and World Cities Research Network. Em 2011, foi considerada uma cidade de gastronomia pela UNESCO e sua culinária local é reconhecida internacionalmente, principalmente por ser picante."
+  },
+  "chiang-mai": {
+    "wikipedia_en": "Chiang Mai",
+    "summary_en": "Chiang Mai is the largest city in northern Thailand, the capital of Chiang Mai province and the second-largest city in Thailand by urban population. It is 700 km (435 mi) north of Bangkok in a mountainous region called the Thai highlands, and has a population of approximately 127,000 within the city municipality and an urban population of about 1.2 million as of 2023.",
+    "wikipedia_pt": "Chiang Mai",
+    "summary_pt": "Chiang Mai é a segunda maior cidade da Tailândia,\na capital cultural do norte da Tailândia e da província de Chiang Mai. Situa-se aproximadamente a 800 km ao norte de Bangkok, capital nacional, numa região montanhosa e tem uma população de 1,2 milhão. A cidade é banhada pelo rio Ping, afluente do rio Chao Phraya."
   },
   "coimbra": {
     "wikipedia_en": "Coimbra",
@@ -155,6 +299,18 @@
     "wikipedia_pt": "Córdova (Espanha)",
     "summary_pt": "Córdova é um município da província homónima, na comunidade autónoma da Andaluzia, na Espanha. O município tem 1 255,24 quilômetros quadrados de área e em 2021 tinha 322 071 habitantes."
   },
+  "curitiba": {
+    "wikipedia_en": "Curitiba",
+    "summary_en": "Curitiba is the capital and largest city in the state of Paraná in Southern Brazil. The city's population was 1,829,225 as of 2024, making it the eighth most populous city in Brazil and the largest in Brazil's South Region. The Curitiba metropolitan area comprises 29 municipalities with a total population of over 3,559,366, making it the ninth most populous metropolitan area in the country.",
+    "wikipedia_pt": "Curitiba",
+    "summary_pt": "Curitiba é a capital do estado brasileiro do Paraná. Localiza-se no Primeiro Planalto Paranaense, a 934 metros de altitude, a mais de 110 quilômetros do Oceano Atlântico e a 1 386 km ao sul de Brasília, capital federal. Com 1 773 718 habitantes, é o município mais populoso do Paraná e da Região Sul e o oitavo mais populoso do país, segundo o censo demográfico de 2022 realizado pelo IBGE."
+  },
+  "da-nang": {
+    "wikipedia_en": "Da Nang",
+    "summary_en": "Da Nang, is the fourth largest city in Vietnam by population and the second largest by geographical area and located in the South Central Coast and Central Highlands. As one of the country's nine centrally-governed city, it falls under the administration of the central government. Da Nang's port and its location on National Route 1 and the North–South Railway makes it a transport hub. APEC 2017 was hosted in Da Nang. Da Nang has a Human Development Index of 0.800, ranking fifth among all municipalities and provinces of Vietnam.",
+    "wikipedia_pt": "Da Nang",
+    "summary_pt": "Da Nang é uma cidade com estatuto de província do Vietnã."
+  },
   "dresden": {
     "wikipedia_en": "Dresden",
     "summary_en": "Dresden is the capital city of the German state of Saxony and its second most populous city after Leipzig. It is the 12th most populous city of Germany, the fourth largest by area, and the third-most populous city in the area of former East Germany, after Berlin and Leipzig. Dresden's urban area comprises the towns of Freital, Pirna, Radebeul, Meissen, Coswig, Radeberg, and Heidenau and has around 790,000 inhabitants. The Dresden metropolitan area has over 1.3 million inhabitants.",
@@ -179,11 +335,41 @@
     "wikipedia_pt": "Edimburgo",
     "summary_pt": "Edimburgo é uma cidade no Reino Unido e capital da Escócia, situada na margem sul do estuário do rio Forth. É sede do parlamento escocês desde 1999. Segundo o census do ano 2011, a cidade conta com 495 360 habitantes, sendo a segunda cidade mais populosa da Escócia, depois de Glasgow, e a sétima cidade mais populosa do Reino Unido. Edimburgo é também a segunda cidade mais visitada de toda Grã-Bretanha, superada apenas por Londres."
   },
+  "fernando-de-noronha": {
+    "wikipedia_en": "Fernando de Noronha",
+    "summary_en": "Fernando de Noronha, officially the State District of Fernando de Noronha and formerly known as the Federal Territory of Fernando de Noronha until 1988, is an archipelago in the Atlantic Ocean, part of the state of Pernambuco, Brazil, and located 191 nautical miles off the Brazilian coast.",
+    "wikipedia_pt": "Fernando de Noronha",
+    "summary_pt": "Fernando de Noronha é um arquipélago brasileiro do estado de Pernambuco. Formado por 21 ilhas, ilhotas e rochedos de origem vulcânica, ocupa uma área total de 26 km² — dos quais 17 km² são da ilha principal — e se situa no Oceano Atlântico a nordeste do Brasil continental, distando 350 km do Rio Grande do Norte e 545 km da capital pernambucana, Recife. O centro comercial da ilha é o núcleo urbano de Vila dos Remédios. A administração do Parque Nacional está atualmente a cargo do Instituto Chico Mendes de Conservação da Biodiversidade (ICMBio). É também a Região intermediária e imediata do Recife."
+  },
+  "fez": {
+    "wikipedia_en": "Fez, Morocco",
+    "summary_en": "Fez or Fes is a city in northern inland Morocco and the capital of the Fez-Meknes administrative region. It is one of the largest cities in Morocco, with a population of 1.256 million, according to the 2024 census. Located to the northwest of the Atlas Mountains, it is surrounded by hills and the old city is centered around the Fez River flowing from west to east.",
+    "wikipedia_pt": "Fez",
+    "summary_pt": "Fez é uma cidade do centro-norte de Marrocos. É a capital da prefeitura homónima e da região de Fez-Mequinez. Com 89 km² de área e 1 267 000 habitantes na região metropolitana em 2022, é a terceira maior cidade do país, após Rabat e Casablanca."
+  },
   "florence": {
     "wikipedia_en": "Florence",
     "summary_en": "Florence is the capital and most populous city of the Italian region of Tuscany, and, as of 2026, with a population of 361,625, the 8th most populous city in the country. It is also the capital of the eponymous metropolitan province, which counts 988,494 inhabitants, while Eurostat estimates that 696,767 people live in the urban area of Florence. The Metropolitan Area of Florence, Prato and Pistoia, constituted in 2000 over an area of roughly 4,800 square kilometres (1,850 sq mi), is home to 1.5 million people.",
     "wikipedia_pt": "Florença",
     "summary_pt": "Florença é um município italiano, sub-capital e maior cidade da Toscana e da província homônima, com cerca de 377 207 habitantes. Estende-se por uma área de 102,41 km², tendo uma densidade populacional de 3 683 hab/km². Faz fronteira com Bagno a Ripoli, Campi Bisenzio, Fiesole, Impruneta, Scandicci, Sesto Fiorentino. Florença foi durante muito tempo considerada a capital da moda."
+  },
+  "florianopolis": {
+    "wikipedia_en": "Florianópolis",
+    "summary_en": "Florianópolis is the capital and second largest city of the state of Santa Catarina, in the South Region of Brazil. The city encompasses Santa Catarina Island and surrounding small islands, as well as part of the mainland. It has a population of 537,211, according to the 2022 Brazilian census, the second-most populous city in the state, and the 39th in Brazil. The metropolitan area has an estimated population of 1,111,702, the 21st largest in the country. The city is known for having the country's third-highest Human Development Index score among all Brazilian cities (0.847).",
+    "wikipedia_pt": "Florianópolis",
+    "summary_pt": "Florianópolis, conhecido coloquialmente como Floripa, é a capital do estado brasileiro de Santa Catarina, na região Sul do país. Florianópolis é também apelidado de \"Ilha da Magia\", decorrente de seus folclóricos contos e histórias de bruxas e criaturas mágicas que habitam na ilha, popularizados pelo escritor Franklin Cascaes. É uma das três ilhas-capitais do Brasil, cujas respectivas regiões metropolitanas abrangem inteiramente ilhas localizadas no litoral brasileiro ao longo do Oceano Atlântico, sendo que a maior parte do município está localizada na Ilha de Santa Catarina."
+  },
+  "fortaleza": {
+    "wikipedia_en": "Fortaleza",
+    "summary_en": "Fortaleza is the state capital of Ceará, located in Northeastern Brazil. It is Brazil's 4th largest city—Fortaleza surpassed Salvador in 2024 census with a population of slightly over 2.5 million—and 12th among cities with the highest gross domestic product. It forms the core of the Fortaleza metropolitan area, which is home to almost 4 million people.",
+    "wikipedia_pt": "Fortaleza",
+    "summary_pt": "Fortaleza é a capital do estado brasileiro do Ceará, na Região Nordeste do país. Distante 2 285 km de Brasília, capital federal, a cidade desenvolveu-se às margens do riacho Pajeú, e sua toponímia é uma alusão ao Forte Schoonenborch, construído pelos holandeses durante sua segunda permanência no local, entre 1649 e 1654, e que deu origem ao município. O lema de Fortaleza, presente em seu brasão, é a palavra em latim Fortitudine, que, em português, significa \"por/com força, valor, coragem\"."
+  },
+  "foz-do-iguacu": {
+    "wikipedia_en": "Foz do Iguaçu",
+    "summary_en": "Foz do Iguaçu, colloquially referred to as Foz, is the Brazilian city on the border of Iguaçu Falls. Foz in Portuguese means the mouth or end of a river and Iguaçu in Guarani or Tupi comes from the words y, meaning \"river\", and guasu, meaning \"big\".",
+    "wikipedia_pt": "Foz do Iguaçu",
+    "summary_pt": "Foz do Iguaçu é um município brasileiro localizado na região oeste do estado do Paraná. Dista 643 quilômetros da capital estadual, sua área territorial é de 617,701 km², dos quais 61,200 km² estão em perímetro urbano, e sua população, conforme o censo de 2022, é de 285 415 habitantes."
   },
   "frankfurt": {
     "wikipedia_en": "Frankfurt",
@@ -209,6 +395,12 @@
     "wikipedia_pt": "Génova",
     "summary_pt": "GénovaPE ou GênovaPB é uma cidade e condados históricos da Itália, na região de Ligúria, cidade metropolitana de Génova, com cerca de 639 560 habitantes. Estende-se por uma área de 243 km², tendo uma densidade populacional de 2 484 hab/km². É limitada com Arenzano, Bargagli, Bogliasco, Bosio (AL), Campomorone, Ceranesi, Davagna, Masone, Mele, Mignanego, Montoggio, Sant'Olcese, Sassello (SV), Serra Riccò, Sori, Tiglieto, Urbe (SV)."
   },
+  "george-town": {
+    "wikipedia_en": "George Town, Penang",
+    "summary_en": "George Town is the capital of the Malaysian state of Penang. It is the core city of the George Town Conurbation, Malaysia's second largest metropolitan area with a population of 2.84 million and the second largest metropolitan economy in the country. The city proper spans an area of 306 km2 (118 sq mi) encompassing Penang Island and surrounding islets, and had a population of 794,313 as of 2020.",
+    "wikipedia_pt": "George Town (Penão)",
+    "summary_pt": "George Town (乔治市) é a capital e a maior cidade do estado de Penão, na Malásia. Com cerca de 220 000 habitantes, ou 400 000 contando os subúrbios, localiza-se na ilha de Penão. Foi fundada em 1786 pelos britânicos."
+  },
   "ghent": {
     "wikipedia_en": "Ghent",
     "summary_en": "Ghent is a city and a municipality in the East Flanders province of the Flemish Region of Belgium. It is the capital and largest city of the province and the third largest in the country, after Brussels and Antwerp. It is a port and university city.",
@@ -227,6 +419,12 @@
     "wikipedia_pt": "Gotemburgo",
     "summary_pt": "Gotemburgo ou Goteburgo é a 2ª maior cidade da Suécia, depois da capital Estocolmo.\nEstá situada na pequena porção da província da Västergötland que atinge o mar, e localizada nas duas margens do rio Göta, imediatamente antes de este desaguar no estreito de Categate."
   },
+  "gramado": {
+    "wikipedia_en": "Gramado",
+    "summary_en": "Gramado is a municipality in the state of Rio Grande do Sul, Brazil. It is located in the Serra Gaúcha region. The city was originally settled by Azorean descendants and later received a contingent of German and Italian immigrants. Gramado is one of the cities along the scenic route known as Rota Romântica.",
+    "wikipedia_pt": "Gramado",
+    "summary_pt": "Gramado é um município do estado do Rio Grande do Sul, no Brasil. Localiza-se na Serra Gaúcha, mais precisamente na Região das Hortênsias, a uma latitude 29º 22' 44\" sul e a uma longitude 50º 52' 26\" oeste, estando a uma altitude de 830 metros. Sua população estimada em 2022 é de 40 134 habitantes, sendo o 54.º mais populoso do estado. Possui uma área de 237,019 km². Seu principal acesso se dá através da RS-115, embora também seja atendida pelas rodovias RS-235 e RS-373."
+  },
   "granada": {
     "wikipedia_en": "Granada",
     "summary_en": "Granada is the capital city of the province of Granada, in the autonomous community of Andalusia, Spain. Granada is located at the foot of the Sierra Nevada mountains, at the confluence of four rivers, the Darro, the Genil, the Monachil and the Beiro. Ascribed to the Vega de Granada comarca, the city sits at an average elevation of 738 m (2,421 ft) above sea level 50 km from the Mediterranean coast, the Costa Tropical. With a population of 233,532 as of 2024, it is the 20th-largest city in Spain and is an important wine growing region. It was the last Muslim stronghold in Islamic Spain.",
@@ -238,6 +436,18 @@
     "summary_en": "Hamburg, officially the Free and Hanseatic City of Hamburg, is the second-largest city in Germany after Berlin and sixth-largest city in the European Union, with a population of over 1.9 million. The Hamburg Metropolitan Region has a population of over 5.1 million and is the tenth-largest metropolitan region by GDP in the European Union. At the base of the Jutland Peninsula, the 110 km (68 mi)-long Elbe estuary begins in Hamburg, at the confluence of the Alster and Bille. Hamburg is one of Germany's three city-states alongside Berlin and Bremen, and is surrounded by Schleswig-Holstein to the north and Lower Saxony to the south. The Port of Hamburg is Germany's largest and Europe's third-largest, after Rotterdam and Antwerp. The local dialect is a variant of Low Saxon.",
     "wikipedia_pt": "Hamburgo",
     "summary_pt": "Hamburgo, oficialmente Cidade Livre e Hanseática de Hamburgo é a segunda maior cidade da Alemanha, com uma população de aproximadamente 1,8 milhão de pessoas. A cidade possui uma região associada mais ampla."
+  },
+  "hangzhou": {
+    "wikipedia_en": "Hangzhou",
+    "summary_en": "Hangzhou is the capital and most populous city of Zhejiang province, China, situated at the intersection of the southern terminus of the Grand Canal and the head of Hangzhou Bay. Renowned as one of the Eight Ancient Capitals of China, Hangzhou is celebrated for its cultural heritage and its West Lake.",
+    "wikipedia_pt": "Hancheu",
+    "summary_pt": "Hancheu ou Hangzhou é uma cidade da República Popular da China, capital da província de Chequião. É um porto no rio Qiantang (錢塘江), perto de Xangai (上海). Historicamente, a cidade era designada de Onchom em português, conforme resulta dos relatos de Galeote Pereira, explorador português, na obra «Algumas Cousas Sabidas da China»."
+  },
+  "hanoi": {
+    "wikipedia_en": "Hanoi",
+    "summary_en": "Hanoi is the capital and second-most populous centrally-governed city of Vietnam. It covers an area of 3,358.6 km2 (1,296.8 mi2), and as of 2025 has a population of 8,807,523. Hanoi had the second-highest gross regional domestic product of all Vietnamese provinces and centrally-governed cities at US$48 billion in 2023, behind Ho Chi Minh City. It hosts 78 foreign embassies, the headquarters of the Vietnam People's Army (VPA), its Vietnam National University system, and other governmental organizations. Hanoi had 18.7 million domestic and international visitors in 2022. It hosts the Imperial Citadel of Thăng Long, Ho Chi Minh Mausoleum, Hoàn Kiếm Lake, West Lake, and Ba Vì National Park near the outskirts of the municipality. Hanoi's urban area has architectural styles, including pre-colonial Vietnamese architecture, French colonial architecture, brutalist apartments and disorganized alleys and tube houses stemming from the city's growth in the 20th century.",
+    "wikipedia_pt": "Hanói",
+    "summary_pt": "Hanói é a capital e segunda maior cidade do Vietnã. Situa-se no centro da planície do delta do rio Vermelho, a 88 km das costas do golfo de Tonquim, onde está o seu anteporto, Hai Phong."
   },
   "heidelberg": {
     "wikipedia_en": "Heidelberg",
@@ -251,11 +461,53 @@
     "wikipedia_pt": "Helsínquia",
     "summary_pt": "Helsínquia (português europeu) ou Helsinque (português brasileiro), com mais de 620 mil habitantes, é a capital da República da Finlândia e a maior cidade do país.\nÉ conhecida como a ”Filha do Mar Báltico” ou ”A cidade branca do Norte”."
   },
+  "hiroshima": {
+    "wikipedia_en": "Hiroshima",
+    "summary_en": "Hiroshima  is the capital of Hiroshima Prefecture in Japan. As of June 1, 2019, the city had an estimated population of 1,199,391. The gross domestic product (GDP) in Greater Hiroshima, Hiroshima Urban Employment Area, was US$61.3 billion as of 2010. Kazumi Matsui has been the city's mayor since April 2011. The Hiroshima metropolitan area is the second largest urban area in the Chugoku Region of Japan, following the Okayama metropolitan area.",
+    "wikipedia_pt": "Hiroshima",
+    "summary_pt": "Hiroshima ou Hiroxima é a capital da prefeitura de Hiroshima, no Japão. É cortada pelo rio Ota (Ota-gawa), cujos seis canais dividem a cidade em ilhas. Cresceu em torno de um castelo feudal do século XVI. Recebeu o estatuto de cidade em 1589. Serviu de quartel-general durante a Primeira Guerra Sino-japonesa (1894–95)."
+  },
+  "ho-chi-minh-city": {
+    "wikipedia_en": "Ho Chi Minh City",
+    "summary_en": "Ho Chi Minh City, also known as Saigon, is the most populous city and centrally-governed city of Vietnam, with a population of more than 14 million in 2025. Its geography is defined by rivers and canals, of which the largest is the Saigon River.",
+    "wikipedia_pt": "Cidade de Ho Chi Minh",
+    "summary_pt": "A Cidade de Ho Chi Minh, e comumente conhecida e nomeada até 1975 como Saigon(pt-BR) ou Saigão(pt-PT?), é a maior cidade e principal centro financeiro, corporativo e mercantil do Vietname. Situa-se no sul do país e tem cerca de 8,5 milhões de habitantes. É uma cidade histórica e portuária, recebendo a classificação de cidade global beta, por parte do Globalization and World Cities Study Group & Network (GaWC). A Cidade de Ho Chi Minh possui, ainda, estatuto de província."
+  },
+  "hoi-an": {
+    "wikipedia_en": "Hội An (city)",
+    "summary_en": "Hội An is a former city of Quảng Nam Province in Central Vietnam. Hội An Old Town has been registered as a UNESCO World Heritage Site since 1999 and is recognized as a well-preserved former site of a once-thriving Southeast Asian trading port dating from the 15th–19th century.",
+    "wikipedia_pt": "Cidade Antiga de Hoi An",
+    "summary_pt": "A Cidade Antiga de Hoi An, ou simplesmente Hội An, conhecida como Faifo, é um excepcionalmente bem-preservado exemplo de um porto comercial do Sudeste Asiático, datando dos séculos XV a XIX. Os seus edificios e as suas ruas reflectem as influências, indigenas e estrangeiras, que foram combinadas para produzir esta mágnifica cidade antiga, declarada Património Mundial em 1999."
+  },
+  "hue": {
+    "wikipedia_en": "Huế (provincial city)",
+    "summary_en": "Huế is a former provincial city of Vietnam. The city was the capital of Thừa Thiên Huế province in the North Central Coast region of Vietnam, located near the center of Vietnam. The original site was a Cham city known as Kandarpapura and later as Amarendrapura and was the capital of the Champa Kingdom from 192 to 605. On 1 January 2025, Thừa Thiên Huế province was upgraded to become Vietnam's sixth centrally-governed municipality, named Huế. The former provincial city was dissolved to establish two new urban districts: Phú Xuân district and Thuận Hóa district.",
+    "wikipedia_pt": null,
+    "summary_pt": null
+  },
+  "ilhabela": {
+    "wikipedia_en": "Ilhabela",
+    "summary_en": "Ilhabela is an archipelago and city situated in the Atlantic Ocean six kilometres off the coast of São Paulo state in Brazil. The city is 205 km (127 mi) from the city of São Paulo and 340 km (210 mi) from the city of Rio de Janeiro. The largest island, although commonly called Ilhabela, is officially named Ilha de São Sebastião. It, the other islands and the islets make up the municipality of Ilhabela.",
+    "wikipedia_pt": "Ilhabela",
+    "summary_pt": "Ilhabela é um dos únicos municípios–arquipélagos marinhos brasileiros, estando localizado no litoral norte do estado de São Paulo. A população, segundo o Censo 2022, é de 34 934 habitantes, resultando numa densidade estimada de 100,9 hab/km² O município é formado pela sede e pelos distritos de Cambaquara e Paranabi. O arquipélago é composto por 19 ilhas, ilhotes e lajes."
+  },
+  "ilheus": {
+    "wikipedia_en": "Ilhéus",
+    "summary_en": "Ilhéus is a major city located in the southern coastal region of Bahia, Brazil, 211 km south of Salvador, the state's capital. The city was founded in 1534 as Vila de São Jorge dos Ilhéus and is known as one of the most important tourism centers of the northeast of Brazil.",
+    "wikipedia_pt": "Ilhéus",
+    "summary_pt": "Ilhéus é um município brasileiro do litoral e sul do estado da Bahia, região Nordeste. Conta com o mais extenso litoral do estado."
+  },
   "innsbruck": {
     "wikipedia_en": "Innsbruck",
     "summary_en": "Innsbruck is the capital of the Austrian state of Tyrol and the fifth-largest city in Austria. It is located on the River Inn, at its junction with the Wipp Valley, which provides access to the Brenner Pass 30 km (19 mi) to the south. The city had a population of 132,188 in 2024.",
     "wikipedia_pt": "Innsbruck",
     "summary_pt": "Innsbruck ou Insbruque é uma cidade no oeste da Áustria, capital do estado do Tirol. Ela é atravessada pelo rio Inn, de onde tem seu nome. A palavra bruck tem sua origem na palavra de língua alemã Brücke, que significa \"ponte\", o que leva a cidade a chamar-se \"Ponte do Rio Inn\". Localizada no vale do Inn, a cidade está no meio de altas montanhas, como o Nordkette ao norte, o Patscherkofel e o Nockspitze ao sul. Innsbruck é um renomado centro de esportes de inverno, sendo que sediou as olimpíadas de inverno nos anos de 1964 e 1976."
+  },
+  "ipojuca": {
+    "wikipedia_en": "Ipojuca",
+    "summary_en": "Ipojuca is a municipality in Pernambuco in eastern Brazil. As of 2025 the population according to IBGE was 106,539 and the per capita income (2007) was R$76.418 making it one of the country's highest. The settlement dates to 1560, but the official founding date is 1861 and the community was incorporated as a town in 1864. It is famous for its beaches such as Porto de Galinhas, Muro Alto, Maracaipe.",
+    "wikipedia_pt": "Ipojuca",
+    "summary_pt": "Ipojuca, é um município da Microrregião de Suape, na Mesorregião Metropolitana do Recife, no estado de Pernambuco, no Brasil. É um dos integrantes da Região Metropolitana do Recife, distando cerca de 43 quilômetros ao sul da capital pernambucana. Ocupa uma área territorial de cerca de 514,8 km², tendo 0,368 km² desse total formando a área urbana municipal, e os 514,5 km² constituindo a zona rural. De acordo com a estimativa populacional do ano de 2013, divulgada pelo Instituto Brasileiro de Geografia e Estatística (IBGE), a sua população total era de 87 926 habitantes, sendo o décimo quinto mais populoso município de Pernambuco, ocupa ainda a décima colocação quando os números são comparados aos dos municípios do Grande Recife."
   },
   "istanbul": {
     "wikipedia_en": "Istanbul",
@@ -263,17 +515,53 @@
     "wikipedia_pt": "Istambul",
     "summary_pt": "Istambul, a antiga Bizâncio e Constantinopla, é a maior cidade da Turquia e rivaliza com Londres como a mais populosa da Europa, com 15 067 724 habitantes na sua área metropolitana em 2018. A grande maioria da população é muçulmana, mas também há um grande número de laicos e uma minoria de cristãos e judeus."
   },
+  "jakarta": {
+    "wikipedia_en": "Jakarta",
+    "summary_en": "Jakarta, officially the Special Capital Region of Jakarta, is the capital and largest city of Indonesia, with administrative status equivalent to a province. It lies on the northwestern coast of Java, borders the provinces of West Java and Banten, and faces the Java Sea to the north. Jakarta itself covers about 662 square kilometres, but the wider Jakarta metropolitan area—locally known as Jabodetabek—is among the largest urban agglomerations in the world by area. By population, the metro area is the most populous urban area in the world with a population of over 40 million. Jakarta is Indonesia's political, economic, and cultural centre and contains many national institutions, corporate headquarters, and the secretariat of the Association of Southeast Asian Nations (ASEAN).",
+    "wikipedia_pt": "Jacarta",
+    "summary_pt": "Jacarta é a capital e maior cidade da Indonésia. Situa-se na ilha de Java e conta com cerca de 35,93 milhões de habitantes na sua área metropolitana, sendo a segunda maior cidade do mundo, atrás de Tóquio. Foi fundada em 1619 pelos neerlandeses com o nome de Batávia, junto à aldeia javanesa de Jacarta. Foi ocupada pelos ingleses entre 1811 e 1814. Tomou o nome actual em 1949."
+  },
+  "jericoacoara": {
+    "wikipedia_en": "Jijoca de Jericoacoara",
+    "summary_en": "Jijoca de Jericoacoara is the northernmost municipality in the Brazilian state of Ceará, near the city of Cruz. It is known for its eponymous beach and national park. It is served by Jericoacoara airport, which opened in 2017.",
+    "wikipedia_pt": "Jijoca de Jericoacoara",
+    "summary_pt": "Jijoca de Jericoacoara é um município brasileiro do estado do Ceará. É o mais setentrional do estado. Tem como atração natural principal a Praia de Jericoacoara."
+  },
+  "joao-pessoa": {
+    "wikipedia_en": "João Pessoa, Paraíba",
+    "summary_en": "João Pessoa is a port city in northeastern Brazil. It is the largest city and capital of the state of Paraíba, with an estimated population of 888,679. It is located on the right bank of the Paraíba do Norte river.",
+    "wikipedia_pt": "João Pessoa",
+    "summary_pt": "João Pessoa é um município brasileiro, capital do estado da Paraíba. Com população de mais de 830 mil habitantes no censo de 2022, a capital paraibana é o município mais populoso de seu estado, o sétimo da Região Nordeste e o 20º do Brasil. A Região Metropolitana de João Pessoa, formada pela capital e mais onze municípios, tinha uma população de aproximadamente 1,4 milhão de pessoas."
+  },
   "krakow": {
     "wikipedia_en": "Kraków",
     "summary_en": "Kraków, officially the Royal Capital City of Kraków, is the second-largest and one of the oldest cities in Poland. Situated on the Vistula River in Lesser Poland Voivodeship, the city has a population of 816,614 (2025), with 1,428,363 people living in the Kraków metropolitan area. Kraków was the official capital of Poland until 1596 and has traditionally been one of the leading centres of Polish economic, academic, cultural, and artistic life. Its Old Town was declared a UNESCO World Heritage Site in 1978, one of the world's first sites granted the status.",
     "wikipedia_pt": "Cracóvia",
     "summary_pt": "Cracóvia é uma cidade no sul da Polônia, na voivodia da Pequena Polônia. Estende-se por uma área de 326,85 km², com 774 839 habitantes, segundo os censo de 2019, com a densidade: 2 370,6 hab./km². Localiza-se no sul do país, nas margens do rio Vístula. É uma das cidades mais antigas da Polônia e a segunda maior cidade do país. A capital da Polônia em 1039-1079, 1138-1290 e 1296-1596, a principal cidade da coroação dos reis da Polônia e até 1609-1611 a cidade residencial dos reis da Polônia."
   },
+  "kuala-lumpur": {
+    "wikipedia_en": "Kuala Lumpur",
+    "summary_en": "Kuala Lumpur (KL), officially the Federal Territory of Kuala Lumpur, is the capital city and a federal territory of Malaysia. It is the most populous city in the country, covering an area of 243 km2 (94 sq mi) with a population of 2,111,536 as of 2026. Greater Kuala Lumpur, which itself includes the Klang Valley, is an urban agglomeration of 8.81 million people as of 2024. It is among the fastest growing metropolitan regions in Southeast Asia, in terms of both population and economic development.",
+    "wikipedia_pt": "Kuala Lumpur",
+    "summary_pt": "Kuala Lumpur, também grafada como Cuala Lumpur, Quala Lumpur ou Cualalampur, é a capital e a maior cidade da Malásia. Ocupa uma área de 244 quilômetros quadrados e tem população estimada de 1,6 milhões de habitantes em 2006. A Grande Kuala Lumpur, também conhecida como Vale Kelang, é uma aglomeração urbana com 7,2 milhões de pessoas. É a região metropolitana com o mais rápido crescimento do país, tanto em população quanto na economia."
+  },
   "kyiv": {
     "wikipedia_en": "Kyiv",
     "summary_en": "Kyiv, also spelt Kiev, is the capital and most populous city of Ukraine. Located in the north-central part of the country, it straddles both banks of the Dnieper River. As of January 2022, the population of Kyiv was 2,952,301, making it the seventh-most populous city in Europe. Kyiv is an important industrial, scientific, educational, and cultural center. It is home to high-tech industries, higher education institutions, and historical landmarks. The city has an extensive public transport system, which includes the Kyiv Metro.",
     "wikipedia_pt": "Kiev",
     "summary_pt": "Kiev ou Kyiv, também conhecida como Quieve, ) é a capital e a cidade mais populosa da Ucrânia. Fica no centro-norte do país, ao longo do rio Dnieper. Em 1.º de janeiro de 2021, sua população era de 2 962 180 habitantes, tornando Kiev a sétima cidade mais populosa da Europa."
+  },
+  "kyoto": {
+    "wikipedia_en": "Kyoto",
+    "summary_en": "Kyoto, officially Kyoto City , is the capital city of Kyoto Prefecture in the Kansai region of Japan's largest and most populous island of Honshu. As of 2020, the city had a population of 1.46 million, making it the ninth-most populous city in Japan. More than half (56.8%) of Kyoto Prefecture's population resides in the city. The city is the cultural anchor of the substantially larger Greater Kyoto, a metropolitan statistical area home to approximately 3.8 million people. It is also part of the even larger Keihanshin metropolitan area, along with Osaka and Kobe.",
+    "wikipedia_pt": "Quioto",
+    "summary_pt": "Quioto é uma cidade do Japão, capital da prefeitura de Quioto, localizada na região Kansai, no centro-sul do país. Fundada no século I, por mais de um milênio foi a capital da Corte Imperial do Japão, de 794 a 1868, quando foi substituída por Tóquio."
+  },
+  "lencois": {
+    "wikipedia_en": "Lençóis",
+    "summary_en": "Lençóis is a municipality in the state of Bahia in Brazil. The population is 11,499 in an area of 1277 km2. The town has a well-preserved colonial atmosphere and is the starting point for treks into Chapada Diamantina.",
+    "wikipedia_pt": "Lençóis",
+    "summary_pt": "Lençóis é um município brasileiro do estado da Bahia. Está localizado na Chapada Diamantina. Sua população, conforme estimativas do IBGE de 2024 era de 11 170 habitantes."
   },
   "lisbon": {
     "wikipedia_en": "Lisbon",
@@ -299,6 +587,12 @@
     "wikipedia_pt": "Londres",
     "summary_pt": "Londres é a capital da Inglaterra e do Reino Unido. Por dois milénios, foi um grande povoado e sua história remonta à sua fundação pelos romanos, quando foi nomeada Londínio. O centro de Londres, antiga City of London, também conhecida como The Square Mile ou The City, mantém as suas fronteiras medievais. Pelo menos desde o século XIX, o nome \"Londres\" refere-se à metrópole desenvolvida em torno desse núcleo. Hoje, a maior parte dessa conurbação constitui a região da Grande Londres, cuja área administrativa tem seu próprio prefeito eleito e assembleia. A cidade abriga a sede da Comunidade das Nações."
   },
+  "luang-prabang": {
+    "wikipedia_en": "Luang Prabang",
+    "summary_en": "Luang Prabang, historically known as Xieng Thong, and alternatively spelled Luang Phabang or Louangphabang, is the capital of Luang Prabang Province in north-central Laos. Its name, meaning “Royal Buddha Image,” derives from the Phra Bang, a statue symbolizing Lao sovereignty. Designated a UNESCO World Heritage Site in 1995, the city is recognized for blending Lao architecture, European colonial buildings, and over 30 Buddhist temples. The protected area encompasses 33 of its 58 villages, where daily rituals like the morning alms-giving ceremony persist.",
+    "wikipedia_pt": "Luang Prabang",
+    "summary_pt": "Luang Prabang, ou Louangphrabang, significando literalmente \"Imagem Real de Buda\", é uma cidade no centro-norte do Laos, consistindo de 58 aldeias adjacentes, das quais 33 compõem a Cidade da UNESCO de Luang Prabang Patrimônio Mundial. Foi listado em 1995 por um patrimônio arquitetônico, religioso e cultural único e \"notável\" bem preservado, uma mistura dos desenvolvimentos rurais e urbanos ao longo de vários séculos, incluindo as influências coloniais francesas durante os séculos XIX e XX."
+  },
   "lucerne": {
     "wikipedia_en": "Lucerne",
     "summary_en": "Lucerne or Luzern is a city and a municipality in central Switzerland, in the German-speaking portion of the country. Lucerne is the capital of the canton of Lucerne and part of the district of the same name. With a population of approximately 86,700 people, Lucerne is the most populous city in Central Switzerland, and a nexus of economics, transport, culture, and media in the region. The city's urban area consists of 19 municipalities and towns with an overall population of about 247,400 people.",
@@ -323,11 +617,23 @@
     "wikipedia_pt": "Lyon",
     "summary_pt": "Lyon ou Lião é a terceira maior cidade da França. Está localizada na parte central do leste do país na confluência dos rios Ródano e Saône, a cerca de 470 km a sul de Paris, 320 km ao norte de Marselha e 55 km a leste de Saint-Étienne. Os habitantes da cidade são chamados de lioneses, em francês lyonnais."
   },
+  "maceio": {
+    "wikipedia_en": "Maceió",
+    "summary_en": "Maceió, formerly anglicised as Maceio, is the capital and the largest city of the coastal state of Alagoas, Brazil. The name \"Maceió\" is a Tupi Indigenous term for a spring.",
+    "wikipedia_pt": "Maceió",
+    "summary_pt": "Maceió é a capital do estado brasileiro de Alagoas, na Região Nordeste do país. Ocupa uma área de 509,320 km², estando distante 2 013 quilômetros de Brasília. É o município mais populoso de Alagoas. Sua população é, de acordo com o Censo demográfico do Instituto Brasileiro de Geografia e Estatística (IBGE), de 957 916 habitantes. Integra, com outros doze municípios alagoanos, a Região Metropolitana de Maceió, totalizando 1 347 703 habitantes em 2024, sendo o mais populoso de Alagoas, o 7⁰ maior do Nordeste e o 25⁰ maior do Brasil."
+  },
   "madrid": {
     "wikipedia_en": "Madrid",
     "summary_en": "Madrid is the capital and largest city of Spain. It had a population of over 3.4 million in the city proper in 2025, and a metropolitan area population of approximately 6.8 million. Madrid is the second-largest city in the European Union (EU), after Berlin, and its metropolitan area is the second-largest in the EU, after Paris. The municipality covers an area of 605.77 square kilometres (233.89 sq mi). Madrid lies on the River Manzanares in the central part of the Iberian Peninsula at about 660 metres (2,170 ft) above mean sea level. The capital city of both Spain and the surrounding autonomous community of Madrid, it is the political, economic and cultural centre of the country.",
     "wikipedia_pt": "Madrid",
     "summary_pt": "Madrid ou Madri (apenas em português brasileiro) é a capital e a maior cidade da Espanha. Em 2021 o município tinha 3 305 408 habitantes e a sua área metropolitana tinha cerca de 6,8 milhões de habitantes. É a segunda maior cidade da União Europeia (UE), depois de Berlim, e sua área metropolitana é a segunda maior da UE, depois de Paris. A área urbana da capital espanhola abrange um total de 604,3 de km2."
+  },
+  "malacca": {
+    "wikipedia_en": "Malacca City",
+    "summary_en": "Malacca City is the capital city of the Malaysian state of Malacca. It is the oldest Malaysian city on the Strait of Malacca, having become a successful entrepôt in the era of the Malacca Sultanate. The city was founded in 1396 by Parameswara, a Sumatran prince who escaped to the Malay Peninsula when the Srivijaya Empire fell to the Majapahit.",
+    "wikipedia_pt": "Malaca (cidade)",
+    "summary_pt": "Malaca é a capital do estado malaio de Malaca, localizada no litoral sudoeste da Península Malaia, defronte o estreito de Malaca. Sua população é de cerca de 370 000 habitantes e sua área, de 303 km². Atualmente o porto serve apenas à navegação costeira, devido à sua pouca profundidade, que o impede de atender à navegação de longo-curso."
   },
   "malaga": {
     "wikipedia_en": "Málaga",
@@ -335,17 +641,53 @@
     "wikipedia_pt": "Málaga",
     "summary_pt": "Málaga é uma cidade da Andaluzia, na Espanha. Capital da província homônima, localiza-se na costa sul do país, no Mediterrâneo. A cidade originou-se de uma colônia grega na antiguidade clássica. É a sexta maior cidade do país, com mais de 560 mil habitantes. Foi fundada pelos fenícios no século XII a.C. Foi incorporada à Coroa de Castela em 1487."
   },
+  "manaus": {
+    "wikipedia_en": "Manaus",
+    "summary_en": "Manaus is the capital and largest city of the Brazilian state of Amazonas. It is the seventh-largest city in Brazil, with an estimated 2024 population of 2,279,686 distributed over a land area of about 11,401 km2 (4,402 sq mi). Located at the east centre of the state, the city is the centre of the Manaus metropolitan area and the largest metropolitan area in the North Region of Brazil by urban landmass. It is situated near the confluence of the Negro and Amazon rivers. It is one of the two cities in the Amazon rainforest with a population of over 1 million people, alongside Belém.",
+    "wikipedia_pt": "Manaus",
+    "summary_pt": "Manaus é a capital do estado brasileiro do Amazonas. É a sétima cidade mais populosa do Brasil, a sexta maior mancha urbana do país e sua região metropolitana, com mais de 2,8 milhões de habitantes, é a 11.ª mais populosa do país. A cidade possui um forte caráter cosmopolita, atraindo imigrantes e turistas de diversas nacionalidades. Localizada no centro da maior floresta tropical do mundo, é uma metrópole regional que exerce significativa influência no Norte do Brasil, especialmente na Amazônia Ocidental, seja no ponto de vista ambiental, cultural ou econômico."
+  },
   "manchester": {
     "wikipedia_en": "Manchester",
     "summary_en": "Manchester is a city and metropolitan borough in North West England, at the centre of the eponymous county of Greater Manchester. It had a population of over 589,000 in 2024. It borders the Cheshire Plain to the south, the Pennines to the north and east, and the city of Salford to the west. The two cities and the surrounding towns form one of the United Kingdom's most populous conurbations, the Greater Manchester Built-up Area, which has a population of 2.87 million.",
     "wikipedia_pt": "Manchester",
     "summary_pt": "Manchester é uma cidade do Reino Unido, no noroeste da Inglaterra. A aglomeração urbana de Manchester tem cerca de 3,6 milhões de habitantes, é a terceira cidade mais populosa da Inglaterra e junto com algumas outras cidades vizinhas, compõe o condado da Grande Manchester. A cidade é um centro industrial, econômico, e muitas companhias têm as sedes administrativas no centro da cidade ou num parque industrial ao este do centro, Trafford Park."
   },
+  "mandalay": {
+    "wikipedia_en": "Mandalay",
+    "summary_en": "Mandalay is the second-largest city in Myanmar, after Yangon. It is located on the east bank of the Irrawaddy River, 631 km (392 mi) north of Yangon. In 2014, the city had a population of 1,225,553.",
+    "wikipedia_pt": "Mandalai",
+    "summary_pt": "Mandalai é uma cidade de Mianmar, localizada no centro do país, às margens do rio Irauádi. Foi a capital do último reino independente birmanês entre 1860 e 1885. É capital da região de Mandalai e de acordo com o censo de 2014, tinha 1 225 546 habitantes."
+  },
+  "manila": {
+    "wikipedia_en": "Manila",
+    "summary_en": "Manila, officially the City of Manila, is the capital and second-most populous city of the Philippines after Quezon City. According to the 2024 census, it has a population of 1,902,590 people. Located on the eastern shore of Manila Bay on the island of Luzon, it is classified as a highly urbanized city. With 44,935 inhabitants per square kilometer (116,380/sq mi), Manila is one of the world's most densely populated cities proper.",
+    "wikipedia_pt": "Manila",
+    "summary_pt": "Manila é a capital das Filipinas e a segunda cidade do país em número de habitantes. A cidade está situada na costa oriental da baía de Manila, junto à desembocadura do rio Pasig, na ilha de Luzon."
+  },
+  "maragogi": {
+    "wikipedia_en": "Maragogi",
+    "summary_en": "Maragogi is a municipality in the Brazilian state of Alagoas, 125 km north of the capital city of Maceió. It has 33,032 inhabitants, a city situated on the northern coast of Alagoas state, Brazil, being the easternmost city of that state.",
+    "wikipedia_pt": "Maragogi",
+    "summary_pt": "Maragogi é um município da Microrregião do Litoral Norte Alagoano, na Mesorregião do Leste Alagoano, no estado de Alagoas, Brasil, situando-se a cerca de 130 quilômetros da capital do estado, Maceió."
+  },
+  "marrakesh": {
+    "wikipedia_en": "Marrakesh",
+    "summary_en": "Marrakesh or Marrakech is the fourth-largest city in Morocco. It is one of the four imperial cities of Morocco and is the capital of the Marrakesh-Safi region. The city lies west of the foothills of the Atlas Mountains.",
+    "wikipedia_pt": "Marraquexe",
+    "summary_pt": "Marraquexe é uma cidade do centro-sudoeste de Marrocos, situada perto do sopé norte da cordilheira do Alto Atlas. Conhecida como a \"cidade vermelha\", a \"pérola do sul\" ou a \"porta do sul\", é a capital da prefeitura homónima e da região de Marraquexe-Safim. Em 2004 tinha 801 043 habitantes na zona urbana e 1 070 838 habitantes na prefeitura."
+  },
   "marseille": {
     "wikipedia_en": "Marseille",
     "summary_en": "Marseille is a city in southern France, the prefecture of the Bouches-du-Rhône department and of the Provence-Alpes-Côte d'Azur region. Situated in Provence, it marks the eastern end of the Côte Bleue on the Mediterranean coast. Marseille is the second-most populous city proper in France, after Paris, with 886,040 inhabitants in 2023 over a municipal territory of 241 km2 (93 sq mi). Together with its suburbs and exurbs, the Marseille metropolitan area, which extends over 3,972 km2 (1,534 sq mi), had a population of 1,917,728 as of 2023. The cities of Marseille, Aix-en-Provence, and 90 suburban municipalities have formed since 2016 the Aix-Marseille-Provence Metropolis, an indirectly elected metropolitan authority now in charge of wider metropolitan issues, with a population of 1,939,077 as of 2023. The southeast of Marseille is in Calanques National Park, making Marseille the only large city in France to have a national park within city limits.",
     "wikipedia_pt": "Marselha",
     "summary_pt": "Marselha é a segunda mais populosa cidade de França e a mais antiga cidade francesa. Localizada na antiga província da Provença e na costa do Mediterrâneo, é o maior porto comercial do país."
+  },
+  "mata-de-sao-joao": {
+    "wikipedia_en": "Mata de São João",
+    "summary_en": "Mata de São João is a municipality in the state of Bahia in the North-East region of Brazil. It covers 605.17 km2 (233.66 mi2) and a population of 47,126. Mata de São João has a population density of 73 inhabitants per square kilometer. It is located 56 km (35 mi) from the state capital of Bahia, Salvador.",
+    "wikipedia_pt": "Mata de São João",
+    "summary_pt": "Mata de São João é um município da região metropolitana de Salvador, no estado da Bahia, no Brasil. Sua população estimada em 2024 era de 44 839 habitantes. A \"Costa dos Coqueiros\", na qual se insere a região litorânea do município, é conhecida no mundo inteiro pela beleza de suas praias, pela ocorrência de sol o ano todo e por sua natureza exuberante."
   },
   "milan": {
     "wikipedia_en": "Milan",
@@ -383,6 +725,18 @@
     "wikipedia_pt": "Nápoles",
     "summary_pt": "Nápoles é uma comuna do sul de Itália, capital da região da Campânia e da província de Nápoles, com cerca de 900 000 habitantes e com cerca de 4 400 000 habitantes na região metropolitana. Nápoles é a terceira cidade mais populosa da Itália após Roma e Milão e tem a segunda ou terceira maior região metropolitana do país. Estende-se por uma área de 117 km², com densidade populacional de densidade: 8 554,4 hab./km²."
   },
+  "nara": {
+    "wikipedia_en": "Nara (city)",
+    "summary_en": "Nara  is the capital city of Nara Prefecture, Japan. As of 2022, Nara has an estimated population of 367,353 according to World Population Review, making it the largest city in Nara Prefecture and sixth-largest in the Kansai region of Honshu. Nara is a core city located in the northern part of Nara Prefecture bordering the Kyoto Prefecture.",
+    "wikipedia_pt": "Nara (cidade)",
+    "summary_pt": "Nara é a capital da Prefeitura de Nara localizada na Região de Kansai no Japão. A cidade ocupa o norte da Prefeitura de Nara, fazendo fronteira com a Prefeitura de Kyoto. Oito templos, santuários e ruínas restam na cidade: Tōdai-ji, Saidai-ji, Kōfuku-ji, Santuário de Kasuga, Gangō-ji, Yakushi-ji, Tōshōdai-ji e o Palácio Heijō, junto com a Floresta Primitiva de Kasugayama, coletivamente formam os Monumentos Históricos da Antiga Nara, um Patrimônio Mundial da UNESCO."
+  },
+  "natal": {
+    "wikipedia_en": "Natal, Rio Grande do Norte",
+    "summary_en": "Natal is a Brazilian municipality and the capital of the state of Rio Grande do Norte, located in the Northeast Region of Brazil. Situated 2,227 kilometers from Brasília, the federal capital, it is the second smallest Brazilian state capital in area, covering an area of approximately 167 km2 (64 sq mi). With just over 750,000 inhabitants (2022), it is the most populous municipality in its state, the eighth in the Northeast, and the 24th in Brazil. The Greater Natal, composed of thirteen other municipalities in Rio Grande do Norte, has more than 1.5 million inhabitants, making it the fourth largest urban agglomeration in the Northeast and the nineteenth largest in Brazil.",
+    "wikipedia_pt": "Natal (Rio Grande do Norte)",
+    "summary_pt": "Natal é a capital do estado brasileiro do Rio Grande do Norte, na Região Nordeste do país. Com aproximadamente 167 km², é a segunda menor capital brasileira em área territorial e dista 2 227 quilômetros de Brasília, capital federal. Com pouco mais de 750 mil habitantes em 2022, é o município mais populoso de seu estado, o oitavo do Nordeste e o 24° do Brasil. Sua região metropolitana, formada por outros treze municípios, possui mais de 1,5 milhão de habitantes e constitui a quarta maior aglomeração urbana do Nordeste e a décima nona do Brasil."
+  },
   "nice": {
     "wikipedia_en": "Nice",
     "summary_en": "Nice is a city and commune, and the prefecture of the department of Alpes-Maritimes, and the administrative region of Provence-Alpes-Côte d'Azur, France. The Nice agglomeration extends beyond the administrative city limits, with a population of nearly one million over an area of approximately 744 km2 (287 sq mi) or about the size of Singapore. Located on the French Riviera, the southeastern coast of France on the Mediterranean Sea, at the foot of the French Alps, Nice is the second-largest French city on the Mediterranean coast and second-largest city in the Provence-Alpes-Côte d'Azur region after Marseille. It is approximately 13 kilometres (8 mi) from the principality of Monaco and 30 kilometres (19 mi) from the French–Italian border. Nice's airport serves as a gateway to the region.",
@@ -401,11 +755,29 @@
     "wikipedia_pt": "Nuremberga",
     "summary_pt": "Nuremberga (português europeu) ou Nurembergue (português brasileiro) é uma cidade independente alemã, situada ao norte do estado da Baviera na região administrativa (Regierungsbezirk) da Média Francónia. Nuremberga é a maior cidade da região histórica Francônia com aproximadamente meio milhão de habitantes, tendo sua área metropolitana cerca de 1 milhão e 17 mil habitantes."
   },
+  "olinda": {
+    "wikipedia_en": "Olinda",
+    "summary_en": "Olinda is a historic city in Pernambuco, Brazil, in the Northeast Region. It is located on the country's northeastern Atlantic Ocean coast, in the Metropolitan Region of Recife, the state capital. It has a population of 349,976 people, covers 41.681 square kilometres (16.093 mi2), and has a population density of 9,437 inhabitants per square kilometre (24,440/sq mi). It is noted as one of the best-preserved colonial cities in Brazil and has been inhabited since 1535.",
+    "wikipedia_pt": "Olinda",
+    "summary_pt": "Olinda é um município brasileiro do estado de Pernambuco. Pertence à Região Metropolitana do Recife, distando seis quilômetros da capital pernambucana."
+  },
+  "osaka": {
+    "wikipedia_en": "Osaka",
+    "summary_en": "Osaka  is a designated city in the Kansai region of Honshu in Japan. It is the capital of and most populous city in Osaka Prefecture, and the second biggest prefectural city, third-most populous city proper in Japan, following the special wards of Tokyo and Yokohama. With an estimated population of 2.8 million as of October 1, 2025 and a population density of about 12,505 people per square kilometer, it is the largest component of the Keihanshin metropolitan area, the second-largest metropolitan area in Japan and the 10th-largest urban area in the world with more than 19 million inhabitants.",
+    "wikipedia_pt": "Osaka",
+    "summary_pt": "Osaka, Osaka ou Ósaca, é uma cidade japonesa localizada na província de mesmo nome."
+  },
   "oslo": {
     "wikipedia_en": "Oslo",
     "summary_en": "Oslo is the capital and most populous city of Norway. It constitutes both a county and a municipality. The municipality of Oslo had a population of 724,290 in 2025, while the city's greater urban area had a population of 1,110,887 in 2025, and the metropolitan area had an estimated population of 1,546,706 in 2021.",
     "wikipedia_pt": "Oslo",
     "summary_pt": "Oslo ou mais raramente: [ˈusˈlu, ˈuʂlu]) é a capital da Noruega e a maior cidade do país. Anteriormente, entre 1624 e 1925, chamou-se Christiania, com a grafia alternativa Kristiania, adotada entre 1877 e 1897."
+  },
+  "ouro-preto": {
+    "wikipedia_en": "Ouro Preto",
+    "summary_en": "Ouro Preto, formerly Vila Rica, is a municipality in the state of Minas Gerais, Brazil. The city, a former colonial mining town located in the Serra do Espinhaço mountains, was designated a World Heritage Site by UNESCO due to its Baroque colonial architecture. Ouro Preto used to be the capital of Minas Gerais from 1720 until the foundation of Belo Horizonte in 1897.",
+    "wikipedia_pt": "Ouro Preto",
+    "summary_pt": "Ouro Preto é um município brasileiro do estado de Minas Gerais, Região Sudeste do país. Localiza-se a cerca de 100 km a sudeste da capital estadual. Ocupa uma área de aproximadamente 1 250 km², sendo que 23 km² estão em área urbana, e sua população foi estimada em 77 914 habitantes em 2025. Situa-se na latitude 20º23'08\" sul, longitude 43º30'29\" oeste e altitude média de 1 179 metros."
   },
   "oxford": {
     "wikipedia_en": "Oxford",
@@ -425,11 +797,47 @@
     "wikipedia_pt": "Palma de Maiorca",
     "summary_pt": "Palma de Maiorca, oficialmente Palma e conhecida coloquialmente como Ciutat, é um município espanhol na comunidade autônoma das ilhas Baleares, da qual é a capital. localize-se na parte ocidental do mar Mediterrâneo, na costa sudoeste da ilha de Maiorca, a cerca de 250 km a leste da Península Ibérica."
   },
+  "paraty": {
+    "wikipedia_en": "Paraty",
+    "summary_en": "Paraty is a Brazilian municipality on the southern coast of the state of Rio de Janeiro. It is 258 kilometres from the state capital, the city of Rio de Janeiro. Alongside the Atlantic Ocean, the municipal area has an average altitude of just five metres above sea level. It covers 924.295 square kilometres and has an estimated population of 47,668, giving a population density of 48.95 inhabitants per square kilometre. According to an estimate by the Brazilian Institute of Geography and Statistics (IBGE) from 2014, it ranks 43rd among the municipalities of the state of Rio de Janeiro by population.",
+    "wikipedia_pt": "Paraty",
+    "summary_pt": "Paraty é um município brasileiro do litoral sul do estado do Rio de Janeiro. Está distante 258 quilômetros da capital estadual, a cidade do Rio de Janeiro. Junto ao oceano Atlântico, o território municipal está a uma altitude média de apenas cinco metros do nível do mar. Possui 924,295 quilômetros quadrados, com uma população recenseada em 2022 de 45.243 habitantes, representando uma densidade demográfica de 48,95 habitantes por quilômetro quadrado. É o 39º município mais populoso do Rio de Janeiro."
+  },
   "paris": {
     "wikipedia_en": "Paris",
     "summary_en": "Paris is the capital and largest city of France, with an estimated city population of 2.04 million in an area of 105.4 km2 (40.7 sq mi), as of January 2026, and a metropolitan population of 13.3 million (2023). Located on the Seine in the centre of the Île-de-France region, it is the largest metropolitan area and fourth-most populous city in the European Union (EU). Paris is nicknamed the \"City of Light\" mainly due to its leading role in the Age of Enlightenment.",
     "wikipedia_pt": "Paris",
     "summary_pt": "Paris ) é a capital e a mais populosa cidade da França, com uma população estimada em 2025 de dois milhões de habitantes em uma área de 105 quilômetros quadrados. Desde o século XVII, Paris é um dos principais centros de finanças, diplomacia, comércio, moda, ciência e artes da Europa. A cidade de Paris é o centro e sede de governo da região administrativa de Ilha de França, que tem uma população estimada em 2025 de treze milhões de habitantes, ou cerca de 18% da população da França. Em 2017, a região de Paris teve um PIB de 709 bilhões de euros. De acordo com a Pesquisa de Custo de Vida da Economist Intelligence Unit em 2018, Paris era a segunda cidade mais cara do mundo, atrás apenas da Singapura e à frente de Zurique, Hong Kong, Oslo e Genebra."
+  },
+  "petrolina": {
+    "wikipedia_en": "Petrolina",
+    "summary_en": "Petrolina is a municipality located in the southernmost point of the state of Pernambuco, in Northeast Brazil, in the valley of the São Francisco River. The population was 418,444 in 2025, and the total area is 4,756.8 km2, making it the largest municipality in the state by area. The municipality is closely integrated with Juazeiro, Bahia, located on the opposite bank of the São Francisco.",
+    "wikipedia_pt": "Petrolina",
+    "summary_pt": "Petrolina é um município brasileiro, terceiro mais populoso do estado de Pernambuco. Está situado a 712 km da capital pernambucana, Recife. Em 2025, o IBGE estimou sua população em 418 444 habitantes. É o principal núcleo urbano do Sertão pernambucano, o décimo-terceiro maior do Nordeste, sendo a terceira maior do interior da região, e a 65ª do Brasil. Petrolina se situa na margem norte do Rio São Francisco, na divisa com o estado da Bahia, fazendo conurbação com o município de Juazeiro (BA). Integra a Região Administrativa Integrada de Desenvolvimento do Polo Petrolina e Juazeiro, a maior RIDE do interior do Nordeste."
+  },
+  "petropolis": {
+    "wikipedia_en": "Petrópolis",
+    "summary_en": "Petrópolis is a city of the estado (state) of central Rio de Janeiro, in southeastern Brazil, in a valley of the Órgãos Mountains, 40 kilometres (25 mi) north of Rio de Janeiro city. According to the 2022 Brazilian census, Petrópolis municipality had a population of 278,881 inhabitants. Besides being the largest and most populous city in the Fluminense Mountain Region, the city also has the largest Gross Domestic Product and Human Development Index in the region.",
+    "wikipedia_pt": "Petrópolis",
+    "summary_pt": "Petrópolis é um município localizado na Região Metropolitana do Rio de Janeiro, no estado do Rio de Janeiro, no Brasil. Ocupa uma área de 795,798 km², e sua população é de 278.881 habitantes, de acordo com o censo do IBGE divulgado em 2023. Além de ser a maior e mais populosa cidade da Região Serrana Fluminense e da Região Geográfica Intermediária de Petrópolis, também detém o maior PIB e IDH da região. O gentílico municipal de Petrópolis é petropolitano."
+  },
+  "phnom-penh": {
+    "wikipedia_en": "Phnom Penh",
+    "summary_en": "Phnom Penh is the capital and most populous city of Cambodia. It has been the national capital since 1865 and has grown to become the nation's primate city and its political, economic, industrial, and cultural centre. The city's name derives from Wat Phnom, a Buddhist temple, and Lady Penh, the city's founder. It sits at the confluence of the Tonlé Sap and Mekong rivers, and is the start of the Bassac River. It is also the seat of Cambodia's monarchy, based at the Royal Palace.",
+    "wikipedia_pt": "Phnom Penh",
+    "summary_pt": "Phnom Penh (em quemer: ភ្នំពេញ; romaniz.: Phnum Pénh; pronunciado em khmer: [pʰnum peɲ]; antigamente romanizado como Panomping; ou, nas formas aportuguesadas, Pnom Pen, Pnom Pene ou Penome Pene, é a capital, cidade mais populosa e o principal centro financeiro, corporativo, econômico e político do Camboja. É uma das quatro cidades com estatuto de província no país. Localizada às margens do rio Mekong e do lago Tonle Sap, Phnom Penh é a capital nacional desde a colonização francesa no país, tornando-se o centro da nação e um importante centro de atividades econômicas e industriais no Sudeste Asiático. Sua população, de acordo com dados de 2019, era de 2,1 milhões de habitantes, e sua área territorial de 678,46 km²."
+  },
+  "phuket": {
+    "wikipedia_en": "Phuket (city)",
+    "summary_en": "Phuket is a city in the southeast of Phuket Island, Thailand, and the capital of Phuket province. As of 2024 the city municipality had a population of 71,284 and an urban population of 252,515 in the entire district of Amphoe Mueang. The broader metropolitan area has a population of about 430,000.",
+    "wikipedia_pt": "Phuket (cidade)",
+    "summary_pt": "Phuket é uma cidade localizada no sudeste da ilha homónima, na Tailândia. É a capital da província de Phuket, abrangendo toda a ilha. A partir de 2007, a cidade tem uma população de 75 573 pessoas. Abrange os subdistritos (tambon) Talad Yai e Talad Nuea de Amphoe Mueang Phuket. A cidade é servida pelo Aeroporto Internacional de Phuket. Foi uma das mais cidades atingidas pelo tsunami ocorrido em dezembro de 2004."
+  },
+  "pirenopolis": {
+    "wikipedia_en": "Pirenópolis",
+    "summary_en": "Pirenópolis, also known as Piri, is a historic municipality located in the Brazilian state of Goiás. It is known for its waterfalls and Portuguese colonial architecture, and a popular festival involving mounted horses called Festa do Divino Espírito Santo which takes place 45 days after Easter. Pirenópolis is located 120 km from Goiânia, the state capital, and 150 km from Brasília, the federal capital.",
+    "wikipedia_pt": "Pirenópolis",
+    "summary_pt": "Pirenópolis, carinhosamente conhecida como Piri pelos turistas, é um município brasileiro situado no estado de Goiás, a aproximadamente 120 km de Goiânia, a capital do estado, e a 150 km de Brasília, a capital federal. Reconhecida por sua rica história, belezas naturais e tradição cultural, a cidade é um importante destino turístico, atraindo visitantes pela exuberância do cerrado, por suas famosas cachoeiras, pela arquitetura colonial portuguesa e pelas festividades tradicionais, especialmente as Cavalhadas, que acontecem durante a Festa do Divino Espírito Santo, um dos eventos culturais mais emblemáticos da cidade."
   },
   "pisa": {
     "wikipedia_en": "Pisa",
@@ -443,11 +851,35 @@
     "wikipedia_pt": "Porto",
     "summary_pt": "Porto é uma cidade portuguesa e capital da sub-região da Área Metropolitana do Porto e da região Norte, pertencendo ao distrito do Porto. É sede do Município do Porto que tem uma área total de 41,42 km2, 248 769 habitantes em 2023 e uma densidade populacional de 6 006 hab./km2, subdividido em 7 freguesias. O município é limitado a norte pelos municípios de Matosinhos e Maia, a leste por Gondomar, a sul por Vila Nova de Gaia e a oeste pelo Oceano Atlântico."
   },
+  "porto-alegre": {
+    "wikipedia_en": "Porto Alegre",
+    "summary_en": "Porto Alegre is the capital and largest city of the Brazilian state of Rio Grande do Sul. Its population of roughly 1.4 million inhabitants (2022) makes it the 11th-most populous city in the country and the centre of Brazil's fifth-largest metropolitan area, with 4.1 million inhabitants (2022). The city is the southernmost capital city of a Brazilian state.",
+    "wikipedia_pt": "Porto Alegre",
+    "summary_pt": "Porto Alegre ) é a capital do estado brasileiro do Rio Grande do Sul. Com uma área de quase 500 km², encontra-se sobre um terreno diversificado, com morros, baixadas e um grande lago: o Guaíba. Está a 2 027 km da capital nacional, Brasília."
+  },
+  "porto-seguro": {
+    "wikipedia_en": "Porto Seguro",
+    "summary_en": "Porto Seguro, is a city located in the far south of Bahia, Brazil. The city has an estimated population of 168,326, covers 2,287 square kilometres (883 mi2), and has a population density of 52.7 residents per square kilometer. The area that includes Porto Seguro and neighbouring Santa Cruz Cabrália and Eunápolis holds a distinctive place in Brazilian history: in 1500 it was the first landing point of Portuguese navigators, principally Pedro Álvares Cabral.",
+    "wikipedia_pt": "Porto Seguro",
+    "summary_pt": "Porto Seguro é um município brasileiro do litoral do estado da Bahia, região Nordeste do país. Localiza-se no extremo sul baiano, estando situado a cerca de 700 km a sudoeste da capital estadual. Ocupa uma área total de aproximadamente 2 285,734 km², sendo que 62,01 km² estão em área urbana, e sua população foi estimada em 184 087 habitantes em 2026."
+  },
   "prague": {
     "wikipedia_en": "Prague",
     "summary_en": "Prague is the capital and largest city of the Czech Republic and the historical capital of Bohemia. Located on the Vltava River, the city has a population of about 1.4 million, making it the twelfth-largest city in the European Union. Its metropolitan area is home to approximately 2.3 million people.",
     "wikipedia_pt": "Praga",
     "summary_pt": "Praga ) é a capital e a maior cidade da Chéquia, situada na margem do Vltava. Conhecida como \"cidade das cem cúpulas\", Praga é um dos mais belos e antigos centros urbanos da Europa, famosa pelo extenso patrimônio arquitetônico e rica vida cultural. Importante também como núcleo de transportes e comunicações, é o principal centro econômico e industrial da Chéquia. Situada na Boêmia central, a cidade de Praga localiza-se sobre colinas, em ambas as margens do rio Vltava, pouco antes de sua confluência com o rio Elba. O curso sinuoso do rio através da cidade, cheia de belas e antigas pontes, contrasta com a presença imponente do grande Castelo de Praga em Hradcany, que domina a capital na margem esquerda (oriental) do Vltava."
+  },
+  "rabat": {
+    "wikipedia_en": "Rabat",
+    "summary_en": "Rabat is the capital city of Morocco, located on the northwestern coasts of the Atlantic Ocean. Rabat is the country's seventh-largest city with a population of 515,619 (2024) and the second largest metropolitan area after Casablanca, with a population of approximately 2.1 million (2025). It is also the capital city of the Rabat-Salé-Kénitra administrative region. Rabat is located on the Atlantic Ocean at the mouth of the river Bou Regreg, opposite Salé, the city's main commuter town.",
+    "wikipedia_pt": "Rabat",
+    "summary_pt": "Rabat ou Rabate é a capital e a segunda maior cidade de Marrocos. Localiza-se na costa do Atlântico. Tem cerca de 1,9 milhões de habitantes.A cidade foi fundada em 1150 pelo califa almóada Abde Almumine, que ali construiu uma fortaleza, uma mesquita e uma residência. Tornou-se cidade imperial em 1660 e foi a capital do Protetorado Francês em Marrocos entre 1912 e 1956."
+  },
+  "recife": {
+    "wikipedia_en": "Recife",
+    "summary_en": "Recife is the state capital of Pernambuco, Brazil, on the northeastern Atlantic coast of South America. It is the largest urban area within both the North and the Northeast Region of Brazil. It is the largest city in Pernambuco state, and the fourth-largest urban area in all of Brazil; the metro population of the city of Recife was 3,726,974 in 2022. Recife was founded in 1537, serving as the main harbor of the Captaincy of Pernambuco—known for its large-scale production of sugar cane. At one point, it was known as Mauritsstad, when it served as the capital city of the 17th century colony of New Holland of Dutch Brazil. Situated at the confluence of the Beberibe and Capibaribe rivers, before they drain into the South Atlantic Ocean, Recife is a major seaport along the Brazilian Atlantic coast. Its name is an allusion to the stone reefs that are present offshore. Together with the urban presence of the Beberibe and Capibaribe rivers and their tributaries, the many additional unique, small islands—and more than 50 bridges linking them throughout the city—create a distinct maritime or \"riviera\" atmosphere, leading to Recife being known as the \"Venice of Brazil\".",
+    "wikipedia_pt": "Recife",
+    "summary_pt": "Recife é a capital do estado brasileiro de Pernambuco, na Região Nordeste do país. Com área territorial de aproximadamente 218 km², é formado por uma planície aluvial, tendo as ilhas, penínsulas e manguezais como suas principais características geográficas. Cidade nordestina com o melhor Índice de Desenvolvimento Humano (IDH-M), o Recife é a quarta capital brasileira na hierarquia da gestão federal, após Brasília, Rio de Janeiro e São Paulo, e possui o quinto aglomerado urbano mais populoso do Brasil, com 3,7 milhões de habitantes em 2022, superado apenas pelas concentrações urbanas de São Paulo, Rio de Janeiro, Belo Horizonte e Brasília. A capital pernambucana tem, num raio de 300 km, três capitais estaduais sob sua influência direta: João Pessoa (122 km), Maceió (257 km) e Natal (286 km)."
   },
   "reykjavik": {
     "wikipedia_en": "Reykjavík",
@@ -460,6 +892,12 @@
     "summary_en": "Riga, officially Riga State City, is the capital, primate, and largest city of Latvia and the second most-populous city in the Baltics. Home to 588,911 inhabitants, the city accounts for a third of Latvia's total population. The population of Riga metropolitan area, which stretches beyond the city limits, is estimated at 847,162. The city lies on the Gulf of Riga at the mouth of the Daugava river where it meets the Baltic Sea. Riga's territory covers 307.17 km2 (118.60 sq mi) and lies 1–10 m (3–33 ft) above sea level on a flat and sandy plain.",
     "wikipedia_pt": "Riga",
     "summary_pt": "Riga ) é a capital e a maior cidade da Letônia. Está localizada no nordeste da Europa, sendo banhada pelo mar Báltico e situado-se no coração do golfo de Riga, na foz do rio Duína Ocidental. É a mais importante cidade da Letônia, principal centro político, cultural, populacional e econômico do país. Segundo dados de 2013, possuí uma população de 643 615 habitantes, ou aproximadamente um terço da população letã no mesmo período. É a mais populosa das capitais bálticas, e a segunda maior área metropolitana da região, depois da região metropolitana de Vilnius."
+  },
+  "rio-de-janeiro": {
+    "wikipedia_en": "Rio de Janeiro",
+    "summary_en": "Rio de Janeiro, also known simply as Rio, is the capital and largest city of the state of Rio de Janeiro. It is the second-largest city in Brazil after São Paulo, and the largest by international tourists. It has a population of 6 million in the city proper, and 13 million people in its metropolitan area as of 2025. It is also the sixth-most-populous city in the Americas.",
+    "wikipedia_pt": "Rio de Janeiro",
+    "summary_pt": "Rio de Janeiro, simplesmente referido como Rio, é a capital do estado brasileiro do Rio de Janeiro. Um dos maiores destinos turísticos internacionais no Brasil, na América Latina e também do Hemisfério Sul, é uma das primeiras cidades do país. É a segunda maior metrópole do Brasil, a sétima maior da América e a décima oitava do mundo. Sua população segundo o censo de 2022 do IBGE era 6 211 223 habitantes. Tem o epíteto de Cidade Maravilhosa, e os que nela nascem são chamados cariocas."
   },
   "rome": {
     "wikipedia_en": "Rome",
@@ -479,6 +917,12 @@
     "wikipedia_pt": "São Petersburgo",
     "summary_pt": "São Petersburgo ou Sampetersburgo é a segunda maior cidade da Rússia, politicamente incorporada como uma cidade autônoma. Ela está localizada ao longo do rio Neva, na entrada do Golfo da Finlândia, no Mar Báltico. Em 1914, o nome da cidade foi mudado para Petrogrado e, em 1924, para Leningrado. Em 1991, após o colapso da União Soviética, a cidade voltou ao seu nome original. É frequentemente chamada apenas de Petersburgo e informalmente conhecida como Peter."
   },
+  "salvador": {
+    "wikipedia_en": "Salvador, Bahia",
+    "summary_en": "Salvador is a Brazilian municipality and capital city of the state of Bahia. Situated in the Zona da Mata in the Northeast Region of Brazil, Salvador is recognized throughout the country and internationally for its cuisine, music, and architecture. The African influence in many cultural aspects of the city makes it a center of Afro-Brazilian culture. As the first capital of Colonial Brazil, the city is one of the oldest in the Americas. Its foundation in 1549 by Tomé de Sousa took place on account of the implementation of the General Government of Brazil by the Portuguese Empire.",
+    "wikipedia_pt": "Salvador",
+    "summary_pt": "Salvador é um município brasileiro, capital do estado da Bahia. Fundada em 29 de março de 1549 por Tomé de Sousa, por conta da implantação do Governo-Geral do Brasil pelo Império Português, foi a primeira capital do Brasil Colonial e está entre as cidades mais antigas continuadamente habitadas do continente americano e uma das primeiras cidades do Brasil, sendo estabelecida como uma cidade planejada, a primeira do tipo no país. A influência africana em muitos aspectos culturais da cidade a torna o centro da cultura afro-brasileira. Salvador ainda é notável em todo o país pela sua gastronomia, música e arquitetura, reconhecidas também internacionalmente."
+  },
   "salzburg": {
     "wikipedia_en": "Salzburg",
     "summary_en": "Salzburg is the fourth-largest city in Austria. In 2026 its population was 157,994. The city lies on the Salzach River, near the border with Germany and at the foot of the Alps mountains.",
@@ -497,6 +941,24 @@
     "wikipedia_pt": "Santiago de Compostela",
     "summary_pt": "Santiago de Compostela é uma cidade e município no noroeste de Espanha. É capital da comunidade autónoma da Galiza e faz parte da província da Corunha e da comarca de Santiago. O município tem 220 km² de área e em 2021 tinha 97 858 habitantes."
   },
+  "santos": {
+    "wikipedia_en": "Santos, São Paulo",
+    "summary_en": "Santos, officially Municipality of Estância Balneária de Santos, is a city and municipality in the Brazilian state of São Paulo, founded in 1546 by the Portuguese nobleman Brás Cubas. It is located mostly on the island of São Vicente, which harbors both the city of Santos and the city of São Vicente. It is the main city in the metropolitan region of Baixada Santista. Santos has a population of 429,570 in an area of 280.67 km2 (108.37 sq mi). The city is home to the Coffee Museum, where world coffee prices were once negotiated, as well as the Port of Santos, through which nearly 29% of the country's trade flow passes. Santos also has a football memorial, called Memorial das Conquistas, which is dedicated to the city's greatest players, which includes Pelé, who spent the majority of his career with Santos Futebol Clube. Its beachfront garden, 5,335 m (5,834 yd) in length, figures in Guinness World Records as the largest beachfront garden in the world.",
+    "wikipedia_pt": "Santos",
+    "summary_pt": "Santos é um município brasileiro no litoral do estado de São Paulo, Região Sudeste do país. Abriga o maior porto da América Latina, que é o principal responsável pela dinâmica econômica da cidade ao lado do turismo, da pesca e do comércio. Ocupa a quinta colocação entre as não capitais mais importantes para a economia brasileira e a décima colocada segundo a qualidade de vida. A cidade é sede do poder executivo paulista todo dia 13 de junho e não apenas sede de diversas instituições de ensino superior como também da mais antiga entidade geral estudantil do Brasil, o Centro dos Estudantes de Santos."
+  },
+  "sao-luis": {
+    "wikipedia_en": "São Luís, Maranhão",
+    "summary_en": "São Luís is the capital and largest city of the Brazilian state of Maranhão. The city is located on São Luís Island, in the Baía de São Marcos, an extension of the Atlantic Ocean which forms the estuary of Pindaré, Mearim, Itapecuru and other rivers. Its coordinates are 2.53° south, 44.30° west. São Luís has the second largest maritime extension within Brazilian states. Its maritime extension is 640 km. The city proper has a population of some 1,088,057 people. The metropolitan area totals 1,536,017, ranked as the 15th largest in Brazil.",
+    "wikipedia_pt": "São Luís (Maranhão)",
+    "summary_pt": "São Luís, também chamada de São Luís do Maranhão, é a capital do estado brasileiro do Maranhão. É a única capital brasileira fundada por franceses, no dia 8 de setembro de 1612, posteriormente invadida por holandeses e, por fim, colonizada pelos portugueses. Localiza-se na ilha de Upaon-Açu no Atlântico Sul, entre as baías de São Marcos e São José de Ribamar, no Golfão Maranhense. Em 1621, quando o Brasil foi dividido em duas unidades administrativas — Estado do Maranhão e Estado do Brasil —, São Luís foi a capital da primeira unidade administrativa. No ano de 1997, o Centro Histórico da cidade foi declarado patrimônio cultural da humanidade pela Unesco."
+  },
+  "sao-paulo": {
+    "wikipedia_en": "São Paulo",
+    "summary_en": "São Paulo is the capital and largest city of the state of São Paulo. The largest city in Brazil, it is also the most populous city in South America, the Americas, and in both the Western and Southern Hemispheres. The city exerts international influence in commerce, finance, culture, gastronomy, arts, fashion, technology, entertainment and media, having been listed by UNESCO's Creative Cities Network as a \"City of Film\" and the title of \"World Capital of Gastronomy\", and by the Globalization and World Cities Research Network (GaWC) as an alpha global city. It is the largest urban area by population outside Asia and the most populous Portuguese-speaking city in the world. The city is named after Paul the Apostle and people from the capital city are known as paulistanos.",
+    "wikipedia_pt": "São Paulo",
+    "summary_pt": "São Paulo é a capital do estado brasileiro de São Paulo. Classificada pela Globalization and World Cities Research Network (GaWC) como uma cidade global alfa, é a área urbana mais populosa do mundo fora da Ásia e exerce significativa influência internacional no comércio, finanças, cultura, gastronomia, artes, moda, tecnologia, entretenimento e mídia, o que lhe garantiu a integração à Rede de Cidades Criativas da Unesco como \"Cidade do Cinema\" e o título de \"Capital Mundial da Gastronomia\". Seu nome homenageia Paulo de Tarso, seus habitantes são conhecidos como paulistanos, enquanto seu lema latino é Non ducor, duco, que se traduz como \"Não sou conduzido, conduzo\"."
+  },
   "sarajevo": {
     "wikipedia_en": "Sarajevo",
     "summary_en": "Sarajevo is the capital and largest city of Bosnia and Herzegovina, with a population of 275,524 in its administrative limits. The Sarajevo Canton, containing the city of Sarajevo and nearby municipalities, is home to 413,593 inhabitants. Located within the greater Sarajevo valley of Bosnia, it is surrounded by the Dinaric Alps and situated along the Miljacka River in the heart of the Balkans, a region of Southeastern Europe.",
@@ -508,6 +970,18 @@
     "summary_en": "Seville is the capital and largest city of the Spanish autonomous community of Andalusia and the province of Seville. It is situated on the lower reaches of the River Guadalquivir, in the southwest of the Iberian Peninsula.",
     "wikipedia_pt": "Sevilha",
     "summary_pt": "Sevilha é uma cidade espanhola situada a sudoeste da Península Ibérica, na comunidade autónoma da Andaluzia. É capital da província homónima. Segundo censo de 2019, havia 1 228 479 de habitantes. Sevilha tem a terceira maior catedral no mundo. Uma das pessoas lá enterradas é Cristóvão Colombo."
+  },
+  "shanghai": {
+    "wikipedia_en": "Shanghai",
+    "summary_en": "Shanghai is a provincial-level direct-administered municipality in China. It has a population of 30,050,000 in the urban area as of 2026, thus making it China's most populous city and more broadly the fifth-largest city in the world by population. The city is located on the southern estuary of the Yangtze River, with the Huangpu River bisecting the city.",
+    "wikipedia_pt": "Xangai",
+    "summary_pt": "Xangai é um dos quatro municípios de administração direta da República Popular da China. A cidade está localizada no estuário sul do rio Yangtzé, pelo qual flui o rio Huangpu. Com uma população de 26,31 milhões, é a maior cidade da China, e uma das cidades mais populosas do mundo e a única cidade do Leste Asiático com um PIB maior que o da capital do seu país. Xangai é um centro global de finanças, negócios e economia, pesquisa, educação, ciência e tecnologia, manufatura, turismo, cultura e transportes, sendo que o Porto de Xangai é o porto de contêineres mais movimentado do mundo."
+  },
+  "siem-reap": {
+    "wikipedia_en": "Siem Reap",
+    "summary_en": "Siem Reap is the second-largest city of Cambodia, as well as the capital and largest city of Siem Reap province in northwestern Cambodia.",
+    "wikipedia_pt": "Siem Reap (cidade)",
+    "summary_pt": "Siem Reap é uma cidade do Camboja, localizada na província de mesmo nome."
   },
   "siena": {
     "wikipedia_en": "Siena",
@@ -539,17 +1013,47 @@
     "wikipedia_pt": "Estrasburgo",
     "summary_pt": "Estrasburgo é uma comuna situada no leste da França, na margem esquerda do Rio Reno. É a capital da região administrativa de Grande Leste e do departamento do Baixo Reno."
   },
+  "tainan": {
+    "wikipedia_en": "Tainan",
+    "summary_en": "Tainan, officially Tainan City, is a special municipality in southern Taiwan, facing the Taiwan Strait on its western coast. Tainan is the oldest city on the island and commonly called the \"prefectural capital\" for its 263-year history as the capital of Taiwan under Dutch rule, the Kingdom of Tungning and later Qing dynasty rule until 1887. Tainan's complex history of comebacks, redefinitions and renewals inspired its popular nickname \"the Phoenix City\". Tainan was classified as a \"Sufficiency\"-level global city by the Globalization and World Cities Research Network in 2020, but was not classified in 2022 and 2024.",
+    "wikipedia_pt": "Tainan",
+    "summary_pt": "Tainan, oficialmente Cidade de Tainan, é uma municipalidade especial de cerca de 1,8 milhão de habitantes localizada no sul da ilha Formosa, de frente para o Estreito de Taiwan. Tainan é a cidade mais antiga do país e também vulgarmente conhecida como a \"Cidade Capital\" em seus mais de 200 anos de história, visto que serviu como a capital de Taiwan durante o governo de Koxinga e, mais tarde, durante o domínio da dinastia Qing. A história complexa de Tainan, com redefinições e renovações, inspirou seu apelido popular de \"Cidade Fênix\". Em 25 de dezembro de 2010, o Condado de Tainan e a cidade foram fundidos em uma municipalidade especial, equivalente a uma província."
+  },
+  "taipei": {
+    "wikipedia_en": "Taipei",
+    "summary_en": "Taipei, officially Taipei City, is the capital and a special municipality of Taiwan. Located in Northern Taiwan, Taipei City is an enclave of the municipality of New Taipei City that sits about 25 kilometres (16 mi) southwest of the northern port city of Keelung. Most of the city rests on the Taipei Basin, an ancient lakebed. The basin is bounded by the relatively narrow valleys of the Keelung and Xindian rivers, which join to form the Tamsui River along the city's western border.",
+    "wikipedia_pt": "Taipé",
+    "summary_pt": "Taipé, oficialmente conhecida como a Cidade de Taipé, é a capital e um município especial de Taiwan. Situada no extremo norte da ilha Formosa, a cidade é um enclave do município de Nova Taipé. Está cerca de 25 quilômetros a sudoeste da cidade portuária de Keelung. Taipé está localizada na bacia homônima, um antigo lago delimitado pelos dois vales relativamente estreitos dos rios Keelung e Xindian, que se juntam para formar o rio Tamsui ao longo da fronteira ocidental da cidade."
+  },
   "tallinn": {
     "wikipedia_en": "Tallinn",
     "summary_en": "Tallinn is the capital and largest city of Estonia. Located on a bay in northern Estonia, on the shore of the Gulf of Finland of the Baltic Sea, it has a population of 452,563 as of 2026, making it the third most-populous city in the Baltics. As of 2024, the population of the Tallinn metropolitan area is estimated at 646,315. Tallinn is the main governmental, financial, industrial, and cultural centre of Estonia. It is located 187 kilometres (116 mi) northwest of the country's second largest city, Tartu, however, only 80 kilometres (50 mi) south of Helsinki, the capital city of Finland. It is also 320 kilometres (200 mi) west of Saint Petersburg, Russia, 300 kilometres (190 mi) north of Riga, Latvia, and 380 kilometres (240 mi) east of Stockholm, Sweden. From the 13th century until the first half of the 20th century, Tallinn was known in most of the world by variants of its other historical name, Reval.",
     "wikipedia_pt": "Tallinn",
     "summary_pt": "Tallinn, Talim, Taline ou Talin é a capital, centro financeiro e maior cidade da Estónia, localizada no golfo da Finlândia, na costa norte do país junto ao mar Báltico, a 80 quilómetros a sul de Helsínquia. Tem cerca de 400 000 habitantes, aproximadamente um terço da população total do país."
   },
+  "tangier": {
+    "wikipedia_en": "Tangier",
+    "summary_en": "Tangier, also called Tangiers, is a city in northwestern Morocco, on the coasts of the Mediterranean Sea and the Atlantic Ocean. The city is the capital of the Tangier-Tetouan-Al Hoceima region, as well as the Tangier-Assilah Prefecture of Morocco.",
+    "wikipedia_pt": "Tânger",
+    "summary_pt": "Tânger é uma cidade do norte de Marrocos, capital da prefeitura de Tânger-Arzila e da região de Tânger-Tetuão-Al Hoceima. Tem 253,5 km² de área e em 2004 tinha 669 685 habitantes."
+  },
   "thessaloniki": {
     "wikipedia_en": "Thessaloniki",
     "summary_en": "Thessaloniki is the capital and largest city of the administrative region of Central Macedonia, and the second-largest city in Greece. It is the largest city of Northern Greece, with over 300,000 in the city proper and slightly over one million inhabitants in its metropolitan area, the capital of the geographic region of Macedonia, and the Decentralized Administration of Macedonia and Thrace. It is also known in Greek as i Symprotévousa, literally \"the co-capital\", a reference to its historical status as the \"co-reigning\" city of the Byzantine Empire alongside Constantinople.",
     "wikipedia_pt": "Salonica",
     "summary_pt": "Salonica, também conhecida como Tessalónica (português europeu) ou Tessalônica (português brasileiro) é a segunda maior cidade da Grécia e a principal cidade da região grega da Macedônia. Em 2011, a população da região metropolitana era de 1 104 460, dos quais 788 952 na cidade propriamente dita e 325 182 no município."
+  },
+  "tiradentes": {
+    "wikipedia_en": "Tiradentes, Minas Gerais",
+    "summary_en": "Tiradentes is a municipality in the Brazilian state of Minas Gerais. It is located at 21°06′37″S 44°12′41″W, has an area of 83.5 km2 (32.2 sq mi), and a maximum elevation above sea level of 927 m. Tiradentes had an estimated population of 8,056 as of 2025. The original village was established in 1702 and became a city on 19 January 1718. In 1889 the city was renamed from Vila de São José do Rio das Mortes in honour of the national hero who was born nearby.",
+    "wikipedia_pt": "Tiradentes (Minas Gerais)",
+    "summary_pt": "Tiradentes é um município brasileiro no interior do estado de Minas Gerais, Região Sudeste do país. Localiza-se na região central mineira e ocupa uma área de cerca de 80 km², sendo que 5 km² estão em perímetro urbano. Sua população foi estimada em 7 744 habitantes em 2022."
+  },
+  "tokyo": {
+    "wikipedia_en": "Tokyo",
+    "summary_en": "Tokyo, officially the Tokyo Metropolis, is the capital and most populous city of Japan. The population of the city proper was over 14 million as of 2023. The Greater Tokyo Area, which includes Tokyo and parts of six neighboring prefectures, is the third-most populous metropolitan area in the world, with 33 million residents as of 2025.",
+    "wikipedia_pt": "Tóquio",
+    "summary_pt": "Tóquio, literalmente \"capital do Leste\"), oficialmente Metrópole de Tóquio , é a capital do Japão e uma das 47 prefeituras do país. Situa-se em Honshu, a maior ilha do arquipélago. Em 2015, Tóquio possuía mais de 13,4 milhões de habitantes, cerca de 11% da população do país, e a Região Metropolitana de Tóquio possui mais de 37 milhões de habitantes, o que torna a aglomeração de Tóquio, independentemente de como se define, como a área urbana mais populosa do mundo. Um de seus monumentos mais famosos é a Torre de Tóquio. Foi fundada em 1457, com o nome de Edo ou Yedo. Tornou-se a capital do Império em 1868 com a atual designação. Sofreu grande destruição duas vezes; uma em 1923, quando foi atingida por um terremoto; e outra em 1944 e 1945, quando bombardeios americanos destruíram grande parte da cidade, sendo que no total foi destruída 51% de sua área e mortas mais de 80 mil pessoas."
   },
   "toledo": {
     "wikipedia_en": "Toledo, Spain",
@@ -568,6 +1072,18 @@
     "summary_en": "Turin is a city and a business and cultural centre in northern Italy. It is the capital and largest city of Piedmont and of the Metropolitan City of Turin. From 1861 to 1865, it was the first capital of the Kingdom of Italy. The city is mainly on the western bank of the River Po, below its Susa Valley, and is surrounded by the western Alpine arch and Superga hill. The population of the city proper is 855,654 as of 2026, while the population of the urban area is estimated by Eurostat to be 1.7 million inhabitants. The Turin metropolitan area is estimated by the OECD to have a population of 2.2 million.",
     "wikipedia_pt": "Turim",
     "summary_pt": "Turim é uma comuna italiana, capital e maior cidade da região do Piemonte, e efetivamente a quarta maior cidade do país, com uma população de 910 188 habitantes (2009), estando atrás apenas de Roma, Milão e Nápoles. Estende-se por uma área de 130 km², tendo uma densidade populacional de 6 596 hab/km². Faz fronteira com Venaria Reale, Settimo Torinese, Borgaro Torinese, San Mauro Torinese, Collegno, Rivoli, Baldissero Torinese, Grugliasco, Pino Torinese, Orbassano, Pecetto Torinese, Beinasco, Moncalieri e Nichelino."
+  },
+  "ubatuba": {
+    "wikipedia_en": "Ubatuba",
+    "summary_en": "Ubatuba is a Brazilian municipality, located on the northeast coast, in the state of São Paulo. It is part of the Metropolitan Region of Vale do Paraíba e Litoral Norte. The population is 92,819 in an area of 723.88 km2, of which 83% is located in the Serra do Mar State Park.",
+    "wikipedia_pt": "Ubatuba",
+    "summary_pt": "Ubatuba, oficialmente Estância Balneária de Ubatuba, é um município brasileiro do estado de São Paulo. Localizada na Mesorregião do Vale do Paraíba Paulista e na Microrregião de Caraguatatuba, trata-se de uma estância balneária cujo território ocupa uma área de 708,105km², sendo 83% coberto pelo Parque Estadual da Serra do Mar. O Censo 2022 apontou que sua população era de 92 981 habitantes, resultando em uma densidade populacional de 131,1 hab/km². O município é formado pela sede e pelo distrito de Picinguaba."
+  },
+  "ubud": {
+    "wikipedia_en": "Ubud",
+    "summary_en": "Ubud is a town in the Gianyar Regency of Bali, Indonesia. Ubud has no status; that is part of the eponymous Ubud District of Gianyar. Promoted as an arts and culture centre, Ubud has developed a large tourism industry. It forms a northern part of the Greater Denpasar metropolitan area.",
+    "wikipedia_pt": "Ubud",
+    "summary_pt": "Ubud é uma cidade da ilha Indonésia de Bali, localizada entre plantações de arroz e vilas agrícolas, no Kabupaten (regência) de Gianyar. É considerada um dos principais centros de artes e cultura de Bali, com o turismo crescendo cada vez mais."
   },
   "utrecht": {
     "wikipedia_en": "Utrecht",
@@ -605,11 +1121,23 @@
     "wikipedia_pt": "Viena",
     "summary_pt": "Viena ) é a capital da Áustria e um dos nove estados austríacos. Com mais de dois milhões de habitantes, em 2025, é a cidade mais populosa da Áustria contando, ainda, com 2,9 milhões de habitantes em sua região metropolitana — o que equivale a cerca de um quarto da população total do país. Viena é, ainda, a sétima maior cidade da União Europeia e a segunda maior cidade de língua alemã no mundo, depois de Berlim. A cidade é basicamente uma das muitas comunidades da Áustria, mas também é uma cidade legal na classificação de um distrito político e, desde 29 de dezembro de 1921, a \"lei da separação\" constitucional classifica-a como um estado, sua posição original mantida até hoje."
   },
+  "vientiane": {
+    "wikipedia_en": "Vientiane",
+    "summary_en": "Vientiane is the capital and largest city of Laos. Comprising the 5 urban districts of Vientiane Prefecture, the city is located on the banks of the Mekong, close to the border with Thailand. Vientiane was the administrative capital during French rule. The city had a population of 840,000 as of the 2023 census. Pha That Luang, an icon of Buddhism, is located in Vientiane. Other Buddhist temples can be found there, such as Haw Phra Kaew, which formerly housed the Emerald Buddha.",
+    "wikipedia_pt": "Vientiane",
+    "summary_pt": "Vientiane ou Vienciana é a capital e a maior cidade do Laos. Está localizada às margens do rio Mecom, que faz fronteira com a Tailândia neste ponto. As informações sobre o número de habitantes variam muito, mas estima-se que há pelo menos 200 000 pessoas no município, o que corresponde a 10% da população do país."
+  },
   "vilnius": {
     "wikipedia_en": "Vilnius",
     "summary_en": "Vilnius is the capital and largest city of Lithuania and the most-populous city in the Baltic states. The city's estimated July 2026 population was 619,405, and the Vilnius urban area has an estimated population of 767,907.",
     "wikipedia_pt": "Vilnius",
     "summary_pt": "Vilnius ), Vílnius ou Vilna é a capital da República da Lituânia. É a cidade mais populosa do país, com cerca de 600 mil habitantes."
+  },
+  "vitoria": {
+    "wikipedia_en": "Vitória, Espírito Santo",
+    "summary_en": "Vitória is the capital of the state of Espírito Santo, Brazil. It is located on a small island within a bay where a number of rivers meet the sea. It was founded in 1551. The city proper is 93 square kilometres and has a population of 322,869 (2022), whilst the Greater Vitória metropolitan area has a population of more than 1,880,828, the 14th largest in Brazil.",
+    "wikipedia_pt": "Vitória (Espírito Santo)",
+    "summary_pt": "Vitória é a capital do estado brasileiro do Espírito Santo, na Região Sudeste do país. Situada a 20º19'09' de latitude sul e 40°20'50' de longitude oeste, Vitória se limita ao norte com o município da Serra, ao sul com Vila Velha, a leste com o oceano Atlântico e a oeste com Cariacica. É uma das três ilhas-capitais do Brasil, cujas respectivas regiões metropolitanas abrangem inteiramente ilhas localizadas no litoral brasileiro ao longo do Oceano Atlântico, sendo que a maior parte do município está localizada na Ilha de Vitória."
   },
   "warsaw": {
     "wikipedia_en": "Warsaw",
@@ -622,6 +1150,24 @@
     "summary_en": "Wrocław is a city in southwestern Poland, and the capital of the Lower Silesian Voivodeship. It is the largest city and historical capital of the regions of Silesia and Lower Silesia. It lies on the banks of the Oder (Odra) River in the Silesian Lowlands. In 2025, the official population of Wrocław was 672,545, making it the third-largest city in Poland. The population of the Wrocław metropolitan area is around 1.25 million.",
     "wikipedia_pt": "Breslávia",
     "summary_pt": "Breslávia é uma cidade da Baixa Silésia, na Polônia. Tem cerca de 672 000 habitantes, o que a torna a terceira mais populosa cidade da Polônia. Localiza–se nas margens do rio Oder, a cerca de 350 km ao sudoeste de Varsóvia."
+  },
+  "xian": {
+    "wikipedia_en": "Xi'an",
+    "summary_en": "Xi'an is the capital of the Chinese province of Shaanxi. A sub-provincial city on the Guanzhong plain, the city is the most populous in the province and third-most populous in Western China after Chongqing and Chengdu, as well as the most populous in Northwestern China. Based on the city's 2025 1% population sample survey, its estimated year-end resident population was 13.24 million, of whom 10.72 million were urban residents.",
+    "wikipedia_pt": "Xian",
+    "summary_pt": "Xian é uma cidade da China, capital da província de Xianxim. Situa-se no vale do rio Wei. Foi a capital da China ao longo de várias dinastias: Qin, Han e Tang."
+  },
+  "yangon": {
+    "wikipedia_en": "Yangon",
+    "summary_en": "Yangon, also romanized in English as Rangoon, is the capital city of the Yangon Region and the largest city of Myanmar. Yangon was the capital city of Myanmar until 2005 and served as such until 2006, when the military government relocated the administrative functions to the purpose-built capital city of Naypyidaw in north central Myanmar. With over five million people, Yangon is Myanmar's most populous city and its most important commercial centre.",
+    "wikipedia_pt": "Rangum",
+    "summary_pt": "Yangon ou, em português, Rangum é a maior cidade de Mianmar, antiga capital. Seu nome é formado por duas palavras: yan, que significa inimigos, e koun, que significa livrar-se de, fugir de - \"cidade sem inimigos\"."
+  },
+  "yogyakarta": {
+    "wikipedia_en": "Yogyakarta",
+    "summary_en": "Yogyakarta is the capital city of the Special Region of Yogyakarta in Indonesia, in the south-central part of the island of Java. As the only Indonesian royal city still ruled by a monarchy, Yogyakarta is regarded as an important centre for classical Javanese fine arts and culture such as ballet, batik textiles, drama, literature, music, poetry, silversmithing, visual arts, and wayang puppetry. Renowned as a centre of Indonesian education, Yogyakarta is home to a large student population and dozens of schools and universities, including Gadjah Mada University, the country's largest institute of higher education and one of its most prestigious.",
+    "wikipedia_pt": "Joguejacarta",
+    "summary_pt": "Joguejacarta, Jogjacarta ou Jojacarta é uma cidade da Indonésia, capital da região especial homónima, na ilha de Java. É conhecida como um centro de educação e centro cultural de artes tradicionais javanesas, como batique, dança, teatro, música, poesia e espetáculos de marionetas. O centro urbano tem 46 km² de área e em 2010 tinha 388 627 habitantes. \nA cidade foi a capital dos revoltosos durante a Revolução Nacional da Indonésia, entre 1945 e 1949, período durante o qual o gabinete do presidente funcionou no Gedung Agung, um dos atuais seis palácios presidenciais da Indonésia. Kotagede, atualmente um dos distritos de Joguejacarta, foi a capital do Sultanato de Matarão entre 1575 e 1640."
   },
   "york": {
     "wikipedia_en": "York",

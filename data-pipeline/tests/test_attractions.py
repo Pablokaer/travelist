@@ -5,7 +5,13 @@ from pathlib import Path
 import pytest
 
 from wayfarer_pipeline.attractions import commons, overpass, pageviews
-from wayfarer_pipeline.attractions.categories import AVG_VISIT_MINUTES, classify
+from wayfarer_pipeline.attractions.categories import (
+    AVG_VISIT_MINUTES,
+    CATEGORIES,
+    ROOTS,
+    _class_roots,
+    classify,
+)
 from wayfarer_pipeline.attractions.pipeline import (
     dedupe,
     is_notable,
@@ -38,6 +44,31 @@ TYPE_ROOTS = {
     "Q88372": ["Q88372"],  # promenade (Promenade des Anglais)
     "Q1060829": ["Q1060829"],  # concert hall (Elbphilharmonie)
     "Q25550691": ["Q25550691"],  # city hall (Stockholm City Hall)
+    # Nature (D-068). Real chain: national park is a subclass of park (and of protected
+    # area), so the class reaches the park root as well as its own.
+    "Q46169": ["Q46169", "Q22698"],  # national park (Tijuca Forest)
+    "Q22698": ["Q22698"],  # park (Vondelpark)
+    "Q167346": ["Q167346", "Q1107656"],  # botanical garden (Jardim Botânico do Rio)
+    "Q40080": ["Q40080"],  # beach (Copacabana)
+    "Q179049": ["Q179049"],  # nature reserve
+    "Q8502": ["Q8502"],  # mountain (Sugarloaf Mountain, Corcovado)
+    "Q34038": ["Q34038"],  # waterfall
+    "Q35509": ["Q35509"],  # cave
+    "Q23442": ["Q23442"],  # island
+    "Q187223": ["Q187223", "Q23397"],  # lagoon (Rodrigo de Freitas Lagoon), a kind of lake
+    "Q570116": ["Q570116"],  # tourist attraction
+    "Q5003624": ["Q5003624"],  # memorial
+    "Q473972": [],  # protected area itself is not a root (it also covers UK conservation areas)
+    # Heritage classes checked for the Asia/Morocco batch (2026-10-03), real chains. Already
+    # covered: mausoleum/tomb reach memorial + monument, city gate reaches fortification,
+    # pagoda reaches tower + structure of worship.
+    "Q162875": ["Q4989906", "Q5003624"],  # mausoleum (Saadian Tombs, Ho Chi Minh Mausoleum)
+    "Q82117": ["Q57821", "Q860861"],  # city gate (Bab Agnaou)
+    "Q199451": ["Q12518", "Q1370598"],  # pagoda
+    "Q132834": ["Q132834"],  # madrasa (Ben Youssef Madrasa)
+    "Q676050": ["Q676050"],  # old town (Vilnius Old Town, Fes el Bali)
+    "Q1128906": ["Q1128906"],  # medina quarter (Medina of Marrakesh)
+    "Q15243209": [],  # historic district: not a root (sweeps in plain neighbourhoods)
 }
 
 
@@ -59,6 +90,27 @@ TYPE_ROOTS = {
         ({"Q88372"}, "landmark"),
         ({"Q1060829"}, "other"),
         ({"Q25550691"}, "landmark"),
+        ({"Q46169"}, "nature"),  # national park: its own park superclass does not count
+        ({"Q22698"}, "park"),  # urban parks stay parks
+        ({"Q167346"}, "park"),
+        ({"Q22698", "Q179049"}, "park"),  # Richmond Park: a park that is also a nature reserve
+        ({"Q8502"}, "nature"),  # Sugarloaf Mountain, Corcovado
+        ({"Q40080"}, "nature"),
+        ({"Q8502", "Q8"}, "viewpoint"),  # a summit observation tower stays a viewpoint
+        ({"Q35509", "Q570116"}, "landmark"),  # Batu Caves: a cave temple, a tourist attraction
+        ({"Q23442", "Q5003624"}, "monument"),  # Island of Tears (Minsk): a memorial island
+        ({"Q34038"}, "nature"),
+        ({"Q35509"}, "nature"),
+        ({"Q23442"}, "nature"),
+        ({"Q187223"}, "nature"),
+        ({"Q473972"}, None),
+        ({"Q162875"}, "monument"),
+        ({"Q82117"}, "castle"),
+        ({"Q199451"}, "landmark"),
+        ({"Q132834"}, "landmark"),
+        ({"Q676050"}, "landmark"),
+        ({"Q1128906"}, "landmark"),
+        ({"Q15243209"}, None),
         (set(), None),
     ],
 )
@@ -69,6 +121,26 @@ def test_classify(types, category):
 def test_avg_visit_minutes_defaults():
     assert AVG_VISIT_MINUTES["museum"] == 90 and AVG_VISIT_MINUTES["viewpoint"] == 15
     assert all(5 <= m <= 600 for m in AVG_VISIT_MINUTES.values())
+
+
+def test_heritage_roots_for_asia_and_morocco():
+    for qid in ("Q132834", "Q676050", "Q1128906"):  # madrasa, old town, medina quarter
+        assert ROOTS[qid] == "landmark"
+    assert "Q15243209" not in ROOTS  # historic district
+
+
+def test_class_roots_drop_park_only_for_nature_areas():
+    assert _class_roots(["Q46169", "Q22698"]) == {"Q46169"}  # national park
+    assert _class_roots(["Q167346", "Q1107656"]) == {"Q167346", "Q1107656"}  # botanical garden
+    assert _class_roots([]) == set()
+
+
+def test_nature_is_a_category_with_its_own_roots():
+    assert "nature" in CATEGORIES and AVG_VISIT_MINUTES["nature"] == 90
+    nature_roots = {q for q, category in ROOTS.items() if category == "nature"}
+    assert {"Q40080", "Q34038", "Q46169", "Q179049", "Q8502"} <= nature_roots
+    # Too broad: covers urban conservation areas and heritage districts (e.g. Highgate).
+    assert "Q473972" not in ROOTS
 
 
 # -- popularity ---------------------------------------------------------------------------
