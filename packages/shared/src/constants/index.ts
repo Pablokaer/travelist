@@ -18,6 +18,9 @@ export const ATTRACTION_CATEGORIES = [
   'viewpoint',
   'landmark',
   'park',
+  // Natural sights (beaches, waterfalls, national parks, mountains…), D-068. Right after park,
+  // as in the database enum.
+  'nature',
   'palace',
   'other',
 ] as const;
@@ -32,6 +35,7 @@ export const DEFAULT_VISIT_MINUTES: Record<AttractionCategory, number> = {
   viewpoint: 15,
   landmark: 20,
   park: 45,
+  nature: 90,
   palace: 75,
   other: 30,
 };

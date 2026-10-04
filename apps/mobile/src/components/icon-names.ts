@@ -73,6 +73,7 @@ export const ICONS = {
   viewpoint: { ios: 'binoculars', android: 'landscape', web: 'landscape' },
   landmark: { ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' },
   park: { ios: 'leaf', android: 'park', web: 'park' },
+  nature: { ios: 'mountain.2', android: 'forest', web: 'forest' },
   palace: { ios: 'crown', android: 'fort', web: 'fort' },
   other: { ios: 'ellipsis.circle', android: 'more_horiz', web: 'more_horiz' },
 } satisfies Record<string, SymbolName>;

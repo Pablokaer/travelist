@@ -4,7 +4,7 @@
      data-pipeline/cities.yaml and data-pipeline/data/attractions. Do not edit by hand:
      `ingest` and `seed` rewrite it, and CI fails when it is stale. -->
 
-**107 cities** in **39 countries**, **107** live on the map, **17,358 attractions** in total.
+**198 cities** in **52 countries**, **197** live on the map, **22,756 attractions** in total.
 
 Cities are listed in the order they were added to `cities.yaml`. When a city is added,
 also record it in [CHANGELOG.md](../CHANGELOG.md). How to add one: see
@@ -122,3 +122,94 @@ number of UNESCO sites; date the data was retrieved.
 | 105 | Moscow | Moscovo | Russia (RU) | `moscow` | 300 | 99% | 47% | 17% | 3 | 2026-10-03 | active |
 | 106 | Saint Petersburg | São Petersburgo | Russia (RU) | `saint-petersburg` | 300 | 99% | 31% | 17% | 9 | 2026-10-03 | active |
 | 107 | Minsk | Minsk | Belarus (BY) | `minsk` | 115 | 99% | 7% | 12% | 0 | 2026-10-03 | active |
+| 108 | Marrakech | Marraquexe | Morocco (MA) | `marrakesh` | 42 | 100% | 38% | 19% | 21 | 2026-10-03 | active |
+| 109 | Fez | Fez | Morocco (MA) | `fez` | 54 | 93% | 11% | 4% | 37 | 2026-10-03 | active |
+| 110 | Casablanca | Casablanca | Morocco (MA) | `casablanca` | 25 | 80% | 16% | 4% | 0 | 2026-10-03 | active |
+| 111 | Rabat | Rabat | Morocco (MA) | `rabat` | 34 | 97% | 29% | 9% | 4 | 2026-10-03 | active |
+| 112 | Tangier | Tânger | Morocco (MA) | `tangier` | 24 | 79% | 4% | 4% | 0 | 2026-10-03 | active |
+| 113 | Yangon | Rangum | Myanmar (MM) | `yangon` | 43 | 70% | 2% | 12% | 0 | 2026-10-03 | active |
+| 114 | Mandalay | Mandalay | Myanmar (MM) | `mandalay` | 24 | 75% | 0% | 4% | 0 | 2026-10-03 | active |
+| 115 | Bangkok | Banguecoque | Thailand (TH) | `bangkok` | 300 | 84% | 5% | 11% | 0 | 2026-10-03 | active |
+| 116 | Chiang Mai | Chiang Mai | Thailand (TH) | `chiang-mai` | 63 | 84% | 8% | 11% | 0 | 2026-10-03 | active |
+| 117 | Phuket | Phuket | Thailand (TH) | `phuket` | 13 | 92% | 0% | 0% | 0 | 2026-10-03 | active |
+| 118 | Phra Nakhon Si Ayutthaya | Ayutthaya | Thailand (TH) | `ayutthaya` | 26 | 92% | 4% | 0% | 0 | 2026-10-03 | active |
+| 119 | Phnom Penh | Phnom Penh | Cambodia (KH) | `phnom-penh` | 23 | 91% | 9% | 13% | 0 | 2026-10-03 | active |
+| 120 | Siem Reap | Siem Reap | Cambodia (KH) | `siem-reap` | 51 | 92% | 24% | 8% | 2 | 2026-10-03 | active |
+| 121 | Hanoi | Hanói | Vietnam (VN) | `hanoi` | 62 | 89% | 10% | 23% | 1 | 2026-10-03 | active |
+| 122 | Ho Chi Minh City | Cidade de Ho Chi Minh | Vietnam (VN) | `ho-chi-minh-city` | 58 | 91% | 7% | 12% | 0 | 2026-10-03 | active |
+| 123 | Huế | Huế | Vietnam (VN) | `hue` | 24 | 88% | 4% | 12% | 10 | 2026-10-03 | active |
+| 124 | Hội An | Hội An | Vietnam (VN) | `hoi-an` | 7 | 86% | 29% | 29% | 1 | 2026-10-03 | active |
+| 125 | Da Nang | Da Nang | Vietnam (VN) | `da-nang` | 15 | 93% | 7% | 7% | 0 | 2026-10-03 | active |
+| 126 | Vientiane | Vienciana | Laos (LA) | `vientiane` | 15 | 87% | 13% | 20% | 0 | 2026-10-03 | active |
+| 127 | Luang Prabang | Luang Prabang | Laos (LA) | `luang-prabang` | 18 | 83% | 0% | 6% | 0 | 2026-10-03 | active |
+| 128 | Kuala Lumpur | Kuala Lumpur | Malaysia (MY) | `kuala-lumpur` | 77 | 82% | 1% | 19% | 0 | 2026-10-03 | active |
+| 129 | George Town | George Town | Malaysia (MY) | `george-town` | 46 | 87% | 0% | 17% | 0 | 2026-10-03 | active |
+| 130 | Malacca | Malaca | Malaysia (MY) | `malacca` | 50 | 96% | 12% | 8% | 0 | 2026-10-03 | active |
+| 131 | Jakarta | Jacarta | Indonesia (ID) | `jakarta` | 100 | 74% | 7% | 15% | 0 | 2026-10-03 | active |
+| 132 | Yogyakarta | Joguejacarta | Indonesia (ID) | `yogyakarta` | 49 | 78% | 10% | 14% | 2 | 2026-10-03 | active |
+| 133 | Ubud | Ubud | Indonesia (ID) | `ubud` | 13 | 85% | 15% | 54% | 0 | 2026-10-03 | active |
+| 134 | Manila | Manila | Philippines (PH) | `manila` | 128 | 85% | 3% | 8% | 1 | 2026-10-03 | active |
+| 135 | Cebu City | Cidade de Cebu | Philippines (PH) | `cebu-city` | 20 | 70% | 10% | 5% | 0 | 2026-10-03 | active |
+| 136 | Beijing | Pequim | China (CN) | `beijing` | 250 | 85% | 11% | 10% | 4 | 2026-10-03 | active |
+| 137 | Shanghai | Xangai | China (CN) | `shanghai` | 128 | 87% | 10% | 16% | 0 | 2026-10-03 | active |
+| 138 | Xi'an | Xi'an | China (CN) | `xian` | 41 | 88% | 20% | 12% | 4 | 2026-10-03 | active |
+| 139 | Hangzhou | Hangzhou | China (CN) | `hangzhou` | 51 | 82% | 2% | 8% | 0 | 2026-10-03 | active |
+| 140 | Chengdu | Chengdu | China (CN) | `chengdu` | 35 | 89% | 14% | 3% | 0 | 2026-10-03 | active |
+| 141 | Taipei | Taipé | Taiwan (TW) | `taipei` | 204 | 89% | 2% | 28% | 0 | 2026-10-03 | active |
+| 142 | Tainan | Tainan | Taiwan (TW) | `tainan` | 49 | 96% | 2% | 18% | 0 | 2026-10-03 | active |
+| 143 | Tokyo | Tóquio | Japan (JP) | `tokyo` | 300 | 98% | 18% | 36% | 1 | 2026-10-03 | active |
+| 144 | Kyoto | Quioto | Japan (JP) | `kyoto` | 266 | 97% | 11% | 24% | 17 | 2026-10-03 | active |
+| 145 | Osaka | Osaka | Japan (JP) | `osaka` | 152 | 95% | 4% | 12% | 0 | 2026-10-03 | active |
+| 146 | Nara | Nara | Japan (JP) | `nara` | 110 | 88% | 11% | 16% | 13 | 2026-10-03 | active |
+| 147 | Hiroshima | Hiroshima | Japan (JP) | `hiroshima` | 38 | 92% | 13% | 13% | 1 | 2026-10-03 | active |
+| 148 | Rio de Janeiro | Rio de Janeiro | Brazil (BR) | `rio-de-janeiro` | 300 | 86% | 100% | 11% | 2 | 2026-10-03 | active |
+| 149 | São Paulo | São Paulo | Brazil (BR) | `sao-paulo` | 300 | 93% | 100% | 19% | 0 | 2026-10-03 | active |
+| 150 | Foz do Iguaçu | Foz do Iguaçu | Brazil (BR) | `foz-do-iguacu` | 17 | 94% | 82% | 18% | 2 | 2026-10-03 | active |
+| 151 | Salvador | Salvador | Brazil (BR) | `salvador` | 300 | 86% | 100% | 2% | 1 | 2026-10-03 | active |
+| 152 | Florianópolis | Florianópolis | Brazil (BR) | `florianopolis` | 90 | 78% | 99% | 0% | 0 | 2026-10-03 | active |
+| 153 | Armação dos Búzios | Armação dos Búzios | Brazil (BR) | `buzios` | 5 | 60% | 100% | 0% | 0 | 2026-10-03 | active |
+| 154 | Recife | Recife | Brazil (BR) | `recife` | 90 | 84% | 100% | 10% | 0 | 2026-10-03 | active |
+| 155 | Fortaleza | Fortaleza | Brazil (BR) | `fortaleza` | 64 | 86% | 100% | 9% | 0 | 2026-10-03 | active |
+| 156 | Natal | Natal | Brazil (BR) | `natal` | 39 | 79% | 97% | 0% | 0 | 2026-10-03 | active |
+| 157 | Porto Alegre | Porto Alegre | Brazil (BR) | `porto-alegre` | 156 | 83% | 98% | 17% | 0 | 2026-10-03 | active |
+| 158 | Brasília | Brasília | Brazil (BR) | `brasilia` | 62 | 85% | 100% | 16% | 2 | 2026-10-03 | active |
+| 159 | Belo Horizonte | Belo Horizonte | Brazil (BR) | `belo-horizonte` | 93 | 87% | 100% | 11% | 1 | 2026-10-03 | active |
+| 160 | Curitiba | Curitiba | Brazil (BR) | `curitiba` | 77 | 73% | 100% | 19% | 0 | 2026-10-03 | active |
+| 161 | Manaus | Manaus | Brazil (BR) | `manaus` | 41 | 90% | 100% | 7% | 1 | 2026-10-03 | active |
+| 162 | Maceió | Maceió | Brazil (BR) | `maceio` | 23 | 43% | 100% | 0% | 0 | 2026-10-03 | active |
+| 163 | Porto Seguro | Porto Seguro | Brazil (BR) | `porto-seguro` | 8 | 100% | 100% | 0% | 3 | 2026-10-03 | active |
+| 164 | Ipojuca | Ipojuca | Brazil (BR) | `ipojuca` | 9 | 33% | 100% | 0% | 0 | 2026-10-03 | active |
+| 165 | Balneário Camboriú | Balneário Camboriú | Brazil (BR) | `balneario-camboriu` | 4 | 25% | 100% | 0% | 0 | 2026-10-03 | active |
+| 166 | Gramado | Gramado | Brazil (BR) | `gramado` | 11 | 91% | 100% | 18% | 0 | 2026-10-03 | active |
+| 167 | Canela | Canela | Brazil (BR) | `canela` | 11 | 91% | 100% | 18% | 0 | 2026-10-03 | active |
+| 168 | Campos do Jordão | Campos do Jordão | Brazil (BR) | `campos-do-jordao` | 11 | 73% | 91% | 0% | 0 | 2026-10-03 | active |
+| 169 | Ouro Preto | Ouro Preto | Brazil (BR) | `ouro-preto` | 53 | 96% | 98% | 6% | 2 | 2026-10-03 | active |
+| 170 | Paraty | Paraty | Brazil (BR) | `paraty` | 24 | 83% | 96% | 4% | 2 | 2026-10-03 | active |
+| 171 | Bonito | Bonito | Brazil (BR) | `bonito` | 4 | 100% | 100% | 0% | 0 | 2026-10-03 | active |
+| 172 | João Pessoa | João Pessoa | Brazil (BR) | `joao-pessoa` | 33 | 82% | 94% | 0% | 0 | 2026-10-03 | active |
+| 173 | Aracaju | Aracaju | Brazil (BR) | `aracaju` | 18 | 89% | 100% | 6% | 0 | 2026-10-03 | active |
+| 174 | São Luís | São Luís | Brazil (BR) | `sao-luis` | 57 | 75% | 100% | 4% | 1 | 2026-10-03 | active |
+| 175 | Belém | Belém | Brazil (BR) | `belem` | 127 | 65% | 100% | 7% | 0 | 2026-10-03 | active |
+| 176 | Fernando de Noronha | Fernando de Noronha | Brazil (BR) | `fernando-de-noronha` | 13 | 62% | 100% | 8% | 1 | 2026-10-03 | active |
+| 177 | Jijoca de Jericoacoara | Jijoca de Jericoacoara | Brazil (BR) | `jericoacoara` | 6 | 67% | 83% | 17% | 0 | 2026-10-03 | active |
+| 178 | Angra dos Reis | Angra dos Reis | Brazil (BR) | `angra-dos-reis` | 18 | 78% | 94% | 0% | 1 | 2026-10-03 | active |
+| 179 | Arraial do Cabo | Arraial do Cabo | Brazil (BR) | `arraial-do-cabo` | 12 | 83% | 92% | 0% | 0 | 2026-10-03 | active |
+| 180 | Cabo Frio | Cabo Frio | Brazil (BR) | `cabo-frio` | 12 | 83% | 100% | 0% | 0 | 2026-10-03 | active |
+| 181 | Petrópolis | Petrópolis | Brazil (BR) | `petropolis` | 23 | 87% | 100% | 4% | 0 | 2026-10-03 | active |
+| 182 | Ilhabela | Ilhabela | Brazil (BR) | `ilhabela` | 9 | 78% | 100% | 0% | 0 | 2026-10-03 | active |
+| 183 | Ubatuba | Ubatuba | Brazil (BR) | `ubatuba` | 26 | 88% | 100% | 4% | 0 | 2026-10-03 | active |
+| 184 | Santos | Santos | Brazil (BR) | `santos` | 64 | 86% | 100% | 11% | 0 | 2026-10-03 | active |
+| 185 | Tiradentes | Tiradentes | Brazil (BR) | `tiradentes` | 9 | 100% | 100% | 0% | 0 | 2026-10-03 | active |
+| 186 | Olinda | Olinda | Brazil (BR) | `olinda` | 31 | 87% | 100% | 10% | 1 | 2026-10-03 | active |
+| 187 | Ilhéus | Ilhéus | Brazil (BR) | `ilheus` | 15 | 87% | 100% | 0% | 0 | 2026-10-03 | active |
+| 188 | Maragogi | Maragogi | Brazil (BR) | `maragogi` | 0 | – | – | – | 0 | 2026-10-03 | inactive |
+| 189 | Caldas Novas | Caldas Novas | Brazil (BR) | `caldas-novas` | 2 | 50% | 100% | 0% | 0 | 2026-10-03 | active |
+| 190 | Pirenópolis | Pirenópolis | Brazil (BR) | `pirenopolis` | 11 | 100% | 100% | 0% | 0 | 2026-10-03 | active |
+| 191 | Bento Gonçalves | Bento Gonçalves | Brazil (BR) | `bento-goncalves` | 2 | 50% | 100% | 0% | 0 | 2026-10-03 | active |
+| 192 | Lençóis | Lençóis | Brazil (BR) | `lencois` | 21 | 95% | 100% | 0% | 0 | 2026-10-03 | active |
+| 193 | Barreirinhas | Barreirinhas | Brazil (BR) | `barreirinhas` | 3 | 33% | 100% | 0% | 1 | 2026-10-03 | active |
+| 194 | Aparecida | Aparecida | Brazil (BR) | `aparecida` | 7 | 86% | 100% | 14% | 0 | 2026-10-03 | active |
+| 195 | Vitória | Vitória | Brazil (BR) | `vitoria` | 51 | 80% | 100% | 4% | 1 | 2026-10-03 | active |
+| 196 | Mata de São João | Mata de São João | Brazil (BR) | `mata-de-sao-joao` | 2 | 100% | 100% | 0% | 0 | 2026-10-03 | active |
+| 197 | Alto Paraíso de Goiás | Alto Paraíso de Goiás | Brazil (BR) | `alto-paraiso-de-goias` | 1 | 100% | 100% | 0% | 1 | 2026-10-03 | active |
+| 198 | Petrolina | Petrolina | Brazil (BR) | `petrolina` | 5 | 60% | 100% | 0% | 0 | 2026-10-03 | active |
