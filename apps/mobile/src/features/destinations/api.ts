@@ -52,6 +52,11 @@ export type AttractionDetail = AttractionSummary & {
   openingHours: string | null;
   fee: string | null;
   wikidataId: string;
+  /** Wikipedia introduction and History excerpt (D-070); null without an article or section. */
+  summaryEn: string | null;
+  summaryPt: string | null;
+  historyEn: string | null;
+  historyPt: string | null;
 };
 
 /**
@@ -271,6 +276,10 @@ function attractionDetailFromRow(r: AttractionDetailRow): AttractionDetail {
     openingHours: r.opening_hours,
     fee: r.fee,
     wikidataId: r.wikidata_id!,
+    summaryEn: r.summary_en,
+    summaryPt: r.summary_pt,
+    historyEn: r.history_en,
+    historyPt: r.history_pt,
   };
 }
 

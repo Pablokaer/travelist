@@ -191,7 +191,8 @@ Deno.test('checklist: full response for a Brazilian in Lisbon validates against 
   assertEquals(passport.rule, 'schengen_3m_after_departure');
   // arrival defaults to today, departure to arrival + 7 → 2026-10-04 + 3 months.
   assertEquals(passport.requiredUntil, '2027-01-04');
-  assertEquals(passport.validity, 'unknown');
+  // No expiry date: the passport is assumed valid.
+  assertEquals(passport.validity, 'ok');
 
   const power = okSection(r.power);
   assertEquals(power.homePlugs, ['N', 'C']);

@@ -57,7 +57,7 @@ const routes = { _layout: RootLayout, onboarding: OnboardingScreen };
 describe('onboarding', () => {
   it('sends new users to onboarding and validates each step', async () => {
     renderRouter(routes, { initialUrl: '/onboarding' });
-    expect(await screen.findByText('Step 1 of 3')).toBeOnTheScreen();
+    expect(await screen.findByText('Step 1 of 2')).toBeOnTheScreen();
 
     await userEvent.press(screen.getByRole('button', { name: 'Next' }));
     expect(await screen.findByText('This field is required')).toBeOnTheScreen();
@@ -68,11 +68,21 @@ describe('onboarding', () => {
     expect(await screen.findByText('Use 3–20 lowercase letters, numbers or _')).toBeOnTheScreen();
     await userEvent.type(screen.getByTestId('nickname'), 'ana_walks');
     await userEvent.press(screen.getByRole('button', { name: 'Next' }));
-    expect(await screen.findByText('Step 2 of 3')).toBeOnTheScreen();
+    expect(await screen.findByText('Step 2 of 2')).toBeOnTheScreen();
 
-    // Nationality is mandatory.
-    await userEvent.press(screen.getByRole('button', { name: 'Next' }));
+    // Nationality is mandatory (step 2 is the last one: the passport expiry step was removed).
+    await userEvent.press(screen.getByRole('button', { name: 'Start exploring' }));
     expect(await screen.findByText('Add at least one nationality')).toBeOnTheScreen();
+  });
+
+  it('does not ask for the passport expiry date', async () => {
+    renderRouter(routes, { initialUrl: '/onboarding' });
+    await userEvent.type(await screen.findByTestId('displayName'), 'Ana');
+    await userEvent.type(screen.getByTestId('nickname'), 'ana_walks');
+    await userEvent.press(screen.getByRole('button', { name: 'Next' }));
+    expect(await screen.findByRole('button', { name: 'Start exploring' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeNull();
+    expect(screen.queryByTestId('passportExpiry')).toBeNull();
   });
 
   it('keeps the nickname chosen at sign-up', async () => {
@@ -101,7 +111,6 @@ describe('onboarding', () => {
     await userEvent.press(screen.getByRole('button', { name: 'Choose a country' }));
     await userEvent.type(await screen.findByLabelText('Search countries'), 'bras');
     await userEvent.press(await screen.findByRole('radio', { name: 'Brazil' }));
-    await userEvent.press(screen.getByRole('button', { name: 'Next' }));
     await userEvent.press(await screen.findByRole('button', { name: 'Start exploring' }));
     expect(await screen.findByText('This nickname is taken. Try another.')).toBeOnTheScreen();
   });

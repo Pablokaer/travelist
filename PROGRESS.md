@@ -165,6 +165,13 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Bounding boxes:** centre-based where municipalities are huge or reach offshore (Beijing, Shanghai, Xi'an, Tokyo, Hanoi, São Paulo, Brasília, Manaus, Vitória…), some including nearby sights visitors reach from the city (Great Wall, Terracotta Army, Angkor, Prambanan) — commented in `cities.yaml` (D-067).
 - **Known gap:** Wikidata covers small tourist towns thinly (candidates need a Wikipedia article): Maragogi has none and is inactive; Alto Paraíso 1, Caldas Novas 2, Bento Gonçalves 2, Mata de São João 2, Barreirinhas 3, Bonito 4, Balneário Camboriú 4, Phuket 13, Hội An 7. A second source (OSM natural features and attractions) would fill them.
 
+## 2026-10-05 — Wikipedia stories on city and attraction pages (D-070, Europe)
+
+- **City pages:** the whole introduction of the city's article plus a **History** excerpt, with **Read the full article on Wikipedia**, for the 105 European cities (104 with History in English, 89 in Portuguese).
+- **Attraction pages:** introduction and History excerpt instead of the one-line description for 12,947 of 17,262 European places (churches 2,075 of 3,283 with a story); the rest keep the description. New columns `cities.history_*`, `attractions.summary_*` / `history_*`.
+- **Pipeline:** `city-summaries --region/--city`, new `attraction-texts` (15,428 article requests, about 80 minutes).
+- **Next:** the other regions (`attraction-texts --all`); attraction texts in the monthly refresh and the data gate.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

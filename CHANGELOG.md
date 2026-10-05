@@ -11,6 +11,17 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Changed
+
+- City pages and attraction pages tell more of the story (D-070). **About {city}** shows the whole introduction of the city's Wikipedia article (it was the first paragraph) and a new **History** part with an excerpt of the article's History section; attraction pages show their article's introduction (what it is, why it matters) and **History** (what happened there) instead of only Wikidata's one-line description. Both end with "From Wikipedia · CC BY-SA 4.0" and **Read the full article on Wikipedia**. New columns `cities.history_*` and `attractions.summary_*` / `history_*` (exposed by `attraction_details`; new migration). European cities first.
+- Pipeline: `city-summaries` reads the article through MediaWiki `prop=extracts` (introduction + History) instead of the REST summary and takes `--region europe` or `--city <slug>`, keeping the other cities; the new `attraction-texts` command writes `data/attraction_texts/<slug>.json`, which `seed` joins into `40_attractions.sql` (D-070).
+
+- Onboarding no longer asks for the passport expiry date: it has 2 steps (about you, your passports) (D-069). Without an expiry date the passport is assumed valid, so the checklist's passport validity shows **ok** instead of "Add your passport expiry date…". The date can still be added in Edit profile.
+
+### Data
+
+- Wikipedia texts for Europe's 105 cities and their attractions, retrieved 2026-10-05 (D-070). Cities: longer introductions for all 105, a History excerpt for 104 in English and 89 in Portuguese (Brussels' article has no History section). Attractions: 12,947 of Europe's 17,262 places have texts — 12,464 English and 3,262 Portuguese introductions, 7,087 English and 1,353 Portuguese History excerpts (churches 2,075 of 3,283 with a story, castles 334 of 519, palaces 673 of 964, monuments 626 of 1,331). 8 texts with leftover wiki markup upstream are left out. No city or attraction added or removed (198 cities, 22,756 attractions).
+
 ### Added
 
 - Nature category for natural sights (D-068): beaches, waterfalls, national parks and nature reserves, caves, islands, lakes and lagoons, dunes, mountains and hills, canyons, hot springs, natural arches. It has its own tab next to Parks ("Nature" / "Natureza"), a forest icon, a teal map colour and a 90-minute default visit. Enum value `nature` (new migration). Existing cities gain nature items at their next re-ingest.

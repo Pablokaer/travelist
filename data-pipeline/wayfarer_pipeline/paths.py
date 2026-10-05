@@ -8,6 +8,7 @@ PIPELINE_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = PIPELINE_DIR.parent
 DATA_DIR = PIPELINE_DIR / "data"
 ATTRACTIONS_DIR = DATA_DIR / "attractions"
+ATTRACTION_TEXTS_DIR = DATA_DIR / "attraction_texts"
 CACHE_DIR = PIPELINE_DIR / ".cache"
 SEED_DIR = REPO_ROOT / "supabase" / "seed"
 

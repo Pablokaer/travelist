@@ -53,6 +53,24 @@ def test_attractions_sql_is_deterministic_and_sorted():
     assert "'church'::public.attraction_category" in sql_a
 
 
+def test_attractions_sql_carries_the_wikipedia_texts():
+    docs = {"london": {"attractions": [_attraction("Q1"), _attraction("Q2")]}}
+    texts = {
+        "london": {
+            "Q1": {
+                "summary_en": "A cathedral.",
+                "history_en": "Rebuilt after 1666.",
+                "summary_pt": None,
+                "history_pt": None,
+            }
+        }
+    }
+    sql, _ = seed.attractions_sql(docs, texts)
+    assert "summary_en, summary_pt, history_en, history_pt" in sql
+    assert "'A cathedral.', null, 'Rebuilt after 1666.', null" in sql
+    assert sql.count("null, null, null, null)") == 1  # Q2 has no texts
+
+
 def test_attractions_duplicate_qid_across_cities_is_skipped():
     docs = {
         "a": {"attractions": [_attraction("Q1")]},

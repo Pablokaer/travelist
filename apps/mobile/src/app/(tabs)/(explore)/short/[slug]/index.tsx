@@ -1,9 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
-import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components/button';
 import { Screen, Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
@@ -13,10 +10,10 @@ import { useCityAbout } from '@/features/destinations/city-about-api';
 import { CityHero } from '@/features/destinations/city-hero';
 import { CityNotFound } from '@/features/destinations/city-not-found';
 import { usePrefetchCityPlaces } from '@/features/destinations/use-prefetch-city-places';
+import { WikipediaTextBlock } from '@/features/destinations/wikipedia-texts';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { CityWalklistsSection } from '@/features/trips/city-walklists-section';
 import { UpcomingMeetupsSection } from '@/features/trips/upcoming-meetups-section';
-import { spacing } from '@/theme/colors';
 
 /**
  * City page (`/short/[slug]`, D-033): the hub of a city, opened from its card on the Home —
@@ -64,37 +61,12 @@ function AboutSection({ city }: { city: City }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage ?? 'en';
   const about = useCityAbout(city.slug, lang);
-  const source = about.data?.sourceUrl;
+  const empty = !about.isPending && !about.data?.summary && !about.data?.history;
   return (
     <Section title={t('cityHub.about', { city: cityName(city, lang) })}>
       {about.isPending ? <LoadingState /> : null}
-      {about.data?.summary ? (
-        <Text style={styles.summary}>{about.data.summary}</Text>
-      ) : about.isPending ? null : (
-        <Text secondary>{t('cityHub.noAbout')}</Text>
-      )}
-      {about.data?.summary ? (
-        <View style={styles.source}>
-          <Text variant="helper" secondary>
-            {t('cityHub.aboutSource')}
-          </Text>
-          {source ? (
-            <Button
-              compact
-              variant="ghost"
-              icon="external"
-              label={t('cityHub.readMore')}
-              accessibilityRole="link"
-              onPress={() => void WebBrowser.openBrowserAsync(source)}
-            />
-          ) : null}
-        </View>
-      ) : null}
+      {about.data ? <WikipediaTextBlock texts={about.data} /> : null}
+      {empty ? <Text secondary>{t('cityHub.noAbout')}</Text> : null}
     </Section>
   );
 }
-
-const styles = StyleSheet.create({
-  summary: { fontSize: 17, lineHeight: 27 },
-  source: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
-});

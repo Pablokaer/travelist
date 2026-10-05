@@ -62,13 +62,14 @@ describe('passport validity', () => {
     expect(r.status).toBe('warning');
   });
 
-  it('is unknown without an expiry date and clamps month ends', () => {
+  // The expiry date is no longer asked at sign-up, so a passport without one counts as valid.
+  it('assumes a valid passport without an expiry date and clamps month ends', () => {
     const r = checkPassportValidity({
       destination: 'US',
       nationalities: ['BR'],
       arrival: '2026-08-31',
     });
-    expect(r.status).toBe('unknown');
+    expect(r.status).toBe('ok');
     expect(r.requiredUntil).toBe('2027-02-28');
   });
 });

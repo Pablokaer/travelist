@@ -1,4 +1,5 @@
 import { render, screen, userEvent, within } from '@testing-library/react-native';
+import * as WebBrowser from 'expo-web-browser';
 
 import AttractionScreen from '@/app/attraction/[id]';
 import type { AttractionDetail } from '@/features/destinations/api';
@@ -31,9 +32,14 @@ class MockAttractionServer {
     openingHours: null,
     fee: null,
     wikidataId: 'Q1',
+    summaryEn: null,
+    summaryPt: null,
+    historyEn: null,
+    historyPt: null,
   };
 }
 
+jest.mock('expo-web-browser', () => ({ openBrowserAsync: jest.fn() }));
 jest.mock('expo-router', () => ({
   Stack: { Screen: () => null },
   useLocalSearchParams: () => ({ id: 'a1' }),
@@ -74,4 +80,39 @@ test('the page adds a sixth place to the route: no plan limit (D-065)', async ()
   expect(useRouteStore.getState().stops).toHaveLength(6);
   expect(screen.queryByText(/places per list/)).toBeNull();
   expect(screen.getByRole('button', { name: 'Remove from route' })).toBeOnTheScreen();
+});
+
+describe('the Wikipedia story of the place (D-070)', () => {
+  const plain = MockAttractionServer.detail;
+  afterEach(() => {
+    MockAttractionServer.detail = plain;
+  });
+
+  test('shows the introduction, its history and a link to the full article', async () => {
+    MockAttractionServer.detail = {
+      ...plain,
+      descriptionEn: 'tower in Lisbon',
+      wikipediaEn: 'Belém Tower',
+      summaryEn: 'A 16th-century fortification that served as a gateway to Lisbon.',
+      historyEn: 'King John II designed a defence system for the mouth of the Tagus.',
+    };
+    render(<AttractionScreen />);
+    expect(screen.getByText(/gateway to Lisbon/)).toBeOnTheScreen();
+    expect(screen.getByText('History')).toBeOnTheScreen();
+    expect(screen.getByText(/defence system for the mouth of the Tagus/)).toBeOnTheScreen();
+    expect(screen.getByText('From Wikipedia · CC BY-SA 4.0')).toBeOnTheScreen();
+    // The one-line Wikidata description is redundant next to the introduction.
+    expect(screen.queryByText('tower in Lisbon')).toBeNull();
+    await userEvent.press(screen.getByRole('link', { name: 'Read the full article on Wikipedia' }));
+    expect(WebBrowser.openBrowserAsync).toHaveBeenCalledWith(
+      'https://en.wikipedia.org/wiki/Bel%C3%A9m_Tower',
+    );
+  });
+
+  test('without an article text, the short description stays', () => {
+    MockAttractionServer.detail = { ...plain, descriptionEn: 'tower in Lisbon' };
+    render(<AttractionScreen />);
+    expect(screen.getByText('tower in Lisbon')).toBeOnTheScreen();
+    expect(screen.queryByText('History')).toBeNull();
+  });
 });
