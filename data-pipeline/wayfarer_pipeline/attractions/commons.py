@@ -9,7 +9,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 from .. import sparql
-from ..http import HttpClient
+from ..sparql import WikidataClient
 
 API = "https://commons.wikimedia.org/w/api.php"
 BATCH = 50
@@ -20,12 +20,23 @@ MAX_URL_LENGTH = 6000
 MAX_AUTHOR_CHARS = 300
 
 
+UNKNOWN_TWICE = re.compile(r"\bUnknown author(?: Unknown author)+\b")
+
+
+def _undouble(text: str) -> str:
+    """``"Unknown author Unknown author"`` → ``"Unknown author"``: Commons' markup for unknown
+    authors repeats the name as a link and its label, alone or inside a longer credit."""
+    text = UNKNOWN_TWICE.sub("Unknown author", text)
+    half = len(text) // 2
+    return text[:half] if len(text) % 2 == 1 and text[:half] == text[half + 1 :] else text
+
+
 def strip_html(value: str | None) -> str | None:
     if not value:
         return None
     text = re.sub(r"<[^>]+>", " ", value)
     text = html.unescape(text)
-    text = re.sub(r"\s+", " ", text).strip()
+    text = _undouble(re.sub(r"\s+", " ", text).strip())
     if not text:
         return None
     return text if len(text) <= MAX_AUTHOR_CHARS else text[: MAX_AUTHOR_CHARS - 1] + "…"
@@ -93,7 +104,7 @@ def _fitting(chunk: list[str]) -> list[list[str]]:
     return _fitting(chunk[:half]) + _fitting(chunk[half:])
 
 
-def fetch(client: HttpClient, filenames: list[str]) -> dict[str, dict[str, Any] | None]:
+def fetch(client: WikidataClient, filenames: list[str]) -> dict[str, dict[str, Any] | None]:
     out: dict[str, dict[str, Any] | None] = {}
     for batch in sparql.chunks(sorted(set(filenames)), BATCH):
         for chunk in _fitting(batch):

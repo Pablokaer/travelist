@@ -663,5 +663,22 @@
     "source": "From Wikipedia · CC BY-SA 4.0",
     "readFull": "Read the full article on Wikipedia",
     "history": "History"
+  },
+  "people": {
+    "title": "Famous people of {{city}}",
+    "filter": {
+      "all": "All",
+      "history": "Historical figures",
+      "writer": "Writers",
+      "music": "Musicians",
+      "art": "Artists"
+    },
+    "born": "born {{year}}",
+    "bce": "{{year}} BC",
+    "bornHere": "Born here",
+    "diedHere": "Died here",
+    "bornAndDiedHere": "Born and died here",
+    "photoCredit": "Photo: {{author}} · {{license}}",
+    "credit": "People born or died in the city, best known first. From Wikidata (CC0); photos from Wikimedia Commons."
   }
 }

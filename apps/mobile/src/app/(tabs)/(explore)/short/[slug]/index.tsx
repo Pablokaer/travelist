@@ -11,13 +11,14 @@ import { CityHero } from '@/features/destinations/city-hero';
 import { CityNotFound } from '@/features/destinations/city-not-found';
 import { usePrefetchCityPlaces } from '@/features/destinations/use-prefetch-city-places';
 import { WikipediaTextBlock } from '@/features/destinations/wikipedia-texts';
+import { NotablePeopleSection } from '@/features/people/notable-people-section';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { CityWalklistsSection } from '@/features/trips/city-walklists-section';
 import { UpcomingMeetupsSection } from '@/features/trips/upcoming-meetups-section';
 
 /**
  * City page (`/short/[slug]`, D-033): the hub of a city, opened from its card on the Home —
- * photo, rating, About, upcoming meetups (D-041), community and official walk lists, Before you
+ * photo, rating, About, famous people (D-071), upcoming meetups (D-041), community and official walk lists, Before you
  * go and reviews.
  * "Explore attractions" opens the Map / List page (`/city/[slug]`).
  */
@@ -45,6 +46,7 @@ function CityHub({ city }: { city: City }) {
       />
       <CityHero city={city} onExplore={openAttractions} />
       <AboutSection city={city} />
+      <NotablePeopleSection city={city} />
       <UpcomingMeetupsSection city={city} />
       <CityWalklistsSection city={city} kind="community" />
       <CityWalklistsSection city={city} kind="official" />

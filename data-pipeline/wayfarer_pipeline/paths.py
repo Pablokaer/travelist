@@ -9,6 +9,7 @@ REPO_ROOT = PIPELINE_DIR.parent
 DATA_DIR = PIPELINE_DIR / "data"
 ATTRACTIONS_DIR = DATA_DIR / "attractions"
 ATTRACTION_TEXTS_DIR = DATA_DIR / "attraction_texts"
+PEOPLE_DIR = DATA_DIR / "people"
 CACHE_DIR = PIPELINE_DIR / ".cache"
 SEED_DIR = REPO_ROOT / "supabase" / "seed"
 

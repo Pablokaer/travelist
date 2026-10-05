@@ -132,6 +132,31 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"notable_people": {
+                  Row: {
+                    "birth_year": number | null,"born_here": boolean,"categories": (string)[],"city_slug": string,"created_at": string,"death_year": number | null,"description_en": string | null,"description_pt": string | null,"died_here": boolean,"image_author": string | null,"image_license": string | null,"image_license_url": string | null,"image_page_url": string | null,"image_url": string | null,"name_en": string,"name_pt": string | null,"sitelinks": number,"updated_at": string,"wikidata_id": string,"wikipedia_en": string | null,"wikipedia_pt": string | null
+                  }
+                  Insert: {
+                    "birth_year"?: number | null,"born_here"?: boolean,"categories": (string)[],"city_slug": string,"created_at"?: string,"death_year"?: number | null,"description_en"?: string | null,"description_pt"?: string | null,"died_here"?: boolean,"image_author"?: string | null,"image_license"?: string | null,"image_license_url"?: string | null,"image_page_url"?: string | null,"image_url"?: string | null,"name_en": string,"name_pt"?: string | null,"sitelinks"?: number,"updated_at"?: string,"wikidata_id": string,"wikipedia_en"?: string | null,"wikipedia_pt"?: string | null
+                  }
+                  Update: {
+                    "birth_year"?: number | null,"born_here"?: boolean,"categories"?: (string)[],"city_slug"?: string,"created_at"?: string,"death_year"?: number | null,"description_en"?: string | null,"description_pt"?: string | null,"died_here"?: boolean,"image_author"?: string | null,"image_license"?: string | null,"image_license_url"?: string | null,"image_page_url"?: string | null,"image_url"?: string | null,"name_en"?: string,"name_pt"?: string | null,"sitelinks"?: number,"updated_at"?: string,"wikidata_id"?: string,"wikipedia_en"?: string | null,"wikipedia_pt"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notable_people_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "cities"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "notable_people_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_list"
+      referencedColumns: ["slug"]
+    }
+                  ]
                 },"plans": {
                   Row: {
                     "billing_interval": string | null,"can_delete_lists": boolean,"created_at": string,"currency": string,"id": string,"is_default": boolean,"max_items_per_list": number | null,"max_lists": number | null,"price_cents": number,"sort_order": number

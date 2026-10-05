@@ -20,10 +20,12 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Data
 
+- Famous people for 179 of the 198 cities, retrieved 2026-10-05 (D-071): 4,143 people — 2,396 historical figures, 1,544 writers, 1,135 musicians, 1,065 artists (a person can be in several) — 3,908 with a Commons portrait. Cities with fewer than 12 people at 20 sitelinks use 8. 19 small towns have nobody listed: Alto Paraíso de Goiás, Arraial do Cabo, Balneário Camboriú, Barreirinhas, Bonito, Búzios, Cabo Frio, Caldas Novas, Campos do Jordão, Fernando de Noronha, Gramado, Hội An, Ilhabela, Ipojuca, Jericoacoara, Maragogi, Pirenópolis, Porto Seguro, Ubatuba. No city or attraction added or removed.
 - Wikipedia texts for Europe's 105 cities and their attractions, retrieved 2026-10-05 (D-070). Cities: longer introductions for all 105, a History excerpt for 104 in English and 89 in Portuguese (Brussels' article has no History section). Attractions: 12,947 of Europe's 17,262 places have texts — 12,464 English and 3,262 Portuguese introductions, 7,087 English and 1,353 Portuguese History excerpts (churches 2,075 of 3,283 with a story, castles 334 of 519, palaces 673 of 964, monuments 626 of 1,331). 8 texts with leftover wiki markup upstream are left out. No city or attraction added or removed (198 cities, 22,756 attractions).
 
 ### Added
 
+- **Famous people** on the city page (D-071): the best known historical figures, writers, musicians and artists born or died in the city, with filters (All · Historical figures · Writers · Musicians · Artists) over a row of cards — portrait with its Commons credit, name, life years, a one-line description and "Born here" / "Died here" — each opening the person's Wikipedia article. New table `notable_people` (new migration, `50_people.sql`) and pipeline command `people --all | --region europe | --city <slug>` (Wikidata + Commons → `data/people/<slug>.json`).
 - Nature category for natural sights (D-068): beaches, waterfalls, national parks and nature reserves, caves, islands, lakes and lagoons, dunes, mountains and hills, canyons, hot springs, natural arches. It has its own tab next to Parks ("Nature" / "Natureza"), a forest icon, a teal map colour and a 90-minute default visit. Enum value `nature` (new migration). Existing cities gain nature items at their next re-ingest.
 - The landmark category also covers madrasas, old towns and medina quarters (e.g. Ben Youssef Madrasa, Fes el Bali, the Medina of Marrakesh) (D-068).
 - Password recovery (D-066): **Forgot password?** on sign-in opens `/forgot-password`, which always answers "If an account exists for {email}, we've sent it a link…" (no account enumeration). The email's link opens `/auth/reset-password` on any device: new password and confirmation (min 8 characters), then you are signed in; an invalid or expired link offers **Request a new link**.
@@ -70,6 +72,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Photo credits from Wikimedia Commons no longer repeat the author ("Unknown author Unknown author", "Kell Kell"): Commons' markup gives the name twice; 152 attraction photos fixed, and the pipeline collapses it from now on.
 - Pipeline: a Commons image-credit request for 50 long non-Latin file names (Belgrade's Cyrillic ones) went over Wikimedia's URL limit (HTTP 414) and stopped the city's ingestion; batches whose URL would pass 6,000 characters are now halved, and batches that fit keep their shape (and their cache).
 
 - Security CI: the new `braces` advisory GHSA-vfj7-8cjw-p6xm (stack exhaustion on deeply nested patterns; no patched version) failed `pnpm audit` and dependency review. It only reaches dev and build tools (jest, metro, `@expo/cli`), so it is ignored in `pnpm-workspace.yaml` and allowed in `security.yml`, like the node-forge advisory (D-049); drop both once a fixed `braces` ships.

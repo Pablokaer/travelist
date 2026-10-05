@@ -172,6 +172,13 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Pipeline:** `city-summaries --region/--city`, new `attraction-texts` (15,428 article requests, about 80 minutes).
 - **Next:** the other regions (`attraction-texts --all`); attraction texts in the monthly refresh and the data gate.
 
+## 2026-10-05 — Famous people on the city page (D-071)
+
+- **City page:** "Famous people of {city}" — filters All · Historical figures · Writers · Musicians · Artists over a row of cards (portrait and credit, life years, description, born/died here) that open Wikipedia.
+- **Data:** 4,143 people in 179 of 198 cities (Wikidata + Commons), new table `notable_people`, pipeline command `people`. 19 small towns have nobody listed.
+- **Fix:** doubled Commons credits ("Unknown author Unknown author") collapsed — 152 attraction photos.
+- **Next:** people tied to a city in other ways (residence, burial), districts as birthplaces; people in the monthly refresh and the data gate.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

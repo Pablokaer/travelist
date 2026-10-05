@@ -663,5 +663,22 @@
     "source": "Da Wikipédia · CC BY-SA 4.0",
     "readFull": "Ler o artigo completo na Wikipédia",
     "history": "História"
+  },
+  "people": {
+    "title": "Personalidades de {{city}}",
+    "filter": {
+      "all": "Todos",
+      "history": "Figuras históricas",
+      "writer": "Escritores",
+      "music": "Músicos",
+      "art": "Artistas"
+    },
+    "born": "n. {{year}}",
+    "bce": "{{year}} a.C.",
+    "bornHere": "Nasceu aqui",
+    "diedHere": "Morreu aqui",
+    "bornAndDiedHere": "Nasceu e morreu aqui",
+    "photoCredit": "Foto: {{author}} · {{license}}",
+    "credit": "Pessoas que nasceram ou morreram na cidade, das mais conhecidas para as menos. Dados do Wikidata (CC0); fotos da Wikimedia Commons."
   }
 }
