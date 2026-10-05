@@ -16,18 +16,14 @@ import { Screen } from '@/components/screen';
 import { Text } from '@/components/text';
 import { FormError } from '@/features/auth/components';
 import { profileSaveError, useProfile, useSaveProfile } from '@/features/profile/api';
-import {
-  NameAndPreferencesFields,
-  NationalityFields,
-  PassportFields,
-} from '@/features/profile/profile-fields';
+import { NameAndPreferencesFields, NationalityFields } from '@/features/profile/profile-fields';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
+// The passport expiry step was removed: the passport is assumed valid (still editable in the profile).
 const STEP_FIELDS = [
   ['displayName', 'nickname', 'language', 'units'],
   ['nationalities', 'homeCountry'],
-  ['passportExpiry'],
 ] as const satisfies readonly (readonly (keyof ProfileForm)[])[];
 
 export default function OnboardingScreen() {
@@ -55,11 +51,8 @@ export default function OnboardingScreen() {
   };
   const finish = handleSubmit((form) => save.mutate(form));
 
-  const titles = [
-    t('onboarding.step1Title'),
-    t('onboarding.step2Title'),
-    t('onboarding.step3Title'),
-  ];
+  const titles = [t('onboarding.step1Title'), t('onboarding.step2Title')];
+  const lastStep = titles.length - 1;
 
   return (
     <Screen width="form" edges={['left', 'right']}>
@@ -73,14 +66,13 @@ export default function OnboardingScreen() {
           ))}
         </View>
         <Text variant="label" secondary accessibilityLiveRegion="polite">
-          {t('onboarding.progress', { step: step + 1, total: 3 })}
+          {t('onboarding.progress', { step: step + 1, total: titles.length })}
         </Text>
       </View>
       <Text variant="title">{titles[step]}</Text>
       <Card style={styles.fields}>
         {step === 0 ? <NameAndPreferencesFields control={control} /> : null}
         {step === 1 ? <NationalityFields control={control} /> : null}
-        {step === 2 ? <PassportFields control={control} /> : null}
       </Card>
       <FormError message={profileSaveError(save.error, t)} />
       <View style={styles.actions}>
@@ -92,7 +84,7 @@ export default function OnboardingScreen() {
             style={styles.flex}
           />
         ) : null}
-        {step < 2 ? (
+        {step < lastStep ? (
           <Button label={t('common.next')} onPress={() => void next()} style={styles.flex} />
         ) : (
           <Button

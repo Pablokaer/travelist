@@ -58,6 +58,9 @@ POLICIES: dict[str, HostPolicy] = {
     "overpass-api.de": HostPolicy(min_interval=5.0, concurrency=1, timeout=300.0, deadline=360.0),
     "wikimedia.org": HostPolicy(min_interval=0.1, concurrency=4),
     "commons.wikimedia.org": HostPolicy(min_interval=0.1, concurrency=2),
+    # Article texts (D-070): thousands of small API reads; Wikimedia asks for modest parallelism.
+    "en.wikipedia.org": HostPolicy(min_interval=0.1, concurrency=2),
+    "pt.wikipedia.org": HostPolicy(min_interval=0.1, concurrency=2),
     "raw.githubusercontent.com": HostPolicy(min_interval=0.5, concurrency=1),
     "api.github.com": HostPolicy(min_interval=1.0, concurrency=1),
 }

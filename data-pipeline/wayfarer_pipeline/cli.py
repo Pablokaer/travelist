@@ -3,7 +3,10 @@
 python -m wayfarer_pipeline validate-config
 python -m wayfarer_pipeline countries          # Wikidata → data/countries.json → 10_countries.sql
 python -m wayfarer_pipeline cities             # cities.yaml → 20_cities.sql
-python -m wayfarer_pipeline city-summaries     # Wikipedia leads → data/city_summaries.json → 20
+python -m wayfarer_pipeline city-summaries [--region europe | --city lisbon]  # Wikipedia intro +
+                                               # history → data/city_summaries.json → 20
+python -m wayfarer_pipeline attraction-texts --region europe | --city lisbon | --all  # D-070
+                                               # → data/attraction_texts → 40
 python -m wayfarer_pipeline visa               # passport-index → data/visa.csv → 30_visa.sql
 python -m wayfarer_pipeline ingest --city lisbon | --all [--jobs 3]  # → data/attractions → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
@@ -19,7 +22,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from . import city_summaries, countries, coverage, seed, visa
+from . import attraction_texts, city_summaries, countries, coverage, regions, seed, visa
 from .attractions import pipeline
 from .config import DEFAULT_CITIES_FILE, CitiesConfig, load_cities
 from .gates.baseline import GitBaseline
@@ -70,12 +73,36 @@ def _cmd_cities(args: argparse.Namespace) -> int:
     return 0
 
 
+def _selected(args: argparse.Namespace, config: CitiesConfig) -> list:
+    return regions.select(config, countries.load(), region=args.region, city=args.city)
+
+
 def _cmd_city_summaries(args: argparse.Namespace) -> int:
     config = load_cities(args.config)
-    summaries = city_summaries.build(_client(args), config)
+    cities = _selected(args, config)
+    summaries = city_summaries.build(_client(args), config, cities, city_summaries.load())
     city_summaries.save(summaries)
     print(city_summaries.summary_line(summaries))
     print(f"wrote {seed.write_cities(config)}")
+    return 0
+
+
+def _cmd_attraction_texts(args: argparse.Namespace) -> int:
+    config = load_cities(args.config)
+    docs = pipeline.load_all()
+    client = _client(args)
+    for city in _selected(args, config):
+        if city.slug not in docs:
+            print(f"  {city.slug}: no attractions file; skipped")
+            continue
+        texts = attraction_texts.build_city(client, docs[city.slug])
+        print(
+            f"  wrote {attraction_texts.save(city.slug, texts)} ({len(texts)} places)", flush=True
+        )
+    print(attraction_texts.summary_line(attraction_texts.load_all()))
+    path, _ = seed.write_attractions()
+    print(f"wrote {path}")
+    print(f"http: {client.stats['network']} network requests, {client.stats['cache']} cached")
     return 0
 
 
@@ -171,6 +198,15 @@ def _cmd_gate(args: argparse.Namespace) -> int:
     return 1 if report.blocked else 0
 
 
+def _add_city_selection(command: argparse.ArgumentParser, required: bool) -> None:
+    """``--city`` / ``--region`` (/ ``--all`` when a choice is required); none means all cities."""
+    target = command.add_mutually_exclusive_group(required=required)
+    target.add_argument("--city", help="city slug from cities.yaml")
+    target.add_argument("--region", choices=sorted(regions.REGION_TIMEZONE_PREFIXES))
+    if required:
+        target.add_argument("--all", action="store_true", help="all cities")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="wayfarer-pipeline")
     parser.add_argument("--config", type=Path, default=DEFAULT_CITIES_FILE)
@@ -184,9 +220,16 @@ def build_parser() -> argparse.ArgumentParser:
         func=_cmd_countries
     )
     sub.add_parser("cities", help="cities.yaml → 20_cities.sql").set_defaults(func=_cmd_cities)
-    sub.add_parser(
-        "city-summaries", help="fetch Wikipedia city leads → data/city_summaries.json"
-    ).set_defaults(func=_cmd_city_summaries)
+    summaries = sub.add_parser(
+        "city-summaries", help="fetch Wikipedia city texts → data/city_summaries.json"
+    )
+    _add_city_selection(summaries, required=False)
+    summaries.set_defaults(func=_cmd_city_summaries)
+    texts = sub.add_parser(
+        "attraction-texts", help="fetch Wikipedia attraction texts → data/attraction_texts"
+    )
+    _add_city_selection(texts, required=True)
+    texts.set_defaults(func=_cmd_attraction_texts)
     sub.add_parser("visa", help="fetch visa rules → 30_visa.sql").set_defaults(func=_cmd_visa)
 
     ingest = sub.add_parser("ingest", help="ingest attractions for one or all cities")

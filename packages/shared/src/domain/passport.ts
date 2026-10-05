@@ -56,7 +56,7 @@ export function passportRuleFor(
 /**
  * @param arrival ISO date of arrival
  * @param departure ISO date of departure (defaults to arrival + 7 days)
- * @param passportExpiry optional ISO expiry date of the passport used
+ * @param passportExpiry optional ISO expiry date of the passport used; absent = assumed valid
  */
 export function checkPassportValidity(input: {
   destination: string;
@@ -76,12 +76,12 @@ export function checkPassportValidity(input: {
   }[rule];
 
   const expiry = input.passportExpiry ?? null;
-  let status: PassportCheck['status'] = 'unknown';
+  // Sign-up no longer asks for the expiry date: without one the passport is assumed valid.
+  let status: PassportCheck['status'] = 'ok';
   if (expiry) {
     if (expiry < requiredUntil) status = 'problem';
     // Warn when there is less than a month of margin: airlines apply rules strictly.
     else if (expiry < addMonths(requiredUntil, 1)) status = 'warning';
-    else status = 'ok';
   }
   return { rule, requiredUntil, status, passportExpiry: expiry };
 }

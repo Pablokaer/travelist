@@ -1,18 +1,19 @@
-// The part of an attraction's page that only the full `attraction_details` row has: description,
-// visit time and fee, opening hours, links — and its skeleton while that row loads (the header
+// The part of an attraction's page that only the full `attraction_details` row has: its story
+// from Wikipedia (D-070) or else the short description, visit time and fee, opening hours, links — and its skeleton while that row loads (the header
 // already shows from the cached city list, D-062).
 import * as WebBrowser from 'expo-web-browser';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import type { AttractionDetail } from './api';
+import { WikipediaTextBlock } from './wikipedia-texts';
 
 import { StatTile } from '@/components/card';
 import type { IconName } from '@/components/icon';
 import { ListRow, RowGroup } from '@/components/list-row';
 import { Section } from '@/components/screen';
 import { Text } from '@/components/text';
-import { preferredArticle, wikipediaUrl } from '@/lib/wikipedia';
+import { preferredArticle, wikipediaTextsFor, wikipediaUrl } from '@/lib/wikipedia';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
@@ -33,19 +34,27 @@ function Divider() {
   return <View style={[styles.divider, { backgroundColor: theme.border }]} />;
 }
 
+/** The Wikipedia introduction and history; the one-line Wikidata description without them. */
+function AttractionStory({ a }: { a: AttractionDetail }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage ?? 'en';
+  const texts = wikipediaTextsFor(a, lang);
+  if (texts.summary || texts.history) return <WikipediaTextBlock texts={texts} />;
+  const description =
+    lang === 'pt' ? (a.descriptionPt ?? a.descriptionEn) : (a.descriptionEn ?? a.descriptionPt);
+  return description ? <Text style={styles.description}>{description}</Text> : null;
+}
+
 /**
- * Description and the Details section (visit time, fee, opening hours).
+ * The place's story and the Details section (visit time, fee, opening hours).
  * @example <AttractionAbout a={page.detail} />
  */
 export function AttractionAbout({ a }: { a: AttractionDetail }) {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.resolvedLanguage ?? 'en';
-  const description =
-    lang === 'pt' ? (a.descriptionPt ?? a.descriptionEn) : (a.descriptionEn ?? a.descriptionPt);
+  const { t } = useTranslation();
   const fee = useFeeLabel(a.fee);
   return (
     <>
-      {description ? <Text style={styles.description}>{description}</Text> : null}
+      <AttractionStory a={a} />
       <Divider />
       <Section title={t('attraction.details')}>
         <View style={styles.tiles}>

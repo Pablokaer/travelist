@@ -522,8 +522,6 @@
   "cityHub": {
     "exploreAttractions": "Explore attractions",
     "about": "About {{city}}",
-    "aboutSource": "From Wikipedia · CC BY-SA 4.0",
-    "readMore": "Read more on Wikipedia",
     "noAbout": "No description available yet.",
     "beforeYouGoIntro": "For a trip starting today, with the passports in your profile.",
     "changeDates": "Choose your dates"
@@ -660,5 +658,10 @@
     "validUntil": "Valid until: {{date}}",
     "manage": "Manage subscription",
     "seePlans": "See plans"
+  },
+  "wikipedia": {
+    "source": "From Wikipedia · CC BY-SA 4.0",
+    "readFull": "Read the full article on Wikipedia",
+    "history": "History"
   }
 }

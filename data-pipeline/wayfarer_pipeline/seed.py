@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from . import attraction_texts as texts_mod
 from . import city_summaries as summaries_mod
 from . import countries as countries_mod
 from . import visa as visa_mod
@@ -61,7 +62,14 @@ def countries_sql(countries: dict[str, dict[str, Any]]) -> str:
     return upsert("public.countries", columns, rows, conflict=["code"])
 
 
-CITY_SUMMARY_COLUMNS = ["summary_en", "summary_pt", "wikipedia_en", "wikipedia_pt"]
+CITY_SUMMARY_COLUMNS = [
+    "summary_en",
+    "summary_pt",
+    "wikipedia_en",
+    "wikipedia_pt",
+    "history_en",
+    "history_pt",
+]
 
 
 def cities_sql(
@@ -116,6 +124,9 @@ def visa_sql(rows: Iterable[dict[str, Any]]) -> str:
     return upsert("public.visa_requirements", columns, values, conflict=["passport", "destination"])
 
 
+# Wikipedia introduction and History excerpt (D-070), from data/attraction_texts.
+TEXT_COLUMNS = ["summary_en", "summary_pt", "history_en", "history_pt"]
+
 ATTRACTION_COLUMNS = [
     "id",
     "city_slug",
@@ -140,6 +151,7 @@ ATTRACTION_COLUMNS = [
     "fee",
     "avg_visit_minutes",
     "popularity",
+    *TEXT_COLUMNS,
 ]
 
 
@@ -147,7 +159,10 @@ def _osm_id(doc: dict[str, Any], qid: str) -> str | None:
     return next((a["osm_id"] for a in doc["attractions"] if a["wikidata_id"] == qid), None)
 
 
-def attractions_rows(docs: dict[str, dict[str, Any]]) -> tuple[list[list[Any]], list[str]]:
+def attractions_rows(
+    docs: dict[str, dict[str, Any]],
+    texts: dict[str, dict[str, texts_mod.AttractionText]] | None = None,
+) -> tuple[list[list[Any]], list[str]]:
     """Rows sorted by city then wikidata id. A wikidata id is unique across the table, so an
     item that falls in two city bboxes (several Wikidata coordinates, e.g. a wrong second one)
     is kept in the city where OSM confirms it (``osm_id`` set), else the first alphabetically."""
@@ -191,13 +206,22 @@ def attractions_rows(docs: dict[str, dict[str, Any]]) -> tuple[list[list[Any]], 
                     a["fee"],
                     int(a["avg_visit_minutes"]),
                     int(a["popularity"]),
+                    *_texts_row((texts or {}).get(slug, {}).get(qid, {})),
                 ]
             )
     return rows, warnings
 
 
-def attractions_sql(docs: dict[str, dict[str, Any]]) -> tuple[str, list[str]]:
-    rows, warnings = attractions_rows(docs)
+def _texts_row(text: texts_mod.AttractionText) -> list[str | None]:
+    return [text.get(col) for col in TEXT_COLUMNS]
+
+
+def attractions_sql(
+    docs: dict[str, dict[str, Any]],
+    texts: dict[str, dict[str, texts_mod.AttractionText]] | None = None,
+) -> tuple[str, list[str]]:
+    """Attractions upsert; ``texts`` (``data/attraction_texts``) fills the page texts (D-070)."""
+    rows, warnings = attractions_rows(docs, texts)
     # Keep the id stable on conflict: the stored uuid is referenced by user data.
     sql = upsert("public.attractions", ATTRACTION_COLUMNS, rows, conflict=["wikidata_id"])
     sql = sql.replace("  id = excluded.id,\n", "")
@@ -224,5 +248,5 @@ def write_visa(seed_dir: Path = SEED_DIR) -> Path:
 
 
 def write_attractions(seed_dir: Path = SEED_DIR) -> tuple[Path, list[str]]:
-    sql, warnings = attractions_sql(attractions_mod.load_all())
+    sql, warnings = attractions_sql(attractions_mod.load_all(), texts_mod.load_all())
     return _write(seed_dir / "40_attractions.sql", "ingest", sql), warnings

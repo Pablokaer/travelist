@@ -49,6 +49,8 @@ const aboutRow = {
   summary_pt: 'Amesterdão é a capital dos Países Baixos.',
   wikipedia_en: 'Amsterdam',
   wikipedia_pt: 'Amesterdão',
+  history_en: 'Amsterdam began as a fishing village dammed on the Amstel around 1250.',
+  history_pt: null,
 };
 
 /** A `list_walklists` row. */
@@ -184,6 +186,12 @@ test('a city card opens the city page: photo, country, rating and About', async 
   expect(await within(hero).findByTestId('rating-summary')).toHaveTextContent('4.0 ★ · 2 reviews');
   expect(await screen.findByText(/known for its canals/)).toBeOnTheScreen();
   expect(screen.getByText('From Wikipedia · CC BY-SA 4.0')).toBeOnTheScreen();
+  // What happened there (D-070), then a link to the full article.
+  expect(screen.getByText('History')).toBeOnTheScreen();
+  expect(screen.getByText(/fishing village dammed on the Amstel/)).toBeOnTheScreen();
+  expect(
+    screen.getByRole('link', { name: 'Read the full article on Wikipedia' }),
+  ).toBeOnTheScreen();
   expect(screen.getAllByText('Photo © Jose A. · CC BY 2.0').length).toBeGreaterThan(0);
 });
 
