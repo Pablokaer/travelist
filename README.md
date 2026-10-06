@@ -1,12 +1,28 @@
 # Wayfarer
 
-> Shown to users as **Travelist** (logo, app name, About page, sign-in emails). _Wayfarer_ remains the project's code name: repository, packages (`@wayfarer/*`), deep-link scheme (`wayfarer://`) and bundle id.
+> Shown to users as **Travelist** (logo — a white swallow on a brick-red tile, `BrandMark` in `components/app-menu.tsx` — app name, About page, sign-in emails). _Wayfarer_ remains the project's code name: repository, packages (`@wayfarer/*`), deep-link scheme (`wayfarer://`) and bundle id.
 
-Cross-platform travel companion (iOS · Android · Web) built with Expo + Supabase.
+Cross-platform travel companion (iOS · Android · Web) built with Expo + Supabase, covering 198 cities in 52 countries and 22,756 attractions.
 
 - **Before you go:** a checklist personalised to your passports (visa, passport validity, power, weather, money, safety, practical info).
-- **Explore:** a map of attractions across cities in Europe, North Africa, Asia and Brazil — full list, counts and data quality per city in [docs/CITIES.md](./docs/CITIES.md).
-- **Walk:** an optimised walking route between the places you pick, saved as a trip and opened in Google / Apple Maps.
+- **Explore:** a map of attractions across cities in Europe, North Africa, Asia and Brazil, with city pages (Wikipedia stories, famous people, community walk lists, reviews) — full list, counts and data quality per city in [docs/CITIES.md](./docs/CITIES.md).
+- **Walk:** an optimised walking route between the places you pick, saved as a trip, shared with other travellers and opened in Google / Apple Maps.
+
+### At a glance
+
+| Part              | Stack                                                                                     | Details                                          |
+| ----------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `apps/mobile`     | Expo SDK 57, React Native 0.86, Expo Router, TanStack Query, Zustand, MapLibre, i18next   | [App architecture](#app-architecture)            |
+| `packages/shared` | TypeScript: zod schemas, constants, domain logic, EN/PT strings (used by app + functions) | [Shared package](#shared-package-packagesshared) |
+| `supabase/`       | Postgres 17 + PostGIS with RLS, Supabase Auth, Deno Edge Functions                        | [Backend reference](#backend-reference)          |
+| `data-pipeline/`  | Python 3.11: Wikidata, OpenStreetMap, Wikipedia, Commons → committed SQL seeds            | [Data pipeline](#data-pipeline)                  |
+| Tooling           | pnpm 10 + Turborepo, Jest, Vitest, Deno test, pgTAP, pytest, Playwright, GitHub Actions   | [Testing and CI](#testing-and-ci)                |
+
+**Run it:** `./run-project.sh` (Node 22 + Docker) starts Supabase, the Edge Functions and the web app at http://localhost:8081; `./run-project.sh --stop` stops the stack. Details in [Quick start](#quick-start-local-everything-on-your-machine).
+
+**Test it:** `pnpm check` (app + shared) · `pnpm db:test` · `cd supabase/functions && deno test --allow-net=jsr.io` · `cd data-pipeline && pytest` · `pnpm e2e`.
+
+**Status:** MVP milestones M0–M4 done, M5 (polish and QA) mostly done; verified on the web, iOS and Android not yet tested on devices. See [Known limitations](#known-limitations) and [PROGRESS.md](./PROGRESS.md).
 
 Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and architecture](#stack-and-architecture) · [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) · Decisions: [docs/DECISIONS.md](./docs/DECISIONS.md) · Data: [docs/DATA_SOURCES.md](./docs/DATA_SOURCES.md) · Launch: [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md) · Cities: [docs/CITIES.md](./docs/CITIES.md) · Changes: [CHANGELOG.md](./CHANGELOG.md)
 
