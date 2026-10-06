@@ -13,17 +13,29 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- `PhotoCredit` can sit in the top-left or bottom-right corner; `BrandMark` takes a wordmark size; the sign-in/sign-up language chips are a shared `LanguageSwitch`.
+- README: an "At a glance" overview at the top (stack per part, how to run and test, status).
+- New logo symbol: a white swallow flying right on a brick-red rounded tile (`assets/images/brand-swallow.png`) replaces the map glyph in the Travelist logo (header, app menu, sign-in, About). App icon, favicon and splash are unchanged.
 - City pages and attraction pages tell more of the story (D-070). **About {city}** shows the whole introduction of the city's Wikipedia article (it was the first paragraph) and a new **History** part with an excerpt of the article's History section; attraction pages show their article's introduction (what it is, why it matters) and **History** (what happened there) instead of only Wikidata's one-line description. Both end with "From Wikipedia · CC BY-SA 4.0" and **Read the full article on Wikipedia**. New columns `cities.history_*` and `attractions.summary_*` / `history_*` (exposed by `attraction_details`; new migration). European cities first.
 - Pipeline: `city-summaries` reads the article through MediaWiki `prop=extracts` (introduction + History) instead of the REST summary and takes `--region europe` or `--city <slug>`, keeping the other cities; the new `attraction-texts` command writes `data/attraction_texts/<slug>.json`, which `seed` joins into `40_attractions.sql` (D-070).
 
 - Onboarding no longer asks for the passport expiry date: it has 2 steps (about you, your passports) (D-069). Without an expiry date the passport is assumed valid, so the checklist's passport validity shows **ok** instead of "Add your passport expiry date…". The date can still be added in Edit profile.
 
+### Fixed
+
+- Backend E2E helper `signUpAndOnboard` follows the 2-step onboarding (it still expected the passport-expiry step removed in D-069).
+
 ### Data
 
+- Famous people for 179 of the 198 cities, retrieved 2026-10-05 (D-071): 4,143 people — 2,396 historical figures, 1,544 writers, 1,135 musicians, 1,065 artists (a person can be in several) — 3,908 with a Commons portrait. Cities with fewer than 12 people at 20 sitelinks use 8. 19 small towns have nobody listed: Alto Paraíso de Goiás, Arraial do Cabo, Balneário Camboriú, Barreirinhas, Bonito, Búzios, Cabo Frio, Caldas Novas, Campos do Jordão, Fernando de Noronha, Gramado, Hội An, Ilhabela, Ipojuca, Jericoacoara, Maragogi, Pirenópolis, Porto Seguro, Ubatuba. No city or attraction added or removed.
 - Wikipedia texts for Europe's 105 cities and their attractions, retrieved 2026-10-05 (D-070). Cities: longer introductions for all 105, a History excerpt for 104 in English and 89 in Portuguese (Brussels' article has no History section). Attractions: 12,947 of Europe's 17,262 places have texts — 12,464 English and 3,262 Portuguese introductions, 7,087 English and 1,353 Portuguese History excerpts (churches 2,075 of 3,283 with a story, castles 334 of 519, palaces 673 of 964, monuments 626 of 1,331). 8 texts with leftover wiki markup upstream are left out. No city or attraction added or removed (198 cities, 22,756 attractions).
 
 ### Added
 
+- **Landing page** on the web (D-072): signed-out visitors opening the site land on `/welcome` instead of sign-in. Sticky header (logo, Features · How it works · Destinations, **Log in**, **Get started**; a menu on narrow screens), a hero ("Turn any city into your personal travel list", **Start exploring**, **See how it works**, the city and country count from `city_list`) beside two phone mockups of the app (Discover and a Lisbon walk list on a real Belém map) over a photo of Lisbon, four benefits, **Popular destinations** (Paris, Rome, Tokyo, Barcelona, London, Lisbon from `city_list`; **View all N cities** lists every covered city), **Plan your trip in minutes** in four steps, a closing **Create your Travelist** and a footer with About, the language switch and photo credits. EN/PT, responsive from 320 px, no horizontal scroll. Native apps still open on sign-in.
+- Icons: heart, plane and forward arrow (web icon font regenerated).
+
+- **Famous people** on the city page (D-071): the best known historical figures, writers, musicians and artists born or died in the city, with filters (All · Historical figures · Writers · Musicians · Artists) over a row of cards — portrait with its Commons credit, name, life years, a one-line description and "Born here" / "Died here" — each opening the person's Wikipedia article. New table `notable_people` (new migration, `50_people.sql`) and pipeline command `people --all | --region europe | --city <slug>` (Wikidata + Commons → `data/people/<slug>.json`).
 - Nature category for natural sights (D-068): beaches, waterfalls, national parks and nature reserves, caves, islands, lakes and lagoons, dunes, mountains and hills, canyons, hot springs, natural arches. It has its own tab next to Parks ("Nature" / "Natureza"), a forest icon, a teal map colour and a 90-minute default visit. Enum value `nature` (new migration). Existing cities gain nature items at their next re-ingest.
 - The landmark category also covers madrasas, old towns and medina quarters (e.g. Ben Youssef Madrasa, Fes el Bali, the Medina of Marrakesh) (D-068).
 - Password recovery (D-066): **Forgot password?** on sign-in opens `/forgot-password`, which always answers "If an account exists for {email}, we've sent it a link…" (no account enumeration). The email's link opens `/auth/reset-password` on any device: new password and confirmation (min 8 characters), then you are signed in; an invalid or expired link offers **Request a new link**.
@@ -70,6 +82,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Photo credits from Wikimedia Commons no longer repeat the author ("Unknown author Unknown author", "Kell Kell"): Commons' markup gives the name twice; 152 attraction photos fixed, and the pipeline collapses it from now on.
 - Pipeline: a Commons image-credit request for 50 long non-Latin file names (Belgrade's Cyrillic ones) went over Wikimedia's URL limit (HTTP 414) and stopped the city's ingestion; batches whose URL would pass 6,000 characters are now halved, and batches that fit keep their shape (and their cache).
 
 - Security CI: the new `braces` advisory GHSA-vfj7-8cjw-p6xm (stack exhaustion on deeply nested patterns; no patched version) failed `pnpm audit` and dependency review. It only reaches dev and build tools (jest, metro, `@expo/cli`), so it is ignored in `pnpm-workspace.yaml` and allowed in `security.yml`, like the node-forge advisory (D-049); drop both once a fixed `braces` ships.

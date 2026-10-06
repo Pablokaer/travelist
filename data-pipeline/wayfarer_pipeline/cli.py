@@ -7,6 +7,8 @@ python -m wayfarer_pipeline city-summaries [--region europe | --city lisbon]  # 
                                                # history → data/city_summaries.json → 20
 python -m wayfarer_pipeline attraction-texts --region europe | --city lisbon | --all  # D-070
                                                # → data/attraction_texts → 40
+python -m wayfarer_pipeline people --region europe | --city lisbon | --all  # D-071
+                                               # → data/people → 50_people.sql
 python -m wayfarer_pipeline visa               # passport-index → data/visa.csv → 30_visa.sql
 python -m wayfarer_pipeline ingest --city lisbon | --all [--jobs 3]  # → data/attractions → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
@@ -30,6 +32,8 @@ from .gates.changelog import add_data_entry, refresh_line
 from .gates.run import run_gates
 from .http import HttpClient
 from .paths import DATA_DIR, REPO_ROOT
+from .people import categories as people_categories
+from .people import pipeline as people
 
 
 def _client(args: argparse.Namespace) -> HttpClient:
@@ -106,6 +110,19 @@ def _cmd_attraction_texts(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_people(args: argparse.Namespace) -> int:
+    config = load_cities(args.config)
+    client = _client(args)
+    lookup = people_categories.OccupationLookup(client)
+    for city in _selected(args, config):
+        doc = people.build_city(client, city, lookup)
+        print(f"  wrote {people.save(doc)} ({len(doc['people'])} people)", flush=True)
+    print(people.summary_line(people.load_all()))
+    print(f"wrote {seed.write_people()}")
+    print(f"http: {client.stats['network']} network requests, {client.stats['cache']} cached")
+    return 0
+
+
 def _cmd_visa(args: argparse.Namespace) -> int:
     raw, meta = visa.fetch(_client(args))
     rows, skipped = visa.normalize(raw, set(countries.load()))
@@ -154,7 +171,7 @@ def _cmd_seed(args: argparse.Namespace) -> int:
         seed.write_visa(),
     ]
     path, warnings = seed.write_attractions()
-    paths.append(path)
+    paths.extend([path, seed.write_people()])
     for w in warnings:
         print(f"WARNING: {w}")
     for p in paths:
@@ -230,6 +247,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_city_selection(texts, required=True)
     texts.set_defaults(func=_cmd_attraction_texts)
+    people_cmd = sub.add_parser("people", help="fetch notable people → data/people")
+    _add_city_selection(people_cmd, required=True)
+    people_cmd.set_defaults(func=_cmd_people)
     sub.add_parser("visa", help="fetch visa rules → 30_visa.sql").set_defaults(func=_cmd_visa)
 
     ingest = sub.add_parser("ingest", help="ingest attractions for one or all cities")

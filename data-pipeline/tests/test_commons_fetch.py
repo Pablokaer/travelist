@@ -43,3 +43,22 @@ def test_short_names_keep_one_request_per_50_files() -> None:
     commons.fetch(client, names)
 
     assert [len(p["titles"].split("|")) for p in client.calls] == [50, 50, 20]
+
+
+def test_an_author_repeated_by_the_commons_markup_is_shown_once():
+    # Public-domain portraits carry "Unknown author" twice (a link and its label), e.g. Amália
+    # Rodrigues' 1956 album cover; the credit read "Unknown author Unknown author".
+    from wayfarer_pipeline.attractions.commons import strip_html
+
+    markup = '<span lang="en">Unknown author</span> <span class="x">Unknown author</span>'
+    assert strip_html(markup) == "Unknown author"
+    assert strip_html("Ana Ana Silva") == "Ana Ana Silva"  # only an exact double is collapsed
+
+
+def test_a_repeated_unknown_author_inside_a_longer_credit_is_shown_once():
+    from wayfarer_pipeline.attractions.commons import strip_html
+
+    assert (
+        strip_html("Original: Unknown author Unknown author Derivative work: TharonXX")
+        == "Original: Unknown author Derivative work: TharonXX"
+    )

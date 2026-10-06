@@ -1,4 +1,5 @@
 import { userEvent } from '@testing-library/react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { act, fireEvent, renderRouter, screen, waitFor, within } from 'expo-router/testing-library';
 
 import { useExploreStore } from '@/features/destinations/store';
@@ -141,7 +142,44 @@ class FakeHubRpc {
   };
 }
 
+/** A `notable_people` row (D-071). */
+function personRow(id: string, name: string, over: Record<string, unknown> = {}) {
+  return {
+    city_slug: 'amsterdam',
+    wikidata_id: id,
+    name_en: name,
+    name_pt: null,
+    description_en: null,
+    description_pt: null,
+    categories: ['art'],
+    birth_year: null,
+    death_year: null,
+    born_here: true,
+    died_here: false,
+    image_url: null,
+    image_author: null,
+    image_license: null,
+    image_license_url: null,
+    image_page_url: null,
+    wikipedia_en: name,
+    wikipedia_pt: null,
+    sitelinks: 50,
+    ...over,
+  };
+}
+
 const tables: Record<string, unknown> = {
+  notable_people: [
+    personRow('Q5598', 'Rembrandt', {
+      description_en: 'Dutch painter (1606–1669)',
+      birth_year: 1606,
+      death_year: 1669,
+      born_here: false,
+      died_here: true,
+      sitelinks: 150,
+    }),
+    personRow('Q1', 'Baruch Spinoza', { categories: ['history'], birth_year: 1632 }),
+  ],
   city_list: [cityRow()],
   profiles: profileRow,
   cities: aboutRow,
@@ -321,4 +359,27 @@ test('a city without meetups still shows the rest of its page', async () => {
   renderRouter(routes, { initialUrl: '/short/amsterdam' });
   expect(await screen.findByText('No meetups planned')).toBeOnTheScreen();
   expect(screen.getByText('Top community walk lists')).toBeOnTheScreen();
+});
+
+test('the city page shows its famous people, filtered by category, each opening Wikipedia', async () => {
+  jest.spyOn(WebBrowser, 'openBrowserAsync').mockResolvedValue({ type: 'opened' } as never);
+  renderRouter(routes, { initialUrl: '/short/amsterdam' });
+  expect(await screen.findByText('Famous people of Amsterdam')).toBeOnTheScreen();
+  const rembrandt = await screen.findByTestId('person-Q5598');
+  expect(within(rembrandt).getByText('Rembrandt')).toBeOnTheScreen();
+  expect(within(rembrandt).getByText('1606–1669')).toBeOnTheScreen();
+  expect(within(rembrandt).getByText('Died here')).toBeOnTheScreen();
+  expect(screen.getByTestId('person-Q1')).toBeOnTheScreen();
+
+  await userEvent.press(screen.getByRole('checkbox', { name: 'Historical figures' }));
+  expect(screen.queryByTestId('person-Q5598')).toBeNull();
+  expect(screen.getByTestId('person-Q1')).toBeOnTheScreen();
+  // Only the categories someone has are offered.
+  expect(screen.queryByRole('checkbox', { name: 'Musicians' })).toBeNull();
+
+  await userEvent.press(screen.getByRole('checkbox', { name: 'All' }));
+  await userEvent.press(screen.getByTestId('person-Q5598'));
+  expect(WebBrowser.openBrowserAsync).toHaveBeenCalledWith(
+    'https://en.wikipedia.org/wiki/Rembrandt',
+  );
 });

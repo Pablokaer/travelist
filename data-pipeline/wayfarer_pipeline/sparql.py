@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable, Iterator
-from typing import Any
-
-from .http import HttpClient
+from typing import Any, Protocol
 
 ENDPOINT = "https://query.wikidata.org/sparql"
 ENTITY_PREFIX = "http://www.wikidata.org/entity/"
 
 
-def run(client: HttpClient, query: str) -> list[dict[str, str]]:
+class WikidataClient(Protocol):
+    """What :func:`run` needs from :class:`~wayfarer_pipeline.http.HttpClient`; tests pass fakes."""
+
+    def request(self, method: str, url: str, **kwargs: Any) -> tuple[int, str]: ...
+
+
+def run(client: WikidataClient, query: str) -> list[dict[str, str]]:
     """Run a SELECT query; return bindings flattened to ``{var: value}`` (QIDs shortened)."""
     _, text = client.request(
         "POST",

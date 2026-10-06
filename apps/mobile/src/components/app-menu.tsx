@@ -1,3 +1,4 @@
+import { Image, type ImageSource } from 'expo-image';
 import { router, usePathname, type Href } from 'expo-router';
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
@@ -11,24 +12,40 @@ import { Text } from './text';
 import { MIN_TOUCH, radius, spacing } from '@/theme/colors';
 import { useShadows, useTheme } from '@/theme/use-theme';
 
+/** The logo symbol: a white swallow on the brick-red brand tile (256 px, enough for @3x at 64 pt). */
+export const BRAND_SYMBOL: ImageSource = require('../../assets/images/brand-swallow.png');
+
 /**
- * The Travelist logo: accent tile with the map glyph, optionally followed by the wordmark.
+ * The Travelist logo: rounded swallow symbol, optionally followed by the wordmark.
  * @example <BrandMark size={40} withName />
  */
-export function BrandMark({ size = 32, withName }: { size?: number; withName?: boolean }) {
+export function BrandMark({
+  size = 32,
+  withName,
+  nameSize,
+}: {
+  size?: number;
+  withName?: boolean;
+  /** Font size of the wordmark; the subtitle size by default. */
+  nameSize?: number;
+}) {
   const theme = useTheme();
   const { t } = useTranslation();
   return (
     <View style={styles.brand}>
-      <View
-        style={[
-          styles.logo,
-          { width: size, height: size, borderRadius: size * 0.3, backgroundColor: theme.primary },
-        ]}>
-        <Icon name="map" size={size * 0.55} color={theme.onPrimary} />
-      </View>
+      <Image
+        testID="brand-symbol"
+        source={BRAND_SYMBOL}
+        accessibilityIgnoresInvertColors
+        style={{ width: size, height: size, borderRadius: size * 0.3 }}
+      />
       {withName ? (
-        <Text variant="subtitle" style={{ color: theme.primary }}>
+        <Text
+          variant="subtitle"
+          style={[
+            { color: theme.primary },
+            nameSize ? { fontSize: nameSize, lineHeight: nameSize * 1.3, fontWeight: '700' } : null,
+          ]}>
           {t('common.appName')}
         </Text>
       ) : null}
@@ -153,7 +170,6 @@ function MenuRow({
 
 const styles = StyleSheet.create({
   brand: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  logo: { alignItems: 'center', justifyContent: 'center' },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',

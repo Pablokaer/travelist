@@ -11,6 +11,7 @@ type SymbolName = Exclude<SymbolViewProps['name'], string>;
 export const ICONS = {
   add: { ios: 'plus', android: 'add', web: 'add' },
   arrowDown: { ios: 'arrow.down', android: 'arrow_downward', web: 'arrow_downward' },
+  arrowForward: { ios: 'arrow.right', android: 'arrow_forward', web: 'arrow_forward' },
   arrowUp: { ios: 'arrow.up', android: 'arrow_upward', web: 'arrow_upward' },
   bookmark: { ios: 'bookmark', android: 'bookmark_add', web: 'bookmark_add' },
   bookmarked: { ios: 'bookmark.fill', android: 'bookmark_added', web: 'bookmark_added' },
@@ -30,8 +31,10 @@ export const ICONS = {
   error: { ios: 'exclamationmark.circle', android: 'error', web: 'error' },
   external: { ios: 'arrow.up.right.square', android: 'open_in_new', web: 'open_in_new' },
   flag: { ios: 'flag', android: 'flag', web: 'flag' },
+  flight: { ios: 'airplane', android: 'flight', web: 'flight' },
   globe: { ios: 'globe', android: 'language', web: 'language' },
   grid: { ios: 'square.grid.2x2', android: 'apps', web: 'apps' },
+  heart: { ios: 'heart', android: 'favorite', web: 'favorite' },
   home: { ios: 'house', android: 'home', web: 'home' },
   info: { ios: 'info.circle', android: 'info', web: 'info' },
   key: { ios: 'key', android: 'key', web: 'key' },
