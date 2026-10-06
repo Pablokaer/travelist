@@ -193,6 +193,11 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Verified:** the landing page in production reads `city_list` from Supabase Cloud with no console errors; Get started opens sign-up; protected functions answer 401 without a session.
 - **Next:** a real sign-up end to end (confirmation email through Resend); Google / Apple sign-in; EAS builds pointing at production; backups/plan decision (free tier pauses after a week idle).
 
+## 2026-10-07 — Continuous deployment (D-074)
+
+- **Deploy workflow:** a push to `main` that passes CI publishes the backend (migrations, seeds, Edge Functions), then the web app to https://travelist.live, then smoke-tests both; also runnable by hand. `scripts/deploy-backend.sh` and `scripts/deploy-web.sh` are shared by CI and manual deploys (both checked with `--dry-run` against production).
+- **Needs:** the GitHub environment `production` with its secrets and variables (README → "Continuous deployment").
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

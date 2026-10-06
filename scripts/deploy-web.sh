@@ -5,8 +5,9 @@
 #   ./scripts/deploy-web.sh            # build with .env.production, then rsync to travelist-vps
 #   ./scripts/deploy-web.sh --dry-run  # build and show what rsync would change
 #
-# Needs: .env.production (git-ignored; EXPO_PUBLIC_* of the Supabase Cloud project) and an SSH
-# host alias `travelist-vps` in ~/.ssh/config. Apache serves /var/www/travelist
+# Needs: the EXPO_PUBLIC_* values of the Supabase Cloud project, from .env.production (git-ignored)
+# or, when that file is absent (GitHub Actions, D-074), from the environment; and an SSH host alias
+# `travelist-vps` in ~/.ssh/config. Apache serves /var/www/travelist
 # (deploy/apache/travelist.live-le-ssl.conf).
 set -euo pipefail
 
@@ -23,16 +24,20 @@ fail() {
 }
 
 [ "${1:-}" = "--dry-run" ] && RSYNC_FLAGS+=(--dry-run --itemize-changes)
-[ -f "$ENV_FILE" ] || fail "Missing $ENV_FILE (EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY…)."
 
 # Production values only: EXPO_NO_DOTENV stops Expo from loading the local .env (which points at
 # the local stack), and --clear stops Metro from reusing modules inlined with local values.
-set -a
-# shellcheck source=/dev/null
-. "$ENV_FILE"
-set +a
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "$ENV_FILE"
+  set +a
+fi
 export EXPO_NO_DOTENV=1
-[ -n "${EXPO_PUBLIC_SUPABASE_URL:-}" ] || fail "EXPO_PUBLIC_SUPABASE_URL is empty in $ENV_FILE."
+[ -n "${EXPO_PUBLIC_SUPABASE_URL:-}" ] ||
+  fail "EXPO_PUBLIC_SUPABASE_URL is empty (expected https://<ref>.supabase.co in $ENV_FILE or the environment)."
+[ -n "${EXPO_PUBLIC_SUPABASE_ANON_KEY:-}" ] ||
+  fail "EXPO_PUBLIC_SUPABASE_ANON_KEY is empty (expected the project's anon key in $ENV_FILE or the environment)."
 
 log "Building the web app for $EXPO_PUBLIC_SUPABASE_URL..."
 cd "$APP_DIR"
