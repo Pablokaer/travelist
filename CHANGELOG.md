@@ -23,6 +23,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Security CI: `pnpm audit` failed on two new advisories with fixed versions — `shell-quote` GHSA-pqg4-j6r4-53mv (critical; via react-native > react-devtools-core) and `source-map-js` GHSA-68fv-2mgg-jv7q (high; via @expo/metro-config > postcss). Both are forced to the patched release with `overrides` in `pnpm-workspace.yaml` (1.12.0 and 1.2.2) until their parents update.
 - Backend E2E helper `signUpAndOnboard` follows the 2-step onboarding (it still expected the passport-expiry step removed in D-069).
 
 ### Data
