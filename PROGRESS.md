@@ -186,6 +186,13 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Verified on web:** 1440, 1280, 960 and 390 px; no console errors, no horizontal overflow, section links land under the header, keyboard Tab/Enter reaches Log in.
 - **Next:** Privacy and Terms pages (then footer links); store badges once the apps ship; check the page on real phones (Safari's frosted header, emoji flags on Windows).
 
+## 2026-10-06 — First production deploy (D-073)
+
+- **Live:** https://travelist.live (HTTP → HTTPS, certificate until 2027-01-04) on the VPS's Apache, next to the existing sites, which were checked before and after (unchanged).
+- **Backend:** Supabase Cloud project `travelist` (Ireland): 31 migrations, 197 active cities, 250 countries, Lisbon's 300 places through the public API; Edge Functions `checklist`, `route-optimize`, `health`, `welcome-email`, `auth-email`; secrets; Auth (site URL, redirects, 6-digit codes, Send Email hook → Resend, `travelist.live` verified).
+- **Verified:** the landing page in production reads `city_list` from Supabase Cloud with no console errors; Get started opens sign-up; protected functions answer 401 without a session.
+- **Next:** a real sign-up end to end (confirmation email through Resend); Google / Apple sign-in; EAS builds pointing at production; backups/plan decision (free tier pauses after a week idle).
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

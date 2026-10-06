@@ -818,12 +818,14 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 
 ## Deploying (hosted)
 
-1. **Supabase project** (supabase.com): `pnpm exec supabase login`, `pnpm exec supabase link --project-ref <ref>`, then
+**Production today (D-073):** the web app at **https://travelist.live** is static files on a VPS behind Apache; the backend is the Supabase Cloud project `travelist` (ref `llrrofuzaxfffwwegxwr`, West EU / Ireland). Public values for the build are in the git-ignored `.env.production`; server secrets live in Supabase; the database password is kept outside the repository.
+
+1. **Supabase project:** `pnpm exec supabase login`, `pnpm exec supabase link --project-ref <ref>`, then
    `pnpm exec supabase db push --include-seed` (schema + reference data) and
-   `pnpm exec supabase functions deploy checklist route-optimize health`.
-2. **Secrets:** `pnpm exec supabase secrets set ORS_API_KEY=...` (optional `EXCHANGE_RATES_BASE_URL`). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
-3. **Auth:** Dashboard → Authentication → URL configuration: Site URL = your web URL; redirect URLs `https://<web>/auth/callback`, `https://<web>/auth/reset-password`, `wayfarer://auth/callback`, `wayfarer://auth/reset-password`. Providers → Google / Apple with your client ids. Email (D-066): deploy `welcome-email` and `auth-email --no-verify-jwt`, set `RESEND_API_KEY`, `EMAIL_FROM`, `SEND_EMAIL_HOOK_SECRET`, `APP_URL` as secrets, and enable Authentication → Hooks → Send Email (HTTPS) at `https://<ref>.supabase.co/functions/v1/auth-email`.
-4. **Web:** `pnpm build:web` → deploy `apps/mobile/dist` to any static host (EAS Hosting: `npx eas-cli deploy`, Netlify, Vercel, Cloudflare Pages) with `EXPO_PUBLIC_*` set at build time.
+   `pnpm exec supabase functions deploy checklist route-optimize health welcome-email auth-email --use-api --import-map supabase/functions/deno.json` (without `--import-map` the remote bundler cannot resolve `zod` / `@supabase/supabase-js`; `verify_jwt` comes from `supabase/config.toml`, off for `health` and `auth-email`).
+2. **Secrets:** `pnpm exec supabase secrets set --env-file <file>` with `RESEND_API_KEY`, `EMAIL_FROM` (an address on the domain verified in Resend), `SEND_EMAIL_HOOK_SECRET` (`v1,whsec_<base64>`), `APP_URL` and `ORS_API_KEY` (optional `EXCHANGE_RATES_BASE_URL`). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
+3. **Auth** (Dashboard → Authentication, or the Management API `PATCH /v1/projects/<ref>/config/auth`): Site URL = the web URL; redirect URLs `https://<web>/**` and `wayfarer://**`; **email OTP length 6** (the app asks for 6 digits; the hosted default is 8); raise the email rate limit (default 2/hour); Hooks → Send Email (HTTPS) at `https://<ref>.supabase.co/functions/v1/auth-email` with the same secret as `SEND_EMAIL_HOOK_SECRET`. Providers → Google / Apple with your client ids. Do not `supabase config push`: `config.toml` holds the local values (localhost, Mailpit).
+4. **Web:** `./scripts/deploy-web.sh` builds with `.env.production` and publishes to the VPS (`--dry-run` shows the changes first). It sets `EXPO_NO_DOTENV=1` and passes `--clear`: otherwise Expo loads the local `.env` and Metro reuses modules inlined with the local URL. The Apache vhosts are in `deploy/apache/` (static export rewrites: `/sign-in` → `sign-in.html`, `/city/<slug>` → `city/[slug].html`, …; HTTP → HTTPS; Let's Encrypt via `certbot --apache`). Any other static host works too (EAS Hosting, Netlify, Vercel, Cloudflare Pages) with the same rewrites.
 5. **iOS / Android:** set `EXPO_PUBLIC_*` as EAS environment variables, then `npx eas-cli build --profile production -p ios|android` and `npx eas-cli submit`.
 
 ## Scripts (root)

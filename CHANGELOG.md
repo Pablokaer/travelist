@@ -32,6 +32,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Added
 
+- **Production (D-073):** https://travelist.live — static web export on the VPS behind Apache (vhosts in `deploy/apache/`, Let's Encrypt), backend on Supabase Cloud (`travelist`, Ireland) with schema, reference data, Edge Functions, secrets and Auth (6-digit codes, emails through Resend). `scripts/deploy-web.sh` builds against `.env.production` and publishes.
 - **Landing page** on the web (D-072): signed-out visitors opening the site land on `/welcome` instead of sign-in. Sticky header (logo, Features · How it works · Destinations, **Log in**, **Get started**; a menu on narrow screens), a hero ("Turn any city into your personal travel list", **Start exploring**, **See how it works**, the city and country count from `city_list`) beside two phone mockups of the app (Discover and a Lisbon walk list on a real Belém map) over a photo of Lisbon, four benefits, **Popular destinations** (Paris, Rome, Tokyo, Barcelona, London, Lisbon from `city_list`; **View all N cities** lists every covered city), **Plan your trip in minutes** in four steps, a closing **Create your Travelist** and a footer with About, the language switch and photo credits. EN/PT, responsive from 320 px, no horizontal scroll. Native apps still open on sign-in.
 - Icons: heart, plane and forward arrow (web icon font regenerated).
 
