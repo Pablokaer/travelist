@@ -179,6 +179,13 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Fix:** doubled Commons credits ("Unknown author Unknown author") collapsed — 152 attraction photos.
 - **Next:** people tied to a city in other ways (residence, burial), districts as birthplaces; people in the monthly refresh and the data gate.
 
+## 2026-10-06 — Landing page (D-072)
+
+- **Web:** signed-out visitors land on `/welcome` — header with section links, Log in and Get started (menu on narrow screens); hero with two phone mockups of the app (Discover and a Lisbon walk list on a real Belém map) over a photo of Lisbon; benefits; Popular destinations from `city_list` (View all lists all 197 cities); four steps; closing CTA; footer with About, language and credits. Native apps still open on sign-in.
+- **Tests:** 22 new unit/component tests (layout, curated cities, section scroll, gradient, the screen's links, real cities, Portuguese); E2E smoke on desktop and Pixel 7 (landing, no sideways scroll, Log in → sign-in). The backend E2E helper was brought up to the 2-step onboarding of D-069; journey and sharing specs pass again.
+- **Verified on web:** 1440, 1280, 960 and 390 px; no console errors, no horizontal overflow, section links land under the header, keyboard Tab/Enter reaches Log in.
+- **Next:** Privacy and Terms pages (then footer links); store badges once the apps ship; check the page on real phones (Safari's frosted header, emoji flags on Windows).
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

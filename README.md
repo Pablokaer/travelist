@@ -31,6 +31,7 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and arc
 ## Contents
 
 - [Features](#features)
+  - [Landing page](#0-landing-page-web)
   - [Account and sign-in](#1-account-and-sign-in)
   - [Onboarding and profile](#2-onboarding-and-profile)
   - [Explore: Home and city pages](#3-explore-home-and-city-pages)
@@ -52,9 +53,21 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and arc
 
 ## Features
 
+### 0. Landing page (web)
+
+`(auth)/welcome.tsx` + `features/landing/` (D-072). On the web, a signed-out visitor opening the site (`/`) lands on `/welcome`; the iOS and Android apps keep opening on sign-in (`signedOutHome`, the `(auth)` stack's initial route). Light theme, EN/PT, from 320 px wide with no sideways scroll.
+
+- **Header** (sticky, frosted on the web) — the Travelist logo (back to the top), **Features** · **How it works** · **Destinations** (scroll to the section, just below the header), **Log in** (outlined → `/sign-in`) and **Get started** (red → `/sign-up`). Below 900 px the links and **Log in** move into a menu (☰ / ✕); **Get started** stays in the bar.
+- **Hero** — "{N} cities in {M} countries" (counted from `city_list`; hidden until it loads), "Turn any city into your **personal travel list**" (accent in red), the subtitle, **Start exploring** (→ `/sign-up`) and **See how it works** (scrolls), then five gold stars and "Loved by travellers worldwide" beside round photos of places (no invented people or numbers). Beside it (stacked below on screens under 860 px), two overlapping phones show the app: **Discover** (logo, "Where to next?", search, All / Museums / Nature chips, Lisbon and Tokyo cards, tab bar) and **My List** (Lisbon, a real map of Belém with the walking route and numbered pins, "≈ 2.4 km · 31 min on foot", four stops with photo, category and visit time). They sit on a photo of Alfama (Lisbon) that fades into the page, with its credit and a quiet "Plan. Explore. Collect memories."; the phones fade in on load (shown at once with reduced motion).
+- **Benefits** — Explore any city · Create your lists · See it on the map · Travel smarter, each with a red icon on a light red circle: four in a row on desktop, 2 × 2 on tablets, icon beside text on phones.
+- **Popular destinations** — Paris, Rome, Tokyo, Barcelona, London and Lisbon, read from `city_list` (a city the database lacks is skipped): cover photo with its credit, name and flag + country; a card lifts on hover and leads to `/sign-up`. One row on desktop, a sideways-scrolling strip below 1024 px. **View all {N} cities** lists every covered city by name (A–Z, flags); **Show fewer cities** hides it. If the list fails to load: "Destinations couldn't load right now."
+- **Plan your trip in minutes** — four numbered steps (Choose a city, Discover places, Build your list, Follow your route), joined by a line on desktop.
+- **Your next trip starts with a list.** — **Create your Travelist** (→ `/sign-up`).
+- **Footer** — logo, tagline, EN/PT switch, Product (the three sections), Company (**About** → `/about`), © year, and the credits of the bundled photos and the map. No Privacy or Terms links until those pages exist.
+
 ### 1. Account and sign-in
 
-Everything except the About page requires a signed-in user. Routes are protected in `apps/mobile/src/app/_layout.tsx` with three guards: signed out → auth screens; signed in but not onboarded → onboarding; signed in and onboarded → the app.
+Everything except the landing page, the About page and shared walk list links requires a signed-in user. Routes are protected in `apps/mobile/src/app/_layout.tsx` with three guards: signed out → auth screens; signed in but not onboarded → onboarding; signed in and onboarded → the app.
 
 | Method                        | How it works                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Code                                                                                     |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
@@ -279,13 +292,14 @@ Every screen stacked above the tabs (attraction, checklist, route, trip, edit pr
 
 | Route                     | File                                          | Access                   | Purpose                                                                                                                                     |
 | ------------------------- | --------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/welcome`                | `(auth)/welcome.tsx`                          | signed out               | Landing page; where `/` leads signed-out visitors on the web (D-072)                                                                        |
 | `/sign-in`                | `(auth)/sign-in.tsx`                          | signed out               | Email or nickname + password, Forgot password?, links to magic link/OAuth                                                                   |
 | `/sign-up`                | `(auth)/sign-up.tsx`                          | signed out               | Create account                                                                                                                              |
 | `/magic-link`             | `(auth)/magic-link.tsx`                       | signed out               | Magic link + 6-digit code                                                                                                                   |
 | `/forgot-password`        | `(auth)/forgot-password.tsx`                  | signed out               | Request a password reset link (D-066)                                                                                                       |
 | `/auth/reset-password`    | `auth/reset-password.tsx`                     | always                   | Reset link landing: new password, then into the app (D-066)                                                                                 |
 | `/auth/callback`          | `auth/callback.tsx`                           | always                   | OAuth / magic link / confirmation landing                                                                                                   |
-| `/onboarding`             | `onboarding.tsx`                              | signed in, not onboarded | 3-step profile setup                                                                                                                        |
+| `/onboarding`             | `onboarding.tsx`                              | signed in, not onboarded | 2-step profile setup                                                                                                                        |
 | `/` (Explore tab)         | `(tabs)/(explore)/index.tsx`                  | onboarded                | Home: searchable grid of destinations                                                                                                       |
 | `/short/[slug]`           | `(tabs)/(explore)/short/[slug]/index.tsx`     | onboarded                | City page (hub): hero, About and History, famous people (D-071), walk lists, Before you go, reviews (D-033)                                 |
 | `/short/[slug]/meetups`   | `(tabs)/(explore)/short/[slug]/meetups.tsx`   | onboarded                | A city's upcoming meetups by day (D-041)                                                                                                    |
@@ -431,6 +445,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 
 ## Known limitations
 
+- Landing page (D-072): the ratings in the phone mockups (4.8, 4.7) are illustrative, since signed-out visitors cannot read reviews; the destination cards show none. "Loved by travellers worldwide" is a tagline, not a measured figure. There are no Privacy or Terms pages yet, so the footer links neither. No App Store / Google Play badges until the apps are published. "View all cities" lists names only (the cities open after signing up). The mockups are drawn by `features/landing/` from fixed data, so a redesign of the Home or a walk list does not update them.
 - Famous people (D-071): categories come from the occupations recorded in Wikidata, so some are odd (a businessman with "writer" among his occupations, royals filed under art because they also painted); "born or died here" uses the city item itself, so people recorded with a district or a former municipality as birthplace are missed, and small towns have few or nobody (≥ 20 Wikipedia editions are required). Athletes and actors are not listed. The list is not part of the monthly refresh: run `people --all` again to update it.
 - Wikipedia texts (D-070): only European cities and their attractions have the introduction and History excerpt so far (other cities keep the first paragraph, and their attractions the one-line description). Attraction texts are not part of the monthly refresh or the data gate yet: run `attraction-texts` again to update them. Texts are verbatim, so they keep Wikipedia's pronunciation brackets and, for Portuguese, its mix of Brazilian and European spelling; the History excerpt is the start of the section (often the oldest period), cut at a whole paragraph — the link leads to the rest. About 70% of attractions have no Portuguese article, so Portuguese users read the English text there.
 

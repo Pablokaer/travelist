@@ -40,9 +40,9 @@ export async function signUpAndOnboard(page: Page) {
   await byTestId('password').fill('correct-horse-battery');
   await role('button', 'Create account').click();
 
-  await expect(page.getByText('Step 1 of 3')).toBeVisible();
+  await expect(page.getByText('Step 1 of 2')).toBeVisible();
   await role('button', 'Next').click();
-  await expect(page.getByText('Step 2 of 3')).toBeVisible();
+  await expect(page.getByText('Step 2 of 2')).toBeVisible();
   await role('button', 'Choose a country').first().click();
   await page.getByLabel('Search countries').filter({ visible: true }).last().fill('Brazil');
   await role('checkbox', 'Brazil').click();
@@ -50,8 +50,7 @@ export async function signUpAndOnboard(page: Page) {
   await role('button', 'Choose a country').click();
   await page.getByLabel('Search countries').filter({ visible: true }).last().fill('Brazil');
   await role('radio', 'Brazil').click();
-  await role('button', 'Next').click();
-  await byTestId('passportExpiry').fill('2030-01-31');
+  // No passport expiry step since D-069: the second step finishes onboarding.
   await role('button', 'Start exploring').click();
   // Onboarding is saved before the Home opens: a test that reloads the page right away would
   // otherwise abort the save and leave the user not onboarded (protected screens then refuse it).

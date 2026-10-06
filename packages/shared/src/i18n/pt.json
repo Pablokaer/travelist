@@ -680,5 +680,94 @@
     "bornAndDiedHere": "Nasceu e morreu aqui",
     "photoCredit": "Foto: {{author}} · {{license}}",
     "credit": "Pessoas que nasceram ou morreram na cidade, das mais conhecidas para as menos. Dados do Wikidata (CC0); fotos da Wikimedia Commons."
+  },
+  "landing": {
+    "nav": {
+      "features": "Recursos",
+      "how": "Como funciona",
+      "destinations": "Destinos",
+      "openMenu": "Abrir menu",
+      "closeMenu": "Fechar menu",
+      "home": "Início do Travelist"
+    },
+    "logIn": "Entrar",
+    "getStarted": "Começar",
+    "hero": {
+      "eyebrow": "{{cities}} cidades em {{countries}} países",
+      "title": "Transforme qualquer cidade na sua <accent>lista de viagem pessoal</accent>",
+      "subtitle": "Descubra lugares incríveis, crie as suas próprias listas e guarde todos os sítios que quer visitar, numa só app.",
+      "start": "Começar a explorar",
+      "how": "Ver como funciona",
+      "socialProof": "Adorado por viajantes de todo o mundo",
+      "note": "Planear. Explorar. Guardar memórias.",
+      "mockups": "A app Travelist: escolher uma cidade e uma lista de lugares a visitar em Lisboa, no mapa",
+      "photo": "Telhados de Alfama, em Lisboa, vistos do Miradouro de Santa Luzia"
+    },
+    "mock": {
+      "search": "Pesquisar cidades, países…",
+      "all": "Todos",
+      "myList": "A minha lista",
+      "walk": "≈ 2,4 km · 31 min a pé"
+    },
+    "features": {
+      "explore": {
+        "title": "Explore qualquer cidade",
+        "text": "Encontre as principais atrações, miradouros, parques e tesouros escondidos."
+      },
+      "lists": {
+        "title": "Crie as suas listas",
+        "text": "Guarde os lugares que quer visitar e organize-os à sua maneira."
+      },
+      "map": {
+        "title": "Veja tudo no mapa",
+        "text": "Visualize a sua lista e planeie o percurso mais eficiente."
+      },
+      "travel": {
+        "title": "Viaje melhor",
+        "text": "Tenha tudo num só lugar e nunca mais perca um sítio."
+      }
+    },
+    "destinations": {
+      "title": "Destinos populares",
+      "subtitle": "Inspire-se e comece a planear a sua próxima aventura.",
+      "viewAll": "Ver as {{count}} cidades",
+      "showFewer": "Mostrar menos cidades",
+      "open": "{{city}}, {{country}}, {{places}}. Crie a sua conta gratuita para a explorar.",
+      "unavailable": "Não foi possível carregar os destinos agora."
+    },
+    "how": {
+      "title": "Planeie a sua viagem em minutos",
+      "subtitle": "De uma cidade a um percurso a pé em quatro passos.",
+      "city": {
+        "title": "Escolha uma cidade",
+        "text": "Escolha um destino na Europa, Norte de África, Ásia ou Brasil."
+      },
+      "discover": {
+        "title": "Descubra lugares",
+        "text": "Veja os principais pontos de interesse no mapa ou numa lista."
+      },
+      "list": {
+        "title": "Monte a sua lista",
+        "text": "Adicione os lugares de que gosta, por qualquer ordem."
+      },
+      "route": {
+        "title": "Siga o seu percurso",
+        "text": "Faça o percurso mais curto e abra-o no Google Maps ou no Apple Maps."
+      }
+    },
+    "cta": {
+      "title": "A sua próxima viagem começa com uma lista.",
+      "text": "Crie a sua conta gratuita e comece a juntar os lugares que quer ver.",
+      "button": "Criar o meu Travelist"
+    },
+    "footer": {
+      "tagline": "Transforme qualquer cidade na sua lista de viagem pessoal.",
+      "product": "Produto",
+      "company": "Empresa",
+      "about": "Sobre",
+      "copyright": "© {{year}} Travelist",
+      "photos": "Fotos do Wikimedia Commons: {{credits}}.",
+      "map": "Mapa © colaboradores do OpenStreetMap · OpenFreeMap."
+    }
   }
 }

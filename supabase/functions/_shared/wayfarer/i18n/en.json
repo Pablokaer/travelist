@@ -680,5 +680,94 @@
     "bornAndDiedHere": "Born and died here",
     "photoCredit": "Photo: {{author}} · {{license}}",
     "credit": "People born or died in the city, best known first. From Wikidata (CC0); photos from Wikimedia Commons."
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "how": "How it works",
+      "destinations": "Destinations",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "home": "Travelist home"
+    },
+    "logIn": "Log in",
+    "getStarted": "Get started",
+    "hero": {
+      "eyebrow": "{{cities}} cities in {{countries}} countries",
+      "title": "Turn any city into your <accent>personal travel list</accent>",
+      "subtitle": "Discover amazing places, create your own lists and keep track of everywhere you want to visit, all in one beautiful app.",
+      "start": "Start exploring",
+      "how": "See how it works",
+      "socialProof": "Loved by travellers worldwide",
+      "note": "Plan. Explore. Collect memories.",
+      "mockups": "The Travelist app: choosing a city, and a list of places to visit in Lisbon on a map",
+      "photo": "Rooftops of Alfama, Lisbon, from the Miradouro de Santa Luzia"
+    },
+    "mock": {
+      "search": "Search cities, countries…",
+      "all": "All",
+      "myList": "My List",
+      "walk": "≈ 2.4 km · 31 min on foot"
+    },
+    "features": {
+      "explore": {
+        "title": "Explore any city",
+        "text": "Find top attractions, viewpoints, parks and hidden gems."
+      },
+      "lists": {
+        "title": "Create your lists",
+        "text": "Save the places you want to visit and organize them your way."
+      },
+      "map": {
+        "title": "See it on the map",
+        "text": "Visualize your list and plan the most efficient route."
+      },
+      "travel": {
+        "title": "Travel smarter",
+        "text": "Keep everything in one place and never miss a place again."
+      }
+    },
+    "destinations": {
+      "title": "Popular destinations",
+      "subtitle": "Get inspired and start planning your next adventure.",
+      "viewAll": "View all {{count}} cities",
+      "showFewer": "Show fewer cities",
+      "open": "{{city}}, {{country}}, {{places}}. Create your free account to explore it.",
+      "unavailable": "Destinations couldn't load right now."
+    },
+    "how": {
+      "title": "Plan your trip in minutes",
+      "subtitle": "From a city to a walking route in four steps.",
+      "city": {
+        "title": "Choose a city",
+        "text": "Pick a destination across Europe, North Africa, Asia and Brazil."
+      },
+      "discover": {
+        "title": "Discover places",
+        "text": "Browse the top sights on the map or in a list."
+      },
+      "list": {
+        "title": "Build your list",
+        "text": "Add the places you love, in any order."
+      },
+      "route": {
+        "title": "Follow your route",
+        "text": "Walk the shortest route and open it in Google or Apple Maps."
+      }
+    },
+    "cta": {
+      "title": "Your next trip starts with a list.",
+      "text": "Create your free account and start collecting the places you want to see.",
+      "button": "Create your Travelist"
+    },
+    "footer": {
+      "tagline": "Turn any city into your personal travel list.",
+      "product": "Product",
+      "company": "Company",
+      "about": "About",
+      "copyright": "© {{year}} Travelist",
+      "photos": "Photos from Wikimedia Commons: {{credits}}.",
+      "map": "Map © OpenStreetMap contributors · OpenFreeMap."
+    }
   }
 }

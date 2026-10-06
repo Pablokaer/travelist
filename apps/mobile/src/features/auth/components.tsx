@@ -125,23 +125,34 @@ export function OAuthButtons({ onError }: { onError: (message: string) => void }
   );
 }
 
-export function AuthFooter() {
+/**
+ * EN/PT chips for signed-out screens, where there is no profile to keep the language in.
+ * @example <LanguageSwitch />
+ */
+export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   return (
+    <View
+      style={styles.langs}
+      accessibilityRole="radiogroup"
+      accessibilityLabel={t('profile.language')}>
+      {SUPPORTED_LANGUAGES.map((lng) => (
+        <Chip
+          key={lng}
+          label={t(`profile.languageName.${lng}`)}
+          selected={i18n.resolvedLanguage === lng}
+          onPress={() => void i18n.changeLanguage(lng)}
+        />
+      ))}
+    </View>
+  );
+}
+
+export function AuthFooter() {
+  const { t } = useTranslation();
+  return (
     <View style={styles.footer}>
-      <View
-        style={styles.langs}
-        accessibilityRole="radiogroup"
-        accessibilityLabel={t('profile.language')}>
-        {SUPPORTED_LANGUAGES.map((lng) => (
-          <Chip
-            key={lng}
-            label={t(`profile.languageName.${lng}`)}
-            selected={i18n.resolvedLanguage === lng}
-            onPress={() => void i18n.changeLanguage(lng)}
-          />
-        ))}
-      </View>
+      <LanguageSwitch />
       <Button
         variant="ghost"
         compact

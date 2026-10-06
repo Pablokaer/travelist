@@ -19,7 +19,16 @@ export const BRAND_SYMBOL: ImageSource = require('../../assets/images/brand-swal
  * The Travelist logo: rounded swallow symbol, optionally followed by the wordmark.
  * @example <BrandMark size={40} withName />
  */
-export function BrandMark({ size = 32, withName }: { size?: number; withName?: boolean }) {
+export function BrandMark({
+  size = 32,
+  withName,
+  nameSize,
+}: {
+  size?: number;
+  withName?: boolean;
+  /** Font size of the wordmark; the subtitle size by default. */
+  nameSize?: number;
+}) {
   const theme = useTheme();
   const { t } = useTranslation();
   return (
@@ -31,7 +40,12 @@ export function BrandMark({ size = 32, withName }: { size?: number; withName?: b
         style={{ width: size, height: size, borderRadius: size * 0.3 }}
       />
       {withName ? (
-        <Text variant="subtitle" style={{ color: theme.primary }}>
+        <Text
+          variant="subtitle"
+          style={[
+            { color: theme.primary },
+            nameSize ? { fontSize: nameSize, lineHeight: nameSize * 1.3, fontWeight: '700' } : null,
+          ]}>
           {t('common.appName')}
         </Text>
       ) : null}
