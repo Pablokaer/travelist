@@ -1,10 +1,11 @@
 // Read-only review pieces (D-028): the "4.6 ★ · 128 reviews" line and one review card.
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type TextStyle } from 'react-native';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/avatar';
 import { Badge } from '@/components/card';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Text } from '@/components/text';
 import { AuthorName } from '@/features/profile/author-name';
 import type { RatingSummary, Review } from '@/features/reviews/api';
@@ -50,15 +51,17 @@ function GoldStar({ text }: { text: string }) {
 export function RatingSummaryLine({
   summary,
   variant = 'subtitle',
+  style,
 }: {
   summary: RatingSummary;
   variant?: 'subtitle' | 'heading';
+  style?: StyleProp<TextStyle>;
 }) {
   const { t } = useTranslation();
   const locale = t('common.locale');
   if (summary.count === 0 || summary.average == null) {
     return (
-      <Text variant="caption" secondary testID="rating-summary">
+      <Text variant="caption" secondary testID="rating-summary" style={style}>
         {t('reviews.none')}
       </Text>
     );
@@ -68,6 +71,7 @@ export function RatingSummaryLine({
     <Text
       variant={variant}
       testID="rating-summary"
+      style={style}
       accessibilityLabel={t('reviews.summaryLabel', values)}>
       <GoldStar text={t('reviews.summary', values)} />
     </Text>
@@ -107,21 +111,30 @@ export function ratingLabel(
   };
 }
 
-/** Author line of a review card: avatar, public name, "Your review", date. */
-function ReviewAuthor({ review }: { review: Review }) {
+/**
+ * Author line of a review card: avatar, public name, "Your review", date. On phones the avatar
+ * sits above the centred name and date (D-076).
+ */
+function ReviewAuthor({ review, centred }: { review: Review; centred: boolean }) {
   const { t } = useTranslation();
   const name = review.authorName ?? t('reviews.anonymous');
   const date = formatDate(review.createdAt, t('common.locale'));
   return (
-    <View style={styles.author}>
+    <View testID="review-author" style={[styles.author, centred && centring.stack]}>
       <Avatar name={name} uri={review.authorAvatarUrl} size={40} />
-      <View style={styles.flex}>
+      <View style={centred ? styles.centredName : styles.flex}>
         <AuthorName name={name} publicId={review.authorPublicId} variant="subtitle" />
-        <Text variant="caption" secondary>
+        <Text variant="caption" secondary style={centred && centring.text}>
           {wasEdited(review) ? `${date} · ${t('reviews.edited')}` : date}
         </Text>
       </View>
-      {review.isOwn ? <Badge label={t('reviews.yours')} /> : null}
+      {review.isOwn ? (
+        <Badge
+          label={t('reviews.yours')}
+          testID="review-own-badge"
+          style={centred && centring.self}
+        />
+      ) : null}
     </View>
   );
 }
@@ -131,11 +144,12 @@ function ReviewAuthor({ review }: { review: Review }) {
  * @example <ReviewCard review={review} />
  */
 export function ReviewCard({ review }: { review: Review }) {
+  const centred = useCentredOnPhone();
   return (
     <View style={styles.card} testID={`review-${review.id}`}>
-      <ReviewAuthor review={review} />
-      <Stars rating={review.rating} />
-      {review.comment ? <Text>{review.comment}</Text> : null}
+      <ReviewAuthor review={review} centred={centred} />
+      <Stars rating={review.rating} testID="review-stars" style={centred && centring.row} />
+      {review.comment ? <Text style={centred && centring.text}>{review.comment}</Text> : null}
     </View>
   );
 }
@@ -144,4 +158,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   card: { gap: spacing.sm, paddingVertical: spacing.md },
   author: { flexDirection: 'row', alignItems: 'center', gap: spacing.md - 4 },
+  centredName: { alignItems: 'center' },
 });

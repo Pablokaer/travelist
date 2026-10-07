@@ -3,6 +3,7 @@ import { REVIEW_RATING_MAX } from '@wayfarer/shared';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Text } from '@/components/text';
 import { radius, spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -38,8 +39,9 @@ function DistributionBar({ stars, count, total }: { stars: number; count: number
  */
 export function RatingDistribution({ distribution }: { distribution: readonly number[] }) {
   const total = distribution.reduce((sum, n) => sum + n, 0);
+  const centred = useCentredOnPhone();
   return (
-    <View style={styles.list}>
+    <View testID="rating-distribution" style={[styles.list, centred && centring.block]}>
       {STARS_DESCENDING.map((stars) => (
         <DistributionBar
           key={stars}

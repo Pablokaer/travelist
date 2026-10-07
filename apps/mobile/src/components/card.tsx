@@ -64,16 +64,22 @@ export function Badge({
   label,
   icon,
   tone = 'neutral',
+  style,
+  testID,
 }: {
   label: string;
   icon?: IconName;
   tone?: 'neutral' | 'accent' | 'overlay';
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
 }) {
   const theme = useTheme();
   const bg = { neutral: theme.surfaceMuted, accent: theme.primary, overlay: theme.surface }[tone];
   const fg = tone === 'accent' ? theme.onPrimary : theme.text;
   return (
-    <View style={[styles.badge, { backgroundColor: bg }, tone === 'overlay' && styles.overlay]}>
+    <View
+      testID={testID}
+      style={[styles.badge, { backgroundColor: bg }, tone === 'overlay' && styles.overlay, style]}>
       {icon ? <Icon name={icon} size={12} color={fg} /> : null}
       <Text variant="helper" style={{ color: fg, fontWeight: '600' }}>
         {label}

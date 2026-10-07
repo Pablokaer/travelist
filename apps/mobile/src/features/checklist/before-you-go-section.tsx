@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Section } from '@/components/screen';
 import { ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
@@ -43,6 +44,7 @@ function SectionBody({ citySlug }: { citySlug: string }) {
  */
 export function BeforeYouGoSection({ citySlug }: { citySlug: string }) {
   const { t } = useTranslation();
+  const centred = useCentredOnPhone();
   const openChecklist = () =>
     router.push({ pathname: '/checklist/[city]', params: { city: citySlug } });
   return (
@@ -57,7 +59,9 @@ export function BeforeYouGoSection({ citySlug }: { citySlug: string }) {
           onPress={openChecklist}
         />
       }>
-      <Text secondary>{t('cityHub.beforeYouGoIntro')}</Text>
+      <Text secondary style={centred && centring.text}>
+        {t('cityHub.beforeYouGoIntro')}
+      </Text>
       <SectionBody citySlug={citySlug} />
     </Section>
   );

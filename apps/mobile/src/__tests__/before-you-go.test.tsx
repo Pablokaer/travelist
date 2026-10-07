@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { checklistRequest } from '@/features/checklist/use-city-checklist';
 import { BeforeYouGoSection } from '@/features/checklist/before-you-go-section';
 import '@/lib/i18n';
+import { layOutAsIPhone } from '@/testing/phone-width';
 
 /** What the profile and checklist hooks return, and the requests the section made. */
 class MockChecklistServer {
@@ -124,5 +125,15 @@ describe('BeforeYouGoSection', () => {
     expect(screen.getByText('Before you go')).toBeOnTheScreen();
     await userEvent.press(screen.getByRole('button', { name: /try again/i }));
     expect(MockChecklistServer.refetch).toHaveBeenCalled();
+  });
+});
+
+// iPhone audit (D-076): under the centred "Before you go" title, its intro is centred too.
+describe('BeforeYouGoSection on a phone', () => {
+  layOutAsIPhone();
+
+  test('centres the intro under the title', () => {
+    render(<BeforeYouGoSection citySlug="lisbon" />);
+    expect(screen.getByText(/For a trip starting today/)).toHaveStyle({ textAlign: 'center' });
   });
 });

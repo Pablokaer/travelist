@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Text } from '@/components/text';
 import type { WikipediaTexts } from '@/lib/wikipedia';
 import { spacing } from '@/theme/colors';
@@ -15,13 +16,14 @@ import { spacing } from '@/theme/colors';
  */
 export function WikipediaTextBlock({ texts }: { texts: WikipediaTexts }) {
   const { t } = useTranslation();
+  const centred = useCentredOnPhone();
   if (!texts.summary && !texts.history) return null;
   return (
     <View style={styles.block}>
       {texts.summary ? <Paragraphs text={texts.summary} /> : null}
       {texts.history ? (
         <View style={styles.history}>
-          <Text variant="subtitle" accessibilityRole="header">
+          <Text variant="subtitle" accessibilityRole="header" style={centred && centring.text}>
             {t('wikipedia.history')}
           </Text>
           <Paragraphs text={texts.history} />

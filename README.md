@@ -53,7 +53,7 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and arc
 
 ## Features
 
-On phones, primary page headings, authentication titles and subtitles, city and attraction hero content, and onboarding headings are centered. Stacked landing copy and navigation titles are centered too. See the [iPhone visual review](artifacts/iphone-audit/index.html) for screenshots at 390 × 844 CSS pixels and element positions; this review uses web emulation rather than a native iOS simulator.
+On phones, primary page headings, authentication titles and subtitles, city and attraction hero content, and onboarding headings are centered. So are section titles (an action beside a title moves below it), walk list cards (name, author and rating, stops · distance · walk, View / Save) and the whole Reviews area (title, average, bars per star, the review form, and each review with its avatar above the name, stars and comment) (D-076); long paragraphs such as the Wikipedia texts stay left-aligned. Tablets and desktop keep the left-aligned layout. Stacked landing copy and navigation titles are centered too. See the [iPhone visual review](artifacts/iphone-audit/index.html) for screenshots at 390 × 844 CSS pixels and element positions; this review uses web emulation rather than a native iOS simulator.
 
 ### 0. Landing page (web)
 

@@ -203,6 +203,11 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Flow:** feature PRs → `dev` (CI + Security required) → **Promote** waits for approval → `main` fast-forwarded to the tested commit → Deploy. `main` only moves through the gate (rulesets). Gate logic in `scripts/release-gate.mjs`, with tests.
 - **Needs:** `SUPABASE_ACCESS_TOKEN` in the `production` environment before the first release.
 
+## 2026-10-07 — iPhone layout, second pass (D-076)
+
+- Section titles, walk list cards and the Reviews area centred on phones; audit of 11 signed-in screens at 390 × 844: 43 off-centre titles → 2 (profile header, by design). Before/after in `artifacts/iphone-audit/`.
+- Production still serves the build from before PR #18 until the first release through the gate deploys (needs `SUPABASE_ACCESS_TOKEN`).
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

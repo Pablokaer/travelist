@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Section } from '@/components/screen';
 import { LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
@@ -27,6 +28,7 @@ function OwnReview({ target, own }: { target: ReviewTarget; own: Review | undefi
   const save = useSaveReview(target);
   const remove = useDeleteReview(target);
   const [saved, setSaved] = useState(false);
+  const centred = useCentredOnPhone();
   const error = save.error ?? remove.error;
   return (
     <View style={styles.list}>
@@ -42,7 +44,11 @@ function OwnReview({ target, own }: { target: ReviewTarget; own: Review | undefi
         kind={target.kind}
       />
       {saved && own ? (
-        <Text variant="helper" secondary accessibilityLiveRegion="polite">
+        <Text
+          variant="helper"
+          secondary
+          accessibilityLiveRegion="polite"
+          style={centred && centring.text}>
           {t('reviews.saved')}
         </Text>
       ) : null}
@@ -54,8 +60,13 @@ function OwnReview({ target, own }: { target: ReviewTarget; own: Review | undefi
 function ReviewList({ reviews, kind }: { reviews: Review[]; kind: ReviewTarget['kind'] }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const centred = useCentredOnPhone();
   if (reviews.length === 0) {
-    return <Text secondary>{t('reviews.noneBody', { context: kind })}</Text>;
+    return (
+      <Text secondary style={centred && centring.text}>
+        {t('reviews.noneBody', { context: kind })}
+      </Text>
+    );
   }
   return (
     <View>
@@ -87,17 +98,30 @@ export function ReviewsSection({
   const summary = useRatingSummary(target);
   const own = reviews.data?.find((r) => r.isOwn);
   const distribution = summary.data?.count ? summary.data.distribution : undefined;
+  const centred = useCentredOnPhone();
   return (
     <Section title={t('reviews.title')}>
-      {summary.data ? <RatingSummaryLine summary={summary.data} variant="heading" /> : null}
+      {summary.data ? (
+        <RatingSummaryLine
+          summary={summary.data}
+          variant="heading"
+          style={centred && centring.text}
+        />
+      ) : null}
       {distribution ? <RatingDistribution distribution={distribution} /> : null}
       {canReview ? (
         <OwnReview target={target} own={own} />
       ) : (
-        <Text secondary>{t('reviews.ownTrip')}</Text>
+        <Text secondary style={centred && centring.text}>
+          {t('reviews.ownTrip')}
+        </Text>
       )}
       {reviews.isPending ? <LoadingState /> : null}
-      {reviews.error ? <Text secondary>{t('reviews.error')}</Text> : null}
+      {reviews.error ? (
+        <Text secondary style={centred && centring.text}>
+          {t('reviews.error')}
+        </Text>
+      ) : null}
       {reviews.data ? <ReviewList reviews={reviews.data} kind={target.kind} /> : null}
     </Section>
   );

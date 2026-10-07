@@ -1,4 +1,4 @@
-import { render, screen, userEvent } from '@testing-library/react-native';
+import { render, renderHook, screen, userEvent } from '@testing-library/react-native';
 import { Text as RNText } from 'react-native';
 
 import { Button, IconButton } from '@/components/button';
@@ -6,6 +6,7 @@ import { Badge, StatTile } from '@/components/card';
 import { Chip } from '@/components/chip';
 import { categoryIcon } from '@/components/icon';
 import { ListRow, RowGroup } from '@/components/list-row';
+import { useCentredOnPhone } from '@/components/phone-centring';
 import { PageHeader, Section } from '@/components/screen';
 import { Segmented } from '@/components/segmented';
 import { Sheet } from '@/components/sheet';
@@ -15,6 +16,7 @@ import { TextField } from '@/components/text-field';
 import { flagEmoji, initials } from '@/lib/format';
 import { fontFamilyFor } from '@/theme/fonts';
 import '@/lib/i18n';
+import { layOutAsIPhone } from '@/testing/phone-width';
 
 describe('format helpers', () => {
   test('flagEmoji maps ISO codes to regional indicators', () => {
@@ -160,5 +162,42 @@ describe('components', () => {
     expect(screen.getByText('Lisbon')).toBeOnTheScreen();
     await userEvent.press(screen.getByRole('button', { name: 'Close' }));
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+// iPhone audit (D-076): section titles are centred on phones, as PageHeader's are; tablets and
+// desktop keep them at the start of the line.
+describe('Section on a phone', () => {
+  layOutAsIPhone();
+
+  test('useCentredOnPhone is true at an iPhone width', () => {
+    expect(renderHook(() => useCentredOnPhone()).result.current).toBe(true);
+  });
+
+  test('centres its title', () => {
+    render(<Section title="Reviews" />);
+    expect(screen.getByRole('header', { name: 'Reviews' })).toHaveStyle({ textAlign: 'center' });
+  });
+
+  test('stacks its action under the centred title', () => {
+    render(<Section title="Before you go" action={<RNText>Choose your dates</RNText>} />);
+    expect(screen.getByTestId('section-header')).toHaveStyle({
+      flexDirection: 'column',
+      alignItems: 'center',
+    });
+  });
+});
+
+describe('Section on a tablet', () => {
+  test('useCentredOnPhone is false at a tablet width', () => {
+    expect(renderHook(() => useCentredOnPhone()).result.current).toBe(false);
+  });
+
+  test('keeps its title at the start of the line, beside the action', () => {
+    render(<Section title="Reviews" action={<RNText>Choose your dates</RNText>} />);
+    expect(screen.getByRole('header', { name: 'Reviews' })).not.toHaveStyle({
+      textAlign: 'center',
+    });
+    expect(screen.getByTestId('section-header')).toHaveStyle({ flexDirection: 'row' });
   });
 });
