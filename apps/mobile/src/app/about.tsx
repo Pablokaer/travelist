@@ -65,7 +65,7 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md },
   logo: { marginBottom: spacing.sm },
-  center: { textAlign: 'center', maxWidth: 420 },
+  center: { textAlign: 'center', maxWidth: 420, alignSelf: 'center' },
   sources: { paddingVertical: 0, gap: 0 },
   source: {
     flexDirection: 'row',

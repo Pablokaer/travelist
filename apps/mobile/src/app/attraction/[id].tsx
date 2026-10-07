@@ -27,6 +27,7 @@ import { RatingSummaryLine } from '@/features/reviews/components';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { useRouteStore } from '@/features/route/store';
 import { radius, spacing } from '@/theme/colors';
+import { useBreakpoint } from '@/theme/use-theme';
 
 /**
  * An attraction's page (`/attraction/[id]`). Opened from a city list, the header (photo, name,
@@ -112,6 +113,7 @@ function AttractionHeader({
 }) {
   const { t, i18n } = useTranslation();
   const name = localizedName(a, i18n.resolvedLanguage ?? 'en');
+  const { isTablet } = useBreakpoint();
   const rating = useRatingSummary({ kind: 'attraction', id: a.id });
   return (
     <>
@@ -137,10 +139,14 @@ function AttractionHeader({
         </View>
       ) : null}
 
-      <View style={styles.titleBlock} testID="attraction-title">
-        <Text variant="display">{name}</Text>
+      <View
+        style={[styles.titleBlock, !isTablet && styles.titleBlockPhone]}
+        testID="attraction-title">
+        <Text variant="display" style={!isTablet && styles.centerText}>
+          {name}
+        </Text>
         {rating.data ? <RatingSummaryLine summary={rating.data} /> : null}
-        <View style={styles.badges}>
+        <View style={[styles.badges, !isTablet && styles.badgesPhone]}>
           <Badge icon={categoryIcon(a.category)} label={t(`category.${a.category}`)} />
           {a.isUnesco ? <Badge icon="globe" label={t('attraction.unesco')} /> : null}
         </View>
@@ -152,6 +158,9 @@ function AttractionHeader({
 const styles = StyleSheet.create({
   hero: { gap: spacing.sm },
   image: { width: '100%', aspectRatio: 16 / 10, maxHeight: 460, borderRadius: radius.xl },
+  titleBlockPhone: { alignItems: 'center' },
+  centerText: { textAlign: 'center' },
+  badgesPhone: { justifyContent: 'center' },
   titleBlock: { gap: spacing.md - 4 },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   footerText: { flex: 1, gap: spacing.xxs },

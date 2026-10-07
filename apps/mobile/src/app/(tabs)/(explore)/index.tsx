@@ -1,20 +1,19 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CardGrid } from '@/components/card-grid';
-import { useGutter } from '@/components/screen';
+import { PageHeader, useGutter } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
-import { Text } from '@/components/text';
 import { cityName, useCities, type City } from '@/features/destinations/api';
 import { BrowseHeader } from '@/features/destinations/browse-header';
 import { CityCard } from '@/features/destinations/city-card';
 import { searchCities } from '@/features/destinations/search';
 import { UpgradeButton } from '@/features/subscription/upgrade-button';
-import { layout, spacing } from '@/theme/colors';
+import { layout } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
 
 /**
@@ -65,12 +64,11 @@ export default function HomeScreen() {
         maxWidth={layout.page}
         gutter={gutter}
         header={
-          <View style={styles.heading}>
-            <Text variant="title">{t('explore.title')}</Text>
-            <Text secondary accessibilityLiveRegion="polite">
-              {t('home.citiesCount', { count: visible.length })}
-            </Text>
-          </View>
+          <PageHeader
+            title={t('explore.title')}
+            subtitle={t('home.citiesCount', { count: visible.length })}
+            size="title"
+          />
         }
         renderCard={(city) => <CityCard city={city} onPress={() => openCity(city.slug)} />}
         empty={<EmptyState icon="search" title={t('explore.noCityMatch')} />}
@@ -87,5 +85,4 @@ function visibleCities(cities: readonly City[], query: string, lang: string): Ci
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  heading: { gap: spacing.xs },
 });

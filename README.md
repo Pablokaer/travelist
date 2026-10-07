@@ -53,6 +53,8 @@ Status and roadmap: [PROGRESS.md](./PROGRESS.md) · Architecture: [Stack and arc
 
 ## Features
 
+On phones, primary page headings, authentication titles and subtitles, city and attraction hero content, and onboarding headings are centered. Stacked landing copy and navigation titles are centered too. See the [iPhone visual review](artifacts/iphone-audit/index.html) for screenshots at 390 × 844 CSS pixels and element positions; this review uses web emulation rather than a native iOS simulator.
+
 ### 0. Landing page (web)
 
 `(auth)/welcome.tsx` + `features/landing/` (D-072). On the web, a signed-out visitor opening the site (`/`) lands on `/welcome`; the iOS and Android apps keep opening on sign-in (`signedOutHome`, the `(auth)` stack's initial route). Light theme, EN/PT, from 320 px wide with no sideways scroll.

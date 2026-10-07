@@ -73,8 +73,14 @@ export function AuthLayout({
           ],
         ]}>
         <View style={styles.heading}>
-          <Text variant="title">{title}</Text>
-          {subtitle ? <Text secondary>{subtitle}</Text> : null}
+          <Text variant="title" style={styles.centerText}>
+            {title}
+          </Text>
+          {subtitle ? (
+            <Text secondary style={styles.centerText}>
+              {subtitle}
+            </Text>
+          ) : null}
         </View>
         {children}
       </View>
@@ -172,7 +178,13 @@ const styles = StyleSheet.create({
     padding: spacing.md - 4,
     borderRadius: radius.md,
   },
-  link: { fontSize: 15, paddingVertical: spacing.sm, textDecorationLine: 'underline' },
+  link: {
+    fontSize: 15,
+    paddingVertical: spacing.sm,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  centerText: { textAlign: 'center' },
   brand: { alignSelf: 'center' },
   panel: { gap: spacing.md },
   card: {

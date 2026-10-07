@@ -104,12 +104,20 @@ export function PageHeader({
   action?: ReactNode;
   size?: 'display' | 'title';
 }) {
+  const { isTablet } = useBreakpoint();
+  const centered = !isTablet && !action;
   return (
     <View style={styles.header}>
       <View style={styles.headerText}>
         {eyebrow}
-        <Text variant={size}>{title}</Text>
-        {subtitle ? <Text secondary>{subtitle}</Text> : null}
+        <Text variant={size} style={centered && styles.centerText}>
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text secondary style={centered && styles.centerText}>
+            {subtitle}
+          </Text>
+        ) : null}
       </View>
       {action}
     </View>
@@ -163,6 +171,7 @@ const styles = StyleSheet.create({
   },
   header: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.md },
   headerText: { flex: 1, gap: spacing.xs },
+  centerText: { textAlign: 'center' },
   section: { gap: spacing.md - 4 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   flex: { flex: 1 },

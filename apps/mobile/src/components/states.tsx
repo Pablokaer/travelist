@@ -17,7 +17,7 @@ export function LoadingState({ label }: { label?: string }) {
       accessibilityRole="progressbar"
       accessibilityLabel={label ?? t('common.loading')}>
       <ActivityIndicator color={theme.primary} size="large" />
-      <Text variant="caption" secondary>
+      <Text variant="caption" secondary style={styles.text}>
         {label ?? t('common.loading')}
       </Text>
     </View>
