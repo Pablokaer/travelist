@@ -9,6 +9,7 @@ import {
   type WalklistCard,
 } from '@/features/trips/community-api';
 import { SaveWalklistButton } from '@/features/trips/save-walklist-button';
+import { CityWalklistsSection } from '@/features/trips/city-walklists-section';
 import { TripCard } from '@/features/trips/trip-card';
 import '@/lib/i18n';
 import { fakeCity } from '@/testing/fixtures';
@@ -24,6 +25,12 @@ class MockSavedWalklists {
 
 jest.mock('@/features/trips/community-api', () => ({
   ...jest.requireActual('@/features/trips/community-api'),
+  // An empty preview: enough to render the section's title and subtitle.
+  useWalklistPreview: () => ({
+    isPending: false,
+    isError: false,
+    data: { items: [], hasMore: false },
+  }),
   useToggleSavedWalklist: () => ({
     isPending: false,
     mutate: (input: { id: string; saved: boolean }) => MockSavedWalklists.calls.push(input),
@@ -181,5 +188,16 @@ describe('TripCard on a tablet', () => {
   test('keeps the title at the start of the line', () => {
     render(<TripCard trip={card()} city={fakeCity()} onPress={jest.fn()} />);
     expect(screen.getByText('Historic Amsterdam')).not.toHaveStyle({ textAlign: 'center' });
+  });
+});
+
+describe('Official walk lists on a phone', () => {
+  layOutAsIPhone();
+
+  test("centres 'Curated by the Travelist team.' under the title", () => {
+    render(<CityWalklistsSection city={fakeCity()} kind="official" />);
+    expect(screen.getByText('Curated by the Travelist team.')).toHaveStyle({
+      textAlign: 'center',
+    });
   });
 });

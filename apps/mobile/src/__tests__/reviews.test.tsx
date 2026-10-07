@@ -309,6 +309,7 @@ describe('Reviews on a phone', () => {
     expect(screen.getByText('Rate this city')).toHaveStyle({ textAlign: 'center' });
     expect(screen.getByTestId('star-rating')).toHaveStyle({ justifyContent: 'center' });
     expect(screen.getByTestId('review-form-actions')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByText('Your comment (optional)')).toHaveStyle({ textAlign: 'center' });
   });
 
   test('centres each review: author above, then stars and comment', () => {

@@ -99,6 +99,7 @@ export function ReviewForm(props: Props) {
         render={({ field, fieldState }) => (
           <TextField
             label={t('reviews.comment')}
+            labelStyle={centred && centring.text}
             placeholder={t('reviews.commentPlaceholder')}
             value={field.value}
             onChangeText={field.onChange}

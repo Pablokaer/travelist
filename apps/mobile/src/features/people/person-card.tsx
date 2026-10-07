@@ -10,6 +10,7 @@ import { connectionKey, lifeYears } from './format';
 
 import { Avatar } from '@/components/avatar';
 import { Badge } from '@/components/card';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
 import { preferredArticle, wikipediaUrl } from '@/lib/wikipedia';
@@ -50,6 +51,8 @@ export function PersonCard({ person }: { person: NotablePerson }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const { name, description, years, article } = usePersonTexts(person);
+  const centred = useCentredOnPhone();
+  const textStyle = centred && centring.text;
   const open = article ? () => void WebBrowser.openBrowserAsync(wikipediaUrl(article)) : undefined;
   return (
     <Tappable
@@ -58,23 +61,35 @@ export function PersonCard({ person }: { person: NotablePerson }) {
       disabled={!open}
       accessibilityRole={open ? 'link' : undefined}
       accessibilityLabel={[name, years, description].filter(Boolean).join(', ')}
-      style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+      style={[
+        styles.card,
+        { backgroundColor: theme.surface, borderColor: theme.border },
+        centred && styles.centredCard,
+      ]}>
       <View style={styles.portrait}>
         <Avatar name={name} uri={person.imageUrl} size={88} />
         <PhotoCredit p={person} />
       </View>
-      <View style={styles.texts}>
-        <Text variant="subtitle" numberOfLines={2}>
+      <View style={[styles.texts, centred && styles.centredTexts]}>
+        <Text variant="subtitle" numberOfLines={2} style={textStyle}>
           {name}
         </Text>
-        {years ? <Text variant="caption">{years}</Text> : null}
+        {years ? (
+          <Text variant="caption" style={textStyle}>
+            {years}
+          </Text>
+        ) : null}
         {description ? (
-          <Text variant="helper" secondary numberOfLines={3}>
+          <Text variant="helper" secondary numberOfLines={3} style={textStyle}>
             {description}
           </Text>
         ) : null}
       </View>
-      <Badge label={t(connectionKey(person))} />
+      <Badge
+        label={t(connectionKey(person))}
+        testID="person-connection"
+        style={centred && centring.self}
+      />
     </Tappable>
   );
 }
@@ -88,8 +103,11 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'flex-start',
   },
-  // The portrait and its credit sit centred above the left-aligned texts.
+  // The portrait and its credit sit centred above the texts (left-aligned on tablets).
   portrait: { alignSelf: 'stretch', alignItems: 'center', gap: spacing.sm },
   credit: { textAlign: 'center' },
   texts: { gap: spacing.xxs, flex: 1 },
+  // Phones (D-076): every element of the card on the centre line.
+  centredCard: { alignItems: 'center' },
+  centredTexts: { alignSelf: 'stretch' },
 });

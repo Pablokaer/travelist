@@ -20,6 +20,12 @@ describe('WikipediaTextBlock on a phone', () => {
     expect(screen.getByRole('header', { name: 'History' })).toHaveStyle({ textAlign: 'center' });
     expect(screen.getByText(texts.history)).not.toHaveStyle({ textAlign: 'center' });
   });
+
+  test("centres the source and 'Read the full article on Wikipedia'", () => {
+    render(<WikipediaTextBlock texts={texts} />);
+    expect(screen.getByTestId('wikipedia-source')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByText('From Wikipedia · CC BY-SA 4.0')).toHaveStyle({ textAlign: 'center' });
+  });
 });
 
 describe('WikipediaTextBlock on a tablet', () => {

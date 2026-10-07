@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Section } from '@/components/screen';
 import { EmptyState, ErrorState, LoadingState } from '@/components/states';
 import { Text } from '@/components/text';
@@ -104,11 +105,16 @@ function ViewAll({ city, kind, show }: { city: City; kind: Kind; show: boolean }
  */
 export function CityWalklistsSection({ city, kind }: { city: City; kind: Kind }) {
   const { t } = useTranslation();
+  const centred = useCentredOnPhone();
   return (
     <View testID={`walklists-${kind}`}>
       <Section
         title={t(kind === 'official' ? 'walklists.officialTitle' : 'walklists.communityTitle')}>
-        {kind === 'official' ? <Text secondary>{t('walklists.officialSubtitle')}</Text> : null}
+        {kind === 'official' ? (
+          <Text secondary style={centred && centring.text}>
+            {t('walklists.officialSubtitle')}
+          </Text>
+        ) : null}
         <PreviewBody city={city} kind={kind} />
       </Section>
     </View>

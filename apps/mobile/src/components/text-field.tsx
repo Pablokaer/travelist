@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   View,
+  type StyleProp,
   type TextInputProps,
   type TextStyle,
 } from 'react-native';
@@ -22,10 +23,12 @@ type Props = TextInputProps & {
   error?: string;
   hint?: string;
   icon?: IconName;
+  /** Style of the label above the box (e.g. centred in the review form on phones, D-076). */
+  labelStyle?: StyleProp<TextStyle>;
 };
 
 export const TextField = forwardRef<TextInput, Props>(function TextField(
-  { label, error, hint, icon, style, onFocus, onBlur, ...rest },
+  { label, error, hint, icon, style, labelStyle, onFocus, onBlur, ...rest },
   ref,
 ) {
   const theme = useTheme();
@@ -35,7 +38,9 @@ export const TextField = forwardRef<TextInput, Props>(function TextField(
   const borderColor = message ? theme.danger : focused ? theme.text : theme.borderStrong;
   return (
     <View style={styles.wrap}>
-      <Text variant="label">{label}</Text>
+      <Text variant="label" style={labelStyle}>
+        {label}
+      </Text>
       <View
         style={[
           styles.box,
