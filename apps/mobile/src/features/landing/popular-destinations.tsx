@@ -203,6 +203,7 @@ export function PopularDestinations({ layout, width, cities, failed }: Destinati
           title={t('landing.destinations.title')}
           subtitle={t('landing.destinations.subtitle')}
           compact={phone}
+          centered={phone}
         />
         {cities?.length ? (
           <ViewAllLink

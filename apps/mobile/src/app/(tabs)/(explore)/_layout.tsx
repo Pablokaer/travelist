@@ -10,7 +10,11 @@ export default function ExploreLayout() {
   const theme = useTheme();
   return (
     <Stack
-      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.background } }}
+      screenOptions={{
+        headerShown: false,
+        headerTitleAlign: 'center',
+        contentStyle: { backgroundColor: theme.background },
+      }}
     />
   );
 }

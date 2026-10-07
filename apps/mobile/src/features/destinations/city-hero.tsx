@@ -11,7 +11,7 @@ import { useRatingSummary } from '@/features/reviews/api';
 import { RatingSummaryLine } from '@/features/reviews/components';
 import { flagEmoji } from '@/lib/format';
 import { radius, spacing } from '@/theme/colors';
-import { useTheme } from '@/theme/use-theme';
+import { useBreakpoint, useTheme } from '@/theme/use-theme';
 
 function Cover({ city, name }: { city: City; name: string }) {
   const { t } = useTranslation();
@@ -43,14 +43,17 @@ export function CityHero({ city, onExplore }: { city: City; onExplore: () => voi
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage ?? 'en';
   const name = cityName(city, lang);
+  const { isTablet } = useBreakpoint();
   const rating = useRatingSummary({ kind: 'city', id: city.slug });
   return (
     <View style={styles.hero} testID="city-hero">
       <Cover city={city} name={name} />
-      <View style={styles.titleRow}>
-        <View style={styles.titleText}>
-          <Text variant="display">{name}</Text>
-          <Text variant="subtitle" secondary>
+      <View style={[styles.titleRow, !isTablet && styles.titleRowPhone]}>
+        <View style={[styles.titleText, !isTablet && styles.titleTextPhone]}>
+          <Text variant="display" style={!isTablet && styles.centerText}>
+            {name}
+          </Text>
+          <Text variant="subtitle" secondary style={!isTablet && styles.centerText}>
             {flagEmoji(city.countryCode)} {countryOf(city, lang)}
           </Text>
           {rating.data ? <RatingSummaryLine summary={rating.data} /> : null}
@@ -72,5 +75,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.md,
   },
+  titleRowPhone: { flexDirection: 'column', alignItems: 'center' },
+  titleTextPhone: { width: '100%', minWidth: 0, alignItems: 'center' },
+  centerText: { textAlign: 'center' },
   titleText: { flexGrow: 1, flexShrink: 1, minWidth: 220, gap: spacing.xs },
 });

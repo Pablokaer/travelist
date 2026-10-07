@@ -51,6 +51,7 @@ function RootNavigator() {
     <Stack
       screenOptions={{
         headerShadowVisible: false,
+        headerTitleAlign: 'center',
         headerTintColor: theme.text,
         headerBackButtonDisplayMode: 'minimal',
         headerTitleStyle: { fontFamily: fontFamilyFor('600'), fontSize: 16 },

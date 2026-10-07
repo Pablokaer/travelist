@@ -65,11 +65,13 @@ export default function OnboardingScreen() {
             />
           ))}
         </View>
-        <Text variant="label" secondary accessibilityLiveRegion="polite">
+        <Text variant="label" secondary style={styles.centerText} accessibilityLiveRegion="polite">
           {t('onboarding.progress', { step: step + 1, total: titles.length })}
         </Text>
       </View>
-      <Text variant="title">{titles[step]}</Text>
+      <Text variant="title" style={styles.centerText}>
+        {titles[step]}
+      </Text>
       <Card style={styles.fields}>
         {step === 0 ? <NameAndPreferencesFields control={control} /> : null}
         {step === 1 ? <NationalityFields control={control} /> : null}
@@ -100,6 +102,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
+  centerText: { textAlign: 'center' },
   progress: { gap: spacing.sm },
   bars: { flexDirection: 'row', gap: spacing.xs },
   bar: { flex: 1, height: 4, borderRadius: radius.pill },

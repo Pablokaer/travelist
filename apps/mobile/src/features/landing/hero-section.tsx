@@ -73,11 +73,24 @@ function StackedPhotoCredit() {
 }
 
 /** "N cities in M countries", from the real city list; nothing until it has loaded. */
-function Eyebrow({ cities, countries }: { cities: number; countries: number }) {
+function Eyebrow({
+  cities,
+  countries,
+  centered,
+}: {
+  cities: number;
+  countries: number;
+  centered?: boolean;
+}) {
   const theme = useTheme();
   const { t } = useTranslation();
   return (
-    <View style={[styles.eyebrow, { backgroundColor: theme.primarySoft }]}>
+    <View
+      style={[
+        styles.eyebrow,
+        centered && styles.eyebrowCentered,
+        { backgroundColor: theme.primarySoft },
+      ]}>
       <Icon name="pin" size={15} color={theme.primary} />
       <Text variant="label" style={{ color: theme.primary }}>
         {t('landing.hero.eyebrow', { cities, countries })}
@@ -86,11 +99,11 @@ function Eyebrow({ cities, countries }: { cities: number; countries: number }) {
   );
 }
 
-function SocialProof() {
+function SocialProof({ centered }: { centered?: boolean }) {
   const theme = useTheme();
   const { t } = useTranslation();
   return (
-    <View style={styles.proof}>
+    <View style={[styles.proof, centered && styles.proofCentered]}>
       <View style={styles.avatars} aria-hidden importantForAccessibility="no-hide-descendants">
         {PROOF_PHOTOS.map((source, i) => (
           <Image
@@ -104,7 +117,7 @@ function SocialProof() {
           />
         ))}
       </View>
-      <View>
+      <View style={styles.proofCopy}>
         <Text style={[styles.stars, { color: theme.star }]} aria-hidden>
           ★★★★★
         </Text>
@@ -130,10 +143,14 @@ function HeroCopy({ layout, counts, onSeeHow }: HeroCopyProps) {
   const stacked = !layout.splitHero;
   return (
     <Animated.View style={[styles.copy, !stacked && styles.copySide, fade]}>
-      {counts ? <Eyebrow {...counts} /> : null}
+      {counts ? <Eyebrow {...counts} centered={stacked} /> : null}
       <Text
         variant="display"
-        style={[styles.title, { fontSize: size, lineHeight: size * 1.06 }]}
+        style={[
+          styles.title,
+          stacked && styles.textCentered,
+          { fontSize: size, lineHeight: size * 1.06 },
+        ]}
         aria-level={1}>
         {/* `t` ties it to the language: without it the React Compiler keeps the first render. */}
         <Trans
@@ -143,7 +160,9 @@ function HeroCopy({ layout, counts, onSeeHow }: HeroCopyProps) {
           components={{ accent: <RNText style={{ color: theme.primary }} /> }}
         />
       </Text>
-      <Text secondary style={[styles.subtitle, stacked && styles.subtitleStacked]}>
+      <Text
+        secondary
+        style={[styles.subtitle, stacked && [styles.subtitleStacked, styles.textCentered]]}>
         {t('landing.hero.subtitle')}
       </Text>
       <View style={[styles.ctas, stacked && styles.ctasStacked]}>
@@ -159,7 +178,7 @@ function HeroCopy({ layout, counts, onSeeHow }: HeroCopyProps) {
           style={styles.cta}
         />
       </View>
-      <SocialProof />
+      <SocialProof centered={stacked} />
     </Animated.View>
   );
 }
@@ -218,6 +237,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md - 4,
     borderRadius: radius.pill,
   },
+  textCentered: { textAlign: 'center', alignSelf: 'center' },
+  eyebrowCentered: { alignSelf: 'center' },
+  proofCentered: { justifyContent: 'center' },
+  proofCopy: { flexShrink: 1 },
   title: { fontWeight: '700', letterSpacing: -1.8 },
   subtitle: { fontSize: 19, lineHeight: 30, maxWidth: 500 },
   subtitleStacked: { fontSize: 17, lineHeight: 26 },
