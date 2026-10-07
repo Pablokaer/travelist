@@ -767,7 +767,7 @@ The **Security** workflow (`.github/workflows/security.yml`, D-049) runs on ever
 4. **audit** — `pnpm audit --audit-level high` and `pip-audit ./data-pipeline`. Advisories with no patched version that only reach dev tooling are listed, with a reason, under `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`.
 5. **workflows** — `actionlint` on every workflow file. Locally: `actionlint`.
 
-CI and Security run on pull requests and on pushes to `dev` and `main`. When both pass on `dev`, the **Promote** workflow (D-075) waits for a manual approval, fast-forwards `main` and runs **Deploy** (D-074) — see [Deploying (hosted) → Continuous deployment](#continuous-deployment).
+CI and Security run on pull requests and on pushes to `dev` (not `main`: it only receives commits that passed on `dev`). When both pass on `dev`, the **Promote** workflow (D-075) waits for a manual approval, fast-forwards `main` and runs **Deploy** (D-074) — see [Deploying (hosted) → Continuous deployment](#continuous-deployment).
 
 ### Conventions
 
@@ -844,7 +844,7 @@ Steps 1 (migrations, seeds, functions) and 4 (web) are also one script each, for
 feature/* ──PR──▶ dev ──CI + Security green──▶ approval ──▶ main (fast-forward) ──▶ deploy
 ```
 
-Rulesets enforce it: `dev` accepts changes only through pull requests with the CI and Security checks green, no force-push or deletion; `main` can only be updated by GitHub Actions (the release job), no force-push or deletion. To deploy without a new commit (e.g. after a failed deploy): Actions → Deploy → Run workflow (the head of `main`).
+Rulesets enforce it: `dev` accepts changes only through pull requests with the CI and Security checks green, no force-push or deletion; `main` can only be updated by a deploy key — the one whose private key is the `RELEASE_DEPLOY_KEY` secret of the `release` environment, readable only by the approved release job (GitHub Actions itself cannot bypass a ruleset in a personal repository) — no force-push or deletion. To deploy without a new commit (e.g. after a failed deploy): Actions → Deploy → Run workflow (the head of `main`).
 
 `.github/workflows/deploy.yml` (D-074) jobs, in order; a failing one stops the rest, and deploys queue instead of overlapping:
 
@@ -852,7 +852,7 @@ Rulesets enforce it: `dev` accepts changes only through pull requests with the C
 2. **web** — `scripts/deploy-web.sh`: Expo static export with the `EXPO_PUBLIC_*` variables, refuses to publish a bundle without the production Supabase URL, `rsync --delete` to `/var/www/travelist` on the VPS.
 3. **smoke** — `https://travelist.live/` and `<supabase>/functions/v1/health` answer 200 (5 retries).
 
-Setup, once: environment **`release`** with required reviewers (the people who approve releases; deployments from `main` only), and environment **`production`** (deployments from `main` only) with:
+Setup, once: environment **`release`** with required reviewers (the people who approve releases; deployments from `main` only) and the secret `RELEASE_DEPLOY_KEY` (private key of a repository deploy key with write access), and environment **`production`** (deployments from `main` only) with:
 
 | Kind     | Name                                                                                                                                                                                                             | Value                                                                                            |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |

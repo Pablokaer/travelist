@@ -51,16 +51,28 @@ jobs:
     concurrency:
       group: release-approval
       cancel-in-progress: true
-    permissions:
-      contents: write # bypasses main's ruleset as GitHub Actions
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.RELEASE_SHA }}
           fetch-depth: 0
+          persist-credentials: false
+      # main's ruleset lets only deploy keys update it: GitHub Actions cannot be a ruleset bypass
+      # actor in a personal repository. The key is a secret of the `release` environment, so it
+      # exists in this job only after the approval. github.com's host key is pinned (`gh api meta`).
       # A plain push: it fails, deploying nothing, if main has a commit dev does not (not a
-      # fast-forward). Pushed with GITHUB_TOKEN, so CI does not run again on main: same commit.
-      - run: git push origin "$RELEASE_SHA:refs/heads/main"
+      # fast-forward).
+      - name: Fast-forward main
+        env:
+          RELEASE_DEPLOY_KEY: ${{ secrets.RELEASE_DEPLOY_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$RELEASE_DEPLOY_KEY" > ~/.ssh/release_key
+          chmod 600 ~/.ssh/release_key
+          echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND='ssh -i ~/.ssh/release_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes'
+          git push "git@github.com:$GITHUB_REPOSITORY.git" "$RELEASE_SHA:refs/heads/main"
+          rm -f ~/.ssh/release_key
       - run: echo "main → \`$RELEASE_SHA\`" >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
