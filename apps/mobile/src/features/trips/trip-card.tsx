@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Badge } from '@/components/card';
 import { Icon, type IconName } from '@/components/icon';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
 import { cityName, type City, type PhotoCover } from '@/features/destinations/api';
@@ -72,15 +73,16 @@ export function authorLabel(
 }
 
 /** Author line of other people's lists; nothing on the owner's own cards. */
-function Byline({ trip }: { trip: TripCardData }) {
+function Byline({ trip, centred }: { trip: TripCardData; centred: boolean }) {
   const { t } = useTranslation();
   if (trip.authorName === undefined && !trip.isOfficial) return null;
   return (
-    <View style={styles.byline}>
+    <View testID="walklist-byline" style={[styles.byline, centred && centring.row]}>
       {trip.isOfficial ? (
         <Badge icon="verified" tone="accent" label={t('walklists.official')} />
       ) : null}
-      <Text variant="caption" secondary numberOfLines={1} style={styles.flex}>
+      {/* Without flex: 1 on phones, so the row can gather in the middle. */}
+      <Text variant="caption" secondary numberOfLines={1} style={!centred && styles.flex}>
         {authorLabel(trip, t)}
       </Text>
       <CardRating summary={trip.rating} />
@@ -118,10 +120,10 @@ function CardCover({ trip, city, lang }: { trip: TripCardData; city?: City; lang
   );
 }
 
-function MetaRow({ items }: { items: MetaItem[] }) {
+function MetaRow({ items, centred }: { items: MetaItem[]; centred: boolean }) {
   const theme = useTheme();
   return (
-    <View style={styles.meta}>
+    <View testID="walklist-meta" style={[styles.meta, centred && centring.row]}>
       {items.map((m) => (
         <View key={m.icon} style={styles.metaItem}>
           <Icon name={m.icon} size={14} color={theme.textSecondary} />
@@ -154,6 +156,7 @@ export function TripCard({
   const theme = useTheme();
   const shadows = useShadows();
   const [hovered, setHovered] = useState(false);
+  const centred = useCentredOnPhone();
   const lang = i18n.resolvedLanguage ?? 'en';
   const place = city ? cityName(city, lang) : trip.citySlug;
   return (
@@ -177,14 +180,18 @@ export function TripCard({
         <CardPhoto cover={trip.cover} />
         <CardCover trip={trip} city={city} lang={lang} />
         <View style={styles.body}>
-          <Text variant="heading" numberOfLines={2}>
+          <Text variant="heading" numberOfLines={2} style={centred && centring.text}>
             {trip.name}
           </Text>
-          <Byline trip={trip} />
-          <MetaRow items={useMeta(trip, lang)} />
+          <Byline trip={trip} centred={centred} />
+          <MetaRow items={useMeta(trip, lang)} centred={centred} />
         </View>
       </Tappable>
-      {actions ? <View style={styles.actions}>{actions}</View> : null}
+      {actions ? (
+        <View testID="walklist-actions" style={[styles.actions, centred && centring.row]}>
+          {actions}
+        </View>
+      ) : null}
     </View>
   );
 }

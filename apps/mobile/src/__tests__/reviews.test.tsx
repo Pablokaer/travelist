@@ -16,6 +16,7 @@ import { ReviewForm } from '@/features/reviews/review-form';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { StarRating } from '@/features/reviews/star-rating';
 import '@/lib/i18n';
+import { layOutAsIPhone } from '@/testing/phone-width';
 
 /** In-memory stand-in for the reviews API hooks: what the server returned and what was sent. */
 class MockReviewsBackend {
@@ -288,5 +289,49 @@ describe('ReviewsSection', () => {
     render(<ReviewsSection target={placeTarget} />);
     expect(screen.queryByTestId('delete-review')).toBeNull();
     expect(screen.getByText('Publish review')).toBeTruthy();
+  });
+});
+
+// iPhone audit (D-076): the whole Reviews area is centred on phones.
+describe('Reviews on a phone', () => {
+  layOutAsIPhone();
+
+  test('centres the title, the average and the bars per star', () => {
+    MockReviewsBackend.summary = { count: 2, average: 4.5, distribution: [0, 0, 0, 1, 1] };
+    render(<ReviewsSection target={cityTarget} />);
+    expect(screen.getByRole('header', { name: 'Reviews' })).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByTestId('rating-summary')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByTestId('rating-distribution')).toHaveStyle({ alignSelf: 'center' });
+  });
+
+  test('centres the form: title, stars and buttons', () => {
+    render(<ReviewForm initial={null} onSave={jest.fn()} onDelete={jest.fn()} kind="city" />);
+    expect(screen.getByText('Rate this city')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByTestId('star-rating')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByTestId('review-form-actions')).toHaveStyle({ justifyContent: 'center' });
+  });
+
+  test('centres each review: author above, then stars and comment', () => {
+    render(<ReviewCard review={review()} />);
+    expect(screen.getByTestId('review-author')).toHaveStyle({
+      flexDirection: 'column',
+      alignItems: 'center',
+    });
+    expect(screen.getByTestId('review-stars')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByText('Great views from the top')).toHaveStyle({ textAlign: 'center' });
+  });
+
+  // Regression: Badge sets alignSelf: flex-start, which beat the centred column.
+  test("centres the 'Your review' badge of the user's own review", () => {
+    render(<ReviewCard review={review({ isOwn: true })} />);
+    expect(screen.getByTestId('review-own-badge')).toHaveStyle({ alignSelf: 'center' });
+  });
+});
+
+describe('Reviews on a tablet', () => {
+  test('keep the author beside the avatar and the comment at the start of the line', () => {
+    render(<ReviewCard review={review()} />);
+    expect(screen.getByTestId('review-author')).toHaveStyle({ flexDirection: 'row' });
+    expect(screen.getByText('Great views from the top')).not.toHaveStyle({ textAlign: 'center' });
   });
 });

@@ -23,6 +23,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- iPhone layout (D-076): section titles (About, Famous people, walk lists, Before you go, Reviews, Good to know, Stops…), walk list card titles and the Reviews area (average, bars per star, review form, each review and its "Your review" badge) were left-aligned on phones; they are now centered, as page headings already were. Tablets and desktop are unchanged. Before/after screenshots in `artifacts/iphone-audit/`.
+
 - Mobile alignment: center authentication titles, subtitles and links, main page headings, city and attraction hero content, onboarding headings, and stacked landing copy. Navigation titles are centered; the iPhone visual review gallery and element positions are recorded in `artifacts/iphone-audit/`.
 
 - Security CI: `pnpm audit` failed on two new advisories with fixed versions — `shell-quote` GHSA-pqg4-j6r4-53mv (critical; via react-native > react-devtools-core) and `source-map-js` GHSA-68fv-2mgg-jv7q (high; via @expo/metro-config > postcss). Both are forced to the patched release with `overrides` in `pnpm-workspace.yaml` (1.12.0 and 1.2.2) until their parents update.

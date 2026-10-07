@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Text } from '@/components/text';
 import { TextField } from '@/components/text-field';
 import { FormError } from '@/features/auth/components';
@@ -66,13 +67,14 @@ export function ReviewForm(props: Props) {
   const { initial, onSave, onDelete, saving, deleting, error, kind = 'attraction' } = props;
   const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
+  const centred = useCentredOnPhone();
   const { control, handleSubmit } = useForm<Form>({
     resolver: zodResolver(reviewFormSchema),
     defaultValues: initial ?? { rating: 0, comment: '' },
   });
   return (
     <Card testID="review-form">
-      <Text variant="subtitle">
+      <Text variant="subtitle" style={centred && centring.text}>
         {initial ? t('reviews.yourReviewTitle') : t('reviews.writeTitle', { context: kind })}
       </Text>
       <Controller
@@ -80,7 +82,11 @@ export function ReviewForm(props: Props) {
         name="rating"
         render={({ field, fieldState }) => (
           <View>
-            <StarRating value={field.value} onChange={field.onChange} />
+            <StarRating
+              value={field.value}
+              onChange={field.onChange}
+              style={centred && centring.row}
+            />
             <FormError
               message={fieldState.error?.message ? t(fieldState.error.message as never) : null}
             />
@@ -105,7 +111,7 @@ export function ReviewForm(props: Props) {
         )}
       />
       <FormError message={error ?? null} />
-      <View style={styles.actions}>
+      <View testID="review-form-actions" style={[styles.actions, centred && centring.row]}>
         <Button
           label={initial ? t('reviews.update') : t('reviews.publish')}
           loading={saving}

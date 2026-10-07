@@ -1,5 +1,6 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 import { WALKLIST_PAGE_SIZE } from '@wayfarer/shared';
+import { Text } from 'react-native';
 
 import {
   nextWalklistOffset,
@@ -11,6 +12,7 @@ import { SaveWalklistButton } from '@/features/trips/save-walklist-button';
 import { TripCard } from '@/features/trips/trip-card';
 import '@/lib/i18n';
 import { fakeCity } from '@/testing/fixtures';
+import { layOutAsIPhone } from '@/testing/phone-width';
 
 /** In-memory stand-in for the save / unsave mutation: what the button asked for. */
 class MockSavedWalklists {
@@ -156,5 +158,28 @@ describe('SaveWalklistButton', () => {
   test('nobody saves their own list', () => {
     render(<SaveWalklistButton trip={card({ is_own: true })} />);
     expect(screen.queryByText('Save')).toBeNull();
+  });
+});
+
+// iPhone audit (D-076): on a phone the card's title, byline, facts and actions are centred.
+describe('TripCard on a phone', () => {
+  layOutAsIPhone();
+  const amsterdam = fakeCity();
+
+  test('centres the title, the author line, the facts and the actions', () => {
+    render(
+      <TripCard trip={card()} city={amsterdam} onPress={jest.fn()} actions={<Text>Save</Text>} />,
+    );
+    expect(screen.getByText('Historic Amsterdam')).toHaveStyle({ textAlign: 'center' });
+    expect(screen.getByTestId('walklist-byline')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByTestId('walklist-meta')).toHaveStyle({ justifyContent: 'center' });
+    expect(screen.getByTestId('walklist-actions')).toHaveStyle({ justifyContent: 'center' });
+  });
+});
+
+describe('TripCard on a tablet', () => {
+  test('keeps the title at the start of the line', () => {
+    render(<TripCard trip={card()} city={fakeCity()} onPress={jest.fn()} />);
+    expect(screen.getByText('Historic Amsterdam')).not.toHaveStyle({ textAlign: 'center' });
   });
 });

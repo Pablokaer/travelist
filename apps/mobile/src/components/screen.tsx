@@ -2,6 +2,7 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { centring, useCentredOnPhone } from './phone-centring';
 import { Text } from './text';
 
 import { layout, spacing } from '@/theme/colors';
@@ -104,17 +105,16 @@ export function PageHeader({
   action?: ReactNode;
   size?: 'display' | 'title';
 }) {
-  const { isTablet } = useBreakpoint();
-  const centered = !isTablet && !action;
+  const centered = useCentredOnPhone() && !action;
   return (
     <View style={styles.header}>
       <View style={styles.headerText}>
         {eyebrow}
-        <Text variant={size} style={centered && styles.centerText}>
+        <Text variant={size} style={centered && centring.text}>
           {title}
         </Text>
         {subtitle ? (
-          <Text secondary style={centered && styles.centerText}>
+          <Text secondary style={centered && centring.text}>
             {subtitle}
           </Text>
         ) : null}
@@ -124,19 +124,23 @@ export function PageHeader({
   );
 }
 
-/** A titled group of content with consistent spacing between sections. */
+/**
+ * A titled group of content with consistent spacing between sections. On phones the title is
+ * centred and its action sits below it (D-076).
+ */
 export function Section({
   title,
   action,
   children,
   style,
 }: PropsWithChildren<{ title?: string; action?: ReactNode; style?: ViewStyle }>) {
+  const centred = useCentredOnPhone();
   return (
     <View style={[styles.section, style]}>
       {title || action ? (
-        <View style={styles.sectionHeader}>
+        <View testID="section-header" style={[styles.sectionHeader, centred && centring.stack]}>
           {title ? (
-            <Text variant="heading" style={styles.flex}>
+            <Text variant="heading" style={centred ? styles.centredTitle : styles.flex}>
               {title}
             </Text>
           ) : null}
@@ -171,7 +175,8 @@ const styles = StyleSheet.create({
   },
   header: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.md },
   headerText: { flex: 1, gap: spacing.xs },
-  centerText: { textAlign: 'center' },
+  // Full width so a title that wraps stays centred line by line.
+  centredTitle: { alignSelf: 'stretch', textAlign: 'center' },
   section: { gap: spacing.md - 4 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   flex: { flex: 1 },

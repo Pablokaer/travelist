@@ -1,7 +1,7 @@
 // Five-star controls for reviews (D-028). Stars are the ★ glyph in gold (filled, `theme.star`)
 // or the strong border colour (empty): one glyph renders the same on web, iOS and Android.
 import { REVIEW_RATING_MAX } from '@wayfarer/shared';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Tappable } from '@/components/tappable';
@@ -31,13 +31,22 @@ function StarGlyph({ filled, size }: { filled: boolean; size: number }) {
  * Picks a whole rating from 1 to 5: five pressable stars, announced as a radio group.
  * @example <StarRating value={rating} onChange={setRating} />
  */
-export function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+export function StarRating({
+  value,
+  onChange,
+  style,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  style?: StyleProp<ViewStyle>;
+}) {
   const { t } = useTranslation();
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={t('reviews.pickRating')}
-      style={styles.row}>
+      testID="star-rating"
+      style={[styles.row, style]}>
       {STAR_VALUES.map((star) => (
         <Tappable
           key={star}
@@ -59,10 +68,24 @@ export function StarRating({ value, onChange }: { value: number; onChange: (v: n
  * Read-only stars for a rating, with a spoken "Rated 4 out of 5".
  * @example <Stars rating={4} />
  */
-export function Stars({ rating, size = 14 }: { rating: number; size?: number }) {
+export function Stars({
+  rating,
+  size = 14,
+  style,
+  testID,
+}: {
+  rating: number;
+  size?: number;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
+}) {
   const { t } = useTranslation();
   return (
-    <View accessible accessibilityLabel={t('reviews.ratingLabel', { rating })} style={styles.row}>
+    <View
+      accessible
+      accessibilityLabel={t('reviews.ratingLabel', { rating })}
+      testID={testID}
+      style={[styles.row, style]}>
       {STAR_VALUES.map((star) => (
         <StarGlyph key={star} filled={star <= rating} size={size} />
       ))}
