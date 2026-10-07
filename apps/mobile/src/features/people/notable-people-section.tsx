@@ -14,6 +14,7 @@ import {
 import { PersonCard } from './person-card';
 
 import { Chip } from '@/components/chip';
+import { centring, useCentredOnPhone } from '@/components/phone-centring';
 import { Section } from '@/components/screen';
 import { Text } from '@/components/text';
 import { cityName, type City } from '@/features/destinations/api';
@@ -30,8 +31,9 @@ function CategoryChips({
 }) {
   const { t } = useTranslation();
   const filters: PeopleFilter[] = ['all', ...categoriesPresent(people)];
+  const centred = useCentredOnPhone();
   return (
-    <View style={styles.chips}>
+    <View testID="people-filters" style={[styles.chips, centred && centring.row]}>
       {filters.map((f) => (
         <Chip
           key={f}
@@ -53,6 +55,7 @@ export function NotablePeopleSection({ city }: { city: City }) {
   const { t, i18n } = useTranslation();
   const people = useNotablePeople(city.slug);
   const [filter, setFilter] = useState<PeopleFilter>('all');
+  const centred = useCentredOnPhone();
   if (!people.data?.length) return null;
   const shown = peopleInCategory(people.data, filter);
   return (
@@ -67,7 +70,7 @@ export function NotablePeopleSection({ city }: { city: City }) {
           <PersonCard key={p.wikidataId} person={p} />
         ))}
       </ScrollView>
-      <Text variant="helper" secondary>
+      <Text variant="helper" secondary style={centred && centring.text}>
         {t('people.credit')}
       </Text>
     </Section>

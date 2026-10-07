@@ -49,9 +49,10 @@ function Paragraphs({ text }: { text: string }) {
 
 function WikipediaSource({ url }: { url: string | null }) {
   const { t } = useTranslation();
+  const centred = useCentredOnPhone();
   return (
-    <View style={styles.source}>
-      <Text variant="helper" secondary>
+    <View testID="wikipedia-source" style={[styles.source, centred && centring.row]}>
+      <Text variant="helper" secondary style={centred && centring.text}>
         {t('wikipedia.source')}
       </Text>
       {url ? (
