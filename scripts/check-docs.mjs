@@ -4,10 +4,10 @@
 //   - fails when code, data or config changed but CHANGELOG.md did not;
 //   - warns when user-facing code changed but README.md did not (README = feature reference).
 // City coverage (docs/CITIES.md) is checked separately by `wayfarer_pipeline cities-doc --check`.
-//   node scripts/check-docs.mjs [base]    base defaults to origin/main (CI passes the PR base)
+//   node scripts/check-docs.mjs [base]    base defaults to origin/dev (CI passes the PR base)
 import { execFileSync } from 'node:child_process';
 
-const base = process.argv[2] ?? 'origin/main';
+const base = process.argv[2] ?? 'origin/dev';
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const lines = (s) => s.split('\n').filter(Boolean);
 

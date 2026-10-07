@@ -13,7 +13,11 @@ Each commit that changes code, data or config must, **in the same commit**:
 4. **Decisions** — non-trivial choices (new provider, library, trade-off) → `docs/DECISIONS.md` as the next `D-0xx`; data sources/licences → `docs/DATA_SOURCES.md`.
 5. **Status** — milestone progress or remaining work → `PROGRESS.md`.
 
-Before committing, run `node scripts/check-docs.mjs` (compares against `origin/main`, including uncommitted files).
+Before committing, run `node scripts/check-docs.mjs` (compares against `origin/dev`, including uncommitted files).
+
+## Branches (D-075)
+
+Branch from `dev` and open pull requests into **`dev`**, never `main`. `main` is production: it only moves when a green commit of `dev` is approved in the Promote workflow, which then deploys it.
 
 ## Code style
 

@@ -198,6 +198,11 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - **Deploy workflow:** a push to `main` that passes CI publishes the backend (migrations, seeds, Edge Functions), then the web app to https://travelist.live, then smoke-tests both; also runnable by hand. `scripts/deploy-backend.sh` and `scripts/deploy-web.sh` are shared by CI and manual deploys (both checked with `--dry-run` against production).
 - **Needs:** the GitHub environment `production` with its secrets and variables (README → "Continuous deployment").
 
+## 2026-10-07 — Release gate dev → main (D-075)
+
+- **Flow:** feature PRs → `dev` (CI + Security required) → **Promote** waits for approval → `main` fast-forwarded to the tested commit → Deploy. `main` only moves through the gate (rulesets). Gate logic in `scripts/release-gate.mjs`, with tests.
+- **Needs:** `SUPABASE_ACCESS_TOKEN` in the `production` environment before the first release.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

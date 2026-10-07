@@ -2,7 +2,7 @@ name: Data refresh
 
 # Monthly refresh of the reference data (D-042): countries (plugs, voltage, emergency numbers,
 # currency), visa rules, city "About" texts and every city's attractions are fetched again, the
-# data gate compares them with main — restoring texts, photos and facts that got worse and blocking
+# data gate compares them with dev — restoring texts, photos and facts that got worse and blocking
 # big losses — and the result is opened as a pull request. Nothing is published without review:
 # merging the PR is the human gate, and CI runs the gate again on it.
 #
@@ -44,6 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: dev # the PR targets dev (D-075); the gate compares against it
           fetch-depth: 0
       # Node only for prettier: the pipeline formats the JSON snapshots it writes.
       - uses: pnpm/action-setup@v4
@@ -101,7 +102,7 @@ jobs:
           key: ${{ steps.class-roots.outputs.cache-primary-key }}
 
       # Restores what got worse (written back to data/), blocks big losses (exit 1: no PR).
-      - name: Data gate against main
+      - name: Data gate against dev
         working-directory: data-pipeline
         run: python -m wayfarer_pipeline gate --base HEAD --fix --report "$GATE_REPORT" --changelog
 
@@ -134,6 +135,7 @@ jobs:
         with:
           token: ${{ secrets.DATA_REFRESH_TOKEN || github.token }}
           branch: data/scheduled-refresh
+          base: dev # released to main through the gate like any other change (D-075)
           delete-branch: true
           title: 'data: scheduled refresh (${{ steps.day.outputs.day }})'
           commit-message: 'data: scheduled refresh (${{ steps.day.outputs.day }}, D-042)'

@@ -1,19 +1,20 @@
 name: Deploy
 
-# Continuous deployment to production (D-074): every push to main that passes CI is published —
-# first the backend (migrations, reference data, Edge Functions on Supabase Cloud), then the web
-# app (static export rsync'ed to the VPS behind Apache), then a smoke test of both. A merged data
-# refresh PR (D-042) is deployed the same way.
+# Deployment to production (D-074): publishes a commit of main — first the backend (migrations, reference data, Edge Functions on Supabase Cloud), then the web
+# app (static export rsync'ed to the VPS behind Apache), then a smoke test of both.
 #
-# Run by hand: Actions → Deploy → Run workflow (deploys the head of main).
+# Called by promote.yml once a release is approved and main fast-forwarded to it (D-075), and
+# runnable by hand to redeploy: Actions → Deploy → Run workflow (the head of main).
 # Setup (README → "Deploying (hosted)" → "Continuous deployment"): GitHub environment `production`
 # with the variables and secrets read below.
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
+  workflow_call:
+    inputs:
+      sha:
+        description: Commit to deploy (the one promoted to main)
+        required: true
+        type: string
   workflow_dispatch:
 
 permissions:
@@ -25,16 +26,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # The commit CI tested (workflow_run), or the head of main (manual run).
-  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+  # The promoted commit (workflow_call), or the head of main (manual run).
+  DEPLOY_SHA: ${{ inputs.sha || github.sha }}
 
 jobs:
   backend:
     name: Backend (migrations · seeds · Edge Functions)
-    # Only CI runs of pushes to main that passed; not PR runs whose head branch happens to be main.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
