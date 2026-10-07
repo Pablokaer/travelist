@@ -456,7 +456,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
   - Nicknames are case-insensitive but shown lowercase.
   - Signing in by nickname makes two requests (nickname → email, then Supabase Auth).
   - The lock after 10 failures also blocks the owner for 15 minutes; signing in with the email still works.
-- Data refresh (D-042): visa rules come from an archived repository, so the monthly refresh finds no new ones; a maintained source is still needed. The refresh opens a pull request and never deploys: publishing to a hosted project is still `supabase db push --include-seed` by hand. GitHub disables scheduled workflows after 60 days without activity in a public repository, and they need the GitHub remote (Launch checklist 11 and 14).
+- Data refresh (D-042): visa rules come from an archived repository, so the monthly refresh finds no new ones; a maintained source is still needed. The refresh opens a pull request and never deploys by itself: the PR targets `dev` and is released through the gate like any other change (D-075). GitHub disables scheduled workflows after 60 days without activity in a public repository, and they need the GitHub remote (Launch checklist 11 and 14).
 - Without `ORS_API_KEY`, or when OpenRouteService answers neither the optimisation nor the directions, routes are straight-line estimates (labelled in the UI). When only the optimisation is unavailable (e.g. its daily quota is used up), the order is computed on the device side of the function (straight-line shortest order) and still walked along the streets (D-046). Routes saved earlier as estimates keep their straight lines until they are built again.
 - The route tray is not persisted; offline cache (MMKV) is not implemented yet.
 - Portuguese attraction names exist for only ~15–55% of places outside Portugal/Rome (English shown as fallback); opening hours cover ~15–30% of places.
@@ -608,7 +608,7 @@ Wayfarer is a **pnpm + Turborepo monorepo** with four deployable parts:
 │   └── tests/                     pytest (with fixtures)
 ├── docs/                          ARCHITECTURE, DECISIONS, DATA_SOURCES, LAUNCH_CHECKLIST, CITIES (generated)
 ├── scripts/                       check-docs.mjs (CHANGELOG gate) · sync-shared.mjs (shared → functions)
-├── .github/workflows/ci.yml       CI jobs
+├── .github/workflows/             ci.yml (CI jobs) · security.yml · deploy.yml (CD to production) · data-refresh.yml · providers-check.yml
 ├── run-project.sh                 one-command local run
 └── package.json · turbo.json · pnpm-workspace.yaml · tsconfig.base.json · .prettierrc.json
 ```
@@ -767,6 +767,8 @@ The **Security** workflow (`.github/workflows/security.yml`, D-049) runs on ever
 4. **audit** — `pnpm audit --audit-level high` and `pip-audit ./data-pipeline`. Advisories with no patched version that only reach dev tooling are listed, with a reason, under `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml`.
 5. **workflows** — `actionlint` on every workflow file. Locally: `actionlint`.
 
+CI and Security run on pull requests and on pushes to `dev` and `main`. When both pass on `dev`, the **Promote** workflow (D-075) waits for a manual approval, fast-forwards `main` and runs **Deploy** (D-074) — see [Deploying (hosted) → Continuous deployment](#continuous-deployment).
+
 ### Conventions
 
 - Formatters: Prettier for TypeScript/JSON/Markdown (`pnpm format`), `deno fmt` for `supabase/functions`, `ruff format` for the pipeline. Generated files (seeds, `docs/CITIES.md`, `database.types.ts`, `_shared/wayfarer`, the web fonts in `apps/mobile/assets/fonts/web` with `web-icon-codepoints.json`) are regenerated, never edited. After adding an icon, rebuild the web fonts with `python3 apps/mobile/scripts/build-web-fonts.py` (needs `pip install fonttools brotli`); a unit test fails until then (D-059).
@@ -825,27 +827,64 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
    `pnpm exec supabase functions deploy checklist route-optimize health welcome-email auth-email --use-api --import-map supabase/functions/deno.json` (without `--import-map` the remote bundler cannot resolve `zod` / `@supabase/supabase-js`; `verify_jwt` comes from `supabase/config.toml`, off for `health` and `auth-email`).
 2. **Secrets:** `pnpm exec supabase secrets set --env-file <file>` with `RESEND_API_KEY`, `EMAIL_FROM` (an address on the domain verified in Resend), `SEND_EMAIL_HOOK_SECRET` (`v1,whsec_<base64>`), `APP_URL` and `ORS_API_KEY` (optional `EXCHANGE_RATES_BASE_URL`). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
 3. **Auth** (Dashboard → Authentication, or the Management API `PATCH /v1/projects/<ref>/config/auth`): Site URL = the web URL; redirect URLs `https://<web>/**` and `wayfarer://**`; **email OTP length 6** (the app asks for 6 digits; the hosted default is 8); raise the email rate limit (default 2/hour); Hooks → Send Email (HTTPS) at `https://<ref>.supabase.co/functions/v1/auth-email` with the same secret as `SEND_EMAIL_HOOK_SECRET`. Providers → Google / Apple with your client ids. Do not `supabase config push`: `config.toml` holds the local values (localhost, Mailpit).
-4. **Web:** `./scripts/deploy-web.sh` builds with `.env.production` and publishes to the VPS (`--dry-run` shows the changes first). It sets `EXPO_NO_DOTENV=1` and passes `--clear`: otherwise Expo loads the local `.env` and Metro reuses modules inlined with the local URL. The Apache vhosts are in `deploy/apache/` (static export rewrites: `/sign-in` → `sign-in.html`, `/city/<slug>` → `city/[slug].html`, …; HTTP → HTTPS; Let's Encrypt via `certbot --apache`). Any other static host works too (EAS Hosting, Netlify, Vercel, Cloudflare Pages) with the same rewrites.
+4. **Web:** `./scripts/deploy-web.sh` builds with `.env.production` (or, when absent, the `EXPO_PUBLIC_*` environment variables) and publishes to the VPS (`--dry-run` shows the changes first). It sets `EXPO_NO_DOTENV=1` and passes `--clear`: otherwise Expo loads the local `.env` and Metro reuses modules inlined with the local URL. The Apache vhosts are in `deploy/apache/` (static export rewrites: `/sign-in` → `sign-in.html`, `/city/<slug>` → `city/[slug].html`, …; HTTP → HTTPS; Let's Encrypt via `certbot --apache`). Any other static host works too (EAS Hosting, Netlify, Vercel, Cloudflare Pages) with the same rewrites.
 5. **iOS / Android:** set `EXPO_PUBLIC_*` as EAS environment variables, then `npx eas-cli build --profile production -p ios|android` and `npx eas-cli submit`.
+
+Steps 1 (migrations, seeds, functions) and 4 (web) are also one script each, for a deploy by hand: `./scripts/deploy-backend.sh` (needs `SUPABASE_DB_PASSWORD` and a `supabase login`; `SUPABASE_PROJECT_REF` is read from `.env.production`) and `./scripts/deploy-web.sh`. Both take `--dry-run`: the pending migrations and seeds / the files rsync would change.
+
+### Continuous deployment
+
+**Branches and release gate (D-075).** Work happens on feature branches and reaches **`dev`** through pull requests (CI and Security must pass; the monthly data refresh opens its PR there too). **`main` is production**: nobody pushes or merges into it. When **CI** and **Security** both pass on a push to `dev`, the **Promote** workflow (`.github/workflows/promote.yml`):
+
+1. **gate** — `scripts/release-gate.mjs` checks that both workflows passed on that commit and that it is still the tip of `dev` (an older commit is never released over a newer one);
+2. **release** — waits for a **manual approval** (environment `release`: Actions → Promote → the waiting run → _Review deployments_ → Approve). A newer green commit on `dev` replaces a release still waiting. Once approved, `main` is fast-forwarded to that exact commit — the one every pipeline tested, no new merge commit;
+3. **deploy** — runs `deploy.yml` on it (below).
+
+```
+feature/* ──PR──▶ dev ──CI + Security green──▶ approval ──▶ main (fast-forward) ──▶ deploy
+```
+
+Rulesets enforce it: `dev` accepts changes only through pull requests with the CI and Security checks green, no force-push or deletion; `main` can only be updated by GitHub Actions (the release job), no force-push or deletion. To deploy without a new commit (e.g. after a failed deploy): Actions → Deploy → Run workflow (the head of `main`).
+
+`.github/workflows/deploy.yml` (D-074) jobs, in order; a failing one stops the rest, and deploys queue instead of overlapping:
+
+1. **backend** — `scripts/deploy-backend.sh`: `supabase db push --include-seed` (new migrations; seed files whose content changed, all upserts) and `functions deploy` of every `supabase/functions/<name>/index.ts` with the import map.
+2. **web** — `scripts/deploy-web.sh`: Expo static export with the `EXPO_PUBLIC_*` variables, refuses to publish a bundle without the production Supabase URL, `rsync --delete` to `/var/www/travelist` on the VPS.
+3. **smoke** — `https://travelist.live/` and `<supabase>/functions/v1/health` answer 200 (5 retries).
+
+Setup, once: environment **`release`** with required reviewers (the people who approve releases; deployments from `main` only), and environment **`production`** (deployments from `main` only) with:
+
+| Kind     | Name                                                                                                                                                                                                             | Value                                                                                            |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Secret   | `SUPABASE_ACCESS_TOKEN`                                                                                                                                                                                          | Personal access token (supabase.com → Account → Access Tokens)                                   |
+| Secret   | `SUPABASE_DB_PASSWORD`                                                                                                                                                                                           | Database password of the hosted project                                                          |
+| Secret   | `VPS_SSH_KEY`                                                                                                                                                                                                    | Private key of a deploy-only key pair whose public key is in the VPS's `authorized_keys`         |
+| Variable | `VPS_HOST` · `VPS_USER` · `VPS_KNOWN_HOSTS`                                                                                                                                                                      | VPS address, SSH user (owner of `/var/www/travelist`), output of `ssh-keyscan -t ed25519 <host>` |
+| Variable | `SUPABASE_PROJECT_REF`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_MAP_STYLE_URL`, `EXPO_PUBLIC_WEB_URL`, `EXPO_PUBLIC_AUTH_PROVIDERS` (optional: Sentry, PostHog, feature flags) | Same values as `.env.production` (public: they end up in the bundle)                             |
+
+Not automated: Supabase secrets and Auth settings (steps 2–3, rarely change), `config.toml` (never pushed), Apache vhosts (`deploy/apache/`), iOS / Android builds.
 
 ## Scripts (root)
 
-| Command                                      | What it does                                                                                               |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `./run-project.sh` / `--stop`                | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                        |
-| `pnpm dev`                                   | Start the Expo dev server                                                                                  |
-| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                                                                    |
-| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests                                                |
-| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                                                     |
-| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                                                            |
-| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                                                         |
-| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds                                             |
-| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                                |
-| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                       |
-| `pnpm db:demo <city>`                        | Load a city's demo community into the **local** DB and self-check it (today: `amsterdam`; D-037)           |
-| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                                                           |
-| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                      |
-| `pnpm docs:check`                            | Fail if code/data/config changed vs `origin/main` without a CHANGELOG entry; warn if README wasn't updated |
+| Command                                      | What it does                                                                                              |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `./run-project.sh` / `--stop`                | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                       |
+| `./scripts/deploy-backend.sh [--dry-run]`    | Push migrations + seeds and deploy every Edge Function to the hosted project (D-074)                      |
+| `./scripts/deploy-web.sh [--dry-run]`        | Build the web app for production and rsync it to the VPS (D-073)                                          |
+| `pnpm dev`                                   | Start the Expo dev server                                                                                 |
+| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                                                                   |
+| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests                                               |
+| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                                                    |
+| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                                                           |
+| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                                                        |
+| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds                                            |
+| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                               |
+| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                      |
+| `pnpm db:demo <city>`                        | Load a city's demo community into the **local** DB and self-check it (today: `amsterdam`; D-037)          |
+| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                                                          |
+| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                     |
+| `pnpm docs:check`                            | Fail if code/data/config changed vs `origin/dev` without a CHANGELOG entry; warn if README wasn't updated |
+| `pnpm test:scripts`                          | `node --test` for the root scripts (`scripts/*.test.mjs`, e.g. the release gate)                          |
 
 Edge Function checks: `cd supabase/functions && deno lint && deno fmt --check && deno test --allow-net=jsr.io`.
 After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy is stale, see D-005).

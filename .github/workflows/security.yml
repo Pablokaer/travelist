@@ -4,7 +4,7 @@ name: Security
 # published after the code was merged, when nothing in the repo changed.
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
   schedule:
     - cron: '0 6 * * 1' # Mondays 06:00 UTC
