@@ -13,9 +13,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- The swallow logo is now the favicon of every web page (`favicon.ico`, 32/192 px PNGs, Apple touch icon) and the link preview shown when travelist.live is pasted in chat or social apps is a 1200×630 card with the logo, name and tagline (Open Graph + Twitter tags in the new `src/app/+html.tsx`; images in `apps/mobile/public/`).
 - `PhotoCredit` can sit in the top-left or bottom-right corner; `BrandMark` takes a wordmark size; the sign-in/sign-up language chips are a shared `LanguageSwitch`.
 - README: an "At a glance" overview at the top (stack per part, how to run and test, status).
-- New logo symbol: a white swallow flying right on a brick-red rounded tile (`assets/images/brand-swallow.png`) replaces the map glyph in the Travelist logo (header, app menu, sign-in, About). App icon, favicon and splash are unchanged.
+- New logo symbol: a white swallow flying right on a brick-red rounded tile (`assets/images/brand-swallow.png`) replaces the map glyph in the Travelist logo (header, app menu, sign-in, About). App icon and splash are unchanged.
 - City pages and attraction pages tell more of the story (D-070). **About {city}** shows the whole introduction of the city's Wikipedia article (it was the first paragraph) and a new **History** part with an excerpt of the article's History section; attraction pages show their article's introduction (what it is, why it matters) and **History** (what happened there) instead of only Wikidata's one-line description. Both end with "From Wikipedia · CC BY-SA 4.0" and **Read the full article on Wikipedia**. New columns `cities.history_*` and `attractions.summary_*` / `history_*` (exposed by `attraction_details`; new migration). European cities first.
 - Pipeline: `city-summaries` reads the article through MediaWiki `prop=extracts` (introduction + History) instead of the REST summary and takes `--region europe` or `--city <slug>`, keeping the other cities; the new `attraction-texts` command writes `data/attraction_texts/<slug>.json`, which `seed` joins into `40_attractions.sql` (D-070).
 
