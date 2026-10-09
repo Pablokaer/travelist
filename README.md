@@ -57,6 +57,8 @@ On phones, primary page headings, authentication titles and subtitles, city and 
 
 ### 0. Landing page (web)
 
+**Favicon and link preview (web).** `src/app/+html.tsx` is the root HTML of the static export: the swallow-on-red-tile favicon (`public/favicon.ico`, PNGs, Apple touch icon) on every page, and Open Graph / Twitter tags pointing at `https://travelist.live/og-image.png` (1200×630: logo, name, tagline), the card shown when the link is pasted in chat or social apps. Files in `apps/mobile/public/` are copied to the site root by `expo export`.
+
 `(auth)/welcome.tsx` + `features/landing/` (D-072). On the web, a signed-out visitor opening the site (`/`) lands on `/welcome`; the iOS and Android apps keep opening on sign-in (`signedOutHome`, the `(auth)` stack's initial route). Light theme, EN/PT, from 320 px wide with no sideways scroll.
 
 - **Header** (sticky, frosted on the web) — the Travelist logo (back to the top), **Features** · **How it works** · **Destinations** (scroll to the section, just below the header), **Log in** (outlined → `/sign-in`) and **Get started** (red → `/sign-up`). Below 900 px the links and **Log in** move into a menu (☰ / ✕); **Get started** stays in the bar.
