@@ -10,7 +10,6 @@ import type { LandingSection } from './sections';
 import { BrandMark } from '@/components/app-menu';
 import { Tappable } from '@/components/tappable';
 import { Text } from '@/components/text';
-import { LanguageSwitch } from '@/features/auth/components';
 import { fontFamilyFor } from '@/theme/fonts';
 import { spacing } from '@/theme/colors';
 import { useTheme } from '@/theme/use-theme';
@@ -57,7 +56,7 @@ function SectionLink({ label, onPress }: { label: string; onPress: () => void })
 }
 
 /**
- * The landing page's footer (D-072): logo, language, section links, About, copyright and the
+ * The landing page's footer (D-072): logo, section links, About, copyright and the
  * credits the bundled photos and the map require. Only pages that exist are linked.
  * @example <LandingFooter layout={layout} onNavigate={scrollTo} />
  */
@@ -80,7 +79,6 @@ export function LandingFooter({
             <Text secondary variant="caption" style={styles.tagline}>
               {t('landing.footer.tagline')}
             </Text>
-            <LanguageSwitch />
           </View>
           <FooterColumn title={t('landing.footer.product')} stacked={stacked}>
             {PRODUCT_LINKS.map(({ section, key }) => (

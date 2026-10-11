@@ -208,6 +208,10 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 - Section titles, walk list cards and the Reviews area centred on phones; audit of 11 signed-in screens at 390 × 844: 43 off-centre titles → 2 (profile header, by design). Before/after in `artifacts/iphone-audit/`.
 - Production still serves the build from before PR #18 until the first release through the gate deploys (needs `SUPABASE_ACCESS_TOKEN`).
 
+## 2026-10-11 — Landing page always in English (D-077)
+
+- The landing page ignores the device and saved language and shows English; the footer's EN/PT switch is gone. Test added; not run in this session (dependencies not installed).
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

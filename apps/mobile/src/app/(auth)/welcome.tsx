@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { I18nextProvider } from 'react-i18next';
 import {
   ScrollView,
   StyleSheet,
@@ -22,6 +23,7 @@ import {
   type LandingSection,
   type SectionOffsets,
 } from '@/features/landing/sections';
+import { landingI18n } from '@/lib/i18n';
 import { useTheme } from '@/theme/use-theme';
 
 /** Cities and countries Travelist covers, for the hero's eyebrow; null until loaded. */
@@ -58,9 +60,18 @@ function useSectionScroll() {
 
 /**
  * The landing page (D-072), where signed-out visitors start on the web: what Travelist does,
- * the app itself, real destinations, and the way to sign up or in.
+ * the app itself, real destinations, and the way to sign up or in. Always in English (D-077),
+ * whatever the app language is.
  */
 export default function WelcomeScreen() {
+  return (
+    <I18nextProvider i18n={landingI18n}>
+      <LandingPage />
+    </I18nextProvider>
+  );
+}
+
+function LandingPage() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const layout = landingLayout(width);
