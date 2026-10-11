@@ -13,6 +13,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- The landing page is always in English, whatever the device or saved language; its footer no longer has the EN/PT switch (D-077). Sign-in, sign-up and the app keep following the user's language.
 - The swallow logo is now the favicon of every web page (`favicon.ico`, 32/192 px PNGs, Apple touch icon) and the link preview shown when travelist.live is pasted in chat or social apps is a 1200×630 card with the logo, name and tagline (Open Graph + Twitter tags in the new `src/app/+html.tsx`; images in `apps/mobile/public/`).
 - `PhotoCredit` can sit in the top-left or bottom-right corner; `BrandMark` takes a wordmark size; the sign-in/sign-up language chips are a shared `LanguageSwitch`.
 - README: an "At a glance" overview at the top (stack per part, how to run and test, status).

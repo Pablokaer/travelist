@@ -637,3 +637,10 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **Decision:** one rule, in `components/phone-centring.ts`: `useCentredOnPhone()` (true below the 600 px tablet breakpoint) and the `centring` styles. On phones `Section` centres its title and stacks its action below it; `TripCard` centres name, byline, facts and actions; the Reviews area centres its summary, bars, form and each review (avatar above name, date, stars and comment). Long reading text (Wikipedia paragraphs) stays left-aligned. `PageHeader` uses the same hook.
 - **Alternatives:** centring per screen (rejected: the same three components appear on the city, attraction, walk list, trips and profile screens, and would drift); centring on every width (rejected: on tablets and desktop sections sit in columns and a left edge reads better).
 - **Trade-offs:** a section action now takes its own line on phones (a little more height); centred multi-line review comments are slightly harder to scan than left-aligned ones, accepted for a consistent column; the profile header (avatar beside the name) stays a row.
+
+## D-077 — The landing page is always in English
+
+- **Context:** the landing page followed the device language and had an EN/PT switch, so a Portuguese browser saw it in Portuguese. The owner wants it in English for every visitor.
+- **Decision:** `WelcomeScreen` wraps the page in an `I18nextProvider` with `landingI18n`, a clone of the app's i18n pinned to `en` that shares its resources (`lib/i18n.ts`). The language switch is removed from the landing footer. The rest of the app, including sign-in and sign-up, still follows the device or saved language.
+- **Alternatives:** forcing `en` on the global instance while on `/welcome` (rejected: it flips the language of the screens the visitor opens next and has to be undone); deleting the PT landing strings (rejected: they are shared keys, and the clone makes them unused rather than wrong).
+- **Trade-offs:** the `landing.*` Portuguese strings and the PT branches of the phone mockups are now unreachable until the owner wants a localised landing again.

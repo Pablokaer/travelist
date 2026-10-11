@@ -71,6 +71,15 @@ describe('landing page (D-072)', () => {
     expect(screen.getByRole('header', { name: 'Plan your trip in minutes' })).toBeOnTheScreen();
   });
 
+  it('stays in English when the app language is Portuguese', async () => {
+    await act(() => i18n.changeLanguage('pt'));
+    openLanding();
+    expect(
+      await screen.findByRole('header', { name: 'Turn any city into your personal travel list' }),
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole('radiogroup')).not.toBeOnTheScreen();
+  });
+
   it('"Get started" opens sign-up', async () => {
     openLanding();
     await userEvent.press((await screen.findAllByRole('button', { name: 'Get started' }))[0]!);
@@ -121,15 +130,5 @@ describe('landing page (D-072)', () => {
     expect(await screen.findByText(/Jakub Hałun \(CC BY 4\.0\)/)).toBeOnTheScreen();
     expect(screen.getByText(/Akonnchiroll \(CC BY-SA 4\.0\)/)).toBeOnTheScreen();
     expect(screen.getByText(/OpenStreetMap contributors/)).toBeOnTheScreen();
-  });
-
-  it('switches to Portuguese', async () => {
-    openLanding();
-    await userEvent.press(await screen.findByRole('checkbox', { name: 'Português' }));
-    expect(
-      await screen.findByRole('header', {
-        name: 'Transforme qualquer cidade na sua lista de viagem pessoal',
-      }),
-    ).toBeOnTheScreen();
   });
 });

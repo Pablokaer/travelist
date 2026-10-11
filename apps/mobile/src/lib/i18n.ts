@@ -26,4 +26,12 @@ if (!i18n.isInitialized) {
   });
 }
 
+/**
+ * A copy of the app's i18n pinned to English for the landing page, which is always English
+ * whatever the device or the visitor's saved language. It shares the translation resources
+ * with the app instance, so it never needs its own copy of the strings.
+ * @example <I18nextProvider i18n={landingI18n}>…</I18nextProvider>
+ */
+export const landingI18n = i18n.cloneInstance({ lng: 'en' });
+
 export default i18n;
