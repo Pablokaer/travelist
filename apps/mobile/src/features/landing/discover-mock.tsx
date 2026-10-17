@@ -13,8 +13,7 @@ import { palette } from '@/theme/colors';
 const c = palette.light;
 
 function MockCityCard({ city }: { city: MockCity }) {
-  const { t, i18n } = useTranslation();
-  const pt = i18n.resolvedLanguage === 'pt';
+  const { t } = useTranslation();
   const places = t('explore.placesCount', { count: city.places });
   return (
     <View style={styles.card}>
@@ -26,7 +25,7 @@ function MockCityCard({ city }: { city: MockCity }) {
       </View>
       <View style={styles.cardTitle}>
         <MockText size={14.5} weight="700">
-          {pt ? city.namePt : city.nameEn}
+          {city.name}
         </MockText>
         <MockText size={12} weight="600">
           <MockText size={12} color={c.star}>
@@ -36,7 +35,7 @@ function MockCityCard({ city }: { city: MockCity }) {
         </MockText>
       </View>
       <MockText size={11.5} secondary>
-        {`${flagEmoji(city.countryCode)} ${pt ? city.countryPt : city.countryEn} · ${places}`}
+        {`${flagEmoji(city.countryCode)} ${city.country} · ${places}`}
       </MockText>
     </View>
   );

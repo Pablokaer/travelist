@@ -71,15 +71,6 @@ describe('landing page (D-072)', () => {
     expect(screen.getByRole('header', { name: 'Plan your trip in minutes' })).toBeOnTheScreen();
   });
 
-  it('stays in English when the app language is Portuguese', async () => {
-    await act(() => i18n.changeLanguage('pt'));
-    openLanding();
-    expect(
-      await screen.findByRole('header', { name: 'Turn any city into your personal travel list' }),
-    ).toBeOnTheScreen();
-    expect(screen.queryByRole('radiogroup')).not.toBeOnTheScreen();
-  });
-
   it('"Get started" opens sign-up', async () => {
     openLanding();
     await userEvent.press((await screen.findAllByRole('button', { name: 'Get started' }))[0]!);
@@ -130,5 +121,44 @@ describe('landing page (D-072)', () => {
     expect(await screen.findByText(/Jakub Hałun \(CC BY 4\.0\)/)).toBeOnTheScreen();
     expect(screen.getByText(/Akonnchiroll \(CC BY-SA 4\.0\)/)).toBeOnTheScreen();
     expect(screen.getByText(/OpenStreetMap contributors/)).toBeOnTheScreen();
+  });
+});
+
+describe('landing page when the app language is Portuguese (D-077)', () => {
+  beforeEach(async () => {
+    await act(() => i18n.changeLanguage('pt'));
+  });
+
+  it('stays in English, with no language switch', async () => {
+    openLanding();
+    expect(
+      await screen.findByRole('header', { name: 'Turn any city into your personal travel list' }),
+    ).toBeOnTheScreen();
+    // The switch's radiogroup is not an accessible element, so role queries never find it:
+    // look for its chips instead.
+    expect(screen.queryByRole('checkbox', { name: 'Português' })).not.toBeOnTheScreen();
+  });
+
+  it('names destinations and the mockups’ places in English', async () => {
+    openLanding();
+    const rome = await screen.findByTestId('destination-rome');
+    expect(rome).toHaveTextContent(/Rome/);
+    expect(rome).not.toHaveTextContent(/Roma/);
+    // The phone mockups are decorative, hidden from screen readers.
+    const hidden = { includeHiddenElements: true };
+    expect(screen.getByText('Tokyo', hidden)).toBeOnTheScreen();
+    expect(screen.queryByText('Tóquio', hidden)).not.toBeOnTheScreen();
+  });
+
+  it('sign-up, opened from the landing, is in Portuguese', async () => {
+    openLanding();
+    await userEvent.press((await screen.findAllByRole('button', { name: 'Get started' }))[0]!);
+    expect(await screen.findByRole('header', { name: 'Criar conta' })).toBeOnTheScreen();
+  });
+
+  it('About, opened from the footer, is in Portuguese', async () => {
+    openLanding();
+    await userEvent.press(await screen.findByRole('link', { name: 'About' }));
+    expect(await screen.findByText(/O Travelist ajuda-o a preparar uma viagem/)).toBeOnTheScreen();
   });
 });

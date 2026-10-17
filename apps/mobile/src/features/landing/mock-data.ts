@@ -1,8 +1,9 @@
 // Content of the landing page's phone mockups (D-072). Only the mockups use it: "Popular
-// destinations" reads the real cities from `city_list`. Names, categories, visit times, place
-// counts and coordinates are the database's (2026-10-06); the ratings are illustrative, since a
-// signed-out visitor cannot read reviews. Photos are Wikimedia Commons files bundled small, credited
-// in the landing footer (LANDING_PHOTO_CREDITS) and in docs/DATA_SOURCES.md.
+// destinations" reads the real cities from `city_list`. Names (in English, the landing's only
+// language: D-077, D-078), categories, visit times, place counts and coordinates are the
+// database's (2026-10-06); the ratings are illustrative, since a signed-out visitor cannot read
+// reviews. Photos are Wikimedia Commons files bundled small, credited in the landing footer
+// (LANDING_PHOTO_CREDITS) and in docs/DATA_SOURCES.md.
 import type { AttractionCategory } from '@wayfarer/shared';
 import type { ImageSourcePropType } from 'react-native';
 
@@ -12,11 +13,9 @@ export type BundledPhoto = { source: ImageSourcePropType; author: string; licens
 /** A city card of the "Discover" mockup. */
 export type MockCity = {
   slug: string;
-  nameEn: string;
-  namePt: string;
+  name: string;
   countryCode: string;
-  countryEn: string;
-  countryPt: string;
+  country: string;
   places: number;
   /** Illustrative: shown in the mockup only. */
   rating: string;
@@ -25,8 +24,7 @@ export type MockCity = {
 
 /** A stop of the "My List" mockup; `pin` is its spot on the map image, as a share of its size. */
 export type MockStop = {
-  nameEn: string;
-  namePt: string;
+  name: string;
   category: AttractionCategory;
   minutes: number;
   photo: BundledPhoto;
@@ -43,11 +41,9 @@ export const HERO_PHOTO: BundledPhoto = {
 export const MOCK_CITIES: readonly MockCity[] = [
   {
     slug: 'lisbon',
-    nameEn: 'Lisbon',
-    namePt: 'Lisboa',
+    name: 'Lisbon',
     countryCode: 'PT',
-    countryEn: 'Portugal',
-    countryPt: 'Portugal',
+    country: 'Portugal',
     places: 300,
     rating: '4.8',
     photo: {
@@ -58,11 +54,9 @@ export const MOCK_CITIES: readonly MockCity[] = [
   },
   {
     slug: 'tokyo',
-    nameEn: 'Tokyo',
-    namePt: 'Tóquio',
+    name: 'Tokyo',
     countryCode: 'JP',
-    countryEn: 'Japan',
-    countryPt: 'Japão',
+    country: 'Japan',
     places: 300,
     rating: '4.7',
     photo: {
@@ -84,8 +78,7 @@ export const MOCK_MAP = {
 
 export const MOCK_STOPS: readonly MockStop[] = [
   {
-    nameEn: 'Belém Palace',
-    namePt: 'Palácio Nacional de Belém',
+    name: 'Belém Palace',
     category: 'palace',
     minutes: 75,
     photo: {
@@ -96,8 +89,7 @@ export const MOCK_STOPS: readonly MockStop[] = [
     pin: { x: 0.882, y: 0.234 },
   },
   {
-    nameEn: 'Jerónimos Monastery',
-    namePt: 'Mosteiro dos Jerónimos',
+    name: 'Jerónimos Monastery',
     category: 'church',
     minutes: 30,
     photo: {
@@ -108,8 +100,7 @@ export const MOCK_STOPS: readonly MockStop[] = [
     pin: { x: 0.631, y: 0.246 },
   },
   {
-    nameEn: 'Padrão dos Descobrimentos',
-    namePt: 'Padrão dos Descobrimentos',
+    name: 'Padrão dos Descobrimentos',
     category: 'monument',
     minutes: 20,
     photo: {
@@ -120,8 +111,7 @@ export const MOCK_STOPS: readonly MockStop[] = [
     pin: { x: 0.627, y: 0.582 },
   },
   {
-    nameEn: 'Belém Tower',
-    namePt: 'Torre de Belém',
+    name: 'Belém Tower',
     category: 'castle',
     minutes: 90,
     photo: {
