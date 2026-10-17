@@ -28,6 +28,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- `pnpm sync:shared` (and `pnpm check`, which runs it) and `pnpm db:demo` crashed on Windows with `ENOENT … D:\D:\…`: the scripts built the repository path from `URL.pathname`. They now share `scripts/repo-root.mjs` (`fileURLToPath`), with a regression test.
+
 - Landing tests: the check that the EN/PT switch is gone could never fail (it looked for the switch's `radiogroup`, which role queries ignore); it now looks for the "Português" chip and fails when the switch is back. New tests for a Portuguese visitor: destinations and mockups stay in English, and sign-up and About opened from the landing are in Portuguese (D-077).
 
 - iPhone layout (D-076), city page: "From Wikipedia" and **Read the full article on Wikipedia**, the Famous people filters and every element of a person's card (name, years, description, "Born here" / "Died here"), the Wikidata credit, "Curated by the Travelist team." and the review form's "Your comment (optional)" label are now centered on phones. Tablets and desktop are unchanged.
