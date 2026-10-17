@@ -13,6 +13,9 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- The landing page's text exists only in English (D-078): the Portuguese `landing.*` strings and the Portuguese place names of the phone mockups are removed, and the EN/PT key-parity test skips the English-only `landing` namespace (`ENGLISH_ONLY_NAMESPACES`).
+- The landing's English i18n (`landingI18n()`) is built the first time the page opens instead of at app start, so the iOS and Android apps no longer build it; the language is the typed `LANDING_LANGUAGE`. The page moved from the route file `(auth)/welcome.tsx` to `features/landing/landing-page.tsx`, split into short components, and takes its i18n as a parameter (D-078).
+- README: the Language and i18n sections describe the landing exception (always English; sign-in, sign-up and About opened from it follow the visitor's language).
 - The landing page is always in English, whatever the device or saved language; its footer no longer has the EN/PT switch (D-077). Sign-in, sign-up and the app keep following the user's language.
 - The swallow logo is now the favicon of every web page (`favicon.ico`, 32/192 px PNGs, Apple touch icon) and the link preview shown when travelist.live is pasted in chat or social apps is a 1200×630 card with the logo, name and tagline (Open Graph + Twitter tags in the new `src/app/+html.tsx`; images in `apps/mobile/public/`).
 - `PhotoCredit` can sit in the top-left or bottom-right corner; `BrandMark` takes a wordmark size; the sign-in/sign-up language chips are a shared `LanguageSwitch`.
@@ -26,6 +29,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 ### Fixed
 
 - `pnpm sync:shared` (and `pnpm check`, which runs it) and `pnpm db:demo` crashed on Windows with `ENOENT … D:\D:\…`: the scripts built the repository path from `URL.pathname`. They now share `scripts/repo-root.mjs` (`fileURLToPath`), with a regression test.
+
+- Landing tests: the check that the EN/PT switch is gone could never fail (it looked for the switch's `radiogroup`, which role queries ignore); it now looks for the "Português" chip and fails when the switch is back. New tests for a Portuguese visitor: destinations and mockups stay in English, and sign-up and About opened from the landing are in Portuguese (D-077).
 
 - iPhone layout (D-076), city page: "From Wikipedia" and **Read the full article on Wikipedia**, the Famous people filters and every element of a person's card (name, years, description, "Born here" / "Died here"), the Wikidata credit, "Curated by the Travelist team." and the review form's "Your comment (optional)" label are now centered on phones. Tablets and desktop are unchanged.
 

@@ -212,6 +212,12 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 
 - The landing page ignores the device and saved language and shows English; the footer's EN/PT switch is gone. Test added; not run in this session (dependencies not installed).
 
+## 2026-10-17 — Landing review follow-ups (D-078)
+
+- Review of PR #26: its "no language switch" check could never fail (a `radiogroup` query); fixed, and shown red with the switch put back. New tests for a Portuguese visitor (destinations and mockups in English; sign-up and About in Portuguese), each shown red against the regression it guards.
+- The landing strings are English-only (`pt.json` loses `landing`, 89 lines); the mockups lose their PT names; `landingI18n()` is built on first use; the page moved to `features/landing/landing-page.tsx`.
+- Run here: lint, typecheck, app tests (66 suites, 480 tests), shared tests (124), script tests (7), `check-docs` — all pass. Not run: Edge Function tests (no Deno on this machine; no function reads the i18n resources). `pnpm format:check` fails on this Windows checkout for every file (CRLF from `core.autocrlf`), so only the changed files were checked. `scripts/sync-shared.mjs` crashes on Windows (`URL.pathname` gives `D:\D:\…`); the copy was made by hand and matches the source.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
