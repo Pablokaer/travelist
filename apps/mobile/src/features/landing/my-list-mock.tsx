@@ -20,7 +20,7 @@ function MockMap() {
       <Image source={MOCK_MAP.source} style={StyleSheet.absoluteFill} contentFit="cover" />
       {MOCK_STOPS.map((stop, i) => (
         <View
-          key={stop.nameEn}
+          key={stop.name}
           style={[
             styles.pin,
             { left: stop.pin.x * MAP_WIDTH - PIN / 2, top: stop.pin.y * MAP_HEIGHT - PIN / 2 },
@@ -40,8 +40,7 @@ function MockMap() {
 }
 
 function MockStopRow({ stop, index }: { stop: MockStop; index: number }) {
-  const { t, i18n } = useTranslation();
-  const name = i18n.resolvedLanguage === 'pt' ? stop.namePt : stop.nameEn;
+  const { t } = useTranslation();
   const visit = t('attraction.visitMinutes', { minutes: stop.minutes });
   return (
     <View style={styles.row}>
@@ -51,7 +50,7 @@ function MockStopRow({ stop, index }: { stop: MockStop; index: number }) {
       <Image source={stop.photo.source} style={styles.thumb} contentFit="cover" />
       <View style={styles.rowText}>
         <MockText size={12.5} weight="600">
-          {name}
+          {stop.name}
         </MockText>
         <View style={styles.meta}>
           <View style={[styles.dot, { backgroundColor: categoryColors[stop.category] }]} />
@@ -69,9 +68,8 @@ function MockStopRow({ stop, index }: { stop: MockStop; index: number }) {
  * @example <PhoneFrame raised><MyListMock /></PhoneFrame>
  */
 export function MyListMock() {
-  const { t, i18n } = useTranslation();
-  const lisbon = MOCK_CITIES[0]!;
-  const city = i18n.resolvedLanguage === 'pt' ? lisbon.namePt : lisbon.nameEn;
+  const { t } = useTranslation();
+  const city = MOCK_CITIES[0]!.name;
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -94,7 +92,7 @@ export function MyListMock() {
         </MockText>
       </View>
       {MOCK_STOPS.map((stop, i) => (
-        <MockStopRow key={stop.nameEn} stop={stop} index={i} />
+        <MockStopRow key={stop.name} stop={stop} index={i} />
       ))}
       <MockTabBar active="trips" />
     </View>
