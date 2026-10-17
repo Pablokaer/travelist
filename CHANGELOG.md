@@ -25,6 +25,8 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- `pnpm sync:shared` (and `pnpm check`, which runs it) and `pnpm db:demo` crashed on Windows with `ENOENT … D:\D:\…`: the scripts built the repository path from `URL.pathname`. They now share `scripts/repo-root.mjs` (`fileURLToPath`), with a regression test.
+
 - iPhone layout (D-076), city page: "From Wikipedia" and **Read the full article on Wikipedia**, the Famous people filters and every element of a person's card (name, years, description, "Born here" / "Died here"), the Wikidata credit, "Curated by the Travelist team." and the review form's "Your comment (optional)" label are now centered on phones. Tablets and desktop are unchanged.
 
 - iPhone layout (D-076): section titles (About, Famous people, walk lists, Before you go, Reviews, Good to know, Stops…), walk list card titles and the Reviews area (average, bars per star, review form, each review and its "Your review" badge) were left-aligned on phones; they are now centered, as page headings already were. Tablets and desktop are unchanged. Before/after screenshots in `artifacts/iphone-audit/`.

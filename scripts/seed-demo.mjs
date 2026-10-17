@@ -8,7 +8,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const root = new URL('..', import.meta.url).pathname;
+import { repoRootOf } from './repo-root.mjs';
+
+const root = repoRootOf(import.meta.url);
 const demoDir = join(root, 'supabase/demo');
 
 function localDbContainer() {

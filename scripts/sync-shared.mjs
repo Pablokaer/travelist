@@ -15,7 +15,9 @@ import {
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 
-const root = new URL('..', import.meta.url).pathname;
+import { repoRootOf } from './repo-root.mjs';
+
+const root = repoRootOf(import.meta.url);
 const src = join(root, 'packages/shared/src');
 const dest = join(root, 'supabase/functions/_shared/wayfarer');
 const skip = (p) => /\.test\.ts$/.test(p);

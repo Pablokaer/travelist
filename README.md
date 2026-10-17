@@ -611,7 +611,7 @@ Wayfarer is a **pnpm + Turborepo monorepo** with four deployable parts:
 │   │   └── attractions/           wikidata, overpass, pageviews, commons, categories, pipeline
 │   └── tests/                     pytest (with fixtures)
 ├── docs/                          ARCHITECTURE, DECISIONS, DATA_SOURCES, LAUNCH_CHECKLIST, CITIES (generated)
-├── scripts/                       check-docs.mjs (CHANGELOG gate) · sync-shared.mjs (shared → functions)
+├── scripts/                       check-docs.mjs (CHANGELOG gate) · sync-shared.mjs (shared → functions) · repo-root.mjs (repo path, Windows too)
 ├── .github/workflows/             ci.yml (CI jobs) · security.yml · deploy.yml (CD to production) · data-refresh.yml · providers-check.yml
 ├── run-project.sh                 one-command local run
 └── package.json · turbo.json · pnpm-workspace.yaml · tsconfig.base.json · .prettierrc.json
