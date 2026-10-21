@@ -11,6 +11,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Added
+
+- SEO for the web app (D-079): every page's HTML now has its own `<title>`, meta description, canonical URL and Open Graph / Twitter title and description (`RouteHead`, `src/lib/seo.ts`); signed-in and personal pages carry `noindex`. New `robots.txt` and `sitemap.xml` (the five public pages), schema.org `WebSite` + `Organization` structured data, and a `<noscript>` summary with links for crawlers that do not run JavaScript. Until now every page's title was empty.
+
 ### Changed
 
 - Security: `vite` (pulled in by `vitest` in `packages/shared`) is a direct dev dependency at ^8.3.4, past GHSA-587h-7wmj-h5pm (high), so `pnpm audit --audit-level high` passes again.
