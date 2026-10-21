@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The public pages of src/lib/seo.ts (D-079); seo.test.ts keeps the two in step. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://travelist.live/</loc></url>
+  <url><loc>https://travelist.live/welcome</loc></url>
+  <url><loc>https://travelist.live/about</loc></url>
+  <url><loc>https://travelist.live/sign-up</loc></url>
+  <url><loc>https://travelist.live/sign-in</loc></url>
+</urlset>

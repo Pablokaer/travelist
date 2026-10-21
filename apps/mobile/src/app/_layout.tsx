@@ -11,6 +11,7 @@ import { Appearance, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppMenuButton } from '@/components/app-menu';
+import { RouteHead } from '@/components/route-head';
 import { LoadingState } from '@/components/states';
 import { AuthProvider, useAuth } from '@/features/auth/auth-provider';
 import { useWelcomeEmail } from '@/features/auth/welcome-email';
@@ -45,55 +46,66 @@ function RootNavigator() {
   // The reset link signs the user in on the reset page itself (D-066). Swapping the navigator for
   // the loading state there would remount it on the app's first screen, skipping the new password.
   const onResetPage = usePathname() === RESET_PASSWORD_PATH;
-  if (isLoading || (signedIn && profile.isPending && !onResetPage)) return <LoadingState />;
+  // RouteHead comes first so the static export, which never has a session, still writes each
+  // page's title and description into its HTML (D-079).
+  if (isLoading || (signedIn && profile.isPending && !onResetPage))
+    return (
+      <>
+        <RouteHead />
+        <LoadingState />
+      </>
+    );
 
   return (
-    <Stack
-      screenOptions={{
-        headerShadowVisible: false,
-        headerTitleAlign: 'center',
-        headerTintColor: theme.text,
-        headerBackButtonDisplayMode: 'minimal',
-        headerTitleStyle: { fontFamily: fontFamilyFor('600'), fontSize: 16 },
-        contentStyle: { backgroundColor: theme.background },
-        // Logo + menu on every stacked screen, so a deep link (e.g. /trip/…) is never a dead end.
-        // "Upgrade" (free plan, D-047) beside the menu on every stacked screen.
-        headerRight: signedIn && onboarded ? () => <HeaderActions /> : undefined,
-      }}>
-      <Stack.Protected guard={signedIn && onboarded}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="attraction/[id]" options={{ title: '', presentation: 'modal' }} />
-        <Stack.Screen
-          name="checklist/[city]"
-          options={{ title: t('checklist.title'), presentation: 'modal' }}
-        />
-        <Stack.Screen name="route" options={{ title: t('route.title') }} />
-        <Stack.Screen name="trip/[id]" options={{ title: t('trips.detailTitle') }} />
-        <Stack.Screen name="edit-profile" options={{ title: t('profile.edit') }} />
-        {/* Free and Premium (D-047). */}
-        <Stack.Screen name="plans" options={{ title: t('plans.title') }} />
-        {/* A walk list's group chat (D-043): /walk-chat?id=…, members only. */}
-        <Stack.Screen name="walk-chat" options={{ title: t('chat.title') }} />
-        {/* A traveller's public profile (D-045): /traveller?id=<public id>. */}
-        <Stack.Screen name="traveller" options={{ title: t('traveller.title') }} />
-      </Stack.Protected>
-      <Stack.Protected guard={signedIn && !onboarded}>
-        <Stack.Screen
-          name="onboarding"
-          options={{ title: t('onboarding.title'), headerBackVisible: false }}
-        />
-      </Stack.Protected>
-      <Stack.Protected guard={!signedIn}>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack.Protected>
-      <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
-      {/* Password reset link (D-066): reachable signed in or out, so the session the link creates
+    <>
+      <RouteHead />
+      <Stack
+        screenOptions={{
+          headerShadowVisible: false,
+          headerTitleAlign: 'center',
+          headerTintColor: theme.text,
+          headerBackButtonDisplayMode: 'minimal',
+          headerTitleStyle: { fontFamily: fontFamilyFor('600'), fontSize: 16 },
+          contentStyle: { backgroundColor: theme.background },
+          // Logo + menu on every stacked screen, so a deep link (e.g. /trip/…) is never a dead end.
+          // "Upgrade" (free plan, D-047) beside the menu on every stacked screen.
+          headerRight: signedIn && onboarded ? () => <HeaderActions /> : undefined,
+        }}>
+        <Stack.Protected guard={signedIn && onboarded}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="attraction/[id]" options={{ title: '', presentation: 'modal' }} />
+          <Stack.Screen
+            name="checklist/[city]"
+            options={{ title: t('checklist.title'), presentation: 'modal' }}
+          />
+          <Stack.Screen name="route" options={{ title: t('route.title') }} />
+          <Stack.Screen name="trip/[id]" options={{ title: t('trips.detailTitle') }} />
+          <Stack.Screen name="edit-profile" options={{ title: t('profile.edit') }} />
+          {/* Free and Premium (D-047). */}
+          <Stack.Screen name="plans" options={{ title: t('plans.title') }} />
+          {/* A walk list's group chat (D-043): /walk-chat?id=…, members only. */}
+          <Stack.Screen name="walk-chat" options={{ title: t('chat.title') }} />
+          {/* A traveller's public profile (D-045): /traveller?id=<public id>. */}
+          <Stack.Screen name="traveller" options={{ title: t('traveller.title') }} />
+        </Stack.Protected>
+        <Stack.Protected guard={signedIn && !onboarded}>
+          <Stack.Screen
+            name="onboarding"
+            options={{ title: t('onboarding.title'), headerBackVisible: false }}
+          />
+        </Stack.Protected>
+        <Stack.Protected guard={!signedIn}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+        {/* Password reset link (D-066): reachable signed in or out, so the session the link creates
           lands here to set the password instead of being sent into the app. */}
-      <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
-      {/* Shared walk lists open for anyone with the link, signed in or not (D-031). */}
-      <Stack.Screen name="shared" options={{ title: t('sharing.sharedTitle') }} />
-      <Stack.Screen name="about" options={{ title: t('about.title') }} />
-    </Stack>
+        <Stack.Screen name="auth/reset-password" options={{ headerShown: false }} />
+        {/* Shared walk lists open for anyone with the link, signed in or not (D-031). */}
+        <Stack.Screen name="shared" options={{ title: t('sharing.sharedTitle') }} />
+        <Stack.Screen name="about" options={{ title: t('about.title') }} />
+      </Stack>
+    </>
   );
 }
 
