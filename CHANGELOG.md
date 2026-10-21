@@ -13,6 +13,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- Security: `vite` (pulled in by `vitest` in `packages/shared`) is a direct dev dependency at ^8.3.4, past GHSA-587h-7wmj-h5pm (high), so `pnpm audit --audit-level high` passes again.
 - The landing page's text exists only in English (D-078): the Portuguese `landing.*` strings and the Portuguese place names of the phone mockups are removed, and the EN/PT key-parity test skips the English-only `landing` namespace (`ENGLISH_ONLY_NAMESPACES`).
 - The landing's English i18n (`landingI18n()`) is built the first time the page opens instead of at app start, so the iOS and Android apps no longer build it; the language is the typed `LANDING_LANGUAGE`. The page moved from the route file `(auth)/welcome.tsx` to `features/landing/landing-page.tsx`, split into short components, and takes its i18n as a parameter (D-078).
 - README: the Language and i18n sections describe the landing exception (always English; sign-in, sign-up and About opened from it follow the visitor's language).
