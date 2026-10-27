@@ -23,9 +23,6 @@ describe('env', () => {
       supabaseUrl: '',
       supabaseAnonKey: '',
       mapStyleUrl: undefined,
-      sentryDsn: '',
-      posthogKey: undefined,
-      posthogHost: undefined,
       authProviders: ' Google, apple ',
     });
     expect(env.supabaseUrl).toBeUndefined();
@@ -37,9 +34,6 @@ describe('env', () => {
     const base = {
       supabaseAnonKey: undefined,
       mapStyleUrl: undefined,
-      sentryDsn: undefined,
-      posthogKey: undefined,
-      posthogHost: undefined,
     };
     expect(() => parseEnv({ ...base, supabaseUrl: 'not a url' })).toThrow(/EXPO_PUBLIC/);
     expect(() => parseEnv({ ...base, supabaseUrl: undefined, authProviders: 'facebook' })).toThrow(
@@ -53,9 +47,6 @@ describe('env: public web address for shared links (D-031)', () => {
     supabaseUrl: undefined,
     supabaseAnonKey: undefined,
     mapStyleUrl: undefined,
-    sentryDsn: undefined,
-    posthogKey: undefined,
-    posthogHost: undefined,
   };
   it('is optional and must be a URL when set', () => {
     expect(parseEnv({ ...base, webUrl: '' }).webUrl).toBeUndefined();

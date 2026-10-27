@@ -15,9 +15,6 @@ const envSchema = z.object({
   ),
   /** Public web address of the app (e.g. https://wayfarer.app); shared trip links use it (D-031). */
   webUrl: z.preprocess(emptyToUndefined, z.url().optional()),
-  sentryDsn: z.preprocess(emptyToUndefined, z.string().optional()),
-  posthogKey: z.preprocess(emptyToUndefined, z.string().optional()),
-  posthogHost: z.preprocess(emptyToUndefined, z.url().default('https://eu.i.posthog.com')),
   /** OAuth providers enabled in Supabase Auth, e.g. "google,apple". Hidden in the UI otherwise. */
   authProviders: z.preprocess(
     (v) =>
@@ -51,8 +48,5 @@ export const env: AppEnv = parseEnv({
   supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
   mapStyleUrl: process.env.EXPO_PUBLIC_MAP_STYLE_URL,
   webUrl: process.env.EXPO_PUBLIC_WEB_URL,
-  sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-  posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY,
-  posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST,
   authProviders: process.env.EXPO_PUBLIC_AUTH_PROVIDERS,
 });
