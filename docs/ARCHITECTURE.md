@@ -75,7 +75,7 @@ src/app/
 
 **i18n.** Resources live in `packages/shared/src/i18n/{en,pt}.json` so Edge Functions can localise messages too. A unit test enforces key parity between languages. Language = profile preference → device locale → `en`.
 
-**Configuration.** Only `EXPO_PUBLIC_*` variables reach the client, validated at startup by a zod schema (`src/lib/env.ts`). Missing optional keys (Sentry, PostHog) turn the integration into a no-op.
+**Configuration.** Only `EXPO_PUBLIC_*` variables reach the client, validated at startup by a zod schema (`src/lib/env.ts`).
 
 ## 4. Backend architecture
 
@@ -112,7 +112,7 @@ Raw responses are cached on disk (`data-pipeline/.cache`) during development; re
 - Tokens stored with `expo-secure-store` on native; Supabase's default storage on web.
 - No passport numbers or document scans are ever stored. Passport expiry is optional.
 - Account deletion removes the profile and all owned rows (FK `on delete cascade` from `auth.users`).
-- Analytics events carry no personal data; Sentry scrubs PII.
+- No third-party error reporting or analytics: nothing about the user leaves the app except to Supabase (D-080).
 
 ## 7. Testing strategy
 

@@ -11,6 +11,14 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Removed
+
+- Sentry and PostHog (D-080): the unused `observability` facade, the `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_POSTHOG_KEY` and `EXPO_PUBLIC_POSTHOG_HOST` settings (app, `.env.example`, deploy workflow) and their docs. The project uses no paid monitoring or analytics service.
+
+### Fixed
+
+- Security: `zod` is ^4.6.7 in the app and shared package, past GHSA-mrhx-c7xc-m3w5 (high), which failed the scheduled Security run's `pnpm audit`; the copy `@expo/cli` pins (zod 3, no patched release, CLI only) is in `auditConfig.ignoreGhsas`.
+
 ### Added
 
 - SEO for the web app (D-079): every page's HTML now has its own `<title>`, meta description, canonical URL and Open Graph / Twitter title and description (`RouteHead`, `src/lib/seo.ts`); signed-in and personal pages carry `noindex`. New `robots.txt` and `sitemap.xml` (the five public pages), schema.org `WebSite` + `Organization` structured data, and a `<noscript>` summary with links for crawlers that do not run JavaScript. Until now every page's title was empty.

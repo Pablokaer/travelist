@@ -234,7 +234,6 @@ Every page of the static export has its own title, description, canonical URL an
 - Meetups: reminders/notifications and a time picker (D-041); chat push notifications, message reporting/moderation and older-message paging (D-043); turn the walk chat back on (`EXPO_PUBLIC_FEATURE_WALK_CHAT`, D-065).
 - Walk lists: an admin screen for moderators (today: SQL), a count of lists on the city page, and a check of the city page on iOS/Android (D-033, D-035).
 - Offline-lite (persisted query cache with MMKV) is not implemented yet.
-- Sentry / PostHog SDKs are not wired (facade ready; needs DSN/keys).
 - Native date pickers (D-019) and a map-beside-list layout for Explore on wide screens (D-007) are post-MVP polish; route and trip detail already use it (D-020).
 - Owner-only items (accounts, keys, store listings): see [docs/LAUNCH_CHECKLIST.md](./docs/LAUNCH_CHECKLIST.md).
 
