@@ -33,3 +33,7 @@ auditConfig:
     # braces stack exhaustion on deeply nested patterns (published 2026-09-18), via jest, metro and
     # @expo/cli (dev and build tools only; patterns come from our own config); no patched version.
     - GHSA-vfj7-8cjw-p6xm
+    # zod memory exhaustion on oversized constrained collections (published 2026-10), via
+    # expo > @expo/cli, which pins zod ^3.25.76 (CLI and dev server only, not the app bundle); the
+    # fix is only in zod >= 4.6.6, which the app and shared package use directly.
+    - GHSA-mrhx-c7xc-m3w5
