@@ -44,9 +44,13 @@ cd "$APP_DIR"
 rm -rf dist
 node scripts/copy-maplibre-worker.mjs
 npx expo export --platform web --clear
+# The public pages' text and Markdown versions for agents and crawlers without JavaScript (D-081).
+node "$ROOT_DIR/scripts/agent-pages.mjs" dist agent-pages
 
 grep -rqF "$EXPO_PUBLIC_SUPABASE_URL" dist/_expo ||
   fail "The bundle does not contain $EXPO_PUBLIC_SUPABASE_URL; refusing to publish."
+[ -f dist/index.var ] && [ -f dist/404.md ] && [ -f dist/llms.txt ] ||
+  fail "dist lacks index.var, 404.md or llms.txt (expected from scripts/agent-pages.mjs and public/); refusing to publish."
 
 log "Publishing to $REMOTE..."
 rsync "${RSYNC_FLAGS[@]}" dist/ "$REMOTE"

@@ -63,7 +63,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "build:web": "node scripts/copy-maplibre-worker.mjs && expo export --platform web",
+    "build:web": "node scripts/copy-maplibre-worker.mjs && expo export --platform web && node ../../scripts/agent-pages.mjs dist agent-pages",
     "e2e": "playwright test",
     "doctor": "expo-doctor"
   },

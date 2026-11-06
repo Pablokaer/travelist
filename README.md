@@ -59,7 +59,15 @@ On phones, primary page headings, authentication titles and subtitles, city and 
 
 **Favicon and link preview (web).** `src/app/+html.tsx` is the root HTML of the static export: the swallow-on-red-tile favicon (`public/favicon.ico`, PNGs, Apple touch icon) on every page, and Open Graph / Twitter tags pointing at `https://travelist.live/og-image.png` (1200×630: logo, name, tagline), the card shown when the link is pasted in chat or social apps. Files in `apps/mobile/public/` are copied to the site root by `expo export`.
 
-**Search engines (web, D-079).** `RouteHead` (`src/components/route-head.tsx`, rendered by the root layout before it waits for the session, so the static export writes it into each page's HTML) sets the page's `<title>`, meta description, canonical URL (`https://travelist.live` + path, no trailing slash except `/`), robots tag and Open Graph / Twitter title and description from `pageSeo()` in `src/lib/seo.ts`. The public pages — `/`, `/welcome` (landing copy), `/about`, `/sign-up`, `/sign-in` — have their own title (≤ 60 characters) and description (≤ 160) and are indexed; every other page is titled "Travelist" and carries `noindex, follow`. `public/robots.txt` allows everything except Expo Router's `/_sitemap` and points at `public/sitemap.xml`, which lists exactly the public pages (a test keeps the two in step). `+html.tsx` adds schema.org `WebSite` + `Organization` JSON-LD and a `<noscript>` summary with links to the landing, About and sign-up.
+**Search engines (web, D-079).** `RouteHead` (`src/components/route-head.tsx`, rendered by the root layout before it waits for the session, so the static export writes it into each page's HTML) sets the page's `<title>`, meta description, canonical URL (`https://travelist.live` + path, no trailing slash except `/`), robots tag and Open Graph / Twitter title and description from `pageSeo()` in `src/lib/seo.ts`. The public pages — `/`, `/welcome` (landing copy), `/about`, `/sign-up`, `/sign-in` — have their own title (≤ 60 characters) and description (≤ 160) and are indexed; every other page is titled "Travelist" and carries `noindex, follow`. `public/robots.txt` allows everything except Expo Router's `/_sitemap` and points at `public/sitemap.xml`, which lists exactly the public pages (a test keeps the two in step). `+html.tsx` adds schema.org `WebSite` + `Organization` JSON-LD, with the product terms "travel list app", "city guide" and "walking route planner" as `keywords` / `knowsAbout` (`SITE_KEYWORDS`, D-081), and a `<noscript>` summary with links to the landing, About and sign-up.
+
+**AI agents and crawlers without JavaScript (web, D-081).** The app is client-rendered, so the exported HTML of a page holds only the loading spinner. For the public pages and the 404, `scripts/agent-pages.mjs` runs after `expo export` (`pnpm build:web`, `deploy-web.sh`). It reads `apps/mobile/agent-pages/pages.json` (route → Markdown source) and writes three files per page:
+
+- `<page>.md`: the Markdown source.
+- `<page>.html`: the same text as HTML, a `<main>` before the app root that replaces the `<noscript>` summary, plus `<link rel="alternate" type="text/markdown">`. An inline script removes the block as soon as JavaScript runs, so with JavaScript the page is unchanged; without it, the text is shown readably.
+- `<page>.var`: an Apache type map. Apache (`mod_negotiation`) serves the Markdown to `Accept: text/markdown` (q-values honoured; HTML for browsers and `*/*`; 406 when both are refused) with `Vary: Accept`.
+
+The 404 gets `404.md` / `404.var` (status 404 kept, Markdown linking `llms.txt` and the sitemap). `public/llms.txt` follows [llmstxt.org](https://llmstxt.org): summary, how agents should use Travelist (no public API; send people to the pages), **When to use Travelist** and the Markdown pages. Tests (`agent-pages.test.ts`) keep the manifest equal to the public pages of `seo.ts`, the Markdown headings sequential, and `llms.txt` in the spec's format. The Markdown subset the publisher renders is #–### headings, paragraphs, `- ` lists, bold and links; other syntax fails the build.
 
 `(auth)/welcome.tsx` (the route) + `features/landing/` (the page, `landing-page.tsx`, and its sections) (D-072). On the web, a signed-out visitor opening the site (`/`) lands on `/welcome`; the iOS and Android apps keep opening on sign-in (`signedOutHome`, the `(auth)` stack's initial route). Light theme, always in English whatever the device or saved language, with no language switch (D-077); sign-in, sign-up and About, opened from it, follow the visitor's language. From 320 px wide with no sideways scroll.
 
@@ -451,7 +459,7 @@ The complete, always-current list is **[docs/CITIES.md](./docs/CITIES.md)**: eve
 
 ## Known limitations
 
-- SEO (D-079): the static HTML of each page has its head tags but no body content (the app renders after it checks the session, so crawlers that do not run JavaScript only see the `<noscript>` summary); city and attraction pages need an account, so they are not indexed; the sitemap is hand-written, and `/shared?id=…` link previews show the site's card, not the walk list's.
+- SEO (D-079, D-081): only the public pages and the 404 carry text in their static HTML, written separately in `apps/mobile/agent-pages/*.md`, which must be kept in step with the landing, About and sign-in/sign-up screens by hand. Other pages hold only the spinner and the `<noscript>` summary. Markdown negotiation covers those pages only: other paths answer HTML whatever the Accept header. City and attraction pages need an account, so they are not indexed; the sitemap is hand-written, and `/shared?id=…` link previews show the site's card, not the walk list's.
 - Landing page (D-072): the ratings in the phone mockups (4.8, 4.7) are illustrative, since signed-out visitors cannot read reviews; the destination cards show none. "Loved by travellers worldwide" is a tagline, not a measured figure. There are no Privacy or Terms pages yet, so the footer links neither. No App Store / Google Play badges until the apps are published. "View all cities" lists names only (the cities open after signing up). The mockups are drawn by `features/landing/` from fixed data, so a redesign of the Home or a walk list does not update them.
 - Famous people (D-071): categories come from the occupations recorded in Wikidata, so some are odd (a businessman with "writer" among his occupations, royals filed under art because they also painted); "born or died here" uses the city item itself, so people recorded with a district or a former municipality as birthplace are missed, and small towns have few or nobody (≥ 20 Wikipedia editions are required). Athletes and actors are not listed. The list is not part of the monthly refresh: run `people --all` again to update it.
 - Wikipedia texts (D-070): only European cities and their attractions have the introduction and History excerpt so far (other cities keep the first paragraph, and their attractions the one-line description). Attraction texts are not part of the monthly refresh or the data gate yet: run `attraction-texts` again to update them. Texts are verbatim, so they keep Wikipedia's pronunciation brackets and, for Portuguese, its mix of Brazilian and European spelling; the History excerpt is the start of the section (often the oldest period), cut at a whole paragraph — the link leads to the rest. About 70% of attractions have no Portuguese article, so Portuguese users read the English text there.
@@ -869,27 +877,30 @@ Setup, once: environment **`release`** with required reviewers (the people who a
 
 Not automated: Supabase secrets and Auth settings (steps 2–3, rarely change), `config.toml` (never pushed), Apache vhosts (`deploy/apache/`), iOS / Android builds.
 
+**Applying an Apache vhost change** (e.g. D-081's Markdown negotiation): deploy the web build first, then copy `deploy/apache/travelist.live-le-ssl.conf` to `/etc/apache2/sites-available/` on the VPS and run `sudo apache2ctl configtest && sudo systemctl reload apache2`. It needs `mod_rewrite`, `mod_headers` and `mod_negotiation` (enabled by default on Ubuntu). Then check with `node scripts/check-agent-readiness.mjs https://travelist.live`. To try the vhost locally, serve `apps/mobile/dist` with an `ubuntu:24.04` + `apache2` container, using the conf without its SSL lines.
+
 ## Scripts (root)
 
-| Command                                      | What it does                                                                                              |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `./run-project.sh` / `--stop`                | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                       |
-| `./scripts/deploy-backend.sh [--dry-run]`    | Push migrations + seeds and deploy every Edge Function to the hosted project (D-074)                      |
-| `./scripts/deploy-web.sh [--dry-run]`        | Build the web app for production and rsync it to the VPS (D-073)                                          |
-| `pnpm dev`                                   | Start the Expo dev server                                                                                 |
-| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Run across all workspaces via Turborepo                                                                   |
-| `pnpm check`                                 | format check + shared-copy check + lint + typecheck + tests                                               |
-| `pnpm build:web`                             | Static web export (`apps/mobile/dist`)                                                                    |
-| `pnpm e2e`                                   | Playwright web E2E (run `pnpm build:web` first)                                                           |
-| `E2E_BACKEND=1 pnpm e2e`                     | Also runs the full journey against the local stack                                                        |
-| `pnpm db:start` / `db:stop` / `db:reset`     | Local Supabase stack; `db:reset` re-applies migrations + seeds                                            |
-| `pnpm db:test`                               | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                               |
-| `pnpm db:types`                              | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                      |
-| `pnpm db:demo <city>`                        | Load a city's demo community into the **local** DB and self-check it (today: `amsterdam`; D-037)          |
-| `pnpm functions:serve`                       | Serve Edge Functions locally with `.env` secrets                                                          |
-| `pnpm sync:shared`                           | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                     |
-| `pnpm docs:check`                            | Fail if code/data/config changed vs `origin/dev` without a CHANGELOG entry; warn if README wasn't updated |
-| `pnpm test:scripts`                          | `node --test` for the root scripts (`scripts/*.test.mjs`, e.g. the release gate)                          |
+| Command                                        | What it does                                                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `./run-project.sh` / `--stop`                  | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                       |
+| `./scripts/deploy-backend.sh [--dry-run]`      | Push migrations + seeds and deploy every Edge Function to the hosted project (D-074)                      |
+| `./scripts/deploy-web.sh [--dry-run]`          | Build the web app for production and rsync it to the VPS (D-073)                                          |
+| `pnpm dev`                                     | Start the Expo dev server                                                                                 |
+| `pnpm lint` / `pnpm typecheck` / `pnpm test`   | Run across all workspaces via Turborepo                                                                   |
+| `pnpm check`                                   | format check + shared-copy check + lint + typecheck + tests                                               |
+| `pnpm build:web`                               | Static web export (`apps/mobile/dist`), then `scripts/agent-pages.mjs` (D-081)                            |
+| `node scripts/check-agent-readiness.mjs <url>` | Check a deployed site for agents: raw-HTML text, Markdown negotiation, Markdown 404, `llms.txt` (D-081)   |
+| `pnpm e2e`                                     | Playwright web E2E (run `pnpm build:web` first)                                                           |
+| `E2E_BACKEND=1 pnpm e2e`                       | Also runs the full journey against the local stack                                                        |
+| `pnpm db:start` / `db:stop` / `db:reset`       | Local Supabase stack; `db:reset` re-applies migrations + seeds                                            |
+| `pnpm db:test`                                 | pgTAP tests in `supabase/tests` (RLS, RPCs)                                                               |
+| `pnpm db:types`                                | Regenerate `apps/mobile/src/lib/database.types.ts` from the local DB                                      |
+| `pnpm db:demo <city>`                          | Load a city's demo community into the **local** DB and self-check it (today: `amsterdam`; D-037)          |
+| `pnpm functions:serve`                         | Serve Edge Functions locally with `.env` secrets                                                          |
+| `pnpm sync:shared`                             | Copy `packages/shared/src` into `supabase/functions/_shared/wayfarer`                                     |
+| `pnpm docs:check`                              | Fail if code/data/config changed vs `origin/dev` without a CHANGELOG entry; warn if README wasn't updated |
+| `pnpm test:scripts`                            | `node --test` for the root scripts (`scripts/*.test.mjs`, e.g. the release gate)                          |
 
 Edge Function checks: `cd supabase/functions && deno lint && deno fmt --check && deno test --allow-net=jsr.io`.
 After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy is stale, see D-005).
