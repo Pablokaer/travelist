@@ -21,6 +21,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Security: `node-forge` is forced to ^1.4.1 (override; via `@expo/cli`, dev server only), past five high advisories published in November 2026 that failed `pnpm audit`. `decode-uri-component` GHSA-qr28-fpjm-wq7f (via `expo-router` > `query-string@7`, in the web bundle) is in `auditConfig.ignoreGhsas`: its only fix, 0.5.1, is ESM-only and breaks `query-string`'s `require()`. The risk is a crafted link freezing the tab that opens it.
 - Security: `zod` is ^4.6.7 in the app and shared package, past GHSA-mrhx-c7xc-m3w5 (high), which failed the scheduled Security run's `pnpm audit`; the copy `@expo/cli` pins (zod 3, no patched release, CLI only) is in `auditConfig.ignoreGhsas`.
 
 ### Added
