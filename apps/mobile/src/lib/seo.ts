@@ -61,3 +61,41 @@ export function pageSeo(pathname: string): PageSeo {
     };
   return { ...copy, canonicalUrl, indexable: true };
 }
+
+/**
+ * What Travelist is, in the words people search for with the brand (D-081). Search engines and
+ * agent-readiness audits read them from the structured data; each must also appear in the home
+ * page text (agent-pages/home.md, checked by agent-pages.test.ts).
+ */
+export const SITE_KEYWORDS: readonly string[] = [
+  'travel list app',
+  'city guide',
+  'walking route planner',
+];
+
+/**
+ * The schema.org `WebSite` + `Organization` JSON-LD of every page (D-079), with the product
+ * terms as `keywords` / `knowsAbout` (D-081).
+ * @example <script type="application/ld+json">{siteStructuredData()}</script>
+ */
+export function siteStructuredData(): string {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        description: LANDING_COPY.description,
+        keywords: SITE_KEYWORDS.join(', '),
+      },
+      {
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/icon-512.png`,
+        knowsAbout: SITE_KEYWORDS,
+      },
+    ],
+  });
+}

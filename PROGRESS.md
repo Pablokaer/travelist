@@ -222,6 +222,12 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 
 Every page of the static export has its own title, description, canonical URL and robots tag; `robots.txt`, `sitemap.xml`, schema.org structured data and a `<noscript>` summary are published. Remaining: server-rendered landing content and indexable city pages (both need public, signed-out pages).
 
+## 2026-11-06 — Agent readiness for the web (D-081)
+
+- Fixes from the Ora "Is Agentic" audit (59/100): text in the raw HTML of the public pages and the 404, Markdown by content negotiation with `Vary: Accept` and 406, a Markdown 404, `llms.txt` with "When to use Travelist", product terms in the JSON-LD.
+- Run here: `scripts/check-agent-readiness.mjs` against the export served by Apache 2.4.58 (Ubuntu 24.04 container, the repo vhost without SSL): 18/18 checks pass (production today: 1/18). Browser check: with JavaScript, `/welcome`, `/about` and `/sign-in` are pixel-identical to the pages without the agent text; without JavaScript the text is shown. App tests (68 suites), shared tests, script tests, lint and typecheck pass. `city-hub.test.tsx` timed out once in a full run under load and passes alone.
+- Remaining: apply the Apache vhost on the VPS after the next web deploy (README → Deploying), then run the checker against https://travelist.live. Brand search ranking for "Travelist" depends on indexing and links, not on code.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).

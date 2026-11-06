@@ -11,12 +11,17 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Added
+
+- Agent readiness for the web (D-081). Agents and crawlers that run no JavaScript now get each public page's text (`/`, `/welcome`, `/about`, `/sign-up`, `/sign-in`) and the 404's text in the raw HTML. Until now they saw only a loading spinner (65 characters on the home page). The text comes from Markdown sources in `apps/mobile/agent-pages/`, added after `expo export` by `scripts/agent-pages.mjs` and removed by an inline script as soon as JavaScript runs, so the app looks the same: verified pixel-identical. `Accept: text/markdown` on those pages returns the Markdown with `Vary: Accept` through Apache content negotiation: q-values are honoured, and a client that refuses both formats gets 406. An unknown path asked for in Markdown returns a Markdown 404 linking `llms.txt` and the sitemap. The Markdown is also at `/index.md`, `/about.md` and so on, linked from each page with `rel="alternate"`. New `public/llms.txt` with a **When to use Travelist** section. The structured data names the product terms ("travel list app", "city guide", "walking route planner") as `keywords` / `knowsAbout`. New `scripts/check-agent-readiness.mjs <url>` checks all of this over HTTP. **Apache:** `deploy/apache/travelist.live-le-ssl.conf` changed (type maps, `.md` type, `ErrorDocument 404 /404.var`, no file ETags on pages) and must be applied on the VPS by hand.
+
 ### Removed
 
 - Sentry and PostHog (D-080): the unused `observability` facade, the `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_POSTHOG_KEY` and `EXPO_PUBLIC_POSTHOG_HOST` settings (app, `.env.example`, deploy workflow) and their docs. The project uses no paid monitoring or analytics service.
 
 ### Fixed
 
+- Security: `node-forge` is forced to ^1.4.1 (override; via `@expo/cli`, dev server only), past five high advisories published in November 2026 that failed `pnpm audit`. `decode-uri-component` GHSA-qr28-fpjm-wq7f (via `expo-router` > `query-string@7`, in the web bundle) is in `auditConfig.ignoreGhsas`: its only fix, 0.5.1, is ESM-only and breaks `query-string`'s `require()`. The risk is a crafted link freezing the tab that opens it.
 - Security: `zod` is ^4.6.7 in the app and shared package, past GHSA-mrhx-c7xc-m3w5 (high), which failed the scheduled Security run's `pnpm audit`; the copy `@expo/cli` pins (zod 3, no patched release, CLI only) is in `auditConfig.ignoreGhsas`.
 
 ### Added

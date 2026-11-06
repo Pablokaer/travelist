@@ -1,24 +1,14 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import type { PropsWithChildren, ReactElement } from 'react';
 
-import { SITE_NAME, SITE_URL } from '@/lib/seo';
+import { SITE_NAME, SITE_URL, siteStructuredData } from '@/lib/seo';
 
 // Link-preview crawlers need absolute image URLs (D-073).
 const PREVIEW_IMAGE = `${SITE_URL}/og-image.png`;
 
-// Who publishes the site, for search engines' knowledge panel and site name (D-079).
-const STRUCTURED_DATA = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': 'WebSite', name: SITE_NAME, url: `${SITE_URL}/` },
-    {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      url: `${SITE_URL}/`,
-      logo: `${SITE_URL}/icon-512.png`,
-    },
-  ],
-});
+// Who publishes the site and what it is, for search engines' knowledge panel and site name
+// (D-079) and the product terms searched with the brand (D-081).
+const STRUCTURED_DATA = siteStructuredData();
 
 /**
  * Root HTML of the static web export: favicon, home-screen icons, the link-preview image and
@@ -53,7 +43,9 @@ export default function RootHtml({ children }: PropsWithChildren): ReactElement 
         <ScrollViewStyleReset />
       </head>
       <body>
-        {/* For crawlers and browsers without JavaScript: the app itself is client-rendered. */}
+        {/* For browsers without JavaScript: the app itself is client-rendered. On the public
+          pages and the 404, scripts/agent-pages.mjs replaces this with the page's full text
+          after the export (D-081). */}
         <noscript>
           <h1>Travelist — turn any city into your personal travel list</h1>
           <p>

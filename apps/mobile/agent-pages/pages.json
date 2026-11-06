@@ -1,0 +1,10 @@
+{
+  "pages": {
+    "/": "home.md",
+    "/welcome": "home.md",
+    "/about": "about.md",
+    "/sign-up": "sign-up.md",
+    "/sign-in": "sign-in.md"
+  },
+  "notFound": "not-found.md"
+}
