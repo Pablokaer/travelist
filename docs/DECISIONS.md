@@ -698,3 +698,12 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - GoTrue accepts `http` hooks only on localhost, so the Send Email hook goes out and back through `https://travelist.live`.
   - Supabase's usual ports 54321/54322 sit in Linux's ephemeral range and collided with Apache's own proxy connections, so the stack uses 18000/15432; `scripts/self-hosted-config.test.mjs` guards this.
   - Studio is off by default and is reached only through an SSH tunnel.
+
+## D-083 — Promote dispatches the released commit's deploy workflow
+
+- **Context:** Promote (D-075) is triggered by `workflow_run`, which runs on the default branch as it is at that moment, before the fast-forward. Its `deploy` job called `uses: ./.github/workflows/deploy.yml`, so it ran the previous `main`'s deploy file against the released commit's scripts. The first release of D-082 changed both: the old backend job had no SSH step, and the new `deploy-backend.sh` failed with "Could not resolve hostname travelist-vps" (run 43799889024). Production was then deployed by running Deploy by hand.
+- **Decision:** after fast-forwarding `main`, Promote runs `gh workflow run deploy.yml --ref main`. `main` now points at the release, so the deploy uses the released commit's own `deploy.yml`. The job then finds that run (a `workflow_dispatch` of the release SHA started after the dispatch), links it in the summary and waits with `gh run watch --exit-status`, so Promote fails when the deploy fails. `deploy.yml` loses its `workflow_call` trigger and deploys `github.sha`, the head of `main`.
+- **Alternatives:**
+  - Calling the reusable workflow at the release SHA: rejected, because `uses:` cannot take an expression.
+  - Keeping `uses: ./…` and redeploying by hand after each release that changes the deploy: rejected, because it leaves a red release and needs a manual step.
+- **Trade-offs:** the deploy is now a separate run, linked from Promote, instead of a nested job, and the Promote job's runner waits for the whole deploy.

@@ -882,7 +882,7 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 
 1. **gate** — `scripts/release-gate.mjs` checks that both workflows passed on that commit and that it is still the tip of `dev` (an older commit is never released over a newer one);
 2. **release** — waits for a **manual approval** (environment `release`: Actions → Promote → the waiting run → _Review deployments_ → Approve). A newer green commit on `dev` replaces a release still waiting. Once approved, `main` is fast-forwarded to that exact commit — the one every pipeline tested, no new merge commit;
-3. **deploy** — runs `deploy.yml` on it (below).
+3. **deploy** — dispatches `deploy.yml` on `main` (now that commit) and waits for it, so the release runs its own deploy workflow, even when it changed that file (D-083). The run is linked in the Promote summary.
 
 ```
 feature/* ──PR──▶ dev ──CI + Security green──▶ approval ──▶ main (fast-forward) ──▶ deploy

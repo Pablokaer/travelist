@@ -4,18 +4,13 @@ name: Deploy
 # self-hosted Supabase on the VPS, D-082), then the web app (static export rsync'ed to the VPS behind Apache), then a smoke test
 # of both.
 #
-# Called by promote.yml once a release is approved and main fast-forwarded to it (D-075), and
-# runnable by hand to redeploy: Actions → Deploy → Run workflow (the head of main).
+# Dispatched by promote.yml on main once a release is approved and main fast-forwarded to it
+# (D-075, D-083), so each release runs its own version of this file; runnable by hand to redeploy:
+# Actions → Deploy → Run workflow (the head of main).
 # Setup (README → "Deploying (hosted)" → "Continuous deployment"): GitHub environment `production`
 # with the variables and secrets read below.
 
 on:
-  workflow_call:
-    inputs:
-      sha:
-        description: Commit to deploy (the one promoted to main)
-        required: true
-        type: string
   workflow_dispatch:
 
 permissions:
@@ -27,8 +22,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # The promoted commit (workflow_call), or the head of main (manual run).
-  DEPLOY_SHA: ${{ inputs.sha || github.sha }}
+  # The head of main: the commit Promote just fast-forwarded it to, or the current one (manual run).
+  DEPLOY_SHA: ${{ github.sha }}
 
 jobs:
   backend:
