@@ -97,7 +97,7 @@ jobs:
           echo "since=$since" >> "$GITHUB_ENV"
       - name: Wait for the deploy run
         run: |
-          for attempt in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             # The newest dispatch of the released commit since this job started it.
             run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow deploy.yml \
               --event workflow_dispatch --commit "$RELEASE_SHA" --limit 5 \
