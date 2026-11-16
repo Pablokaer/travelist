@@ -672,3 +672,29 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
 - **Decision:** each public page's text is written once, as Markdown, in `apps/mobile/agent-pages/`. After `expo export`, `scripts/agent-pages.mjs` writes it as `<page>.md`, inserts it as HTML before the app root (an inline script removes it as soon as JavaScript runs) and writes an Apache type map `<page>.var`. Apache's `mod_negotiation` picks HTML (qs 1.0) or Markdown (qs 0.9) by the Accept header, adds `Vary: Accept` and answers 406 when the client refuses both. `ErrorDocument 404 /404.var` does the same for the 404. `FileETag None` on pages, because negotiation writes a malformed ETag on Apache 2.4.58. `public/llms.txt` follows llmstxt.org, with "When to use Travelist" as an H2 file list. `SITE_KEYWORDS` become `keywords` / `knowsAbout` in the JSON-LD.
 - **Alternatives:** rendering the screens in the static export (rejected: the first client render is the loading state, so hydration would mismatch and flash; D-079); `mod_rewrite` on `%{HTTP:Accept} text/markdown` (rejected: a substring match serves Markdown to `text/markdown;q=0` and never 406s); `MultiViews` (rejected: without source qualities `*/*` can pick the smaller Markdown file); a Markdown library to render the HTML (rejected: a 30-line renderer of the small subset the sources use, failing the build on anything else, avoids a dependency); `<noscript>` with more text (rejected: agents strip it).
 - **Trade-offs:** the agent text is a second copy of the public pages' copy, kept in step by hand; it is removed for people with JavaScript, so search engines that render JavaScript see the app as before. The Apache vhost is applied by hand (not part of the deploy). Paths other than the public pages and the 404 have no Markdown variant.
+
+## D-082 — Backend moved from Supabase Cloud to a self-hosted Supabase on the VPS
+
+- **Context:** on 2026-11-16 the landing page's "Popular destinations" cards stayed grey placeholders, and sign-in and every data screen were broken. The free Supabase Cloud project (D-073) had been paused after a week without traffic, and a paused project's host (`llrrofuzaxfffwwegxwr.supabase.co`) no longer resolves (NXDOMAIN). The owner wants the backend completely free. The app uses most of Supabase: password, OTP and OAuth sign-in, the Send Email hook, RLS, ~20 RPCs, Storage, Realtime (walk chat) and five Edge Functions.
+- **Decision:** the backend runs on the existing VPS as the official self-hosted Supabase (`docker/` of `github.com/supabase/supabase`, pinned commit). Only Travelist's differences live in the repository:
+  - `deploy/supabase/docker-compose.travelist.yml`:
+    - turns off Studio, postgres-meta, imgproxy and Supavisor;
+    - publishes the gateway on `127.0.0.1:18000` and Postgres on `127.0.0.1:15432`;
+    - sets the Auth settings from `config.toml`, the Send Email hook and the functions' secrets.
+  - `scripts/install-supabase-vps.sh`: installs or upgrades the stack. Its secrets are generated on the VPS by upstream's own script.
+  - `deploy/supabase/backup.sh`: a nightly `pg_dump` and a tar of Storage, keeping 14 of each.
+
+  Apache proxies `/rest|auth|storage|functions|graphql/v1`, and `/realtime/v1` as a WebSocket, from `https://travelist.live`. The app's Supabase URL becomes the site itself: no new DNS name or certificate, and same-origin calls. `deploy-backend.sh` now runs `supabase db push --db-url` through an SSH tunnel and copies the functions into the stack's volume. The deploy workflow's two jobs share a `vps-ssh` composite action.
+
+- **Alternatives:**
+  - Staying on the free Cloud plan with a scheduled keep-alive request: rejected by the owner, since the project would stay subject to the plan's pausing and limits.
+  - Writing our own backend (Postgres + Node API + auth): rejected because it means rewriting auth, Storage, Realtime and every data call, with weeks of work and a high risk.
+  - A new subdomain (`api.travelist.live`): rejected because it needs a DNS record, a certificate and CORS, while same-origin paths need none.
+  - Kong as the gateway: rejected because upstream now ships Envoy by default.
+- **Trade-offs:**
+  - We now run the database: upgrades (change the pin and re-run the script), backups, and disk and RAM (about 1 GB) on a VPS shared with other sites.
+  - The VPS is a single point of failure, and the backups stay on it until they are copied elsewhere.
+  - The keys are new, so sessions from the Cloud project end and users sign in again.
+  - GoTrue accepts `http` hooks only on localhost, so the Send Email hook goes out and back through `https://travelist.live`.
+  - Supabase's usual ports 54321/54322 sit in Linux's ephemeral range and collided with Apache's own proxy connections, so the stack uses 18000/15432; `scripts/self-hosted-config.test.mjs` guards this.
+  - Studio is off by default and is reached only through an SSH tunnel.

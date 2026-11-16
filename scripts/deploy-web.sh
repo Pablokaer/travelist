@@ -5,7 +5,7 @@
 #   ./scripts/deploy-web.sh            # build with .env.production, then rsync to travelist-vps
 #   ./scripts/deploy-web.sh --dry-run  # build and show what rsync would change
 #
-# Needs: the EXPO_PUBLIC_* values of the Supabase Cloud project, from .env.production (git-ignored)
+# Needs: the EXPO_PUBLIC_* values of the self-hosted Supabase (D-082), from .env.production (git-ignored)
 # or, when that file is absent (GitHub Actions, D-074), from the environment; and an SSH host alias
 # `travelist-vps` in ~/.ssh/config. Apache serves /var/www/travelist
 # (deploy/apache/travelist.live-le-ssl.conf).
@@ -35,9 +35,9 @@ if [ -f "$ENV_FILE" ]; then
 fi
 export EXPO_NO_DOTENV=1
 [ -n "${EXPO_PUBLIC_SUPABASE_URL:-}" ] ||
-  fail "EXPO_PUBLIC_SUPABASE_URL is empty (expected https://<ref>.supabase.co in $ENV_FILE or the environment)."
+  fail "EXPO_PUBLIC_SUPABASE_URL is empty (expected https://travelist.live, where Apache proxies the self-hosted API, in $ENV_FILE or the environment)."
 [ -n "${EXPO_PUBLIC_SUPABASE_ANON_KEY:-}" ] ||
-  fail "EXPO_PUBLIC_SUPABASE_ANON_KEY is empty (expected the project's anon key in $ENV_FILE or the environment)."
+  fail "EXPO_PUBLIC_SUPABASE_ANON_KEY is empty (expected ANON_KEY from /opt/travelist-supabase/docker/.env on the VPS, in $ENV_FILE or the environment)."
 
 log "Building the web app for $EXPO_PUBLIC_SUPABASE_URL..."
 cd "$APP_DIR"

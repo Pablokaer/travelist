@@ -189,7 +189,7 @@ Monaco, Andorra la Vella, Kyiv, Lviv, Moscow, Saint Petersburg, Minsk — Monaco
 ## 2026-10-06 — First production deploy (D-073)
 
 - **Live:** https://travelist.live (HTTP → HTTPS, certificate until 2027-01-04) on the VPS's Apache, next to the existing sites, which were checked before and after (unchanged).
-- **Backend:** Supabase Cloud project `travelist` (Ireland): 31 migrations, 197 active cities, 250 countries, Lisbon's 300 places through the public API; Edge Functions `checklist`, `route-optimize`, `health`, `welcome-email`, `auth-email`; secrets; Auth (site URL, redirects, 6-digit codes, Send Email hook → Resend, `travelist.live` verified).
+- **Backend (until D-082):** Supabase Cloud project `travelist` (Ireland): 31 migrations, 197 active cities, 250 countries, Lisbon's 300 places through the public API; Edge Functions `checklist`, `route-optimize`, `health`, `welcome-email`, `auth-email`; secrets; Auth (site URL, redirects, 6-digit codes, Send Email hook → Resend, `travelist.live` verified).
 - **Verified:** the landing page in production reads `city_list` from Supabase Cloud with no console errors; Get started opens sign-up; protected functions answer 401 without a session.
 - **Next:** a real sign-up end to end (confirmation email through Resend); Google / Apple sign-in; EAS builds pointing at production; backups/plan decision (free tier pauses after a week idle).
 
@@ -227,6 +227,13 @@ Every page of the static export has its own title, description, canonical URL an
 - Fixes from the Ora "Is Agentic" audit (59/100): text in the raw HTML of the public pages and the 404, Markdown by content negotiation with `Vary: Accept` and 406, a Markdown 404, `llms.txt` with "When to use Travelist", product terms in the JSON-LD.
 - Run here: `scripts/check-agent-readiness.mjs` against the export served by Apache 2.4.58 (Ubuntu 24.04 container, the repo vhost without SSL): 18/18 checks pass (production today: 1/18). Browser check: with JavaScript, `/welcome`, `/about` and `/sign-in` are pixel-identical to the pages without the agent text; without JavaScript the text is shown. App tests (68 suites), shared tests, script tests, lint and typecheck pass. `city-hub.test.tsx` timed out once in a full run under load and passes alone.
 - Remaining: apply the Apache vhost on the VPS after the next web deploy (README → Deploying), then run the checker against https://travelist.live. Brand search ranking for "Travelist" depends on indexing and links, not on code.
+
+## 2026-11-16 — Self-hosted Supabase on the VPS (D-082)
+
+- **Why:** the free Supabase Cloud project was paused and its host stopped resolving. The landing cards were stuck as placeholders, and sign-in and every data screen were down.
+- **Done:** the official self-hosted Supabase runs in `/opt/travelist-supabase` on the VPS: Postgres 17, Envoy, Auth, PostgREST, Realtime, Storage and the Edge Runtime, about 1 GB of RAM. Apache proxies the API from `https://travelist.live`. All 31 migrations, the reference data (197 cities) and the five Edge Functions are deployed there. A nightly backup is in place. `deploy-backend.sh` and the deploy workflow target it.
+- **Verified:** a web build pointing at it shows the six destination cards with photos. Sign-up, sign-in, RLS reads, `my_subscription`, the `checklist` function, `health` and the Realtime WebSocket (101) all work.
+- **Open:** fill `RESEND_API_KEY` in the VPS's `.env`; without it, sign-in codes and password-reset emails fail. Import the Cloud project's users and lists once the owner restores it. Copy the backups off the VPS.
 
 ## Remaining (M5 and launch)
 
