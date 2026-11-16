@@ -75,10 +75,37 @@ jobs:
           rm -f ~/.ssh/release_key
       - run: echo "main → \`$RELEASE_SHA\`" >> "$GITHUB_STEP_SUMMARY"
 
+  # Dispatched, not `uses: ./.github/workflows/deploy.yml`: a workflow_run job resolves local
+  # workflows at the previous main, so a release that changed deploy.yml deployed with the old
+  # file (2026-11-16, run 43799889024: the backend job had no SSH). Dispatching on main, which now
+  # points at the release, runs the released commit's own deploy.yml; this job waits for it.
   deploy:
-    name: Deploy
+    name: Deploy (the released commit's deploy.yml)
     needs: release
-    uses: ./.github/workflows/deploy.yml
-    with:
-      sha: ${{ github.event.workflow_run.head_sha }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      actions: write
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Dispatch deploy.yml on main
+        run: |
+          since="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "since=$since" >> "$GITHUB_ENV"
+      - name: Wait for the deploy run
+        run: |
+          for attempt in $(seq 1 30); do
+            # The newest dispatch of the released commit since this job started it.
+            run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow deploy.yml \
+              --event workflow_dispatch --commit "$RELEASE_SHA" --limit 5 \
+              --json databaseId,createdAt \
+              --jq "map(select(.createdAt >= \"$since\")) | .[0].databaseId // empty")"
+            [ -n "$run_id" ] && break
+            sleep 5
+          done
+          [ -n "$run_id" ] || { echo "No Deploy run for $RELEASE_SHA started after $since"; exit 1; }
+          echo "Deploy run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$run_id" >> "$GITHUB_STEP_SUMMARY"
+          gh run watch "$run_id" --repo "$GITHUB_REPOSITORY" --interval 30 --exit-status

@@ -11,6 +11,10 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Fixed
+
+- Releases that change the deploy workflow now deploy with the new version (D-083). Promote ran `deploy.yml` as it was on the previous `main`, so the first release of D-082 failed: the old backend job had no SSH access, and the deploy had to be run by hand. Promote now dispatches `deploy.yml` on `main` after fast-forwarding it and waits for the run to finish.
+
 ### Changed
 
 - The backend left Supabase Cloud for a free, self-hosted Supabase on the same VPS as the web app (D-082). The landing page's "Popular destinations" cards, sign-in and every data screen had stopped working because the free Cloud project was paused and its address no longer existed. Apache serves the API from `https://travelist.live` itself (`/rest/v1`, `/auth/v1`, `/storage/v1`, `/functions/v1`, `/realtime/v1`).
