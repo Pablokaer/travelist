@@ -1,0 +1,73 @@
+# Travelist's changes to the official self-hosted Supabase stack (D-082), applied on top of the
+# upstream docker/docker-compose.yml at the commit pinned in scripts/install-supabase-vps.sh.
+# The VPS's .env sets COMPOSE_FILE=docker-compose.yml:docker-compose.travelist.yml, so a plain
+# `docker compose …` in /opt/travelist-supabase/docker uses both files.
+#
+# - Only what the app uses runs: db, api-gw (Envoy), auth, rest, realtime, storage, functions.
+#   Studio and its postgres-meta are behind the `studio` profile (start on demand over an SSH
+#   tunnel); imgproxy (the app never asks for image transforms) and the Supavisor pooler are off.
+# - Ports listen on 127.0.0.1 only: Apache proxies /rest|auth|storage|functions|realtime|graphql/v1
+#   from https://travelist.live (deploy/apache/travelist.live-le-ssl.conf); deploys reach the
+#   database through an SSH tunnel (scripts/deploy-backend.sh). Both ports sit below Linux's
+#   ephemeral range (32768-60999): Supabase's usual 54321/54322 were taken at random by Apache's
+#   own outgoing proxy connections ("failed to bind host port … address already in use").
+
+services:
+  studio:
+    profiles: [studio]
+  meta:
+    profiles: [studio]
+  imgproxy:
+    profiles: [disabled]
+  supavisor:
+    profiles: [disabled]
+
+  api-gw:
+    # Upstream waits for a healthy Studio, which no longer starts by default.
+    depends_on: !reset {}
+    ports: !override
+      - 127.0.0.1:18000:8000/tcp
+
+  db:
+    ports:
+      - 127.0.0.1:15432:5432/tcp
+
+  storage:
+    depends_on: !override
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    environment:
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+      IMGPROXY_URL: ''
+
+  auth:
+    environment:
+      # Same Auth settings as supabase/config.toml (which drives the local stack).
+      GOTRUE_PASSWORD_MIN_LENGTH: 6
+      GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED: 'true'
+      GOTRUE_SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 10
+      GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: 'true'
+      GOTRUE_MAILER_OTP_EXP: 3600
+      GOTRUE_MAILER_OTP_LENGTH: 6
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: ${AUTH_RATE_LIMIT_EMAIL_SENT:-30}
+      # Auth emails are sent by the auth-email Edge Function through Resend (D-066), not SMTP.
+      # The public https address: GoTrue refuses http hooks other than localhost ("only localhost,
+      # 127.0.0.1, and ::1 are supported with http"); the function checks the hook's signature.
+      GOTRUE_HOOK_SEND_EMAIL_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_EMAIL_URI: ${SUPABASE_PUBLIC_URL}/functions/v1/auth-email
+      GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${SEND_EMAIL_HOOK_SECRET}
+
+  functions:
+    mem_limit: ${FUNCTIONS_MEMORY_LIMIT:-512m}
+    environment:
+      # The functions' own secrets (supabase/functions/_shared/env.ts). Upstream's main router
+      # passes the container environment to every function.
+      SEND_EMAIL_HOOK_SECRET: ${SEND_EMAIL_HOOK_SECRET}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      ORS_API_KEY: ${ORS_API_KEY:-}
+      # SUPABASE_URL is the internal gateway; links in emails need the public address.
+      AUTH_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      APP_URL: ${SITE_URL}

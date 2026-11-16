@@ -1,0 +1,36 @@
+name: SSH access to the VPS
+description: >
+  Sets up the `travelist-vps` SSH alias that scripts/deploy-backend.sh and scripts/deploy-web.sh
+  use on the owner's machine. known_hosts is pinned (variable VPS_KNOWN_HOSTS), never learnt with
+  ssh-keyscan at deploy time. Remove the key afterwards (`rm -f ~/.ssh/travelist_deploy`).
+
+inputs:
+  ssh-key:
+    description: Private key (secret VPS_SSH_KEY)
+    required: true
+  host:
+    description: VPS address (variable VPS_HOST)
+    required: true
+  user:
+    description: SSH user (variable VPS_USER)
+    required: true
+  known-hosts:
+    description: The VPS's pinned host key line(s) (variable VPS_KNOWN_HOSTS)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        VPS_SSH_KEY: ${{ inputs.ssh-key }}
+        VPS_HOST: ${{ inputs.host }}
+        VPS_USER: ${{ inputs.user }}
+        VPS_KNOWN_HOSTS: ${{ inputs.known-hosts }}
+      run: |
+        install -m 700 -d ~/.ssh
+        printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/travelist_deploy
+        chmod 600 ~/.ssh/travelist_deploy
+        printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+        printf 'Host travelist-vps\n  HostName %s\n  User %s\n  IdentityFile ~/.ssh/travelist_deploy\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' \
+          "$VPS_HOST" "$VPS_USER" > ~/.ssh/config

@@ -833,17 +833,48 @@ The Supabase CLI is installed as a dev dependency, so `pnpm exec supabase <cmd>`
 
 ## Deploying (hosted)
 
-**Production today (D-073):** the web app at **https://travelist.live** is static files on a VPS behind Apache; the backend is the Supabase Cloud project `travelist` (ref `llrrofuzaxfffwwegxwr`, West EU / Ireland). Public values for the build are in the git-ignored `.env.production`; server secrets live in Supabase; the database password is kept outside the repository.
+**Production today (D-082):** everything runs on one VPS. The web app at **https://travelist.live** is static files behind Apache, and the backend is a **self-hosted Supabase** (the official Docker setup) in `/opt/travelist-supabase` on the same machine. Apache proxies `/rest/v1`, `/auth/v1`, `/storage/v1`, `/functions/v1`, `/realtime/v1` (WebSocket) and `/graphql/v1` to it, so the app's Supabase URL is the site itself, `https://travelist.live`. It costs nothing beyond the VPS. Until 2026-11 the backend was the free Supabase Cloud project `llrrofuzaxfffwwegxwr` (D-073), which Supabase pauses after a week without traffic; a paused project vanishes from DNS, and the site loses its data. Public values for the build are in the git-ignored `.env.production`; server secrets live only in the VPS's `/opt/travelist-supabase/docker/.env`.
 
-1. **Supabase project:** `pnpm exec supabase login`, `pnpm exec supabase link --project-ref <ref>`, then
-   `pnpm exec supabase db push --include-seed` (schema + reference data) and
-   `pnpm exec supabase functions deploy checklist route-optimize health welcome-email auth-email --use-api --import-map supabase/functions/deno.json` (without `--import-map` the remote bundler cannot resolve `zod` / `@supabase/supabase-js`; `verify_jwt` comes from `supabase/config.toml`, off for `health` and `auth-email`).
-2. **Secrets:** `pnpm exec supabase secrets set --env-file <file>` with `RESEND_API_KEY`, `EMAIL_FROM` (an address on the domain verified in Resend), `SEND_EMAIL_HOOK_SECRET` (`v1,whsec_<base64>`), `APP_URL` and `ORS_API_KEY` (optional `EXCHANGE_RATES_BASE_URL`). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
-3. **Auth** (Dashboard → Authentication, or the Management API `PATCH /v1/projects/<ref>/config/auth`): Site URL = the web URL; redirect URLs `https://<web>/**` and `wayfarer://**`; **email OTP length 6** (the app asks for 6 digits; the hosted default is 8); raise the email rate limit (default 2/hour); Hooks → Send Email (HTTPS) at `https://<ref>.supabase.co/functions/v1/auth-email` with the same secret as `SEND_EMAIL_HOOK_SECRET`. Providers → Google / Apple with your client ids. Do not `supabase config push`: `config.toml` holds the local values (localhost, Mailpit).
-4. **Web:** `./scripts/deploy-web.sh` builds with `.env.production` (or, when absent, the `EXPO_PUBLIC_*` environment variables) and publishes to the VPS (`--dry-run` shows the changes first). It sets `EXPO_NO_DOTENV=1` and passes `--clear`: otherwise Expo loads the local `.env` and Metro reuses modules inlined with the local URL. The Apache vhosts are in `deploy/apache/` (static export rewrites: `/sign-in` → `sign-in.html`, `/city/<slug>` → `city/[slug].html`, …; HTTP → HTTPS; Let's Encrypt via `certbot --apache`). Any other static host works too (EAS Hosting, Netlify, Vercel, Cloudflare Pages) with the same rewrites.
-5. **iOS / Android:** set `EXPO_PUBLIC_*` as EAS environment variables, then `npx eas-cli build --profile production -p ios|android` and `npx eas-cli submit`.
+#### Self-hosted Supabase
 
-Steps 1 (migrations, seeds, functions) and 4 (web) are also one script each, for a deploy by hand: `./scripts/deploy-backend.sh` (needs `SUPABASE_DB_PASSWORD` and a `supabase login`; `SUPABASE_PROJECT_REF` is read from `.env.production`) and `./scripts/deploy-web.sh`. Both take `--dry-run`: the pending migrations and seeds / the files rsync would change.
+- **Install or upgrade:** run `./scripts/install-supabase-vps.sh` (idempotent).
+  - It checks out the `docker/` folder of `github.com/supabase/supabase` at the commit pinned in the script, adds `deploy/supabase/docker-compose.travelist.yml` and starts the stack.
+  - The first run generates every secret on the VPS with upstream's `utils/generate-keys.sh`: `POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY` / `SERVICE_ROLE_KEY` (valid 5 years), and the rest. It also generates `SEND_EMAIL_HOOK_SECRET`.
+  - **Upgrading Supabase:** change `UPSTREAM_REF`, then re-run the script.
+- **What runs:**
+  - Running: Postgres 17, the Envoy gateway, Auth (GoTrue), PostgREST, Realtime, Storage (files in `docker/volumes/storage`) and the Edge Runtime. Together they use about 1 GB of RAM.
+  - Off: Studio and postgres-meta, behind the `studio` profile. To use them, run `docker compose --profile studio up -d studio`, then open an SSH tunnel to `127.0.0.1:18000`.
+  - Not installed: imgproxy and the Supavisor pooler.
+- **Ports:** the gateway listens on `127.0.0.1:18000` and Postgres on `127.0.0.1:15432`, both on loopback only. They are below Linux's ephemeral range: Apache's outgoing connections took Supabase's usual 54321/54322.
+- **Secrets the owner fills in** `/opt/travelist-supabase/docker/.env`:
+  - `RESEND_API_KEY` and `EMAIL_FROM`: without them, sign-in codes and password-reset emails fail.
+  - `ORS_API_KEY`: optional.
+
+  Then run `docker compose up -d` in `/opt/travelist-supabase/docker`.
+
+- **Auth settings:** they mirror `supabase/config.toml` (`deploy/supabase/docker-compose.travelist.yml` and the `.env` values the install script writes).
+  - Site URL: `https://travelist.live`. Redirect URLs: `https://travelist.live/**`, `wayfarer://**` and `exp://**`.
+  - 6-digit OTP, no email confirmation step, 30 emails/hour.
+  - Send Email Hook: `https://travelist.live/functions/v1/auth-email`. GoTrue accepts `http` only for localhost, so the hook goes through the public URL.
+- **Backups:** `deploy/supabase/backup.sh` runs nightly (`/etc/cron.d/travelist-supabase`). It writes a `pg_dump` of the whole database and a tar of the Storage files to `/opt/travelist-supabase/backups` and keeps the last 14 of each. The restore commands are in the script's header.
+
+#### Deploying
+
+1. **Backend:** `./scripts/deploy-backend.sh` (`--dry-run` lists the pending migrations and seeds).
+   - It opens an SSH tunnel to the database and runs `supabase db push --db-url … --include-seed` (schema and reference data).
+   - It copies every `supabase/functions/<name>/` (without tests) into the stack's functions volume and restarts the Edge Runtime.
+   - It needs `SUPABASE_DB_PASSWORD`: the `POSTGRES_PASSWORD` of the VPS's `.env`, read from `.env.production` when unset.
+   - Upstream's `main` router serves the functions, with `deno.json` as their import map. The gateway does not check JWTs (`FUNCTIONS_VERIFY_JWT=false`); the functions that need a user check the token themselves (D-053).
+2. **Web:** `./scripts/deploy-web.sh` (`--dry-run` shows the changes first).
+   - It builds with `.env.production` or, when that file is absent, the `EXPO_PUBLIC_*` environment variables, then publishes to the VPS.
+   - `EXPO_PUBLIC_SUPABASE_URL=https://travelist.live`, and `EXPO_PUBLIC_SUPABASE_ANON_KEY` is the `ANON_KEY` of the VPS's `.env`.
+   - It sets `EXPO_NO_DOTENV=1` and passes `--clear`. Otherwise Expo loads the local `.env` and Metro reuses modules inlined with the local URL.
+   - The Apache vhosts are in `deploy/apache/`:
+     - static export rewrites: `/sign-in` → `sign-in.html`, `/city/<slug>` → `city/[slug].html`, …;
+     - the API proxy;
+     - HTTP → HTTPS;
+     - Let's Encrypt via `certbot --apache`.
+3. **iOS / Android:** set `EXPO_PUBLIC_*` as EAS environment variables, then run `npx eas-cli build --profile production -p ios|android` and `npx eas-cli submit`.
 
 ### Continuous deployment
 
@@ -861,30 +892,37 @@ Rulesets enforce it: `dev` accepts changes only through pull requests with the C
 
 `.github/workflows/deploy.yml` (D-074) jobs, in order; a failing one stops the rest, and deploys queue instead of overlapping:
 
-1. **backend** — `scripts/deploy-backend.sh`: `supabase db push --include-seed` (new migrations; seed files whose content changed, all upserts) and `functions deploy` of every `supabase/functions/<name>/index.ts` with the import map.
+1. **backend** — `scripts/deploy-backend.sh` over SSH:
+   - `supabase db push --include-seed` through a tunnel: new migrations, plus seed files whose content changed (all upserts);
+   - the Edge Functions copied into the self-hosted stack (D-082).
 2. **web** — `scripts/deploy-web.sh`: Expo static export with the `EXPO_PUBLIC_*` variables, refuses to publish a bundle without the production Supabase URL, `rsync --delete` to `/var/www/travelist` on the VPS.
-3. **smoke** — `https://travelist.live/` and `<supabase>/functions/v1/health` answer 200 (5 retries).
+3. **smoke** — `https://travelist.live/` and `https://travelist.live/functions/v1/health` answer 200 (5 retries).
 
 Setup, once: environment **`release`** with required reviewers (the people who approve releases; deployments from `main` only) and the secret `RELEASE_DEPLOY_KEY` (private key of a repository deploy key with write access), and environment **`production`** (deployments from `main` only) with:
 
-| Kind     | Name                                                                                                                                                                                            | Value                                                                                            |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Secret   | `SUPABASE_ACCESS_TOKEN`                                                                                                                                                                         | Personal access token (supabase.com → Account → Access Tokens)                                   |
-| Secret   | `SUPABASE_DB_PASSWORD`                                                                                                                                                                          | Database password of the hosted project                                                          |
-| Secret   | `VPS_SSH_KEY`                                                                                                                                                                                   | Private key of a deploy-only key pair whose public key is in the VPS's `authorized_keys`         |
-| Variable | `VPS_HOST` · `VPS_USER` · `VPS_KNOWN_HOSTS`                                                                                                                                                     | VPS address, SSH user (owner of `/var/www/travelist`), output of `ssh-keyscan -t ed25519 <host>` |
-| Variable | `SUPABASE_PROJECT_REF`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_MAP_STYLE_URL`, `EXPO_PUBLIC_WEB_URL`, `EXPO_PUBLIC_AUTH_PROVIDERS` (optional: feature flags) | Same values as `.env.production` (public: they end up in the bundle)                             |
+| Kind     | Name                                                                                                                                                                    | Value                                                                                            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Secret   | `SUPABASE_DB_PASSWORD`                                                                                                                                                  | `POSTGRES_PASSWORD` of the self-hosted stack (`/opt/travelist-supabase/docker/.env`)             |
+| Secret   | `VPS_SSH_KEY`                                                                                                                                                           | Private key of a deploy-only key pair whose public key is in the VPS's `authorized_keys`         |
+| Variable | `VPS_HOST` · `VPS_USER` · `VPS_KNOWN_HOSTS`                                                                                                                             | VPS address, SSH user (owner of `/var/www/travelist`), output of `ssh-keyscan -t ed25519 <host>` |
+| Variable | `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_MAP_STYLE_URL`, `EXPO_PUBLIC_WEB_URL`, `EXPO_PUBLIC_AUTH_PROVIDERS` (optional: feature flags) | Same values as `.env.production` (public: they end up in the bundle)                             |
 
-Not automated: Supabase secrets and Auth settings (steps 2–3, rarely change), `config.toml` (never pushed), Apache vhosts (`deploy/apache/`), iOS / Android builds.
+Not automated:
 
-**Applying an Apache vhost change** (e.g. D-081's Markdown negotiation): deploy the web build first, then copy `deploy/apache/travelist.live-le-ssl.conf` to `/etc/apache2/sites-available/` on the VPS and run `sudo apache2ctl configtest && sudo systemctl reload apache2`. It needs `mod_rewrite`, `mod_headers` and `mod_negotiation` (enabled by default on Ubuntu). Then check with `node scripts/check-agent-readiness.mjs https://travelist.live`. To try the vhost locally, serve `apps/mobile/dist` with an `ubuntu:24.04` + `apache2` container, using the conf without its SSL lines.
+- installing or upgrading the self-hosted stack (`scripts/install-supabase-vps.sh`) and its secrets;
+- `config.toml` (local only);
+- the Apache vhosts (`deploy/apache/`);
+- iOS / Android builds.
+
+**Applying an Apache vhost change** (e.g. D-081's Markdown negotiation): deploy the web build first, then copy `deploy/apache/travelist.live-le-ssl.conf` to `/etc/apache2/sites-available/` on the VPS and run `sudo apache2ctl configtest && sudo systemctl reload apache2`. It needs `mod_rewrite`, `mod_headers`, `mod_negotiation`, `mod_proxy` and `mod_proxy_http` (enabled on the VPS; `upgrade=websocket` needs Apache 2.4.47+). Then check with `node scripts/check-agent-readiness.mjs https://travelist.live`. To try the vhost locally, serve `apps/mobile/dist` with an `ubuntu:24.04` + `apache2` container, using the conf without its SSL lines.
 
 ## Scripts (root)
 
 | Command                                        | What it does                                                                                              |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `./run-project.sh` / `--stop`                  | Run everything locally in one command (see _Quick start_) / stop the Supabase stack                       |
-| `./scripts/deploy-backend.sh [--dry-run]`      | Push migrations + seeds and deploy every Edge Function to the hosted project (D-074)                      |
+| `./scripts/deploy-backend.sh [--dry-run]`      | Push migrations + seeds and publish every Edge Function to the self-hosted Supabase on the VPS (D-082)    |
+| `./scripts/install-supabase-vps.sh`            | Install or upgrade the self-hosted Supabase stack on the VPS (D-082)                                      |
 | `./scripts/deploy-web.sh [--dry-run]`          | Build the web app for production and rsync it to the VPS (D-073)                                          |
 | `pnpm dev`                                     | Start the Expo dev server                                                                                 |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test`   | Run across all workspaces via Turborepo                                                                   |
@@ -907,7 +945,7 @@ After editing `packages/shared`, run `pnpm sync:shared` (CI fails when the copy 
 
 ## Environment variables
 
-See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, OAuth secrets) are only for Edge Functions / Supabase Auth: set them with `supabase secrets set` or in the dashboard for hosted projects. `EXPO_PUBLIC_AUTH_PROVIDERS=google,apple` shows the OAuth buttons once the providers are enabled in Supabase. `EXPO_PUBLIC_WEB_URL` (optional, e.g. `https://wayfarer.app`) is the public web address used in shared walk-list links, so a link shared from iOS/Android opens in any browser; empty, the app's own link is shared. `EXPO_PUBLIC_FEATURE_WALK_CHAT` / `EXPO_PUBLIC_FEATURE_PAID_PLANS` (`true` to show; empty = hidden, D-065) bring back the walk group chat and the paid plans UI; e2e specs read the same variables (`builtWith`). Email (D-066): `RESEND_API_KEY` (production) or `MAILPIT_URL` (local), `EMAIL_FROM`, `SEND_EMAIL_HOOK_SECRET` (also read by `config.toml`), `AUTH_PUBLIC_URL` (local only), `APP_URL`; the functions refuse to start without a provider.
+See [.env.example](./.env.example). Only `EXPO_PUBLIC_*` values reach the app, and they are validated at startup (`apps/mobile/src/lib/env.ts`). Secrets (`ORS_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, OAuth secrets) are only for Edge Functions / Supabase Auth: set them in `supabase/functions/.env` locally, or in `/opt/travelist-supabase/docker/.env` on the VPS for production (D-082). `EXPO_PUBLIC_AUTH_PROVIDERS=google,apple` shows the OAuth buttons once the providers are enabled in Supabase. `EXPO_PUBLIC_WEB_URL` (optional, e.g. `https://wayfarer.app`) is the public web address used in shared walk-list links, so a link shared from iOS/Android opens in any browser; empty, the app's own link is shared. `EXPO_PUBLIC_FEATURE_WALK_CHAT` / `EXPO_PUBLIC_FEATURE_PAID_PLANS` (`true` to show; empty = hidden, D-065) bring back the walk group chat and the paid plans UI; e2e specs read the same variables (`builtWith`). Email (D-066): `RESEND_API_KEY` (production) or `MAILPIT_URL` (local), `EMAIL_FROM`, `SEND_EMAIL_HOOK_SECRET` (also read by `config.toml`), `AUTH_PUBLIC_URL` (local only), `APP_URL`; the functions refuse to start without a provider.
 
 ## Data pipeline
 
