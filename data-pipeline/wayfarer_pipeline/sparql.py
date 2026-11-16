@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterable, Iterator
+import time
+from collections.abc import Callable, Iterable, Iterator
 from typing import Any, Protocol
 
 ENDPOINT = "https://query.wikidata.org/sparql"
 ENTITY_PREFIX = "http://www.wikidata.org/entity/"
+# A query that times out while streaming answers 200 with a truncated body (Data refresh run
+# 41299514328), which the HTTP client does not retry; a later try usually completes.
+ATTEMPTS = 3
+RETRY_WAIT_S = 30.0
 
 
 class WikidataClient(Protocol):
@@ -16,8 +21,24 @@ class WikidataClient(Protocol):
     def request(self, method: str, url: str, **kwargs: Any) -> tuple[int, str]: ...
 
 
-def run(client: WikidataClient, query: str) -> list[dict[str, str]]:
-    """Run a SELECT query; return bindings flattened to ``{var: value}`` (QIDs shortened)."""
+def run(
+    client: WikidataClient, query: str, *, sleep: Callable[[float], None] = time.sleep
+) -> list[dict[str, str]]:
+    """Run a SELECT query; return bindings flattened to ``{var: value}`` (QIDs shortened).
+
+    Example: ``run(client, "SELECT ?item { VALUES ?item { wd:Q1 } }") == [{"item": "Q1"}]``
+    """
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            return _parse(_post(client, query))
+        except RuntimeError:
+            if attempt == ATTEMPTS:
+                raise
+            sleep(RETRY_WAIT_S * attempt)
+    raise AssertionError("unreachable: the last attempt returns or raises")
+
+
+def _post(client: WikidataClient, query: str) -> str:
     _, text = client.request(
         "POST",
         ENDPOINT,
@@ -25,6 +46,10 @@ def run(client: WikidataClient, query: str) -> list[dict[str, str]]:
         data={"query": query},
         headers={"Accept": "application/sparql-results+json"},
     )
+    return text
+
+
+def _parse(text: str) -> list[dict[str, str]]:
     try:
         doc = json.loads(text)
     except json.JSONDecodeError as exc:  # WDQS returns a Java stack trace on timeouts
