@@ -38,9 +38,11 @@ class FakeHealthyProviders {
 }
 
 const today = new Date('2026-10-05T06:00:00Z');
+/** No pause before the retry: tests stay fast. */
+const noWait = { retryDelayMs: 0 };
 
 Deno.test('every provider answering in the expected shape passes', async () => {
-  const results = await runLiveChecks(new FakeHealthyProviders(), today);
+  const results = await runLiveChecks(new FakeHealthyProviders(), today, noWait);
   assertEquals(results.map((r) => [r.check, r.ok]), [
     ['weather.forecast', true],
     ['weather.climate', true],
@@ -53,7 +55,7 @@ Deno.test('a provider that fails or changed its answer is reported with the reas
   const providers = new FakeHealthyProviders();
   providers.fx = () => Promise.resolve(null);
   providers.advisory = () => Promise.reject(new Error('HTTP 503 from data.international.gc.ca'));
-  const failed = (await runLiveChecks(providers, today)).filter((r) => !r.ok);
+  const failed = (await runLiveChecks(providers, today, noWait)).filter((r) => !r.ok);
   assertEquals(failed, [
     { check: 'fx', ok: false, detail: 'EUR→USD: expected a positive rate, got null' },
     { check: 'advisory', ok: false, detail: 'HTTP 503 from data.international.gc.ca' },
@@ -74,10 +76,24 @@ Deno.test('a forecast without temperatures fails', async () => {
         weatherCode: null,
       }]),
   };
-  const [forecast] = await runLiveChecks(providers, today);
+  const [forecast] = await runLiveChecks(providers, today, noWait);
   assertEquals(forecast, {
     check: 'weather.forecast',
     ok: false,
     detail: 'expected days with a maximum temperature, got 1 day(s) without',
   });
+});
+
+// Regression: Open-Meteo timed out once (2026-11-16, run 43885327730) and answered 503 once
+// (2026-11-02), each time opening an issue for a source that worked a minute later.
+Deno.test('a provider that fails once and then answers passes', async () => {
+  const providers = new FakeHealthyProviders();
+  const healthy = providers.weather.forecast;
+  let calls = 0;
+  providers.weather = {
+    ...providers.weather,
+    forecast: (q) => ++calls === 1 ? Promise.reject(new Error('timeout')) : healthy(q),
+  };
+  const [forecast] = await runLiveChecks(providers, today, noWait);
+  assertEquals([forecast.ok, calls], [true, 2]);
 });

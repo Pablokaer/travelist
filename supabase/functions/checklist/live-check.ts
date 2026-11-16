@@ -14,6 +14,11 @@ export type LiveProviders = {
   advisory: AdvisoryProvider;
 };
 export type LiveCheckResult = { check: string; ok: boolean; detail: string };
+export type LiveCheckOptions = { retryDelayMs: number };
+
+// The free sources blip now and then (an Open-Meteo timeout on 2026-11-16, a 503 on 2026-11-02),
+// so a failed probe is tried once more after a pause before it counts as down.
+const DEFAULT_OPTIONS: LiveCheckOptions = { retryDelayMs: 30_000 };
 
 // Amsterdam, the Netherlands: a launch city every source covers.
 const PLACE = { lat: 52.37, lng: 4.9 };
@@ -53,7 +58,7 @@ async function advisoryProblem(p: LiveProviders): Promise<string | null> {
   return `${COUNTRY}: expected a level 0–3 advisory with a page, got ${JSON.stringify(advisory)}`;
 }
 
-async function runOne(
+async function probeOnce(
   check: string,
   probe: () => Promise<string | null>,
 ): Promise<LiveCheckResult> {
@@ -65,16 +70,31 @@ async function runOne(
   }
 }
 
+async function runOne(
+  check: string,
+  probe: () => Promise<string | null>,
+  { retryDelayMs }: LiveCheckOptions,
+): Promise<LiveCheckResult> {
+  const first = await probeOnce(check, probe);
+  if (first.ok) return first;
+  await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+  return probeOnce(check, probe);
+}
+
 /**
- * Probes every provider once, sequentially (the sources are free: stay polite).
+ * Probes every provider sequentially (the sources are free: stay polite), retrying a failure once.
  * @example (await runLiveChecks(realProviders(), new Date())).every((r) => r.ok)
  */
-export async function runLiveChecks(p: LiveProviders, today: Date): Promise<LiveCheckResult[]> {
+export async function runLiveChecks(
+  p: LiveProviders,
+  today: Date,
+  options: LiveCheckOptions = DEFAULT_OPTIONS,
+): Promise<LiveCheckResult[]> {
   return [
-    await runOne('weather.forecast', () => forecastProblem(p, today)),
-    await runOne('weather.climate', () => climateProblem(p, today)),
-    await runOne('fx', () => fxProblem(p)),
-    await runOne('advisory', () => advisoryProblem(p)),
+    await runOne('weather.forecast', () => forecastProblem(p, today), options),
+    await runOne('weather.climate', () => climateProblem(p, today), options),
+    await runOne('fx', () => fxProblem(p), options),
+    await runOne('advisory', () => advisoryProblem(p), options),
   ];
 }
 
