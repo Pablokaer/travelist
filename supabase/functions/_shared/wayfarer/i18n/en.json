@@ -15,7 +15,9 @@
   "tabs": {
     "explore": "Explore",
     "trips": "My Trips",
-    "profile": "Profile"
+    "profile": "Profile",
+    "plan": "Plan trip",
+    "futureTrips": "Future trips"
   },
   "auth": {
     "signInTitle": "Welcome back",
@@ -469,7 +471,10 @@
     "themeName": {
       "light": "Light",
       "dark": "Dark"
-    }
+    },
+    "avoidTitle": "Countries I do not want to visit",
+    "avoidNone": "None yet. You can rule countries out when you plan a trip.",
+    "avoidRemove": "Stop avoiding {{country}}"
   },
   "about": {
     "title": "About",
@@ -769,5 +774,181 @@
       "photos": "Photos from Wikimedia Commons: {{credits}}.",
       "map": "Map © OpenStreetMap contributors · OpenFreeMap."
     }
+  },
+  "plan": {
+    "title": "Plan your next trip",
+    "subtitle": "Answer a few questions, one at a time, and the AI proposes places that fit.",
+    "start": "Start",
+    "intro": "Tell us when you want to go, what weather and sights you dream of and how far you will travel. Only cities that really fit are proposed.",
+    "progress": "Question {{current}} of {{total}}",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Show my destinations",
+    "other": "Or type your own answer",
+    "otherPlaceholder": "Type your answer",
+    "distanceOther": "Or type a distance in km",
+    "loadingQuestion": "Thinking of the next question…",
+    "thinking": "Finding places that fit…",
+    "thinkingBody": "The AI is weighing your answers against the climate, distance and attractions of every city. This can take a moment.",
+    "originHere": "Use my location",
+    "originSearch": "Or search for a city",
+    "originFound": "Starting from {{place}}",
+    "typicalDay": "About {{amount}} a day for food and drinks (two cheap meals, a restaurant dinner, two beers)",
+    "originLocating": "Finding your position…",
+    "originNear": "Near {{city}}",
+    "originDenied": "Location access was not allowed. Allow it in your browser or device settings, or search for a city below.",
+    "originError": "Could not get your position ({{message}}). Search for a city below instead.",
+    "locating": "Finding you…",
+    "originNeeded": "Choose where you will start from.",
+    "dateNeeded": "Pick a day for the trip.",
+    "errorTitle": "Something went wrong",
+    "errorBody": "We could not prepare your destinations: {{message}}",
+    "tryAgain": "Try again",
+    "resultsTitle": "Where could you go?",
+    "resultsBody": "Tick the places that tempt you and save them to Future trips.",
+    "noResults": "No city fits all your answers",
+    "noResultsBody": "Try a longer distance, another month, fewer wishes or fewer countries ruled out.",
+    "startOver": "Start over",
+    "relaxed": "Few cities match the weather you asked for, so these are the closest fits.",
+    "byModel": "Chosen by the AI",
+    "byRules": "The AI is not available right now, so these are ranked by how well they match your answers.",
+    "km": "{{km}} km away",
+    "climate": "{{temp}} °C · {{sun}} h of sun a day · {{rain}} mm of rain",
+    "snowfall": "{{snow}} cm of snow",
+    "select": "Select {{city}}",
+    "selected": "{{city}} selected",
+    "saveSelected": "Save {{count}} to Future trips",
+    "savedTitle": "Saved to Future trips",
+    "saveError": "Could not save: {{message}}",
+    "q": {
+      "origin": {
+        "text": "Where will you travel from?"
+      },
+      "date": {
+        "text": "When would you like to travel?"
+      },
+      "length": {
+        "text": "How long is the trip?",
+        "opt": {
+          "weekend": "A long weekend (2–4 days)",
+          "week": "About a week",
+          "fortnight": "Two weeks",
+          "long": "Three weeks or more"
+        }
+      },
+      "distance": {
+        "text": "How far from home are you willing to go?",
+        "opt": {
+          "km-500": "Up to 500 km",
+          "km-1500": "Up to 1,500 km",
+          "km-4000": "Up to 4,000 km",
+          "km-8000": "Up to 8,000 km",
+          "any": "Anywhere in the world"
+        }
+      },
+      "weather": {
+        "text": "What weather are you hoping for?",
+        "opt": {
+          "sunny": "Sunny",
+          "warm": "Warm",
+          "hot": "Hot",
+          "mild": "Mild",
+          "cool": "Cool and fresh",
+          "rainy": "Rainy",
+          "snow": "Snow"
+        }
+      },
+      "attractions": {
+        "text": "What do you want to see and do?",
+        "opt": {
+          "beaches": "Beaches",
+          "castles": "Castles and palaces",
+          "history": "Old towns and history",
+          "museums": "Museums and art",
+          "nature": "Nature and parks",
+          "churches": "Churches and cathedrals",
+          "viewpoints": "Viewpoints"
+        }
+      },
+      "character": {
+        "text": "What kind of city do you picture?",
+        "opt": {
+          "ancient": "One of the oldest cities",
+          "big-city": "A big, lively city",
+          "small-quiet": "Small and quiet",
+          "tech": "A technology and innovation hub",
+          "food": "Food and nightlife"
+        }
+      },
+      "pace": {
+        "text": "What pace do you like on a trip?",
+        "opt": {
+          "relaxed": "Relaxed, few plans",
+          "balanced": "A bit of both",
+          "packed": "Packed, see everything"
+        }
+      },
+      "extra": {
+        "text": "Anything else the trip should have, or avoid?"
+      },
+      "avoid": {
+        "text": "Are there countries you do not want as options?"
+      }
+    },
+    "myLocation": "My location",
+    "countriesSearch": "Search a country",
+    "avoidedNone": "No country ruled out",
+    "rememberAvoid": "Remember these countries in my profile",
+    "avoidSaved": "Saved in your profile",
+    "searchCity": "Search a city",
+    "noCountries": "No city found for “{{query}}”."
+  },
+  "prices": {
+    "title": "Estimated prices in {{city}}",
+    "note": "Modelled estimates in euros, not live quotes: a reference basket scaled by the country's price level (World Bank). Only the Big Mac is a measured price, when The Economist's index has the country. Real prices vary by area and venue.",
+    "bigMacIndex": "Big Mac index",
+    "item": {
+      "beer": "Beer (0.5 L, bar or restaurant)",
+      "softDrink": "Coca-Cola (0.33 L, restaurant)",
+      "cocktail": "Cocktail",
+      "coffee": "Cappuccino",
+      "mealCheap": "Meal, inexpensive restaurant",
+      "mealMid": "Meal, mid-range restaurant (3 courses)",
+      "localDish": "Typical local dish",
+      "bigMac": "McDonald's Big Mac",
+      "transportTicket": "Public transport, one-way ticket",
+      "taxi5km": "Taxi or ride-hailing, about 5 km"
+    },
+    "budgetTitle": "Your day's budget",
+    "meals": "Meals per day",
+    "drinks": "Drinks per day",
+    "mealStyle": {
+      "budget": "Budget",
+      "restaurant": "Restaurant",
+      "local": "Local dish"
+    },
+    "drinkKind": {
+      "beer": "Beer",
+      "softDrink": "Soft drink",
+      "cocktail": "Cocktail",
+      "coffee": "Coffee"
+    },
+    "perDay": "About {{amount}} a day",
+    "breakdown": "Meals {{meals}} · Drinks {{drinks}}"
+  },
+  "futureTrips": {
+    "title": "Future trips",
+    "subtitle": "Destinations you saved from the trip planner.",
+    "empty": "No future trips yet",
+    "emptyBody": "Answer a few questions and pick the places that tempt you.",
+    "plan": "Plan your next trip",
+    "remove": "Remove {{city}} from future trips",
+    "plannedFor": "Planned for {{date}}",
+    "removeShort": "Remove"
+  },
+  "calendar": {
+    "chooseDate": "Choose a date",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
   }
 }

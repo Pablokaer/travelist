@@ -11,6 +11,19 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ## Unreleased
 
+### Added
+
+- **Plan trip** (D-085), ported from the TravelisHachtoberfest fork:
+  - An interview of ten questions, one at a time: where you start, the date, how long, how far, countries to avoid, weather, attractions, the kind of city, and two follow-ups written by the AI.
+  - A shortlist built by code within your distance and month, then ordered by **OpenAI** with a reason per city, and **"About €50 a day"** for food and drinks.
+  - Save the ones you like to the new **Future trips** tab. Countries ruled out can be kept in the profile.
+  - The model runs in the new `plan` Edge Function, which reads the key from the `OPENAI_API_KEY` variable (server-side only; optional `OPENAI_MODEL`, default `gpt-4.1-mini`). Without a key the planner asks fixed questions and ranks by score.
+- **Estimated prices** on every city page (D-084): a beer, a soft drink, a cocktail, a coffee, cheap and mid-range meals, a local dish, a Big Mac, a transport ticket and a 5 km ride, in euros, with a calculator for a day's meals and drinks. The prices are modelled from World Bank price levels and The Economist's Big Mac index, and the card says so.
+
+### Data
+
+- Monthly climate (Open-Meteo, 2022–2024), facts (population, founding year, beaches) and price estimates for all 198 cities: new pipeline commands `climate`, `facts` and `prices`, and new seeds `70_city_climate.sql`, `80_city_facts.sql` and `90_city_prices.sql` (D-084).
+
 ### Fixed
 
 - Scheduled pipelines no longer fail on one-off provider blips. The weekly live data source check now retries a failed probe once after 30 s before reporting it: a single Open-Meteo timeout (2026-11-16) and a single 503 (2026-11-02) had each opened a `data-source` issue for a source that was fine a minute later. The monthly Data refresh now retries a Wikidata query up to 3 times when the answer is cut off: on 2026-11-01 a query hit the Wikidata timeout mid-answer and the whole 50-minute refresh failed.

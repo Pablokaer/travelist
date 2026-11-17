@@ -19,6 +19,10 @@ export const env = {
   /** Injected by the Supabase edge runtime. */
   serviceRoleKey: (): string => required('SUPABASE_SERVICE_ROLE_KEY'),
   orsApiKey: (): string | undefined => optional('ORS_API_KEY'),
+  /** The trip planner's language model (D-085); unset: the planner's fixed questions only. */
+  openAiApiKey: (): string | undefined => optional('OPENAI_API_KEY'),
+  /** OpenAI model for the trip planner; unset: the function's default (gpt-4.1-mini). */
+  openAiModel: (): string | undefined => optional('OPENAI_MODEL'),
   /** Frankfurter-compatible base URL overriding the public Frankfurter instance. */
   exchangeRatesBaseUrl: (): string | undefined => optional('EXCHANGE_RATES_BASE_URL'),
   /** Email provider settings (D-066): Resend in production, Mailpit locally. */

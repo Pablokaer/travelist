@@ -72,6 +72,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "attractions_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     }
                   ]
                 },"cities": {
@@ -93,6 +99,99 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"city_climate": {
+                  Row: {
+                    "city_slug": string,"month": number,"precip_mm": number,"snowfall_cm": number,"sunshine_hours": number,"temp_max_c": number,"temp_mean_c": number
+                  }
+                  Insert: {
+                    "city_slug": string,"month": number,"precip_mm": number,"snowfall_cm": number,"sunshine_hours": number,"temp_max_c": number,"temp_mean_c": number
+                  }
+                  Update: {
+                    "city_slug"?: string,"month"?: number,"precip_mm"?: number,"snowfall_cm"?: number,"sunshine_hours"?: number,"temp_max_c"?: number,"temp_mean_c"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "city_climate_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "cities"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_climate_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_list"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_climate_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
+    }
+                  ]
+                },"city_facts": {
+                  Row: {
+                    "beach_count": number,"city_slug": string,"inception_year": number | null,"population": number | null
+                  }
+                  Insert: {
+                    "beach_count"?: number,"city_slug": string,"inception_year"?: number | null,"population"?: number | null
+                  }
+                  Update: {
+                    "beach_count"?: number,"city_slug"?: string,"inception_year"?: number | null,"population"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "city_facts_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "cities"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_facts_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "city_list"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_facts_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
+    }
+                  ]
+                },"city_prices": {
+                  Row: {
+                    "beer": number,"big_mac": number,"big_mac_is_real": boolean,"city_slug": string,"cocktail": number,"coffee": number,"currency": string,"local_dish": number,"meal_cheap": number,"meal_mid": number,"price_level": number,"retrieved_on": string,"soft_drink": number,"taxi_5km": number,"transport_ticket": number
+                  }
+                  Insert: {
+                    "beer": number,"big_mac": number,"big_mac_is_real"?: boolean,"city_slug": string,"cocktail": number,"coffee": number,"currency"?: string,"local_dish": number,"meal_cheap": number,"meal_mid": number,"price_level": number,"retrieved_on": string,"soft_drink": number,"taxi_5km": number,"transport_ticket": number
+                  }
+                  Update: {
+                    "beer"?: number,"big_mac"?: number,"big_mac_is_real"?: boolean,"city_slug"?: string,"cocktail"?: number,"coffee"?: number,"currency"?: string,"local_dish"?: number,"meal_cheap"?: number,"meal_mid"?: number,"price_level"?: number,"retrieved_on"?: string,"soft_drink"?: number,"taxi_5km"?: number,"transport_ticket"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "city_prices_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "cities"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_prices_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "city_list"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "city_prices_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: true
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
+    }
+                  ]
                 },"countries": {
                   Row: {
                     "ambulance_number": string | null,"calling_code": string | null,"code": string,"currency_codes": (string)[],"driving_side": string | null,"emergency_number": string | null,"fire_number": string | null,"frequency_hz": number | null,"is_eu": boolean,"is_schengen": boolean,"languages": (string)[],"name_en": string,"name_pt": string,"plug_types": (string)[],"police_number": string | null,"timezones": (string)[],"updated_at": string,"voltage": number | null
@@ -105,6 +204,37 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"future_trips": {
+                  Row: {
+                    "city_slug": string,"created_at": string,"planned_for": string | null,"reason": string | null,"user_id": string
+                  }
+                  Insert: {
+                    "city_slug": string,"created_at"?: string,"planned_for"?: string | null,"reason"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "city_slug"?: string,"created_at"?: string,"planned_for"?: string | null,"reason"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "future_trips_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "cities"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "future_trips_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_list"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "future_trips_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
+    }
                   ]
                 },"moderators": {
                   Row: {
@@ -155,6 +285,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "notable_people_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     }
                   ]
                 },"plans": {
@@ -197,13 +333,13 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "avatar_path": string | null,"created_at": string,"display_name": string | null,"home_country": string | null,"id": string,"language": string,"nickname": string | null,"onboarded_at": string | null,"passport_expiry": string | null,"public_id": string,"theme": string,"units": string,"updated_at": string,"welcome_email_sent_at": string | null
+                    "avatar_path": string | null,"avoid_countries": (string)[],"created_at": string,"display_name": string | null,"home_country": string | null,"id": string,"language": string,"nickname": string | null,"onboarded_at": string | null,"passport_expiry": string | null,"public_id": string,"theme": string,"units": string,"updated_at": string,"welcome_email_sent_at": string | null
                   }
                   Insert: {
-                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string | null,"home_country"?: string | null,"id": string,"language"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"passport_expiry"?: string | null,"public_id"?: string,"theme"?: string,"units"?: string,"updated_at"?: string,"welcome_email_sent_at"?: string | null
+                    "avatar_path"?: string | null,"avoid_countries"?: (string)[],"created_at"?: string,"display_name"?: string | null,"home_country"?: string | null,"id": string,"language"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"passport_expiry"?: string | null,"public_id"?: string,"theme"?: string,"units"?: string,"updated_at"?: string,"welcome_email_sent_at"?: string | null
                   }
                   Update: {
-                    "avatar_path"?: string | null,"created_at"?: string,"display_name"?: string | null,"home_country"?: string | null,"id"?: string,"language"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"passport_expiry"?: string | null,"public_id"?: string,"theme"?: string,"units"?: string,"updated_at"?: string,"welcome_email_sent_at"?: string | null
+                    "avatar_path"?: string | null,"avoid_countries"?: (string)[],"created_at"?: string,"display_name"?: string | null,"home_country"?: string | null,"id"?: string,"language"?: string,"nickname"?: string | null,"onboarded_at"?: string | null,"passport_expiry"?: string | null,"public_id"?: string,"theme"?: string,"units"?: string,"updated_at"?: string,"welcome_email_sent_at"?: string | null
                   }
                   Relationships: [
                     {
@@ -255,6 +391,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "reviews_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     },{
       foreignKeyName: "reviews_trip_id_fkey"
       columns: ["trip_id"]
@@ -399,6 +541,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "trips_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     }
                   ]
                 },"visa_requirements": {
@@ -478,6 +626,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "attractions_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     }
                   ]
                 },"attraction_rating_summary": {
@@ -497,6 +651,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "city_list"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "attractions_city_slug_fkey"
+      columns: ["city_slug"]
+isOneToOne: false
+      referencedRelation: "city_profiles"
+      referencedColumns: ["city_slug"]
     }
                   ]
                 },"city_list": {
@@ -511,6 +671,13 @@ isOneToOne: false
       referencedRelation: "countries"
       referencedColumns: ["code"]
     }
+                  ]
+                },"city_profiles": {
+                  Row: {
+                    "attraction_count": number | null,"castle_count": number | null,"church_count": number | null,"city_slug": string | null,"landmark_count": number | null,"monument_count": number | null,"museum_count": number | null,"nature_count": number | null,"palace_count": number | null,"park_count": number | null,"unesco_count": number | null,"viewpoint_count": number | null
+                  }
+                  Relationships: [
+                    
                   ]
                 },"rating_summary": {
                   Row: {

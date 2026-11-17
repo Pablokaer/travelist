@@ -10,6 +10,13 @@ python -m wayfarer_pipeline attraction-texts --region europe | --city lisbon | -
 python -m wayfarer_pipeline people --region europe | --city lisbon | --all  # D-071
                                                # → data/people → 50_people.sql
 python -m wayfarer_pipeline visa               # passport-index → data/visa.csv → 30_visa.sql
+python -m wayfarer_pipeline climate --city lisbon | --all [--refresh]  # D-084
+                                               # Open-Meteo normals → data/climate → 70_city_climate
+python -m wayfarer_pipeline facts --city lisbon | --all [--refresh]  # D-084
+                                               # population, founding year, OSM beaches
+                                               # → data/facts → 80_city_facts.sql
+python -m wayfarer_pipeline prices --city lisbon | --all [--refresh]  # D-084
+                                               # Big Mac index + World Bank levels → 90_city_prices
 python -m wayfarer_pipeline ingest --city lisbon | --all [--jobs 3]  # → data/attractions → 40
 python -m wayfarer_pipeline report             # quality report from committed attraction files
 python -m wayfarer_pipeline seed               # regenerate every seed file, no network
@@ -24,7 +31,18 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from . import attraction_texts, city_summaries, countries, coverage, regions, seed, visa
+from . import (
+    attraction_texts,
+    city_data_commands,
+    city_summaries,
+    climate,
+    countries,
+    coverage,
+    regions,
+    seed,
+    seed_city_data,
+    visa,
+)
 from .attractions import pipeline
 from .config import DEFAULT_CITIES_FILE, CitiesConfig, load_cities
 from .gates.baseline import GitBaseline
@@ -162,6 +180,18 @@ def _cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_climate(args: argparse.Namespace) -> int:
+    return city_data_commands.cmd_climate(args, _client(args))
+
+
+def _cmd_facts(args: argparse.Namespace) -> int:
+    return city_data_commands.cmd_facts(args, _client(args))
+
+
+def _cmd_prices(args: argparse.Namespace) -> int:
+    return city_data_commands.cmd_prices(args, _client(args))
+
+
 def _cmd_seed(args: argparse.Namespace) -> int:
     config = load_cities(args.config)
     paths = [
@@ -171,7 +201,15 @@ def _cmd_seed(args: argparse.Namespace) -> int:
         seed.write_visa(),
     ]
     path, warnings = seed.write_attractions()
-    paths.extend([path, seed.write_people()])
+    paths.extend(
+        [
+            path,
+            seed.write_people(),
+            seed_city_data.write_climate(),
+            seed_city_data.write_facts(),
+            seed_city_data.write_prices(),
+        ]
+    )
     for w in warnings:
         print(f"WARNING: {w}")
     for p in paths:
@@ -224,6 +262,27 @@ def _add_city_selection(command: argparse.ArgumentParser, required: bool) -> Non
         target.add_argument("--all", action="store_true", help="all cities")
 
 
+def _add_city_data_commands(sub: argparse._SubParsersAction) -> None:
+    """``climate``, ``facts`` and ``prices`` (D-084): per-city snapshots → seeds 70, 80, 90."""
+    for name, func, what in (
+        ("climate", _cmd_climate, "monthly climate normals (Open-Meteo) → data/climate → 70"),
+        ("facts", _cmd_facts, "population, founding year, beaches → data/facts → 80"),
+        ("prices", _cmd_prices, "estimated everyday prices (Big Mac index, World Bank) → 90"),
+    ):
+        command = sub.add_parser(name, help=what)
+        _add_city_selection(command, required=True)
+        command.add_argument("--refresh", action="store_true", help="fetch cities already done")
+        command.add_argument("--shard", help="K/N: every Nth city from the Kth, to run N at once")
+        if name == "climate":
+            command.add_argument(
+                "--first-year",
+                type=int,
+                default=climate.FIRST_YEAR,
+                help="first year of the window (Open-Meteo's free quota weighs days)",
+            )
+        command.set_defaults(func=func)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="wayfarer-pipeline")
     parser.add_argument("--config", type=Path, default=DEFAULT_CITIES_FILE)
@@ -266,6 +325,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("report", help="attraction quality report").set_defaults(func=_cmd_report)
     sub.add_parser("seed", help="regenerate all seed SQL offline").set_defaults(func=_cmd_seed)
+    _add_city_data_commands(sub)
 
     gate = sub.add_parser("gate", help="compare data/ with a git ref: restore or block (D-042)")
     gate.add_argument("--base", default="origin/main", help="git ref with the trusted data")

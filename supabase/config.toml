@@ -453,6 +453,10 @@ verify_jwt = true
 [functions.route-optimize]
 verify_jwt = true
 
+# The trip planner's language model (D-085): OpenAI, with the server's OPENAI_API_KEY.
+[functions.plan]
+verify_jwt = true
+
 # Sends the signed-in user's welcome email once (D-066).
 [functions.welcome-email]
 verify_jwt = true

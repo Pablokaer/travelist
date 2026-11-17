@@ -8,8 +8,8 @@
 #
 # Needs: the SSH host alias `travelist-vps` (as deploy-web.sh). The first run generates every
 # secret on the VPS (upstream utils/generate-keys.sh) into /opt/travelist-supabase/docker/.env,
-# which never leaves the server; later runs keep them. Fill RESEND_API_KEY, EMAIL_FROM and
-# ORS_API_KEY in that file, then re-run (README → "Self-hosted Supabase").
+# which never leaves the server; later runs keep them. Fill RESEND_API_KEY, EMAIL_FROM,
+# ORS_API_KEY and OPENAI_API_KEY in that file, then re-run (README → "Self-hosted Supabase").
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -81,6 +81,8 @@ add_env SEND_EMAIL_HOOK_SECRET "v1,whsec_$(openssl rand -base64 32)"
 add_env RESEND_API_KEY ''
 add_env EMAIL_FROM ''
 add_env ORS_API_KEY ''
+add_env OPENAI_API_KEY ''
+add_env OPENAI_MODEL ''
 
 docker compose pull --quiet
 docker compose up -d --remove-orphans

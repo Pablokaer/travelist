@@ -15,7 +15,9 @@
   "tabs": {
     "explore": "Explorar",
     "trips": "As minhas viagens",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "plan": "Planear",
+    "futureTrips": "Viagens futuras"
   },
   "auth": {
     "signInTitle": "Bem-vindo de volta",
@@ -469,7 +471,10 @@
     "themeName": {
       "light": "Claro",
       "dark": "Escuro"
-    }
+    },
+    "avoidTitle": "Países que não quero visitar",
+    "avoidNone": "Ainda nenhum. Pode excluir países ao planear uma viagem.",
+    "avoidRemove": "Deixar de evitar {{country}}"
   },
   "about": {
     "title": "Sobre",
@@ -680,5 +685,181 @@
     "bornAndDiedHere": "Nasceu e morreu aqui",
     "photoCredit": "Foto: {{author}} · {{license}}",
     "credit": "Pessoas que nasceram ou morreram na cidade, das mais conhecidas para as menos. Dados do Wikidata (CC0); fotos da Wikimedia Commons."
+  },
+  "plan": {
+    "title": "Planear a próxima viagem",
+    "subtitle": "Responda a algumas perguntas, uma de cada vez, e a IA propõe lugares que combinam consigo.",
+    "start": "Começar",
+    "intro": "Diga-nos quando quer ir, com que tempo e que visitas sonha e até onde viajará. Só são propostas cidades que realmente servem.",
+    "progress": "Pergunta {{current}} de {{total}}",
+    "back": "Voltar",
+    "next": "Seguinte",
+    "finish": "Mostrar os meus destinos",
+    "other": "Ou escreva a sua resposta",
+    "otherPlaceholder": "Escreva a sua resposta",
+    "distanceOther": "Ou escreva uma distância em km",
+    "loadingQuestion": "A pensar na pergunta seguinte…",
+    "thinking": "A procurar lugares que combinem…",
+    "thinkingBody": "A IA está a comparar as suas respostas com o clima, a distância e as atrações de cada cidade. Pode demorar um momento.",
+    "originHere": "Usar a minha localização",
+    "originSearch": "Ou pesquise uma cidade",
+    "originFound": "A partir de {{place}}",
+    "typicalDay": "Cerca de {{amount}} por dia em comida e bebidas (duas refeições económicas, um jantar de restaurante, duas cervejas)",
+    "originLocating": "A procurar a sua posição…",
+    "originNear": "Perto de {{city}}",
+    "originDenied": "O acesso à localização não foi permitido. Permita-o no navegador ou nas definições do dispositivo, ou pesquise uma cidade abaixo.",
+    "originError": "Não foi possível obter a sua posição ({{message}}). Pesquise antes uma cidade abaixo.",
+    "locating": "A localizá-lo…",
+    "originNeeded": "Escolha o ponto de partida.",
+    "dateNeeded": "Escolha um dia para a viagem.",
+    "errorTitle": "Algo correu mal",
+    "errorBody": "Não foi possível preparar os seus destinos: {{message}}",
+    "tryAgain": "Tentar novamente",
+    "resultsTitle": "Para onde poderia ir?",
+    "resultsBody": "Assinale os lugares que o tentam e guarde-os em Viagens futuras.",
+    "noResults": "Nenhuma cidade serve todas as suas respostas",
+    "noResultsBody": "Experimente uma distância maior, outro mês, menos desejos ou menos países excluídos.",
+    "startOver": "Recomeçar",
+    "relaxed": "Poucas cidades têm o tempo que pediu, por isso estas são as que mais se aproximam.",
+    "byModel": "Escolhido pela IA",
+    "byRules": "A IA não está disponível de momento, por isso estas estão ordenadas pela correspondência com as suas respostas.",
+    "km": "a {{km}} km",
+    "climate": "{{temp}} °C · {{sun}} h de sol por dia · {{rain}} mm de chuva",
+    "snowfall": "{{snow}} cm de neve",
+    "select": "Selecionar {{city}}",
+    "selected": "{{city}} selecionada",
+    "saveSelected": "Guardar {{count}} em Viagens futuras",
+    "savedTitle": "Guardado em Viagens futuras",
+    "saveError": "Não foi possível guardar: {{message}}",
+    "q": {
+      "origin": {
+        "text": "De onde vai partir?"
+      },
+      "date": {
+        "text": "Quando gostaria de viajar?"
+      },
+      "length": {
+        "text": "Quanto tempo dura a viagem?",
+        "opt": {
+          "weekend": "Um fim de semana prolongado (2–4 dias)",
+          "week": "Cerca de uma semana",
+          "fortnight": "Duas semanas",
+          "long": "Três semanas ou mais"
+        }
+      },
+      "distance": {
+        "text": "Até onde está disposto a ir a partir de casa?",
+        "opt": {
+          "km-500": "Até 500 km",
+          "km-1500": "Até 1500 km",
+          "km-4000": "Até 4000 km",
+          "km-8000": "Até 8000 km",
+          "any": "Qualquer ponto do mundo"
+        }
+      },
+      "weather": {
+        "text": "Que tempo espera encontrar?",
+        "opt": {
+          "sunny": "Sol",
+          "warm": "Quente",
+          "hot": "Muito calor",
+          "mild": "Ameno",
+          "cool": "Fresco",
+          "rainy": "Chuva",
+          "snow": "Neve"
+        }
+      },
+      "attractions": {
+        "text": "O que quer ver e fazer?",
+        "opt": {
+          "beaches": "Praias",
+          "castles": "Castelos e palácios",
+          "history": "Centros históricos",
+          "museums": "Museus e arte",
+          "nature": "Natureza e parques",
+          "churches": "Igrejas e catedrais",
+          "viewpoints": "Miradouros"
+        }
+      },
+      "character": {
+        "text": "Que tipo de cidade imagina?",
+        "opt": {
+          "ancient": "Uma das cidades mais antigas",
+          "big-city": "Uma cidade grande e animada",
+          "small-quiet": "Pequena e sossegada",
+          "tech": "Um polo de tecnologia e inovação",
+          "food": "Gastronomia e vida noturna"
+        }
+      },
+      "pace": {
+        "text": "Que ritmo prefere numa viagem?",
+        "opt": {
+          "relaxed": "Calmo, com poucos planos",
+          "balanced": "Um pouco de cada",
+          "packed": "Intenso, ver tudo"
+        }
+      },
+      "extra": {
+        "text": "Mais alguma coisa que a viagem deva ter, ou evitar?"
+      },
+      "avoid": {
+        "text": "Há países que não quer como opção?"
+      }
+    },
+    "myLocation": "A minha localização",
+    "countriesSearch": "Pesquisar um país",
+    "avoidedNone": "Nenhum país excluído",
+    "rememberAvoid": "Guardar estes países no meu perfil",
+    "avoidSaved": "Guardado no seu perfil",
+    "searchCity": "Procurar uma cidade",
+    "noCountries": "Nenhuma cidade encontrada para “{{query}}”."
+  },
+  "prices": {
+    "title": "Preços estimados em {{city}}",
+    "note": "Estimativas modeladas em euros, não cotações em tempo real: uma cesta de referência ajustada ao nível de preços do país (Banco Mundial). Só o Big Mac é um preço medido, quando o índice da The Economist tem o país. Os preços reais variam conforme a zona e o estabelecimento.",
+    "bigMacIndex": "índice Big Mac",
+    "item": {
+      "beer": "Cerveja (0,5 L, bar ou restaurante)",
+      "softDrink": "Coca-Cola (0,33 L, restaurante)",
+      "cocktail": "Cocktail",
+      "coffee": "Cappuccino",
+      "mealCheap": "Refeição, restaurante económico",
+      "mealMid": "Refeição, restaurante intermédio (3 pratos)",
+      "localDish": "Prato típico local",
+      "bigMac": "Big Mac do McDonald's",
+      "transportTicket": "Transportes públicos, bilhete simples",
+      "taxi5km": "Táxi ou transporte por aplicação, cerca de 5 km"
+    },
+    "budgetTitle": "O orçamento do seu dia",
+    "meals": "Refeições por dia",
+    "drinks": "Bebidas por dia",
+    "mealStyle": {
+      "budget": "Económica",
+      "restaurant": "Restaurante",
+      "local": "Prato típico"
+    },
+    "drinkKind": {
+      "beer": "Cerveja",
+      "softDrink": "Refrigerante",
+      "cocktail": "Cocktail",
+      "coffee": "Café"
+    },
+    "perDay": "Cerca de {{amount}} por dia",
+    "breakdown": "Refeições {{meals}} · Bebidas {{drinks}}"
+  },
+  "futureTrips": {
+    "title": "Viagens futuras",
+    "subtitle": "Destinos que guardou no planeador de viagens.",
+    "empty": "Ainda não tem viagens futuras",
+    "emptyBody": "Responda a algumas perguntas e escolha os lugares que o tentam.",
+    "plan": "Planear a próxima viagem",
+    "remove": "Retirar {{city}} das viagens futuras",
+    "plannedFor": "Prevista para {{date}}",
+    "removeShort": "Retirar"
+  },
+  "calendar": {
+    "chooseDate": "Escolher uma data",
+    "previousMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte"
   }
 }
