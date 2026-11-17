@@ -707,3 +707,47 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - Calling the reusable workflow at the release SHA: rejected, because `uses:` cannot take an expression.
   - Keeping `uses: ./…` and redeploying by hand after each release that changes the deploy: rejected, because it leaves a red release and needs a manual step.
 - **Trade-offs:** the deploy is now a separate run, linked from Promote, instead of a nested job, and the Promote job's runner waits for the whole deploy.
+
+## D-084 — City climate, facts and price estimates, ported from the TravelisHachtoberfest fork
+
+- **Context:** the owner asked for two features of the `Pablokaer/TravelisHachtoberfest` fork: the card that shows what drinks and meals cost in a city, and the AI trip planner (D-085). Both read reference data this repository did not have: monthly climate, a few facts per city, and price estimates. The fork has the same 198 cities, so its data applies as it is.
+- **Decision:**
+  - Bring over the pipeline commands that make this data, without the fork's local city builder: `climate` (Open-Meteo normals), `facts` (Wikidata population and founding year, OpenStreetMap beaches) and `prices`.
+  - The committed snapshots go in `data/climate`, `data/facts` and `data/prices`, and `seed` writes them into `70_city_climate.sql`, `80_city_facts.sql` and `90_city_prices.sql`. Regenerated offline here, they are byte-identical to the fork's seeds.
+  - New public, read-only tables `city_climate`, `city_facts` and `city_prices`, plus the view `city_profiles` (attraction counts per category).
+  - The prices are **modelled, not measured**, as the fork decided (its D-088): a reference basket of ten items (`data/price_basket.yaml`, assumed US prices) scaled by the country's World Bank price level and converted to euros. The Big Mac is The Economist index's real price wherever the index has the country.
+  - The city page shows the prices, clearly marked as estimates, with a calculator for a day of meals and drinks (sliders, meal style, kind of drink).
+- **Alternatives:**
+  - Per-city price sources (Numbeo, Expatistan): rejected, since they need a paid key or scraping against their terms.
+  - Asking the language model for prices: rejected, since it would invent them.
+  - Copying only the seeds: rejected, since generated files must come from the pipeline (CLAUDE.md), so the commands came too.
+- **Trade-offs:**
+  - Every city of a country shares one price factor (Porto equals Lisbon), in euros at the rate of the day the data was generated.
+  - Climate is a monthly average from a 25 km reanalysis, good for comparing cities and months, not as a forecast.
+  - The fork's `--local` mode (cities built on demand) is not ported.
+
+## D-085 — The trip planner asks OpenAI through an Edge Function
+
+- **Context:** the fork's "Plan your next trip" asks the traveller one question at a time, shortlists cities by code, and has a local Ollama model write the last follow-up questions and a reason for each proposed city. The owner wants the same planner here, without running a model locally: the requests go to the OpenAI API, and the key is supplied as a variable.
+- **Decision:**
+  - The planner's app code is ported as it is:
+    - the interview, with eight fixed questions and two written by the model;
+    - the shortlist in `packages/shared` (`trip-planning.ts`), where distance, the month's climate and the avoided countries are hard limits applied by code, never by the model;
+    - **Future trips** (`future_trips`, owner-only);
+    - the countries to avoid, kept in `profiles.avoid_countries`.
+  - The model sits behind a new Edge Function `plan`, which ports the fork's `plan.py` to Deno:
+    - `POST /functions/v1/plan/question` writes the next question;
+    - `POST /functions/v1/plan/rank` orders the shortlist with a reason per city;
+    - it calls OpenAI's Chat Completions with **strict Structured Outputs** (a JSON schema), and the code then checks every answer: lengths, 3–6 distinct options, no repeated question, only candidate slugs, and no number of 100 or more that is not in the city's facts;
+    - an invalid answer is asked again twice, with the problem fed back, before the function answers `503 plan_unavailable`.
+  - The key is `OPENAI_API_KEY`, a server-side secret (`supabase/functions/.env` locally; the VPS's `/opt/travelist-supabase/docker/.env` in production, passed to the functions container by `docker-compose.travelist.yml`). It is never an `EXPO_PUBLIC_` variable, so it never reaches the browser. `OPENAI_MODEL` picks the model; the default is `gpt-4.1-mini`.
+  - The function needs a signed-in user, so anonymous callers cannot spend the key. Without a key, or when OpenAI fails, the app asks its fixed follow-up questions and ranks by score, exactly as the fork does without Ollama.
+- **Alternatives:**
+  - Calling OpenAI from the app with the key in an `EXPO_PUBLIC_` variable: rejected, because the key would ship in the web bundle for anyone to copy.
+  - Keeping the fork's local Ollama service: rejected by the owner, who does not want to run the model locally.
+  - Letting the model choose cities freely: rejected, because it invents places and ignores distance, so code shortlists and the model only orders and explains.
+- **Trade-offs:**
+  - Each interview costs two to three OpenAI calls (plus retries), billed to the key's account.
+  - The answers and the shortlisted cities' facts are sent to OpenAI; no name, email or position is included, but the origin's distance to each city is.
+  - There is no per-user rate limit yet.
+  - The fork's "search any city of the world" for the starting point needed its local city builder, so the start is the device's location or one of the app's cities.

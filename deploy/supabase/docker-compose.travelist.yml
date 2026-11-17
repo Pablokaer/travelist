@@ -68,6 +68,9 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
       ORS_API_KEY: ${ORS_API_KEY:-}
+      # Trip planner's language model (D-085); empty: fixed questions, ranking by score.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
       # SUPABASE_URL is the internal gateway; links in emails need the public address.
       AUTH_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       APP_URL: ${SITE_URL}

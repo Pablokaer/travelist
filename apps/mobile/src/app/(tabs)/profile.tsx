@@ -18,8 +18,10 @@ import {
   countryName,
   useCountries,
   useProfile,
+  useSaveAvoidedCountries,
   useUpdatePreferences,
 } from '@/features/profile/api';
+import { AvoidedCountriesSection } from '@/features/profile/avoided-countries-section';
 import { formatDate } from '@/lib/format';
 import { spacing } from '@/theme/colors';
 import { useBreakpoint, useTheme } from '@/theme/use-theme';
@@ -33,6 +35,7 @@ export default function ProfileScreen() {
   const profile = useProfile();
   const countries = useCountries();
   const update = useUpdatePreferences();
+  const saveAvoided = useSaveAvoidedCountries();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -161,6 +164,14 @@ export default function ProfileScreen() {
           </View>
         </Section>
       </View>
+
+      {p ? (
+        <AvoidedCountriesSection
+          codes={p.avoidCountries}
+          nameOf={name}
+          onChange={(codes) => saveAvoided.mutate(codes)}
+        />
+      ) : null}
 
       <SubscriptionSection />
 

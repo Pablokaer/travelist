@@ -235,6 +235,22 @@ Every page of the static export has its own title, description, canonical URL an
 - **Verified:** a web build pointing at it shows the six destination cards with photos. Sign-up, sign-in, RLS reads, `my_subscription`, the `checklist` function, `health` and the Realtime WebSocket (101) all work.
 - **Open:** fill `RESEND_API_KEY` in the VPS's `.env`; without it, sign-in codes and password-reset emails fail. Import the Cloud project's users and lists once the owner restores it. Copy the backups off the VPS.
 
+## 2026-11-17 — Trip planner with OpenAI and city price estimates (D-084, D-085)
+
+- **Why:** the owner asked to bring two features over from the `TravelisHachtoberfest` fork: the card with what drinks and meals cost, and the AI that helps choose where to travel, calling the OpenAI API instead of a local model.
+- **Done:**
+  - City data: the pipeline's `climate`, `facts` and `prices` commands, the snapshots of all 198 cities, and seeds `70`–`90` (identical to the fork's). Tables `city_climate`, `city_facts` and `city_prices`, and the view `city_profiles`.
+  - City page: **Estimated prices** card with the day's budget calculator.
+  - **Plan trip** tab: interview, shortlist by code and ranking by the model. **Future trips** tab (`future_trips`), and countries to avoid in the profile (`profiles.avoid_countries`).
+  - New `plan` Edge Function: OpenAI Chat Completions with strict JSON schemas and every answer checked by code. It reads the key from `OPENAI_API_KEY` (optional `OPENAI_MODEL`).
+- **Verified locally:**
+  - pgTAP 432/432, including the new RLS tests for the four migrations.
+  - `plan` function: 21 Deno tests (fake model and fetch).
+  - App Jest and shared Vitest suites green; `typecheck` green.
+  - Pipeline: 253 pytest tests.
+- **Not verified:** a real OpenAI call (there is no key yet), and the planner end to end in a browser with the model.
+- **Open:** put `OPENAI_API_KEY` in the VPS's `/opt/travelist-supabase/docker/.env` and recreate the functions container. Until then the planner works with fixed questions and ranks by score.
+
 ## Remaining (M5 and launch)
 
 - Native iOS/Android runs not verified here: this machine has no Xcode/Android SDK. Build with `expo run:ios|android` or EAS (`eas.json` included).
