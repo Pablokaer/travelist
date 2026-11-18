@@ -751,3 +751,13 @@ Non-trivial choices made while building Wayfarer. Format: context → decision �
   - The answers and the shortlisted cities' facts are sent to OpenAI; no name, email or position is included, but the origin's distance to each city is.
   - There is no per-user rate limit yet.
   - The fork's "search any city of the world" for the starting point needed its local city builder, so the start is the device's location or one of the app's cities.
+
+## D-086 — The app starts in English; the account's language is chosen at sign-up
+
+- **Context:** the app followed the device or browser language until a profile was loaded, while the landing page was always English (D-077). A visitor could go from an English landing to Portuguese sign-up screens, and the language saved with the account was whatever the browser happened to say, unless the small switch in the footer was used. The owner wants the site to start in English and the account to set the language when it is created.
+- **Decision:**
+  - `lib/i18n.ts` starts in `en` (`DEFAULT_LANGUAGE`); `expo-localization` is no longer read for the language.
+  - The sign-up form has a visible **Language** field (`LanguageField`, the EN/PT chips with a label). Picking a language switches the screen at once and is sent as the account's `language`, which `handle_new_user` stores in the profile. The footer's switch is hidden on sign-up so there is one control; sign-in keeps it.
+  - Once signed in, `_layout` applies the profile's language, as before. Google, Apple and magic-link sign-ups confirm the language in onboarding step 1.
+- **Alternatives:** keeping the browser language as the starting value with a field on sign-up (rejected by the owner: the site starts in English); asking only in onboarding (rejected: the account should be created with its language).
+- **Trade-offs:** on each fresh load a signed-in Portuguese user sees English until the profile arrives, then Portuguese; native users with a Portuguese phone see the sign-in screen in English.

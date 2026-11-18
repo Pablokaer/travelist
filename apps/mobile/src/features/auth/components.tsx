@@ -154,11 +154,30 @@ export function LanguageSwitch() {
   );
 }
 
-export function AuthFooter() {
+/**
+ * The account's language as a field of the sign-up form (D-086): saved with the account, and the
+ * screen switches to it at once. The site starts in English, so this is where it is chosen.
+ * @example <LanguageField />
+ */
+export function LanguageField() {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.field}>
+      <Text variant="label">{t('profile.language')}</Text>
+      <LanguageSwitch />
+    </View>
+  );
+}
+
+/**
+ * Language chips and the About link under the signed-out screens.
+ * @example <AuthFooter languageSwitch={false} /> // sign-up: its form has a LanguageField
+ */
+export function AuthFooter({ languageSwitch = true }: { languageSwitch?: boolean }) {
   const { t } = useTranslation();
   return (
     <View style={styles.footer}>
-      <LanguageSwitch />
+      {languageSwitch ? <LanguageSwitch /> : null}
       <Button
         variant="ghost"
         compact
@@ -203,4 +222,5 @@ const styles = StyleSheet.create({
   line: { flex: 1, height: StyleSheet.hairlineWidth },
   footer: { alignItems: 'center', gap: spacing.sm },
   langs: { flexDirection: 'row', gap: spacing.sm },
+  field: { gap: spacing.sm },
 });

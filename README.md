@@ -103,7 +103,7 @@ Everything except the landing page, the About page and shared walk list links re
   - Sign-up checks it is free before creating the account ("This nickname is taken. Try another."). A nickname taken meanwhile is left empty rather than failing the sign-up.
   - Google, Apple and magic-link sign-ups, and accounts from before nicknames, choose one in onboarding step 1. It can be changed in Edit profile.
   - The Profile tab shows `@nickname · email`. In the walk group chat every message shows its author's `@nickname`: your own replace "You", and without a nickname the chat keeps the name or "You".
-- The sign-in and sign-up screens have an EN/PT language switch and a link to About.
+- The sign-up form has a **Language** field (EN/PT, English by default); the screen switches at once and the choice is saved with the account (D-086). The sign-in screen has an EN/PT switch in its footer; both have a link to About.
 
 ### 2. Onboarding and profile
 
@@ -299,7 +299,7 @@ First version of subscriptions; **no payment yet** (no checkout, billing or prov
 
 ### 8. Language, units, theme and accessibility
 
-- **Languages:** English and Portuguese. Order: profile language → device language → English. The exception is the web landing page, always in English with no language switch (D-077); the screens opened from it (sign-in, sign-up, About) follow the order above. All strings live in `packages/shared/src/i18n/{en,pt}.json` (a test enforces key parity); the landing's `landing.*` strings exist only in English (D-078). Attraction and city names are shown in PT when available, otherwise EN.
+- **Languages:** English and Portuguese. The app starts in English, whatever the device or browser language (D-086); the visitor can switch on sign-in and sign-up, and the language picked on sign-up is saved in the profile, which wins once signed in (also editable in onboarding and Edit profile). The web landing page is always in English with no language switch (D-077). All strings live in `packages/shared/src/i18n/{en,pt}.json` (a test enforces key parity); the landing's `landing.*` strings exist only in English (D-078). Attraction and city names are shown in PT when available, otherwise EN.
 - **Units:** metric (km, °C, mm) or imperial (mi, °F, in) for distances, temperatures and precipitation.
 - **Theme:** light by default; users can switch to dark in Profile → Preferences (saved on the profile, `profiles.theme`). The system dark-mode setting is not followed (D-021). Design tokens (colours, spacing, radii, shadows, breakpoints) live in `apps/mobile/src/theme`; shared components in `apps/mobile/src/components` (D-020).
 - **Layout:** phones (< 600 px) get a bottom tab bar and single-column content; tablets (≥ 600 px) get card grids, centred dialogs and two-column sections; desktop (≥ 1024 px) gets a side navigation rail and map-beside-list layouts. Content is capped at 440 px (forms), 760 px (reading) or 1200 px (grids).

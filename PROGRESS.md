@@ -249,7 +249,13 @@ Every page of the static export has its own title, description, canonical URL an
   - App Jest and shared Vitest suites green; `typecheck` green.
   - Pipeline: 253 pytest tests.
 - **Not verified:** a real OpenAI call (there is no key yet), and the planner end to end in a browser with the model.
-- **Open:** put `OPENAI_API_KEY` in the VPS's `/opt/travelist-supabase/docker/.env` and recreate the functions container. Until then the planner works with fixed questions and ranks by score.
+- **Open:** put `OPENAI_API_KEY` in the VPS's `/opt/travelist-supabase/docker/.env` and recreate the functions container. Until then the planner works with fixed questions and ranks by score. Done the same day: a real call through the `plan` code returned a valid Portuguese question, and the key is in the functions container.
+
+## 2026-11-18 — The account chooses the app's language (D-086)
+
+- **Why:** the owner wants the site to start in English and the language to be set when the account is created.
+- **Done:** the app starts in English instead of the device or browser language; the sign-up form has a **Language** field, saved with the account and applied once signed in.
+- **Verified:** Jest tests for the starting language (a Portuguese device still starts in English) and for sign-up saving `pt` after picking Português.
 
 ## Remaining (M5 and launch)
 
