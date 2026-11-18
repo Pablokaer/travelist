@@ -26,6 +26,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Fixed
 
+- Security CI: the new `picomatch` advisory GHSA-fc5q-39xc-vjpf (ReDoS on repeated extglobs; no patched release, 4.0.7 is the latest) made `pnpm audit` fail on every pull request from 2026-11-18. It only reaches test and lint tools (`@types/jest` via micromatch, `eslint-config-expo` via tinyglobby), so it is ignored in `pnpm-workspace.yaml` like the `braces` advisory (D-049); drop it once a fixed `picomatch` ships.
 - Scheduled pipelines no longer fail on one-off provider blips. The weekly live data source check now retries a failed probe once after 30 s before reporting it: a single Open-Meteo timeout (2026-11-16) and a single 503 (2026-11-02) had each opened a `data-source` issue for a source that was fine a minute later. The monthly Data refresh now retries a Wikidata query up to 3 times when the answer is cut off: on 2026-11-01 a query hit the Wikidata timeout mid-answer and the whole 50-minute refresh failed.
 - Releases that change the deploy workflow now deploy with the new version (D-083). Promote ran `deploy.yml` as it was on the previous `main`, so the first release of D-082 failed: the old backend job had no SSH access, and the deploy had to be run by hand. Promote now dispatches `deploy.yml` on `main` after fast-forwarding it and waits for the run to finish.
 

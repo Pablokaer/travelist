@@ -41,6 +41,11 @@ auditConfig:
     # expo > @expo/cli, which pins zod ^3.25.76 (CLI and dev server only, not the app bundle); the
     # fix is only in zod >= 4.6.6, which the app and shared package use directly.
     - GHSA-mrhx-c7xc-m3w5
+    # picomatch ReDoS on repeated single-branch extglobs (published 2026-10-19, in npm audit since
+    # 2026-11-17), via @types/jest > jest-message-util > micromatch and eslint-config-expo >
+    # typescript-estree > tinyglobby (test and lint tools only; patterns come from our own config);
+    # no patched version (4.0.7 is the latest).
+    - GHSA-fc5q-39xc-vjpf
     # Exception to the rule above: this one reaches the web bundle. decode-uri-component quadratic
     # replacement of percent-encoded runs (published 2026-11), via expo-router > query-string@7,
     # which require()s it as a CommonJS function; the only fix, 0.5.1, is ESM-only, so an override
