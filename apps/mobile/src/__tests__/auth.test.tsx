@@ -158,6 +158,27 @@ describe('signed-out experience', () => {
     expect(supabase.auth.signUp).not.toHaveBeenCalled();
   });
 
+  it('chooses the account language in the sign-up form, once', async () => {
+    renderRouter(routes, { initialUrl: '/sign-up' });
+    expect(await screen.findByText('Language')).toBeOnTheScreen();
+    // The form's field replaces the footer's chips on this screen: one control, not two.
+    expect(screen.getAllByRole('checkbox', { name: 'Português' })).toHaveLength(1);
+    await userEvent.press(screen.getByRole('checkbox', { name: 'Português' }));
+    await userEvent.type(screen.getByTestId('displayName'), 'Ana');
+    await userEvent.type(screen.getByTestId('nickname'), 'ana_walks');
+    await userEvent.type(screen.getByTestId('email'), 'ana@example.com');
+    await userEvent.type(screen.getByTestId('password'), 'long-enough-password');
+    await userEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+    expect(await screen.findByRole('header', { name: 'Verifique o seu email' })).toBeOnTheScreen();
+    expect(supabase.auth.signUp).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.objectContaining({
+          data: expect.objectContaining({ language: 'pt' }),
+        }),
+      }),
+    );
+  });
+
   it('switches the auth screens to Portuguese', async () => {
     renderRouter(routes, { initialUrl: '/sign-in' });
     await userEvent.press(await screen.findByRole('checkbox', { name: 'Português' }));

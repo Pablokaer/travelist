@@ -32,6 +32,7 @@ How to record a change (enforced in CI by `scripts/check-docs.mjs`):
 
 ### Changed
 
+- The site and the apps start in English instead of following the device or browser language (D-086). The language is chosen in a new **Language** field of the sign-up form, saved with the account, and applied on every device once signed in. Sign-in keeps its EN/PT switch; on sign-up the field replaces it.
 - The backend left Supabase Cloud for a free, self-hosted Supabase on the same VPS as the web app (D-082). The landing page's "Popular destinations" cards, sign-in and every data screen had stopped working because the free Cloud project was paused and its address no longer existed. Apache serves the API from `https://travelist.live` itself (`/rest/v1`, `/auth/v1`, `/storage/v1`, `/functions/v1`, `/realtime/v1`).
   - New `scripts/install-supabase-vps.sh` installs or upgrades the stack: the official Docker setup at a pinned commit, plus `deploy/supabase/docker-compose.travelist.yml`.
   - `scripts/deploy-backend.sh` now pushes migrations and seeds through an SSH tunnel and copies the Edge Functions to the VPS.

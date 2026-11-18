@@ -12,6 +12,7 @@ import {
   AuthFooter,
   AuthLayout,
   FormError,
+  LanguageField,
   OAuthButtons,
   TextLink,
 } from '@/features/auth/components';
@@ -43,6 +44,7 @@ export default function SignUpScreen() {
       const needsConfirmation = await signUp({
         ...form,
         email: form.email.trim(),
+        // The LanguageField's choice; English unless changed, as the site starts in it (D-086).
         language: i18n.resolvedLanguage ?? 'en',
       });
       if (needsConfirmation) setConfirmEmail(form.email.trim());
@@ -62,7 +64,7 @@ export default function SignUpScreen() {
   }
 
   return (
-    <AuthLayout title={t('auth.signUpTitle')} footer={<AuthFooter />}>
+    <AuthLayout title={t('auth.signUpTitle')} footer={<AuthFooter languageSwitch={false} />}>
       <Controller
         control={control}
         name="displayName"
@@ -137,6 +139,7 @@ export default function SignUpScreen() {
           />
         )}
       />
+      <LanguageField />
       <FormError message={error} />
       <Button label={t('auth.createAccount')} loading={formState.isSubmitting} onPress={onSubmit} />
       <OAuthButtons onError={setError} />
